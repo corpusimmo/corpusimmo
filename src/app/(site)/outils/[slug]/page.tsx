@@ -4,10 +4,12 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, FileSpreadsheet } from "lucide-react";
 
 import { FavoriteButton } from "@/components/tools/favorite-button";
+import { PreviewGallery } from "@/components/tools/preview-gallery";
 import { ToolRunner } from "@/components/tools/tool-runner";
 import { Badge } from "@/components/ui";
 import { toolAssetTypes, toolUsages } from "@/config/navigation";
 import { disclaimers, siteConfig } from "@/config/site";
+import { getToolPreviews } from "@/data/tool-previews";
 import { toolCatalogue, getToolCard } from "@/data/tools-catalogue";
 import { getToolSpec } from "@/lib/tools/definitions";
 
@@ -50,6 +52,7 @@ export default async function OutilPage({ params }: PageProps) {
   if (!tool) notFound();
 
   const spec = getToolSpec(tool.id);
+  const previews = getToolPreviews(tool.id);
 
   return (
     <div className="bg-canvas py-8 md:py-12">
@@ -116,6 +119,19 @@ export default async function OutilPage({ params }: PageProps) {
                 ))}
               </ul>
             </section>
+
+            {previews.length > 0 ? (
+              <section className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
+                <div>
+                  <h2 className="font-display text-xl text-ink">Le classeur, onglet par onglet</h2>
+                  <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+                    L&apos;outil ci-dessus reprend ces calculs dans le navigateur. Le classeur, lui,
+                    s&apos;emporte, s&apos;annote et se transmet.
+                  </p>
+                </div>
+                <PreviewGallery shots={previews} title={tool.title} />
+              </section>
+            ) : null}
           </div>
 
           <aside className="flex flex-col gap-5">

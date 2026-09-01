@@ -153,3 +153,39 @@ export async function grantStoredAccess(
 
   return { granted: true, alreadyOwned: outcome.alreadyOwned, quota: outcome.quota };
 }
+
+/**
+ * REPREND LES DÉBLOCAGES OBTENUS AVANT LA CONNEXION.
+ *
+ * Quelqu'un débloque deux outils sans compte, le cookie signé les porte. Il se
+ * connecte ensuite : sans cette fonction, la base ne saurait rien de ces deux
+ * outils et la personne les perdrait au moment même où elle nous fait confiance
+ * assez pour créer un compte. C'est exactement le genre de perte silencieuse
+ * qui fait partir quelqu'un sans un mot.
+ *
+ * ON N'APPLIQUE PAS LE QUOTA ICI, et c'est délibéré. Ces déblocages ont déjà été
+ * accordés, dans les règles, par le registre du cookie. Les repasser par
+ * `applyGrant` reviendrait à reprendre ce qui a été donné parce que la personne
+ * s'est connectée. Leur horodatage d'origine est conservé, donc la fenêtre
+ * glissante les compte à leur vraie date : on n'offre rien non plus.
+ *
+ * `onConflictDoNothing` rend l'appel idempotent, ce qui permet de le faire à
+ * chaque lecture sans se demander s'il a déjà eu lieu.
+ */
+export async function importGrants(userId: string, grants: readonly Grant[]): Promise<number> {
+  if (!isDatabaseConfigured() || grants.length === 0) return 0;
+
+  const rows = grants.map((grant) => ({
+    userId,
+    toolSlug: grant.slug,
+    unlockedAt: new Date(grant.at * 1000),
+  }));
+
+  const inserted = await getDb()
+    .insert(toolUnlocks)
+    .values(rows)
+    .onConflictDoNothing()
+    .returning({ id: toolUnlocks.id });
+
+  return inserted.length;
+}

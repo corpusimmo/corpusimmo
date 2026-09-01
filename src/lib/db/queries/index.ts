@@ -17,6 +17,7 @@ import "server-only";
 export {
   grantStoredAccess,
   hasStoredAccess,
+  importGrants,
   readStoredAccess,
   WEEKLY_LIMIT,
   type Grant,

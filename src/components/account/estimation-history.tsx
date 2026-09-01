@@ -11,20 +11,52 @@
  * Les estimations que le moteur n'a PAS conclues sont gardées elles aussi, et
  * affichées comme telles. Les effacer donnerait l'illusion d'un outil qui
  * réussit toujours.
+ *
+ * DEUX SOURCES, ET LAQUELLE GAGNE. Pour une personne connectée, la liste vient
+ * de la base et suit d'un appareil à l'autre : c'est elle qui fait foi, et les
+ * suppressions passent par des actions serveur. Pour une visite anonyme, elle
+ * vient du navigateur. Le composant est le même dans les deux cas, et il DIT
+ * lequel s'applique plutôt que de laisser croire à une sauvegarde qui n'existe
+ * pas.
  */
 
+import { useTransition } from "react";
 import Link from "next/link";
 import { Trash2 } from "lucide-react";
 
 import { Badge, Button, EmptyState, SkeletonText } from "@/components/ui";
-import { useEstimationHistory } from "@/lib/history/estimations";
+import { useEstimationHistory, type EstimationRecord } from "@/lib/history/estimations";
 import { formatArea, formatPrice, formatPricePerSqm } from "@/lib/utils/format";
 import { PROPERTY_TYPE_LABELS } from "@/types/property";
 
 const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short" });
 
-export function EstimationHistory() {
-  const { estimations, forget, clear, hydrated } = useEstimationHistory();
+export function EstimationHistory({
+  stored,
+  onForget,
+  onClear,
+}: {
+  /** La liste de la base. `null` pour une visite anonyme. */
+  stored?: EstimationRecord[] | null;
+  onForget?: (id: string) => Promise<void>;
+  onClear?: () => Promise<void>;
+} = {}) {
+  const local = useEstimationHistory();
+  const [pending, startTransition] = useTransition();
+
+  const serverBacked = stored != null;
+  const estimations = serverBacked ? stored : local.estimations;
+  const hydrated = serverBacked || local.hydrated;
+
+  const forget = (id: string) => {
+    if (serverBacked && onForget) startTransition(() => void onForget(id));
+    else local.forget(id);
+  };
+
+  const clear = () => {
+    if (serverBacked && onClear) startTransition(() => void onClear());
+    else local.clear();
+  };
 
   if (!hydrated) return <SkeletonText lines={4} />;
 
@@ -32,7 +64,11 @@ export function EstimationHistory() {
     return (
       <EmptyState
         title="Aucune estimation pour l'instant"
-        description="Chaque estimation terminée s'ajoute ici automatiquement. Elle reste dans ce navigateur : rien n'est envoyé ni conservé sur nos serveurs."
+        description={
+          serverBacked
+            ? "Chaque estimation terminée s'ajoute ici automatiquement, rattachée à votre compte."
+            : "Chaque estimation terminée s'ajoute ici automatiquement. Elle reste dans ce navigateur : rien n'est envoyé ni conservé sur nos serveurs."
+        }
         action={
           <Button asChild variant="secondary">
             <Link href="/estimer">Estimer un bien</Link>
@@ -113,10 +149,11 @@ export function EstimationHistory() {
 
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-xs leading-relaxed text-ink-subtle">
-          Ces estimations vivent dans ce navigateur uniquement. Elles ne suivent pas d&apos;un
-          appareil à l&apos;autre, et un nettoyage de l&apos;historique les efface.
+          {serverBacked
+            ? "Ces estimations sont rattachées à votre compte : vous les retrouvez sur tous vos appareils."
+            : "Ces estimations vivent dans ce navigateur uniquement. Elles ne suivent pas d'un appareil à l'autre, et un nettoyage de l'historique les efface."}
         </p>
-        <Button variant="ghost" size="sm" onClick={clear}>
+        <Button variant="ghost" size="sm" onClick={clear} disabled={pending}>
           Tout effacer
         </Button>
       </div>

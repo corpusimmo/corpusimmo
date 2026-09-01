@@ -7,6 +7,10 @@ import { SavedTools } from "@/components/account/saved-tools";
 import { Button, PageHeader } from "@/components/ui";
 import { getToolCard } from "@/data/tools-catalogue";
 import { readAccess } from "@/lib/access/ledger";
+import { auth, isAuthConfigured } from "@/lib/auth";
+import { isDatabaseConfigured, listEstimations } from "@/lib/db";
+
+import { clearEstimationsAction, forgetEstimationAction } from "./actions";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 /**
@@ -37,6 +41,12 @@ export const metadata: Metadata = pageMetadata({
 
 export default async function MonEspacePage() {
   const access = await readAccess();
+
+  // Pour une personne connectée, l'historique vient de la base et suit d'un
+  // appareil à l'autre. Sinon il reste dans le navigateur, et la page le dit.
+  const session = isAuthConfigured && isDatabaseConfigured() ? await auth() : null;
+  const userId = session?.user?.id ?? null;
+  const stored = userId ? await listEstimations(userId) : null;
   const unlocked = access.unlocked
     .map((grant) => ({ grant, tool: getToolCard(grant.slug) }))
     .filter((entry): entry is { grant: (typeof access.unlocked)[number]; tool: NonNullable<ReturnType<typeof getToolCard>> } =>
@@ -54,7 +64,11 @@ export default async function MonEspacePage() {
       <div className="container-page flex max-w-4xl flex-col gap-10">
         <PageHeader
           title="Mon espace"
-          description="Ce que vous avez ouvert, ce que vous avez mis de côté, et ce que vous avez estimé. Sans compte : tout est rattaché à ce navigateur."
+          description={
+            userId
+              ? "Ce que vous avez ouvert, ce que vous avez mis de côté, et ce que vous avez estimé. Rattaché à votre compte, donc retrouvable sur tous vos appareils."
+              : "Ce que vous avez ouvert, ce que vous avez mis de côté, et ce que vous avez estimé. Sans compte : tout est rattaché à ce navigateur."
+          }
         />
 
         {/* ----------------------------------------------------- le quota -- */}
@@ -187,11 +201,18 @@ export default async function MonEspacePage() {
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
               Chaque estimation terminée s&apos;ajoute ici, avec sa fourchette et le nombre de
-              ventes qui la portent.
+              ventes qui la portent.{" "}
+              {stored
+                ? "Elles sont rattachées à votre compte."
+                : "Elles restent dans ce navigateur tant que vous n'êtes pas connecté."}
             </p>
           </div>
 
-          <EstimationHistory />
+          <EstimationHistory
+            stored={stored}
+            onForget={forgetEstimationAction}
+            onClear={clearEstimationsAction}
+          />
         </section>
       </div>
     </div>

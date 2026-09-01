@@ -15,6 +15,12 @@ import type { DefaultSession } from "next-auth";
 declare module "next-auth" {
   interface Session {
     user: {
+      /**
+       * L'identifiant de la ligne `users` en base, quand une base est
+       * configurée. Sinon, l'identifiant opaque du fournisseur : utilisable
+       * comme clé de session, jamais comme clé étrangère.
+       */
+      id: string;
       /** Google a confirmé que l'adresse appartient à la personne. */
       verifiedEmail: boolean;
     } & DefaultSession["user"];

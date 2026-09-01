@@ -19,6 +19,9 @@
  */
 
 import { NextResponse } from "next/server";
+
+import { auth, isAuthConfigured } from "@/lib/auth";
+import { isDatabaseConfigured, saveEstimation } from "@/lib/db";
 import { estimateByComparison, parseValuationRequest } from "@/lib/valuation";
 
 export const runtime = "nodejs";
@@ -28,6 +31,13 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
+
+/** L'identifiant en base de la personne connectée, ou `null`. */
+async function currentUserId(): Promise<string | null> {
+  if (!isAuthConfigured || !isDatabaseConfigured()) return null;
+  const session = await auth();
+  return session?.user?.id ?? null;
+}
 
 export async function POST(request: Request): Promise<NextResponse> {
   let body: unknown;
@@ -61,6 +71,19 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   try {
     const result = await estimateByComparison(parsed.data);
+
+    // L'ENREGISTREMENT NE PEUT PAS COÛTER SON RÉSULTAT À LA PERSONNE.
+    // On persiste pour qui est connecté, et un échec de base est journalisé
+    // sans jamais remonter : le calcul a abouti, il doit être rendu. Sans
+    // session ni base, l'historique reste dans le navigateur, comme avant.
+    const userId = await currentUserId();
+    if (userId) {
+      const stored = await saveEstimation(result, userId);
+      if (!stored.stored) {
+        console.warn(`[api/estimation] estimation non enregistrée : ${stored.reason}`);
+      }
+    }
+
     return NextResponse.json(result, { status: 200, headers: NO_STORE });
   } catch (error) {
     // Ne jamais renvoyer le corps en écho : il porte une adresse saisie par

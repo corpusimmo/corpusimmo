@@ -22,8 +22,12 @@
  *   construit avec un `.env` vide.
  */
 
+import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { NextAuthConfig } from "next-auth";
 import Google from "next-auth/providers/google";
+
+import { getDb, isDatabaseConfigured } from "@/lib/db";
+import { accounts, sessions, users, verificationTokens } from "@/lib/db/schema";
 
 function clean(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
@@ -42,6 +46,27 @@ const authSecret = clean(process.env.AUTH_SECRET);
 export const isAuthConfigured = Boolean(googleId && googleSecret && authSecret);
 
 export const authConfig: NextAuthConfig = {
+  /**
+   * L'ADAPTATEUR EST CONDITIONNEL, et il doit le rester.
+   *
+   * Sans base, la configuration demeure inerte et la session en jeton signé
+   * continue de fonctionner : c'est le contrat du dépôt, qui doit démarrer et
+   * se construire avec un `.env` vide.
+   *
+   * Avec base, l'adaptateur persiste les utilisateurs et les comptes. C'est ce
+   * qui donne enfin un IDENTIFIANT STABLE à une personne, et donc ce qui permet
+   * à ses outils débloqués, à ses estimations et à ses comparables de la suivre
+   * d'un appareil à l'autre.
+   */
+  adapter: isDatabaseConfigured()
+    ? DrizzleAdapter(getDb(), {
+        usersTable: users,
+        accountsTable: accounts,
+        sessionsTable: sessions,
+        verificationTokensTable: verificationTokens,
+      })
+    : undefined,
+
   // Sans fournisseur configuré, la liste est vide : Auth.js reste montable,
   // il n'a simplement rien à proposer.
   providers:
@@ -79,15 +104,30 @@ export const authConfig: NextAuthConfig = {
       return profile.email_verified === true;
     },
 
-    jwt({ token, profile }) {
+    /**
+     * `user` n'est fourni qu'à la connexion, et il vient de l'adaptateur : son
+     * `id` est celui de la ligne `users` en base. On le fige dans `sub`, sinon
+     * la session ne saurait plus à qui elle appartient dès la requête suivante,
+     * et aucune lecture en base ne serait possible.
+     */
+    jwt({ token, user, profile }) {
       if (profile?.email_verified === true) {
         token.verifiedEmail = true;
+      }
+      if (user?.id) {
+        token.sub = user.id;
       }
       return token;
     },
 
     session({ session, token }) {
       session.user.verifiedEmail = token.verifiedEmail === true;
+      // Sans base, `sub` reste l'identifiant du fournisseur : utilisable comme
+      // clé opaque, mais il ne désigne aucune ligne. Les appelants vérifient
+      // `isDatabaseConfigured()` avant d'en faire une clé étrangère.
+      if (token.sub) {
+        session.user.id = token.sub;
+      }
       return session;
     },
   },

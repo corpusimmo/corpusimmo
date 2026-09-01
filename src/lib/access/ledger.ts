@@ -18,15 +18,44 @@ import "server-only";
  * environnement serverless, chaque démarrage à froid aurait invalidé les
  * déblocages de tout le monde. Un secret configuré est stable par construction.
  *
- * SANS SECRET, IL N'Y A PAS DE VERROU — et les outils restent ouverts. C'est
+ * SANS SECRET, IL N'Y A PAS DE VERROU, et les outils restent ouverts. C'est
  * délibéré : l'application doit tourner avec un `.env` vide, et un verrou qu'on
  * ne peut pas signer ne doit pas se transformer en porte close pour tout le
  * monde. L'absence est journalisée une fois.
+ *
+ * ── DEUX REGISTRES, ET LEQUEL FAIT FOI ────────────────────────────────────
+ *
+ * Depuis que la base existe, il y a deux endroits possibles :
+ *
+ *   · LA BASE, dès qu'une personne est connectée. C'est le seul registre qui
+ *     suit d'un appareil à l'autre, donc le seul qui fasse foi pour elle ;
+ *   · LE COOKIE SIGNÉ, pour tous les autres. Il reste le registre des visiteurs
+ *     anonymes, et il n'a pas vocation à disparaître : on ne veut pas d'un site
+ *     où il faut un compte pour ouvrir un premier outil.
+ *
+ * LA REPRISE. Quelqu'un qui a débloqué deux outils sans compte, puis se
+ * connecte, doit les RETROUVER. `importGrants` verse donc le contenu du cookie
+ * dans la base à la première lecture authentifiée, en conservant les
+ * horodatages d'origine et sans repasser par le quota : ces déblocages ont déjà
+ * été accordés dans les règles, les reprendre parce que la personne se connecte
+ * serait la punir d'avoir créé un compte. L'appel est idempotent, donc on ne se
+ * demande jamais s'il a déjà eu lieu.
+ *
+ * Le cookie n'est pas effacé après la reprise : `readAccess` est appelée depuis
+ * des composants serveur, où écrire un cookie lève. Il devient simplement sans
+ * effet, puisque son contenu est désormais en base.
  */
 
 import { cookies } from "next/headers";
 
 import { env } from "@/config/env";
+import { auth, isAuthConfigured } from "@/lib/auth";
+import {
+  grantStoredAccess,
+  importGrants,
+  isDatabaseConfigured,
+  readStoredAccess,
+} from "@/lib/db";
 
 import {
   applyGrant,
@@ -74,12 +103,43 @@ function secret(): string | undefined {
   return value;
 }
 
-/** Lecture seule — utilisable depuis un Server Component. */
+/**
+ * L'identifiant en base de la personne connectée, ou `undefined`.
+ *
+ * `undefined` couvre trois cas qui appellent la même réponse : pas
+ * d'authentification configurée, personne connectée, ou pas de base. Dans les
+ * trois, le cookie reste le registre.
+ */
+async function storedUserId(): Promise<string | undefined> {
+  if (!isAuthConfigured || !isDatabaseConfigured()) return undefined;
+  const session = await auth();
+  return session?.user?.id;
+}
+
+/** Lecture seule côté cookie, utilisable depuis un Server Component. */
+async function readCookieGrants(key: string): Promise<Grant[]> {
+  return decodeGrants((await cookies()).get(ACCESS_COOKIE)?.value, key);
+}
+
+/** Lecture seule : utilisable depuis un Server Component. */
 export async function readAccess(now: Date = new Date()): Promise<AccessState> {
   const key = secret();
   if (!key) return { unlocked: [], quota: OPEN_QUOTA, enforced: false };
 
-  const grants = decodeGrants((await cookies()).get(ACCESS_COOKIE)?.value, key);
+  const userId = await storedUserId();
+
+  if (userId) {
+    // La reprise d'abord : sans elle, la lecture qui suit ignorerait ce que la
+    // personne avait obtenu avant de se connecter.
+    await importGrants(userId, await readCookieGrants(key));
+
+    const stored = await readStoredAccess(userId, now);
+    if (stored.configured) {
+      return { unlocked: stored.unlocked, quota: stored.quota, enforced: true };
+    }
+  }
+
+  const grants = await readCookieGrants(key);
   return {
     unlocked: [...grants].sort((a, b) => b.at - a.at),
     quota: computeQuota(grants, now),
@@ -107,6 +167,23 @@ export type GrantResult =
 export async function grantAccess(slug: string, now: Date = new Date()): Promise<GrantResult> {
   const key = secret();
   if (!key) return { granted: true, alreadyOwned: true, quota: OPEN_QUOTA };
+
+  const userId = await storedUserId();
+
+  if (userId) {
+    await importGrants(userId, await readCookieGrants(key));
+    const outcome = await grantStoredAccess(userId, slug, now);
+
+    // `not_configured` ne peut survenir que si la base a disparu entre les deux
+    // appels. On retombe alors sur le cookie plutôt que de refuser : perdre la
+    // base ne doit pas fermer la porte à quelqu'un qui a le droit d'entrer.
+    if (outcome.granted) {
+      return { granted: true, alreadyOwned: outcome.alreadyOwned, quota: outcome.quota };
+    }
+    if (outcome.reason === "quota_exhausted") {
+      return { granted: false, reason: "quota_exhausted", quota: outcome.quota };
+    }
+  }
 
   const jar = await cookies();
   const outcome = applyGrant(decodeGrants(jar.get(ACCESS_COOKIE)?.value, key), slug, now);

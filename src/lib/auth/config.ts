@@ -24,10 +24,13 @@
 
 import { DrizzleAdapter } from "@auth/drizzle-adapter";
 import type { NextAuthConfig } from "next-auth";
+import type { EmailConfig } from "next-auth/providers";
 import Google from "next-auth/providers/google";
 
+import { env } from "@/config/env";
 import { getDb, isDatabaseConfigured } from "@/lib/db";
 import { accounts, sessions, users, verificationTokens } from "@/lib/db/schema";
+import { getMailer, maskEmail, renderSignInLinkEmail } from "@/lib/email";
 
 function clean(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
@@ -37,6 +40,54 @@ function clean(value: string | undefined): string | undefined {
 const googleId = clean(process.env.AUTH_GOOGLE_ID);
 const googleSecret = clean(process.env.AUTH_GOOGLE_SECRET);
 const authSecret = clean(process.env.AUTH_SECRET);
+
+/**
+ * LA SECONDE VOIE D'ENTRÉE : un lien de connexion par courriel.
+ *
+ * POURQUOI PAS DE MOT DE PASSE. Un mot de passe se stocke, se fuit, se réutilise
+ * ailleurs, et il faut prévoir de le réinitialiser. Un lien à usage unique
+ * vérifie l'adresse au passage, exactement comme Google le fait, et ne laisse
+ * rien à protéger chez nous. L'exigence est la même pour les deux voies : ce
+ * que nous voulons est une ADRESSE PROUVÉE, pas un compte de plus.
+ *
+ * ELLE EXIGE UNE BASE, et ce n'est pas un choix : le jeton à usage unique doit
+ * être écrit quelque part entre l'envoi du courriel et le clic. Sans base, la
+ * voie n'existe pas, et l'interface n'en montre rien plutôt que de proposer un
+ * formulaire qui ne pourrait pas aboutir.
+ *
+ * ELLE PASSE PAR NOTRE PROPRE TRANSPORTEUR, pas par celui d'Auth.js. Trois
+ * raisons : le courriel porte la marque comme les autres ; il respecte
+ * `EMAIL_PROVIDER`, donc en développement le lien s'affiche dans la console au
+ * lieu de partir ; et le jour où l'on change de fournisseur d'envoi, il n'y a
+ * qu'un endroit à toucher.
+ *
+ * QUINZE MINUTES de validité. Assez pour aller chercher son courrier, trop peu
+ * pour qu'un lien oublié dans une boîte partagée serve six mois plus tard.
+ */
+const SIGN_IN_LINK_MAX_AGE_SECONDS = 15 * 60;
+
+const emailLinkProvider: EmailConfig = {
+  id: "email",
+  type: "email",
+  name: "Lien de connexion",
+  from: env.email.from,
+  maxAge: SIGN_IN_LINK_MAX_AGE_SECONDS,
+  async sendVerificationRequest({ identifier, url, expires }) {
+    const template = renderSignInLinkEmail({ url, expiresAt: expires });
+    const result = await getMailer().send({ to: identifier, ...template });
+
+    // Un envoi qui échoue doit LEVER : sans cela, Auth.js redirigerait vers
+    // « vérifiez votre boîte » alors que rien n'est parti, et la personne
+    // attendrait un message qui n'arrivera jamais.
+    if (!result.delivered) {
+      console.error(
+        `[auth] lien de connexion non envoyé à ${maskEmail(identifier)} : ` +
+          (result.error ?? "raison inconnue"),
+      );
+      throw new Error("sign_in_link_not_sent");
+    }
+  },
+};
 
 /**
  * Vrai quand les trois secrets sont là. Lu par l'en-tête pour décider
@@ -69,8 +120,8 @@ export const authConfig: NextAuthConfig = {
 
   // Sans fournisseur configuré, la liste est vide : Auth.js reste montable,
   // il n'a simplement rien à proposer.
-  providers:
-    googleId && googleSecret
+  providers: [
+    ...(googleId && googleSecret
       ? [
           Google({
             clientId: googleId,
@@ -82,7 +133,11 @@ export const authConfig: NextAuthConfig = {
             authorization: { params: { scope: "openid email profile" } },
           }),
         ]
-      : [],
+      : []),
+    // Le lien de connexion n'existe que s'il y a une base pour y écrire son
+    // jeton. Voir l'en-tête de `emailLinkProvider`.
+    ...(isDatabaseConfigured() ? [emailLinkProvider] : []),
+  ],
 
   session: { strategy: "jwt" },
 
@@ -100,6 +155,9 @@ export const authConfig: NextAuthConfig = {
      * donner accès à ce que le formulaire protège.
      */
     signIn({ profile }) {
+      // Pas de profil : c'est la voie du lien de connexion. L'adresse y est
+      // prouvée par le clic sur un jeton envoyé à elle seule, ce qui est
+      // exactement la garantie que `email_verified` apporte côté Google.
       if (!profile) return true;
       return profile.email_verified === true;
     },
@@ -110,8 +168,15 @@ export const authConfig: NextAuthConfig = {
      * la session ne saurait plus à qui elle appartient dès la requête suivante,
      * et aucune lecture en base ne serait possible.
      */
-    jwt({ token, user, profile }) {
+    jwt({ token, user, profile, account }) {
       if (profile?.email_verified === true) {
+        token.verifiedEmail = true;
+      }
+      // Le lien de connexion n'a pas de profil, mais il prouve l'adresse tout
+      // aussi bien : le jeton n'a été envoyé qu'à elle, et il a fallu cliquer.
+      // Sans cette ligne, une personne entrée par cette voie serait tenue pour
+      // non vérifiée, alors qu'elle vient d'en administrer la preuve.
+      if (account?.provider === "email") {
         token.verifiedEmail = true;
       }
       if (user?.id) {

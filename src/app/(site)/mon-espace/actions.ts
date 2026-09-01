@@ -19,7 +19,7 @@
 import { revalidatePath } from "next/cache";
 
 import { currentUserId } from "@/lib/auth/current-user";
-import { clearEstimations, forgetEstimation } from "@/lib/db";
+import { clearEstimations, forgetEstimation, upsertProfile } from "@/lib/db";
 
 /** Borne de sûreté : un identifiant de ligne, rien d'autre. */
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -38,5 +38,39 @@ export async function clearEstimationsAction(): Promise<void> {
   if (!userId) return;
 
   await clearEstimations(userId);
+  revalidatePath("/mon-espace");
+}
+
+/**
+ * Enregistre le profil.
+ *
+ * Les trois champs sont envoyés tels qu'ils sont affichés, et un champ vide
+ * VIDE bien la valeur en base : `upsertProfile` distingue « ne touche pas »
+ * (`undefined`) de « efface » (`null`), et c'est la seconde intention qu'un
+ * formulaire pré-rempli exprime quand on efface une case.
+ *
+ * Aucune validation de forme sur le téléphone : les formats français sont
+ * nombreux, les internationaux davantage, et refuser un numéro correct au
+ * motif qu'il ne rentre pas dans une expression régulière coûte plus cher que
+ * d'accepter une saisie approximative sur un champ facultatif.
+ */
+export async function saveProfileAction(values: {
+  firstName: string;
+  lastName: string;
+  phone: string;
+}): Promise<void> {
+  const userId = await currentUserId();
+  if (!userId) return;
+
+  const trim = (value: string): string | null => {
+    const clean = value.trim().slice(0, 120);
+    return clean === "" ? null : clean;
+  };
+
+  await upsertProfile(userId, {
+    firstName: trim(values.firstName),
+    lastName: trim(values.lastName),
+    phone: trim(values.phone),
+  });
   revalidatePath("/mon-espace");
 }

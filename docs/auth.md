@@ -21,8 +21,37 @@ disposer d'une **adresse e-mail vérifiée par un tiers**, ce qui permet de
 remettre un document sans repasser par un formulaire ni attendre un aller-retour
 de courriel.
 
-D'où le fournisseur unique : Google vérifie l'adresse. Ajouter un fournisseur
-qui ne la vérifie pas retirerait tout l'intérêt du dispositif.
+## Deux voies d'entrée, une seule exigence
+
+**Google**, qui vérifie l'adresse et fournit un nom et une photo.
+
+**Un lien de connexion par courriel**, sans mot de passe. Le lien est à usage
+unique, valable quinze minutes, et il prouve l'adresse aussi bien que Google :
+le jeton n'a été envoyé qu'à elle, et il a fallu cliquer.
+
+Aucune des deux ne demande de mot de passe, et c'est délibéré. Un mot de passe
+se stocke, se fuit, se réutilise ailleurs, et il faut prévoir de le
+réinitialiser. Ce que nous voulons est une **adresse prouvée**, pas un compte de
+plus. Un fournisseur qui ne vérifie pas l'adresse retirerait tout l'intérêt du
+dispositif, et n'a donc pas sa place ici.
+
+### Ce que le lien de connexion exige
+
+**Une base.** Le jeton à usage unique doit être écrit quelque part entre l'envoi
+du courriel et le clic. Sans `DATABASE_URL`, la voie n'existe pas, et la page de
+connexion n'en montre rien plutôt que d'afficher un formulaire qui ne pourrait
+pas aboutir. Elle interroge le serveur pour le savoir, elle ne le suppose pas.
+
+**Aucune variable nouvelle.** Le courriel part par le transporteur du projet
+(`EMAIL_PROVIDER`, `EMAIL_PROVIDER_KEY`, `EMAIL_FROM`), et non par celui
+d'Auth.js. Trois conséquences utiles : le message porte la marque comme les
+autres, il respecte `EMAIL_PROVIDER` donc en développement le lien s'affiche
+dans la console au lieu de partir, et changer de fournisseur d'envoi ne touche
+qu'un seul endroit.
+
+**Un envoi qui échoue lève.** Sans cela, Auth.js redirigerait vers « vérifiez
+votre boîte » alors que rien n'est parti, et la personne attendrait un message
+qui n'arrivera jamais.
 
 **La route de déblocage ne lit jamais l'adresse envoyée par le client**, mais
 celle de la session. Une adresse postée dans un corps de requête serait une

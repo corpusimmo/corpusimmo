@@ -24,6 +24,7 @@ export type {
 } from "./types";
 export { maskEmail } from "./types";
 export { renderEstimationReadyEmail } from "./templates/estimation-ready";
+export { renderSignInLinkEmail } from "./templates/sign-in-link";
 export { parseSender } from "./brevo";
 
 let cached: Mailer | null = null;

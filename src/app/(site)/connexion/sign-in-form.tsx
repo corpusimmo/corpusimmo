@@ -3,9 +3,10 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { getProviders, signIn, useSession } from "next-auth/react";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { AlertTriangle, CheckCircle2, MailCheck } from "lucide-react";
 
-import { Button, LoadingState } from "@/components/ui";
+import { Button, Field, Input, LoadingState } from "@/components/ui";
+import { track } from "@/lib/analytics/track";
 
 /** Les erreurs d'Auth.js, traduites. Le code brut ne dit rien à personne. */
 const ERRORS: Record<string, string> = {
@@ -23,7 +24,13 @@ export function SignInForm() {
   const searchParams = useSearchParams();
   const { data: session, status } = useSession();
   const [available, setAvailable] = useState<boolean | null>(null);
+  /** Vrai quand le lien de connexion par courriel est réellement proposé. */
+  const [emailLink, setEmailLink] = useState(false);
   const [pending, setPending] = useState(false);
+  const [email, setEmail] = useState("");
+  const [linkPending, setLinkPending] = useState(false);
+  const [linkSent, setLinkSent] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
 
   const error = searchParams.get("error");
   const next = searchParams.get("next") ?? "/";
@@ -34,7 +41,13 @@ export function SignInForm() {
     // bouton qui mènerait à une erreur vaut moins que la phrase qui l'explique.
     let cancelled = false;
     void getProviders().then((providers) => {
-      if (!cancelled) setAvailable(Boolean(providers && Object.keys(providers).length > 0));
+      if (cancelled) return;
+      const ids = providers ? Object.keys(providers) : [];
+      setAvailable(ids.length > 0);
+      // Le lien de connexion n'est proposé que si le serveur le propose : il
+      // dépend d'une base, et un formulaire qui ne pourrait pas aboutir vaut
+      // moins que son absence.
+      setEmailLink(ids.includes("email"));
     });
     return () => {
       cancelled = true;
@@ -77,6 +90,34 @@ export function SignInForm() {
     );
   }
 
+  if (linkSent) {
+    return (
+      <div className="flex flex-col gap-4 rounded-lg border border-success/25 bg-success-soft p-6">
+        <p className="flex items-center gap-2 text-sm font-semibold text-success-soft-fg">
+          <MailCheck aria-hidden="true" className="size-4" />
+          Votre lien est parti
+        </p>
+        <p className="text-sm leading-relaxed text-success-soft-fg/90">
+          Nous venons d&apos;envoyer un lien de connexion à{" "}
+          <strong>{email.trim()}</strong>. Il est valable quinze minutes, et une seule fois.
+          Pensez à regarder dans les indésirables si vous ne le voyez pas arriver.
+        </p>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          className="w-fit"
+          onClick={() => {
+            setLinkSent(false);
+            setLinkError(null);
+          }}
+        >
+          Utiliser une autre adresse
+        </Button>
+      </div>
+    );
+  }
+
   return (
     <div className="flex flex-col gap-5">
       {error ? (
@@ -106,6 +147,73 @@ export function SignInForm() {
         contacts, à votre agenda ni à vos fichiers n&apos;est demandé, et rien n&apos;est publié en
         votre nom.
       </p>
+
+      {emailLink ? (
+        <>
+          <div className="flex items-center gap-3" aria-hidden="true">
+            <span className="h-px flex-1 bg-border" />
+            <span className="text-xs font-medium tracking-wide text-ink-subtle uppercase">ou</span>
+            <span className="h-px flex-1 bg-border" />
+          </div>
+
+          <form
+            noValidate
+            className="flex flex-col gap-3"
+            onSubmit={async (event) => {
+              event.preventDefault();
+              const address = email.trim();
+              if (!address) {
+                setLinkError("Indiquez une adresse e-mail.");
+                return;
+              }
+
+              setLinkPending(true);
+              setLinkError(null);
+              track({ name: "login_started", params: { provider: "email" } });
+
+              // `redirect: false` pour rester sur place : la page de
+              // vérification d'Auth.js est en anglais et hors de notre
+              // direction artistique.
+              const outcome = await signIn("email", { email: address, redirect: false });
+
+              if (outcome?.error) {
+                setLinkError("L'envoi n'a pas abouti. Réessayez dans un instant.");
+                setLinkPending(false);
+                return;
+              }
+
+              setLinkSent(true);
+              setLinkPending(false);
+            }}
+          >
+            <Field
+              label="Recevoir un lien de connexion"
+              htmlFor="sign-in-email"
+              hint="Sans mot de passe : nous envoyons un lien valable quinze minutes."
+            >
+              <Input
+                id="sign-in-email"
+                type="email"
+                required
+                autoComplete="email"
+                placeholder="prenom@exemple.fr"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+              />
+            </Field>
+
+            {linkError ? (
+              <p role="alert" className="text-sm text-danger">
+                {linkError}
+              </p>
+            ) : null}
+
+            <Button type="submit" variant="secondary" loading={linkPending} className="w-fit">
+              M&apos;envoyer un lien
+            </Button>
+          </form>
+        </>
+      ) : null}
     </div>
   );
 }

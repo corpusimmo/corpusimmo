@@ -1,16 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Bookmark, Clock, History, Unlock } from "lucide-react";
+import { ArrowRight, Bookmark, Clock, History, UserRound, Unlock } from "lucide-react";
 
 import { EstimationHistory } from "@/components/account/estimation-history";
+import { ProfileForm } from "@/components/account/profile-form";
 import { SavedTools } from "@/components/account/saved-tools";
 import { Button, PageHeader } from "@/components/ui";
 import { getToolCard } from "@/data/tools-catalogue";
 import { readAccess } from "@/lib/access/ledger";
 import { currentUserId } from "@/lib/auth/current-user";
-import { listEstimations } from "@/lib/db";
+import { listEstimations, readProfile } from "@/lib/db";
 
-import { clearEstimationsAction, forgetEstimationAction } from "./actions";
+import { clearEstimationsAction, forgetEstimationAction, saveProfileAction } from "./actions";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 /**
@@ -46,6 +47,7 @@ export default async function MonEspacePage() {
   // appareil à l'autre. Sinon il reste dans le navigateur, et la page le dit.
   const userId = await currentUserId();
   const stored = userId ? await listEstimations(userId) : null;
+  const profile = userId ? await readProfile(userId) : null;
   const unlocked = access.unlocked
     .map((grant) => ({ grant, tool: getToolCard(grant.slug) }))
     .filter((entry): entry is { grant: (typeof access.unlocked)[number]; tool: NonNullable<ReturnType<typeof getToolCard>> } =>
@@ -187,6 +189,33 @@ export default async function MonEspacePage() {
 
           <SavedTools unlocked={access.unlocked.map((grant) => grant.slug)} />
         </section>
+
+        {/* ----------------------------------------------- le profil -- */}
+        {userId ? (
+          <section aria-labelledby="profil" className="flex flex-col gap-4">
+            <div>
+              <h2 id="profil" className="flex items-center gap-2 font-display text-xl text-ink">
+                <UserRound aria-hidden="true" className="size-5 text-ink-subtle" />
+                Vos informations
+              </h2>
+              <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+                Elles ne servent qu&apos;à vous adresser correctement, et à vous rappeler si vous
+                le demandez. Le téléphone est facultatif.
+              </p>
+            </div>
+
+            <div className="rounded-lg border border-border bg-surface p-6">
+              <ProfileForm
+                initial={{
+                  firstName: profile?.firstName ?? "",
+                  lastName: profile?.lastName ?? "",
+                  phone: profile?.phone ?? "",
+                }}
+                onSave={saveProfileAction}
+              />
+            </div>
+          </section>
+        ) : null}
 
         {/* ------------------------------------------- les estimations -- */}
         <section aria-labelledby="estimations" className="flex flex-col gap-4">

@@ -65,6 +65,37 @@ campagne n'abîme pas la messagerie de l'entreprise. Pas avant : au lancement,
 une adresse en sous-domaine fait surtout bizarre à la lecture, sans rien
 protéger qui existe encore.
 
+## La liste, selon le fournisseur actif
+
+`syncContact` fonctionne avec **Brevo comme avec Resend** — il transmet
+l'identifiant configuré sans l'interpréter, parce que Brevo numérote ses listes
+et Resend identifie ses audiences par UUID.
+
+Mais les deux ne se valent pas, et il faut le savoir :
+
+| | Brevo | Resend |
+|---|---|---|
+| Attributs libres sur un contact | oui | **non** |
+| Source, date et détail du consentement | stockés | **impossibles à stocker** |
+
+Chez Resend, l'audience est une **liste de diffusion, pas une preuve**. La
+source, la date de consentement et le détail des accords n'y ont aucune place —
+alors que ce sont précisément les éléments à produire en cas de réclamation.
+
+**Conséquence à assumer** : tant qu'on envoie par Resend, la preuve du
+consentement devra vivre dans notre propre base. C'est l'un des motifs du
+chantier de persistance, au même titre que la bande « valeur » du score de lead.
+
+### Sans identifiant de liste, l'interface le dit
+
+Le formulaire du pied de page ne lit pas le code de statut mais le champ
+`subscribed` de la réponse. Sans liste configurée, il affiche « l'inscription
+n'est pas encore ouverte, rien n'a été enregistré » plutôt qu'un « c'est noté »
+qui serait faux.
+
+C'est la même règle que sur les prix : on ne montre jamais un succès qu'on n'a
+pas obtenu.
+
 ## Ce qu'il faut créer chez Brevo
 
 1. **Un compte**, et le domaine `corpus.immo` **authentifié** (SPF, DKIM,

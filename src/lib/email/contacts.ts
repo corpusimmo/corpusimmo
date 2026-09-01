@@ -26,7 +26,8 @@ import { env } from "@/config/env";
 
 import { maskEmail } from "./types";
 
-const ENDPOINT = "https://api.brevo.com/v3/contacts";
+const BREVO_ENDPOINT = "https://api.brevo.com/v3/contacts";
+const RESEND_ENDPOINT = "https://api.resend.com/audiences";
 const TIMEOUT_MS = 10_000;
 
 /** À quoi la personne a dit oui, explicitement. */
@@ -84,7 +85,7 @@ function buildAttributes(input: ContactInput): Record<string, string> {
  */
 export async function syncContact(
   input: ContactInput,
-  listId: number | undefined,
+  listId: number | string | undefined,
 ): Promise<ContactSyncOutcome> {
   // Règle 1 — aucune inscription sans accord explicite.
   if (!input.consents.marketing) return { synced: false, reason: "no_consent" };
@@ -93,7 +94,8 @@ export async function syncContact(
   if (!listId) return { synced: false, reason: "no_list" };
 
   const apiKey = env.email.apiKey;
-  if (env.email.provider !== "brevo" || !apiKey) {
+  const provider = env.email.provider;
+  if (provider === "console" || !apiKey) {
     return { synced: false, reason: "not_configured" };
   }
 
@@ -101,38 +103,28 @@ export async function syncContact(
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
   try {
-    const response = await fetch(ENDPOINT, {
-      method: "POST",
-      headers: {
-        "api-key": apiKey,
-        accept: "application/json",
-        "content-type": "application/json",
-      },
-      body: JSON.stringify({
-        email: input.email.toLowerCase(),
-        attributes: buildAttributes(input),
-        listIds: [listId],
-        // Sans cela, un contact déjà connu fait échouer la requête au lieu
-        // d'être mis à jour — et l'on perdrait la trace du nouvel accord.
-        updateEnabled: true,
-      }),
-      signal: controller.signal,
-    });
+    const response =
+      provider === "brevo"
+        ? await postBrevo(apiKey, input, listId, controller.signal)
+        : await postResend(apiKey, input, listId, controller.signal);
 
-    // 201 : créé. 204 : déjà connu, mis à jour. Les deux sont des succès.
+    // Brevo — 201 : créé, 204 : déjà connu et mis à jour.
+    // Resend — 201 : créé ou mis à jour, il ne distingue pas.
     if (response.status === 201) return { synced: true, created: true };
-    if (response.status === 204) return { synced: true, created: false };
+    if (response.status === 204 || response.status === 200) {
+      return { synced: true, created: false };
+    }
 
     const detail = await response.text().catch(() => "");
     console.error(
-      `[contacts:brevo] inscription refusée (${response.status}) pour ` +
+      `[contacts:${provider}] inscription refusée (${response.status}) pour ` +
         `${maskEmail(input.email)} — ${detail.slice(0, 200)}`,
     );
     return { synced: false, reason: "failed" };
   } catch (error) {
     const reason = error instanceof Error ? error.message : "erreur inconnue";
     console.error(
-      `[contacts:brevo] inscription impossible pour ${maskEmail(input.email)} — ${reason}`,
+      `[contacts:${provider}] inscription impossible pour ${maskEmail(input.email)} — ${reason}`,
     );
     return { synced: false, reason: "failed" };
   } finally {
@@ -140,12 +132,70 @@ export async function syncContact(
   }
 }
 
-/** La liste de la lettre d'information. */
-export function newsletterListId(): number | undefined {
+function postBrevo(
+  apiKey: string,
+  input: ContactInput,
+  listId: number | string,
+  signal: AbortSignal,
+): Promise<Response> {
+  return fetch(BREVO_ENDPOINT, {
+    method: "POST",
+    headers: { "api-key": apiKey, accept: "application/json", "content-type": "application/json" },
+    body: JSON.stringify({
+      email: input.email.toLowerCase(),
+      attributes: buildAttributes(input),
+      listIds: [Number(listId)],
+      // Sans cela, un contact déjà connu fait échouer la requête au lieu
+      // d'être mis à jour — et l'on perdrait la trace du nouvel accord.
+      updateEnabled: true,
+    }),
+    signal,
+  });
+}
+
+/**
+ * Resend — l'audience, plus pauvre que la liste Brevo.
+ *
+ * L'API n'accepte que l'e-mail, le prénom, le nom et l'état d'abonnement :
+ * PAS d'attributs libres. La source, la date de consentement et les accords
+ * détaillés n'y ont donc AUCUNE place, alors qu'ils sont précisément ce qu'on
+ * doit pouvoir produire en cas de réclamation.
+ *
+ * Conséquence à assumer, écrite ici pour qu'elle ne se perde pas : chez Resend,
+ * l'audience est une liste de diffusion, pas une preuve. La preuve du
+ * consentement devra vivre dans NOTRE base — c'est un des motifs du chantier de
+ * persistance, au même titre que le score de lead.
+ */
+function postResend(
+  apiKey: string,
+  input: ContactInput,
+  audienceId: number | string,
+  signal: AbortSignal,
+): Promise<Response> {
+  return fetch(`${RESEND_ENDPOINT}/${audienceId}/contacts`, {
+    method: "POST",
+    headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" },
+    body: JSON.stringify({
+      email: input.email.toLowerCase(),
+      ...(input.firstName ? { first_name: input.firstName } : {}),
+      ...(input.lastName ? { last_name: input.lastName } : {}),
+      unsubscribed: false,
+    }),
+    signal,
+  });
+}
+
+/**
+ * La liste de la lettre d'information.
+ *
+ * `number | string` : Brevo numérote ses listes, Resend identifie ses audiences
+ * par UUID. Le module ne tranche pas — il transmet ce qui est configuré.
+ */
+export function newsletterListId(): number | string | undefined {
   return env.contacts.newsletterListId;
 }
 
 /** La liste alimentée par le parcours d'estimation. */
-export function leadsListId(): number | undefined {
+export function leadsListId(): number | string | undefined {
   return env.contacts.leadsListId;
 }

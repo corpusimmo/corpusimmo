@@ -25,10 +25,13 @@ const schema = z.object({
   EMAIL_PROVIDER: z.enum(["console", "resend", "brevo"]).optional(),
   EMAIL_PROVIDER_KEY: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
-  /** Liste Brevo qui reçoit les inscrits à la lettre d'information. */
-  BREVO_NEWSLETTER_LIST_ID: z.coerce.number().int().positive().optional(),
-  /** Liste Brevo qui reçoit les contacts issus d'une estimation. */
-  BREVO_LEADS_LIST_ID: z.coerce.number().int().positive().optional(),
+  /**
+   * Les listes de diffusion. Volontairement neutres de fournisseur : Brevo
+   * numérote ses listes, Resend identifie ses audiences par UUID. Une chaîne
+   * accepte les deux, et `contacts.ts` transmet sans interpréter.
+   */
+  NEWSLETTER_LIST_ID: z.string().trim().min(1).optional(),
+  LEADS_LIST_ID: z.string().trim().min(1).optional(),
 
   // --- Signature des liens de téléchargement ---
   DOWNLOAD_SIGNING_SECRET: z.string().min(32).optional(),
@@ -92,8 +95,8 @@ export const env = {
    * mélangerait des consentements qui ne se recouvrent pas.
    */
   contacts: {
-    newsletterListId: raw.BREVO_NEWSLETTER_LIST_ID,
-    leadsListId: raw.BREVO_LEADS_LIST_ID,
+    newsletterListId: raw.NEWSLETTER_LIST_ID,
+    leadsListId: raw.LEADS_LIST_ID,
   },
 
   /**

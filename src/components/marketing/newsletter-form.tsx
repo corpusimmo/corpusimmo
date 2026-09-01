@@ -7,6 +7,11 @@ import { Button, Checkbox, Input } from "@/components/ui";
 
 type Status = "idle" | "sending" | "done" | "error";
 
+interface SubscribeResponse {
+  subscribed?: boolean;
+  error?: { message?: string };
+}
+
 /**
  * L'inscription à la lettre d'information.
  *
@@ -45,13 +50,26 @@ export function NewsletterForm() {
             body: JSON.stringify({ email: email.trim(), consent }),
           });
 
+          const payload = (await response.json().catch(() => null)) as SubscribeResponse | null;
+
           if (!response.ok) {
-            const payload: unknown = await response.json().catch(() => null);
-            const detail =
-              typeof payload === "object" && payload !== null && "error" in payload
-                ? (payload as { error: { message?: string } }).error.message
-                : undefined;
-            setMessage(detail ?? "L'inscription n'a pas abouti. Réessayez.");
+            setMessage(payload?.error?.message ?? "L'inscription n'a pas abouti. Réessayez.");
+            setStatus("error");
+            return;
+          }
+
+          /**
+           * La route répond 202 même quand la liste n'est pas configurée : de
+           * son point de vue la demande est bien reçue. Mais l'adresse n'est
+           * alors enregistrée NULLE PART — et afficher « c'est noté » ici
+           * serait un mensonge, exactement celui que ce produit s'interdit sur
+           * les prix. On lit donc `subscribed`, pas le code de statut.
+           */
+          if (payload?.subscribed !== true) {
+            setMessage(
+              "L'inscription n'est pas encore ouverte. Rien n'a été enregistré — " +
+                "revenez dans quelques jours.",
+            );
             setStatus("error");
             return;
           }

@@ -100,7 +100,9 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
             aria-pressed={onlyFavorites}
             onClick={() => setOnlyFavorites((value) => !value)}
             className={cn(
-              "inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors",
+              // Une pastille de 34 px se voit très bien et s'attrape mal : la
+              // zone d'appui monte à 44 px sans que le filtre ne grossisse.
+              "tap-target relative inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors",
               onlyFavorites
                 ? "border-accent bg-accent-soft text-accent-soft-fg"
                 : "border-border bg-surface text-ink-muted hover:border-border-strong hover:text-ink",
@@ -121,7 +123,9 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
                   : "Aucun outil ne correspond."
                 : `${visible.length} outil${visible.length > 1 ? "s" : ""} sur ${tools.length}`}
             </p>
-            <Button variant="ghost" size="sm" onClick={reset}>
+            {/* `size="sm"` dessine 36 px de haut : la zone d'appui complète
+                les 8 px qui manquent, sans alourdir la barre de filtres. */}
+            <Button variant="ghost" size="sm" onClick={reset} className="tap-target">
               <SlidersHorizontal aria-hidden="true" className="size-4" />
               Tout afficher
             </Button>
@@ -167,7 +171,12 @@ function Facets<Id extends string>({
   onChange: (next: Id | null) => void;
 }) {
   return (
-    <fieldset className="flex flex-wrap items-center gap-2">
+    // `gap-y-2.5` : les pastilles font 34 px de haut mais 44 px de zone
+    // d'appui. Les 8 px d'origine laissaient donc la zone d'une pastille mordre
+    // de 2 px sur celle de la ligne suivante dès que la rangée se replie, et un
+    // filtre attrapé à la place d'un autre est pire qu'un filtre difficile à
+    // attraper. 34 + 10 = 44 : les zones se touchent sans se recouvrir.
+    <fieldset className="flex flex-wrap items-center gap-x-2 gap-y-2.5">
       <legend className="eyebrow mb-2">{legend}</legend>
       {options.map((option) => {
         const active = value === option.id;
@@ -178,7 +187,7 @@ function Facets<Id extends string>({
             aria-pressed={active}
             onClick={() => onChange(active ? null : option.id)}
             className={cn(
-              "rounded-full border px-3 py-1.5 text-sm transition-colors",
+              "tap-target relative rounded-full border px-3 py-1.5 text-sm transition-colors",
               active
                 ? "border-primary bg-primary text-primary-fg"
                 : "border-border bg-surface text-ink-muted hover:border-border-strong hover:text-ink",

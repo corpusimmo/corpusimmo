@@ -404,19 +404,33 @@ export function EstimatorWizard({ onResult }: EstimatorWizardProps) {
           )}
         </div>
 
-        <div className="sticky bottom-0 flex items-center gap-3 rounded-b-lg border-t border-border bg-surface/95 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur sm:px-8">
+        {/* Les deux actions tiennent côte à côte dès 360 px. En dessous, elles
+            ne tiennent PAS : « Retour » et « Obtenir l'estimation » réclament
+            ensemble 343 px là où l'écran en offre 280, et les libellés d'un
+            bouton ne se coupent pas en deux. La rangée passe donc en colonne,
+            plutôt que de laisser le bouton principal sortir de l'écran — un
+            débordement masqué reste un bouton qu'on ne peut pas atteindre. */}
+        <div className="sticky bottom-0 flex flex-col gap-3 rounded-b-lg border-t border-border bg-surface/95 px-5 py-4 pb-[max(1rem,env(safe-area-inset-bottom))] backdrop-blur min-[360px]:flex-row min-[360px]:items-center sm:px-8">
           <Button
             type="button"
             variant="ghost"
             onClick={goBack}
             disabled={state.step === 0 || submitting}
-            className="shrink-0"
+            // `self-start` en colonne : un « Retour » étiré sur toute la
+            // largeur pèserait autant que l'action principale posée en
+            // dessous, alors qu'il ne fait que revenir en arrière.
+            className="shrink-0 self-start min-[360px]:self-auto"
           >
             <ArrowLeft aria-hidden="true" className="size-4" />
             Retour
           </Button>
 
-          <Button type="submit" size="lg" loading={submitting} className="ml-auto min-w-40">
+          <Button
+            type="submit"
+            size="lg"
+            loading={submitting}
+            className="min-w-40 min-[360px]:ml-auto"
+          >
             {isLast ? (
               <>
                 <Sparkles aria-hidden="true" className="size-4" />

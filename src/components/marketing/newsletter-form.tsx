@@ -93,7 +93,12 @@ export function NewsletterForm() {
           onChange={(event) => setEmail(event.target.value)}
           placeholder="prenom@exemple.fr"
           aria-label="Votre adresse e-mail"
-          className="flex-1 bg-white/10 text-white placeholder:text-white/40"
+          // `sm:flex-1` et non `flex-1` : sous 640 px la rangée est une
+          // COLONNE, et `flex-1` s'y applique donc à la hauteur. Le champ
+          // retombait à 19 px, hauteur de son texte, au lieu des 44 px de
+          // `h-11` — une cible impossible à viser au doigt. Le partage de la
+          // largeur ne sert qu'une fois les deux éléments côte à côte.
+          className="bg-white/10 text-white placeholder:text-white/40 sm:flex-1"
         />
         <Button type="submit" variant="secondary" loading={status === "sending"} className="shrink-0">
           S&apos;inscrire

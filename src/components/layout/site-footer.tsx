@@ -44,12 +44,19 @@ export function SiteFooter() {
           <nav aria-label="Plan du site" className="grid gap-8 sm:grid-cols-2">
             <div>
               <h2 className="eyebrow !text-[color:var(--accent-rule)]">Le produit</h2>
-              <ul className="mt-3 space-y-2">
+              {/* Un lien de plan de site est une cible ISOLÉE, pas un mot dans
+                  une phrase : il peut donc prendre la hauteur d'un doigt sans
+                  abîmer d'interligne. Chaque lien monte à 44 px (`min-h-11`)
+                  et l'espacement de la liste descend d'autant, pour que le pied
+                  de page occupe la même hauteur qu'avant. `min-w-11` couvre le
+                  cas des libellés courts : « Outils » ne mesure que 36 px de
+                  large, et une cible se rate aussi bien en largeur. */}
+              <ul className="mt-2 space-y-0.5">
                 {mainNav.map((entry) => (
                   <li key={entry.href}>
                     <Link
                       href={entry.href}
-                      className="text-sm text-white/75 transition-colors hover:text-white"
+                      className="inline-flex min-h-11 min-w-11 items-center text-sm text-white/75 transition-colors hover:text-white"
                     >
                       {entry.label}
                     </Link>
@@ -60,24 +67,26 @@ export function SiteFooter() {
 
             <div>
               <h2 className="eyebrow !text-[color:var(--accent-rule)]">La maison</h2>
-              <ul className="mt-3 space-y-2">
+              {/* Même règle que la colonne « Le produit » : cibles isolées,
+                  donc 44 px de haut chacune, espacement resserré en regard. */}
+              <ul className="mt-2 space-y-0.5">
                 {secondaryNav.map((item) => (
                   <li key={item.href}>
                     <Link
                       href={item.href}
-                      className="text-sm text-white/75 transition-colors hover:text-white"
+                      className="inline-flex min-h-11 min-w-11 items-center text-sm text-white/75 transition-colors hover:text-white"
                     >
                       {item.label}
                     </Link>
                   </li>
                 ))}
                 <li>
-                  <ConsentFooterLink className="text-sm text-white/75 transition-colors hover:text-white" />
+                  <ConsentFooterLink className="inline-flex min-h-11 min-w-11 items-center text-sm text-white/75 transition-colors hover:text-white" />
                 </li>
                 <li>
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}
-                    className="text-sm text-white/75 transition-colors hover:text-white"
+                    className="inline-flex min-h-11 min-w-11 items-center text-sm text-white/75 transition-colors hover:text-white"
                   >
                     Nous écrire
                   </a>

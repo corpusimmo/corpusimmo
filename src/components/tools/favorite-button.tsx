@@ -40,7 +40,10 @@ export function FavoriteButton({
         track({ name: active ? "tool_unsaved" : "tool_saved", params: { tool_id: slug } });
       }}
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-sm transition-colors",
+        // `tap-target` : sans libellé, le signet ne dessine que 32×28 px. Le
+        // grossir pour la main déséquilibrerait la carte d'outil qui le porte,
+        // alors on n'élargit que la zone d'appui, invisible et centrée.
+        "tap-target relative inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-sm transition-colors",
         active ? "text-accent" : "text-ink-subtle hover:text-ink",
         className,
       )}

@@ -363,6 +363,37 @@
   border-block-end: 2px solid var(--accent-rule);
 }
 
+/* La cible tactile de 44 px, gagnée sans grossir le dessin.
+   Un signet de 32×28 px est visuellement JUSTE : c'est la main qui le rate,
+   pas l'œil. Grossir le bouton déséquilibrerait la carte qui le porte, alors
+   qu'un pseudo-élément centré étend la seule chose qui manque — la zone
+   d'appui. Le rendu ne bouge pas d'un pixel, et le doigt arrive.
+
+   `width`/`height` à 100 % pour ne jamais RÉTRÉCIR une cible déjà large ; les
+   deux `min-*` font le reste. À réserver aux contrôles isolés : deux zones de
+   44 px qui se recouvrent, c'est un mauvais clic sur deux, ce qui est pire que
+   la petite cible qu'on prétendait corriger. Dans une rangée qui peut passer à
+   la ligne, écarter les lignes d'autant (`gap-y-*`) fait partie du correctif.
+
+   L'utilitaire ne pose PAS `position` lui-même : il l'exigerait de l'élément au
+   moment même où certains contrôles sont déjà `absolute` (une flèche posée sur
+   une image), et la déclaration gagnante dépendrait alors de l'ordre des
+   classes. À accompagner donc de `relative` — ou du positionnement que le
+   contrôle porte déjà. */
+@utility tap-target {
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    min-width: 44px;
+    min-height: 44px;
+    transform: translate(-50%, -50%);
+  }
+}
+
 @utility skeleton {
   position: relative;
   overflow: hidden;

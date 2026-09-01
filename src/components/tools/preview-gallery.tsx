@@ -103,14 +103,19 @@ export function PreviewGallery({ shots, title }: { shots: ToolPreviewShot[]; tit
       </div>
 
       {!single ? (
-        <div className="flex flex-wrap items-center gap-2">
+        /* `gap-y-4` et non `gap-2` : chaque onglet porte une zone d'appui de
+           44 px, plus haute que la pastille de 28 px. Quand la rangée passe à
+           la ligne, il faut donc 16 px entre les lignes pour que la zone d'un
+           onglet ne recouvre pas celle de la ligne suivante — deux cibles qui
+           se chevauchent transforment un bon geste en mauvais clic. */
+        <div className="flex flex-wrap items-center gap-x-2 gap-y-4">
           {shots.map((shot, index) => (
             <button
               key={shot.src}
               type="button"
               onClick={() => goTo(index)}
               aria-current={index === active}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`tap-target relative rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                 index === active
                   ? "bg-primary text-primary-fg"
                   : "bg-surface-2 text-ink-muted hover:text-ink"
@@ -147,7 +152,10 @@ function RailButton({
       onClick={onClick}
       disabled={disabled}
       aria-label={side === "left" ? "Aperçu précédent" : "Aperçu suivant"}
-      className={`absolute top-1/2 hidden -translate-y-1/2 rounded-full border border-border bg-surface/95 p-2 shadow-sm backdrop-blur transition-opacity hover:bg-surface sm:block ${
+      // Le rond de 36 px reste dessiné tel quel : il flotte sur la capture et
+      // s'y ferait remarquer plus gros. Seule sa zone d'appui monte à 44 px, et
+      // les deux flèches sont aux extrémités opposées : aucun recouvrement.
+      className={`tap-target absolute top-1/2 hidden -translate-y-1/2 rounded-full border border-border bg-surface/95 p-2 shadow-sm backdrop-blur transition-opacity hover:bg-surface sm:block ${
         side === "left" ? "left-2" : "right-2"
       } ${disabled ? "pointer-events-none opacity-0" : "opacity-100"}`}
     >

@@ -77,7 +77,13 @@ export function SiteHeader() {
       </a>
 
       <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Link href="/" aria-label={`${siteConfig.name}, accueil`} className="rounded-sm">
+        {/* `min-h-11` : le lockup dessine 38 px, et c'est la première cible de
+            chaque page. Le bandeau fait 64 px, la hauteur est disponible. */}
+        <Link
+          href="/"
+          aria-label={`${siteConfig.name}, accueil`}
+          className="inline-flex min-h-11 items-center rounded-sm"
+        >
           <BrandLockup markClassName="size-8" />
         </Link>
 
@@ -98,7 +104,9 @@ export function SiteHeader() {
                     <Link
                       href={entry.href}
                       className={cn(
-                        "inline-flex h-9 items-center rounded-sm px-3 text-[0.9375rem] transition-colors",
+                        // h-11 et non h-9 : ces entrées n'ont pas de fond, la
+                        // hauteur ne se voit donc pas, mais elle se touche.
+                        "inline-flex h-11 items-center rounded-sm px-3 text-[0.9375rem] transition-colors",
                         isActive(pathname, entry.href)
                           ? "font-semibold text-ink"
                           : "text-ink-muted hover:text-ink",
@@ -115,13 +123,15 @@ export function SiteHeader() {
 
         <div className="flex items-center gap-2">
           <AccountMenu className="hidden lg:inline-flex" />
-          <Button asChild size="sm" className="hidden sm:inline-flex">
+          {/* `tap-target` : le CTA est dessiné en `sm` (36 px) pour ne pas
+              écraser le bandeau, sa zone d'appui monte seule à 44 px. */}
+          <Button asChild size="sm" className="tap-target hidden sm:inline-flex">
             <Link href={primaryCta.href}>{primaryCta.label}</Link>
           </Button>
 
           <button
             type="button"
-            className="inline-flex size-10 items-center justify-center rounded-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink lg:hidden"
             aria-expanded={mobileOpen}
             aria-controls="menu-mobile"
             onClick={() => setMobileOpen((open) => !open)}
@@ -164,7 +174,8 @@ function DropdownEntry({
         aria-controls={panelId}
         onClick={onToggle}
         className={cn(
-          "inline-flex h-9 items-center gap-1 rounded-sm px-3 text-[0.9375rem] transition-colors",
+          // Même hauteur que les entrées simples, pour la même raison.
+          "inline-flex h-11 items-center gap-1 rounded-sm px-3 text-[0.9375rem] transition-colors",
           active || open ? "font-semibold text-ink" : "text-ink-muted hover:text-ink",
         )}
       >
@@ -219,7 +230,7 @@ function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => vo
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex size-9 items-center justify-center rounded-sm text-ink-muted hover:bg-surface-2 hover:text-ink"
+          className="inline-flex size-11 items-center justify-center rounded-sm text-ink-muted hover:bg-surface-2 hover:text-ink"
         >
           <span className="sr-only">Fermer le menu</span>
           <X aria-hidden="true" className="size-5" />
@@ -244,10 +255,16 @@ function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => vo
           ))}
         </ul>
 
-        <ul className="mt-5 flex flex-wrap gap-x-5 gap-y-2">
+        {/* Ces quatre entrées sont des cibles isolées dans une liste, pas des
+            mots dans une phrase : elles prennent les 44 px, et l'écart entre
+            les lignes se resserre d'autant. */}
+        <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-0.5">
           {secondaryNav.map((item) => (
             <li key={item.href}>
-              <Link href={item.href} className="text-sm text-ink-muted hover:text-ink">
+              <Link
+                href={item.href}
+                className="inline-flex min-h-11 items-center text-sm text-ink-muted hover:text-ink"
+              >
                 {item.label}
               </Link>
             </li>
@@ -278,7 +295,9 @@ function MobileLink({
     <Link
       href={item.href}
       className={cn(
-        "block rounded-sm px-1 py-2",
+        // `py-3` : le lien passe de 36 à 44 px de haut. Un menu mobile est
+        // touché au pouce, jamais pointé.
+        "block rounded-sm px-1 py-3",
         strong ? "text-[0.9375rem]" : "text-sm",
         isActive(pathname, item.href) ? "font-semibold text-ink" : "text-ink-muted",
       )}

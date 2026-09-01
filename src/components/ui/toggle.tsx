@@ -81,9 +81,17 @@ export function Checkbox({ label, error, className, id, ...props }: CheckboxProp
 
   return (
     <div className={cn("flex flex-col gap-1.5", className)}>
+      {/* `-m-3 p-3` : la case ne dessine que 20×20 px, et rien au-dessus
+          d'elle n'était cliquable. Le rembourrage étend la zone d'appui du
+          label de 12 px sur les quatre côtés, la marge négative la reprend dans
+          la mise en page : le dessin ne bouge pas, et le doigt qui vise haut
+          coche quand même. On rembourre le LABEL plutôt que la case elle-même
+          pour ne rien poser par-dessus l'input, qui garde ainsi son survol.
+          Les cases du site sont séparées d'au moins 12 px, donc aucune zone
+          n'en recouvre une autre. */}
       <label
         htmlFor={inputId}
-        className="flex cursor-pointer items-start gap-2.5 text-sm leading-relaxed text-ink"
+        className="-m-3 flex cursor-pointer items-start gap-2.5 p-3 text-sm leading-relaxed text-ink"
       >
         <span className="relative mt-0.5 grid size-5 shrink-0 place-items-center">
           <input

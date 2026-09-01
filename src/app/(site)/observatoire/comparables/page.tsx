@@ -9,7 +9,8 @@ import { pageMetadata } from "@/lib/seo/metadata";
  * `noindex` — et pour deux raisons qui se rejoignent.
  *
  * 1. Il n'y a rien à indexer : la page rend une sélection PERSONNELLE, tenue
- *    dans le navigateur du visiteur. Un robot n'y verrait qu'un état vide.
+ *    dans le navigateur du visiteur ou dans son compte. Un robot n'y verrait
+ *    qu'un état vide.
  * 2. Ce qu'elle affiche, quand elle affiche quelque chose, ce sont des
  *    mutations DVF détaillées, adresse comprise. Le décret du 28/12/2018
  *    interdit leur indexation.
@@ -20,8 +21,8 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "Mes comparables",
   description:
-    "Votre sélection de références de marché, tenue dans ce navigateur : excluez sans " +
-    "supprimer, mesurez la dispersion, emportez-la en tableur.",
+    "Votre sélection de références de marché, conservée d'un écran à l'autre : excluez " +
+    "sans supprimer, mesurez la dispersion, emportez-la en tableur.",
   path: "/observatoire/comparables",
   index: false,
 });

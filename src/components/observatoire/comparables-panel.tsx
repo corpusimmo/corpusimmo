@@ -10,6 +10,7 @@ import {
   CardHeader,
   CardTitle,
   EmptyState,
+  ErrorState,
   Table,
   TableBody,
   TableCell,
@@ -33,13 +34,17 @@ import { dvfTypeLabel } from "./comparables-cart";
 import { RealDataNotice } from "./data-notice";
 
 export function ComparablesPanel() {
-  const { items, count, activeCount, hydrated, remove, clear, setExcluded } = useComparables();
+  const { items, count, activeCount, hydrated, source, syncing, failed, remove, clear, setExcluded } =
+    useComparables();
+
   /**
-   * Rien n'est verrouillé dans cette version : consulter, exclure, mesurer la
-   * dispersion ET emporter en tableur sont tous libres. Le compte n'apparaîtra
-   * que le jour où quelque chose devra survivre à l'appareil — retrouver une
-   * sélection ailleurs, pas la télécharger ici.
+   * Rien n'est verrouillé : consulter, exclure, mesurer la dispersion ET
+   * emporter en tableur sont libres, avec ou sans compte. Ce que le compte
+   * apporte est la seule chose que le navigateur ne sait pas faire, retrouver
+   * la sélection sur un autre appareil, et l'écran le DIT plutôt que de
+   * laisser croire à une sauvegarde qui n'existe pas.
    */
+  const backed = source === "account";
   const exportSelection = () => downloadCsv(comparablesToCsv(items), "corpusimmo-comparables");
 
   if (!hydrated) {
@@ -50,12 +55,33 @@ export function ComparablesPanel() {
     );
   }
 
+  /*
+   * Le compte n'a pas répondu, et le panier affiché est vide. Les deux
+   * ensemble ne veulent PAS dire « vous n'avez rien sélectionné » : la
+   * sélection est peut-être rangée dans le compte, hors de portée pour
+   * l'instant. Annoncer un panier vide ici effacerait un travail aux yeux de
+   * la personne qui l'a fait.
+   */
+  if (failed && count === 0) {
+    return (
+      <ErrorState
+        title="Votre sélection n'a pas pu être chargée"
+        description="Votre compte n'a pas répondu. Si vous aviez une sélection, elle y est toujours rangée : réessayez dans un instant."
+        onRetry={() => window.location.reload()}
+      />
+    );
+  }
+
   if (count === 0) {
     return (
       <EmptyState
         icon={<Layers className="size-6" aria-hidden />}
         title="Aucun comparable sélectionné"
-        description="Votre panier se remplit depuis l'observatoire ou depuis la recherche tabulaire. Il est conservé d'un écran à l'autre et d'une session à l'autre."
+        description={
+          backed
+            ? "Votre panier se remplit depuis l'observatoire ou depuis la recherche tabulaire. Il est rattaché à votre compte, donc retrouvable sur vos autres appareils."
+            : "Votre panier se remplit depuis l'observatoire ou depuis la recherche tabulaire. Il est conservé d'un écran à l'autre et d'une session à l'autre, dans ce navigateur."
+        }
         action={
           <div className="flex flex-wrap justify-center gap-2">
             <Button asChild>
@@ -127,10 +153,7 @@ export function ComparablesPanel() {
         </div>
       )}
 
-      <p className="text-xs leading-relaxed text-ink-subtle">
-        Cette sélection est conservée sur cet appareil, dans ce navigateur. Elle ne quitte pas votre
-        machine et ne survivra pas à un changement d&apos;appareil.
-      </p>
+      <SourceNotice backed={backed} failed={failed} syncing={syncing} />
 
       <div className="grid gap-4 xl:grid-cols-3">
         {/* --------------------------------------------------- distribution */}
@@ -300,5 +323,54 @@ export function ComparablesPanel() {
         </Card>
       </div>
     </div>
+  );
+}
+
+/**
+ * OÙ VIT CETTE SÉLECTION, dit en une phrase.
+ *
+ * C'est la seule différence visible entre une visite anonyme et une visite
+ * connectée sur cet écran, et elle mérite d'être écrite : une personne qui
+ * croit sa sélection sauvegardée alors qu'elle tient dans un `localStorage`
+ * perdra son travail sans comprendre pourquoi, et n'aura aucune raison de
+ * revenir.
+ */
+function SourceNotice({
+  backed,
+  failed,
+  syncing,
+}: {
+  backed: boolean;
+  failed: boolean;
+  syncing: boolean;
+}) {
+  if (failed) {
+    return (
+      <p
+        role="status"
+        className="rounded-md border border-warning/25 bg-warning-soft px-4 py-3 text-xs leading-relaxed text-warning-soft-fg"
+      >
+        Votre compte n&apos;a pas pu être joint. Ce qui est affiché vient de ce navigateur, et vos
+        dernières modifications n&apos;y sont pas enregistrées.
+      </p>
+    );
+  }
+
+  if (backed) {
+    return (
+      <p className="text-xs leading-relaxed text-ink-subtle" aria-live="polite">
+        Cette sélection est rattachée à votre compte&nbsp;: vous la retrouvez sur vos autres
+        appareils.
+        {syncing ? " Enregistrement en cours…" : null}
+      </p>
+    );
+  }
+
+  return (
+    <p className="text-xs leading-relaxed text-ink-subtle">
+      Cette sélection est conservée sur cet appareil, dans ce navigateur. Elle ne quitte pas votre
+      machine et ne survivra pas à un changement d&apos;appareil&nbsp;; connectez-vous pour la
+      retrouver ailleurs.
+    </p>
   );
 }

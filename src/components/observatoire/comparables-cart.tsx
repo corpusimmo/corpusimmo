@@ -24,7 +24,7 @@ export { dvfTypeLabel };
 const HIDDEN_ON = ["/observatoire/comparables"];
 
 export function ComparablesCart() {
-  const { items, count, activeCount, hydrated, remove, clear } = useComparables();
+  const { items, count, activeCount, hydrated, source, failed, remove, clear } = useComparables();
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const pathname = usePathname() ?? "";
@@ -66,10 +66,26 @@ export function ComparablesCart() {
         open={open}
         onClose={() => setOpen(false)}
         title={`Comparables sélectionnés · ${count}`}
-        description="Votre panier suit la navigation, de l'observatoire jusqu'à la valorisation."
+        description={
+          /*
+           * Le panier suit la navigation dans les deux cas. Ce qui change est
+           * jusqu'où : d'un écran à l'autre quand il tient dans le navigateur,
+           * d'un appareil à l'autre quand il est rattaché à un compte. Le dire
+           * ici évite d'avoir à ouvrir « Mes comparables » pour le savoir.
+           */
+          source === "account"
+            ? "Votre panier suit la navigation, et il est rattaché à votre compte."
+            : "Votre panier suit la navigation, dans ce navigateur."
+        }
         size="md"
         footer={
           <div className="space-y-2">
+            {failed && (
+              <p role="status" className="text-xs text-warning-soft-fg">
+                Votre compte n&apos;a pas pu être joint&nbsp;: vos dernières modifications ne sont
+                pas enregistrées.
+              </p>
+            )}
             {missing > 0 && (
               <p className="text-xs text-warning-soft-fg">
                 Le moteur exige au moins {MIN_COMPARABLES} comparables retenus (secret

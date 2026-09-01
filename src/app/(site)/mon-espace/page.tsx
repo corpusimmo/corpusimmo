@@ -7,8 +7,8 @@ import { SavedTools } from "@/components/account/saved-tools";
 import { Button, PageHeader } from "@/components/ui";
 import { getToolCard } from "@/data/tools-catalogue";
 import { readAccess } from "@/lib/access/ledger";
-import { auth, isAuthConfigured } from "@/lib/auth";
-import { isDatabaseConfigured, listEstimations } from "@/lib/db";
+import { currentUserId } from "@/lib/auth/current-user";
+import { listEstimations } from "@/lib/db";
 
 import { clearEstimationsAction, forgetEstimationAction } from "./actions";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -44,8 +44,7 @@ export default async function MonEspacePage() {
 
   // Pour une personne connectée, l'historique vient de la base et suit d'un
   // appareil à l'autre. Sinon il reste dans le navigateur, et la page le dit.
-  const session = isAuthConfigured && isDatabaseConfigured() ? await auth() : null;
-  const userId = session?.user?.id ?? null;
+  const userId = await currentUserId();
   const stored = userId ? await listEstimations(userId) : null;
   const unlocked = access.unlocked
     .map((grant) => ({ grant, tool: getToolCard(grant.slug) }))

@@ -20,8 +20,8 @@
 
 import { NextResponse } from "next/server";
 
-import { auth, isAuthConfigured } from "@/lib/auth";
-import { isDatabaseConfigured, saveEstimation } from "@/lib/db";
+import { currentUserId } from "@/lib/auth/current-user";
+import { saveEstimation } from "@/lib/db";
 import { estimateByComparison, parseValuationRequest } from "@/lib/valuation";
 
 export const runtime = "nodejs";
@@ -31,13 +31,6 @@ export const dynamic = "force-dynamic";
 export const maxDuration = 30;
 
 const NO_STORE = { "Cache-Control": "no-store" } as const;
-
-/** L'identifiant en base de la personne connectée, ou `null`. */
-async function currentUserId(): Promise<string | null> {
-  if (!isAuthConfigured || !isDatabaseConfigured()) return null;
-  const session = await auth();
-  return session?.user?.id ?? null;
-}
 
 export async function POST(request: Request): Promise<NextResponse> {
   let body: unknown;

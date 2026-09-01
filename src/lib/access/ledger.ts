@@ -49,13 +49,8 @@ import "server-only";
 import { cookies } from "next/headers";
 
 import { env } from "@/config/env";
-import { auth, isAuthConfigured } from "@/lib/auth";
-import {
-  grantStoredAccess,
-  importGrants,
-  isDatabaseConfigured,
-  readStoredAccess,
-} from "@/lib/db";
+import { currentUserId } from "@/lib/auth/current-user";
+import { grantStoredAccess, importGrants, readStoredAccess } from "@/lib/db";
 
 import {
   applyGrant,
@@ -103,19 +98,6 @@ function secret(): string | undefined {
   return value;
 }
 
-/**
- * L'identifiant en base de la personne connectée, ou `undefined`.
- *
- * `undefined` couvre trois cas qui appellent la même réponse : pas
- * d'authentification configurée, personne connectée, ou pas de base. Dans les
- * trois, le cookie reste le registre.
- */
-async function storedUserId(): Promise<string | undefined> {
-  if (!isAuthConfigured || !isDatabaseConfigured()) return undefined;
-  const session = await auth();
-  return session?.user?.id;
-}
-
 /** Lecture seule côté cookie, utilisable depuis un Server Component. */
 async function readCookieGrants(key: string): Promise<Grant[]> {
   return decodeGrants((await cookies()).get(ACCESS_COOKIE)?.value, key);
@@ -126,7 +108,7 @@ export async function readAccess(now: Date = new Date()): Promise<AccessState> {
   const key = secret();
   if (!key) return { unlocked: [], quota: OPEN_QUOTA, enforced: false };
 
-  const userId = await storedUserId();
+  const userId = await currentUserId();
 
   if (userId) {
     // La reprise d'abord : sans elle, la lecture qui suit ignorerait ce que la
@@ -168,7 +150,7 @@ export async function grantAccess(slug: string, now: Date = new Date()): Promise
   const key = secret();
   if (!key) return { granted: true, alreadyOwned: true, quota: OPEN_QUOTA };
 
-  const userId = await storedUserId();
+  const userId = await currentUserId();
 
   if (userId) {
     await importGrants(userId, await readCookieGrants(key));

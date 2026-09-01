@@ -18,14 +18,8 @@
 
 import { revalidatePath } from "next/cache";
 
-import { auth, isAuthConfigured } from "@/lib/auth";
-import { clearEstimations, forgetEstimation, isDatabaseConfigured } from "@/lib/db";
-
-async function currentUserId(): Promise<string | null> {
-  if (!isAuthConfigured || !isDatabaseConfigured()) return null;
-  const session = await auth();
-  return session?.user?.id ?? null;
-}
+import { currentUserId } from "@/lib/auth/current-user";
+import { clearEstimations, forgetEstimation } from "@/lib/db";
 
 /** Borne de sûreté : un identifiant de ligne, rien d'autre. */
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

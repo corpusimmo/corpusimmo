@@ -6,7 +6,7 @@ on:
   pull_request:
     branches: [main]
 
-# A newer push makes an in-flight run pointless — cancel it rather than pay for it.
+# A newer push makes an in-flight run pointless : on annule plutôt que de payer.
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
@@ -18,13 +18,16 @@ jobs:
     timeout-minutes: 15
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
+      # AUCUNE version ici, délibérément. `package.json` porte un champ
+      # `packageManager`, et l'action REFUSE de démarrer quand les deux
+      # sources se contredisent. Une version écrite dans le workflow serait
+      # de toute façon une seconde vérité, qui finirait par diverger du
+      # fichier de verrouillage : c'est lui qui commande.
       - uses: pnpm/action-setup@v4
-        with:
-          version: 10
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
           cache: pnpm
@@ -41,8 +44,9 @@ jobs:
       - name: Tests
         run: pnpm test
 
-      # The build must pass with an EMPTY environment: that is the contract of
-      # this project — no key is required to serve real DVF data. If this step
-      # ever needs a secret, something has been wired the wrong way round.
+      # La construction doit passer avec un environnement VIDE : c'est le
+      # contrat du projet, aucune clé n'est nécessaire pour servir de vraies
+      # données DVF. Si cette étape réclame un jour un secret, c'est que
+      # quelque chose a été branché à l'envers.
       - name: Build
         run: pnpm build

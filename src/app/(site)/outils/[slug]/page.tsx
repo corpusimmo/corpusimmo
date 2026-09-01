@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, FileSpreadsheet } from "lucide-react";
 
+import { FavoriteButton } from "@/components/tools/favorite-button";
 import { ToolRunner } from "@/components/tools/tool-runner";
 import { Badge } from "@/components/ui";
 import { toolAssetTypes, toolUsages } from "@/config/navigation";
@@ -70,7 +71,13 @@ export default async function OutilPage({ params }: PageProps) {
             <p className="mt-3 text-lg leading-relaxed text-ink-muted">{tool.summary}</p>
           </div>
 
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap items-center gap-2">
+            <FavoriteButton
+              slug={tool.id}
+              title={tool.title}
+              withLabel
+              className="order-last ml-auto border border-border"
+            />
             {tool.assetTypes.map((id) => (
               <Badge key={id} tone="neutral" size="sm">
                 {toolAssetTypes.find((entry) => entry.id === id)?.label ?? id}

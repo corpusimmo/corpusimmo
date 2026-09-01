@@ -135,6 +135,99 @@ export function StepFeatures({ state, errors, update, updateFeatures }: StepProp
     </Field>
   );
 
+  /* ── Tertiaire ────────────────────────────────────────────────────────────
+   * Bureaux, commerce et local d'activité partagent le même écran, et il ne
+   * ressemble à aucun des trois autres : ce qui décide de la valeur ici n'est
+   * pas le nombre de pièces mais le REVENU. D'où l'occupation en question
+   * obligatoire, et le loyer en place dès que le bien est loué.
+   *
+   * Le terrain professionnel est délibérément absent : un foncier se décrit par
+   * sa surface et sa constructibilité, pas par son locataire. Il repart donc
+   * dans le bloc « terrain », commun aux deux usages.
+   */
+  if (state.type === "office" || state.type === "retail" || state.type === "business_premises") {
+    const occupied = f.occupancy === "occupied";
+
+    return (
+      <div className="flex flex-col gap-8">
+        <Group title="Surfaces">
+          <div className="grid gap-4 sm:grid-cols-2">
+            <NumberField
+              id="feat-usable-area"
+              label="Surface utile"
+              unit="m²"
+              value={f.livingArea}
+              onChange={(value) => set({ livingArea: value })}
+              error={errors.livingArea}
+              required
+              hint="La surface exploitable, pas la surface de plancher."
+            />
+            <NumberField
+              id="feat-parking-spaces"
+              label="Places de stationnement"
+              unit="places"
+              value={f.parkingSpaces}
+              onChange={(value) => set({ parkingSpaces: value })}
+              hint="Déterminant en périphérie, presque indifférent en hypercentre."
+            />
+          </div>
+          <Toggle
+            checked={f.divisible}
+            onChange={(value) => set({ divisible: value })}
+            label="Le local est divisible"
+            description="Un actif qui peut se scinder en plusieurs lots se reloue plus facilement."
+          />
+        </Group>
+
+        <Group title="Occupation">
+          <div className="flex flex-col gap-4">
+            <ChoiceGroup label="Le bien est-il occupé ?" columns={2}>
+              <ChoiceCard
+                selected={f.occupancy === "occupied"}
+                title="Occupé"
+                description="Un bail est en cours. La valeur se lit d’abord dans le revenu."
+                onSelect={() => set({ occupancy: "occupied" })}
+              />
+              <ChoiceCard
+                selected={f.occupancy === "vacant"}
+                title="Libre"
+                description="Vacant ou libéré à la vente. La comparaison reprend la main."
+                onSelect={() => set({ occupancy: "vacant", annualRent: "" })}
+              />
+            </ChoiceGroup>
+
+            {errors.occupancy ? (
+              <p role="alert" className="text-sm font-medium text-danger">
+                {errors.occupancy}
+              </p>
+            ) : null}
+
+            {occupied ? (
+              <NumberField
+                id="feat-annual-rent"
+                label="Loyer annuel en place"
+                unit="€ / an"
+                value={f.annualRent}
+                onChange={(value) => set({ annualRent: value })}
+                error={errors.annualRent}
+                required
+                hint="Hors charges et hors taxes, tel qu’il figure au bail. C’est lui qui fonde l’estimation d’un bien occupé."
+              />
+            ) : null}
+          </div>
+        </Group>
+
+        <Group title="État">{conditionField}</Group>
+
+        <p className="text-xs leading-relaxed text-ink-muted">
+          Les mutations tertiaires sont rares dans DVF, et souvent vendues en bloc avec plusieurs
+          lots. L’estimation sera d’autant plus large — et pourra ne pas aboutir. Nous vous le
+          dirons franchement plutôt que d’avancer un chiffre que la donnée ne soutient pas.
+        </p>
+      </div>
+    );
+  }
+
   if (state.type === "apartment") {
     return (
       <div className="flex flex-col gap-8">

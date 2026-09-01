@@ -473,10 +473,20 @@ export function validateStep(step: number, state: WizardState): WizardErrors {
       requireArea(features.landArea, "landArea", "la surface du terrain", errors);
     }
 
-    // Tertiaire : la surface utile est indispensable, et l'occupation décide de
-    // la méthode. Un bien déclaré occupé sans loyer renseigné ne peut pas être
-    // valorisé par le revenu — autant le dire tout de suite.
-    if (state.usage === "professional") {
+    /*
+     * Tertiaire — mais SEULEMENT les trois familles bâties.
+     *
+     * Un terrain professionnel n'a ni surface utile ni locataire : il se décrit
+     * par son emprise et sa constructibilité, exactement comme un terrain de
+     * particulier, et il passe donc par le bloc « terrain » ci-dessus. Sans
+     * cette restriction, la validation réclamait une occupation que l'écran
+     * n'affichait pas — une erreur impossible à corriger, qui bloquait le
+     * parcours pour de bon.
+     */
+    const isTertiaryBuilding =
+      state.type === "office" || state.type === "retail" || state.type === "business_premises";
+
+    if (state.usage === "professional" && isTertiaryBuilding) {
       requireArea(features.livingArea, "livingArea", "la surface utile", errors, 200_000);
       if (!features.occupancy) {
         errors.occupancy = "Indiquez si le bien est occupé ou libre : la méthode d'estimation en dépend.";
@@ -561,6 +571,19 @@ export function toPropertyFeatures(state: WizardState): PropertyFeatures {
   }
 
   if (type === "house") result.hasGarage = features.hasGarage;
+
+  /*
+   * Tertiaire — ce qui passe, et ce qui ne passe pas.
+   *
+   * `PropertyFeatures` porte `parkingSpots`, donc le nombre de places arrive
+   * jusqu'au moteur. L'occupation, le loyer en place et la divisibilité, eux,
+   * n'ont AUCUN champ où atterrir : le moteur ne connaît que la comparaison, et
+   * la méthode par le revenu n'est pas construite. On les collecte quand même —
+   * ils orientent la conversation avec la personne, et ils seront là le jour où
+   * la capitalisation existera — mais il faut savoir qu'ils s'arrêtent ici.
+   */
+  const parkingSpots = parseNumber(features.parkingSpaces);
+  if (parkingSpots !== undefined) result.parkingSpots = parkingSpots;
 
   if (features.condition !== "") result.condition = features.condition;
 

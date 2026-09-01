@@ -8,8 +8,21 @@ import type { BBox, LatLng } from "@/types/geo";
 import type { DvfQueryFilters, DvfTransaction } from "@/types/dvf";
 import { bboxContains, haversineMeters } from "@/lib/geo/distance";
 
-/** Server-side ceiling. The client may ask for less, never for more. */
-export const DVF_MAX_LIMIT = 800;
+/**
+ * Plafond serveur. Le client peut demander moins, jamais plus.
+ *
+ * La valeur suit la densité la plus élevée offerte par l'interface
+ * (`DENSITY_OPTIONS`, dans `components/observatoire/dvf-filters.tsx`) — et
+ * `dvf-limit.test.ts` vérifie que les deux ne divergent pas.
+ *
+ * POURQUOI CE TEST EXISTE : le plafond valait 800 alors que le sélecteur
+ * proposait 1200 et 2500. Le schéma zod REJETTE au-dessus du plafond au lieu de
+ * plafonner, si bien que choisir « Dense » renvoyait un 400 et laissait
+ * l'observatoire vide, avec pour seul indice « limit: Too big ». Une constante
+ * et une liste d'options dans deux fichiers différents finissent toujours par
+ * se désaccorder ; seul un test les tient ensemble.
+ */
+export const DVF_MAX_LIMIT = 2500;
 export const DVF_DEFAULT_LIMIT = 400;
 
 export function matchesFilters(row: DvfTransaction, filters: DvfQueryFilters): boolean {

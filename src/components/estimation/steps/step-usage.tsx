@@ -41,7 +41,7 @@ export function StepUsage({ state, errors, update }: StepProps) {
             selected={state.usage === "professional"}
             icon={<Briefcase aria-hidden="true" />}
             title="Professionnel"
-            description="Bureaux, commerce, local d’activité ou terrain. Estimé par le revenu qu’il produit, recoupé par les ventes."
+            description="Bureaux, commerce, local d’activité ou terrain. Comparé aux mutations tertiaires du secteur, qui sont rares : la fourchette sera plus large."
             onSelect={() => choisir("professional")}
           />
         </ChoiceGroup>
@@ -54,9 +54,11 @@ export function StepUsage({ state, errors, update }: StepProps) {
       ) : null}
 
       <p className="text-xs leading-relaxed text-ink-muted">
-        Les deux parcours ne posent pas les mêmes questions, et ne suivent pas la même méthode. En
-        professionnel, nous demanderons notamment si le bien est occupé : un immeuble loué et le
-        même immeuble vide ne se valorisent pas de la même façon.
+        Les deux parcours ne posent pas les mêmes questions. En professionnel, nous demanderons
+        notamment si le bien est occupé et à quel loyer — un immeuble loué et le même immeuble vide
+        ne se négocient pas de la même façon. La valorisation par le revenu n’est pas encore
+        construite : ces réponses éclairent la lecture du résultat, elles n’entrent pas dans le
+        calcul, et nous préférons vous le dire.
       </p>
     </div>
   );

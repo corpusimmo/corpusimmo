@@ -12,13 +12,16 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import { Search, SlidersHorizontal } from "lucide-react";
+import { Bookmark, Search, SlidersHorizontal } from "lucide-react";
 
 import { Badge, Button, Input } from "@/components/ui";
 import { toolAssetTypes, toolUsages } from "@/config/navigation";
 import type { ToolAssetType, ToolUsage } from "@/config/navigation";
 import { cn } from "@/lib/utils/cn";
 import type { ToolCard } from "@/types/tool";
+
+import { FavoriteButton } from "./favorite-button";
+import { useFavorites } from "./favorites";
 
 function matches(tool: ToolCard, assetType: ToolAssetType | null, usage: ToolUsage | null, query: string) {
   // « Tous actifs » répond à n'importe quel filtre de type d'actif : c'est ce
@@ -40,19 +43,27 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
   const [assetType, setAssetType] = useState<ToolAssetType | null>(null);
   const [usage, setUsage] = useState<ToolUsage | null>(null);
   const [query, setQuery] = useState("");
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const { favorites, hydrated } = useFavorites();
 
   const visible = useMemo(
-    () => tools.filter((tool) => matches(tool, assetType, usage, query)),
-    [tools, assetType, usage, query],
+    () =>
+      tools.filter(
+        (tool) =>
+          matches(tool, assetType, usage, query) &&
+          (!onlyFavorites || favorites.includes(tool.id)),
+      ),
+    [tools, assetType, usage, query, onlyFavorites, favorites],
   );
 
   const reset = () => {
     setAssetType(null);
     setUsage(null);
     setQuery("");
+    setOnlyFavorites(false);
   };
 
-  const filtered = assetType !== null || usage !== null || query !== "";
+  const filtered = assetType !== null || usage !== null || query !== "" || onlyFavorites;
 
   return (
     <div className="flex flex-col gap-8">
@@ -80,11 +91,34 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
         />
         <Facets legend="Usage" options={toolUsages} value={usage} onChange={setUsage} />
 
+        {/* Le filtre n'apparaît qu'une fois qu'il a quelque chose à montrer :
+            un « mes favoris (0) » proposé d'emblée n'apprend rien et occupe
+            une ligne. */}
+        {hydrated && favorites.length > 0 ? (
+          <button
+            type="button"
+            aria-pressed={onlyFavorites}
+            onClick={() => setOnlyFavorites((value) => !value)}
+            className={cn(
+              "inline-flex w-fit items-center gap-2 rounded-full border px-3 py-1.5 text-sm transition-colors",
+              onlyFavorites
+                ? "border-accent bg-accent-soft text-accent-soft-fg"
+                : "border-border bg-surface text-ink-muted hover:border-border-strong hover:text-ink",
+            )}
+          >
+            <Bookmark aria-hidden="true" className="size-4" />
+            Ce que j&apos;ai mis de côté
+            <span className="tnum text-xs opacity-70">{favorites.length}</span>
+          </button>
+        ) : null}
+
         {filtered ? (
           <div className="flex items-center justify-between gap-3 border-t border-border-soft pt-4">
             <p aria-live="polite" className="text-sm text-ink-muted">
               {visible.length === 0
-                ? "Aucun outil ne correspond."
+                ? onlyFavorites
+                  ? "Aucun de vos favoris ne correspond aux autres filtres."
+                  : "Aucun outil ne correspond."
                 : `${visible.length} outil${visible.length > 1 ? "s" : ""} sur ${tools.length}`}
             </p>
             <Button variant="ghost" size="sm" onClick={reset}>
@@ -111,6 +145,7 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
                     {toolUsages.find((entry) => entry.id === id)?.label ?? id}
                   </Badge>
                 ))}
+                <FavoriteButton slug={tool.id} title={tool.title} className="ml-auto" />
               </span>
             </Link>
           </li>

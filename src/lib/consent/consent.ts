@@ -36,7 +36,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-import { createLocalStore } from "@/lib/browser/local-store";
+import { createLocalStore, useHydrated } from "@/lib/browser/local-store";
 
 /** À incrémenter dès que les finalités changent. */
 export const CONSENT_VERSION = 1;
@@ -127,6 +127,7 @@ export interface ConsentApi extends ConsentState {
 }
 
 export function useConsent(): ConsentApi {
+  const hydrated = useHydrated();
   const state = useSyncExternalStore(store.subscribe, store.getSnapshot, store.getServerSnapshot);
 
   const acceptAll = useCallback(() => answerConsent({ analytics: true }), []);
@@ -140,6 +141,6 @@ export function useConsent(): ConsentApi {
     refuseAll,
     answer,
     reopen,
-    hydrated: state !== store.serverSnapshot,
+    hydrated,
   };
 }

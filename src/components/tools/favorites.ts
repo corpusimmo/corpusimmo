@@ -15,7 +15,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-import { createLocalStore } from "@/lib/browser/local-store";
+import { createLocalStore, useHydrated } from "@/lib/browser/local-store";
 
 /** Un signet n'est pas une base : au-delà, on ne garde que les plus récents. */
 const MAX_FAVORITES = 60;
@@ -43,6 +43,7 @@ export interface FavoritesApi {
 }
 
 export function useFavorites(): FavoritesApi {
+  const hydrated = useHydrated();
   const favorites = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,
@@ -61,5 +62,5 @@ export function useFavorites(): FavoritesApi {
 
   const isFavorite = useCallback((slug: string) => favorites.includes(slug), [favorites]);
 
-  return { favorites, isFavorite, toggle, hydrated: favorites !== store.serverSnapshot };
+  return { favorites, isFavorite, toggle, hydrated };
 }

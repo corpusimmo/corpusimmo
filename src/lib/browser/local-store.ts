@@ -22,6 +22,8 @@
  * écriture, ou quand un autre onglet en signale une.
  */
 
+import { useSyncExternalStore } from "react";
+
 export interface LocalStore<T> {
   subscribe: (listener: () => void) => () => void;
   getSnapshot: () => T;
@@ -29,11 +31,6 @@ export interface LocalStore<T> {
   /** Lecture directe, hors React. */
   read: () => T;
   write: (next: T) => void;
-  /**
-   * L'identité du repli serveur. La comparer à la valeur rendue dit si
-   * l'hydratation a eu lieu, sans drapeau supplémentaire.
-   */
-  serverSnapshot: T;
 }
 
 export interface LocalStoreOptions<T> {
@@ -98,5 +95,29 @@ export function createLocalStore<T>({ key, parse, empty }: LocalStoreOptions<T>)
     };
   };
 
-  return { subscribe, getSnapshot, getServerSnapshot: () => empty, read, write, serverSnapshot: empty };
+  return { subscribe, getSnapshot, getServerSnapshot: () => empty, read, write };
+}
+
+const noopSubscribe = () => () => {};
+
+/**
+ * Vrai une fois l'hydratation faite, faux au rendu serveur et au premier rendu
+ * client.
+ *
+ * POURQUOI CE CROCHET EXISTE, ET CE QU'IL A CORRIGÉ. La version précédente
+ * déduisait l'hydratation d'une comparaison d'identité avec le repli serveur.
+ * Quand le stockage était VIDE, la lecture renvoyait exactement cet objet de
+ * repli : la comparaison restait donc fausse pour toujours, et un espace compte
+ * neuf affichait des squelettes de chargement à l'infini. Signalé en
+ * production.
+ *
+ * Un drapeau explicite ne peut pas se tromper de cette façon : il ne dit rien
+ * du contenu, seulement du moment.
+ */
+export function useHydrated(): boolean {
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
 }

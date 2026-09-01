@@ -26,7 +26,7 @@
 
 import { useCallback, useSyncExternalStore } from "react";
 
-import { createLocalStore } from "@/lib/browser/local-store";
+import { createLocalStore, useHydrated } from "@/lib/browser/local-store";
 import type { PropertyType } from "@/types/property";
 import { PROPERTY_TYPE_LABELS } from "@/types/property";
 import type { ValuationResult } from "@/types/valuation";
@@ -162,6 +162,7 @@ export interface EstimationHistoryApi {
 }
 
 export function useEstimationHistory(): EstimationHistoryApi {
+  const hydrated = useHydrated();
   const estimations = useSyncExternalStore(
     store.subscribe,
     store.getSnapshot,
@@ -176,5 +177,5 @@ export function useEstimationHistory(): EstimationHistoryApi {
     store.write([]);
   }, []);
 
-  return { estimations, forget, clear, hydrated: estimations !== store.serverSnapshot };
+  return { estimations, forget, clear, hydrated };
 }

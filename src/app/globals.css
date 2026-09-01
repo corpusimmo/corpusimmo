@@ -1,0 +1,562 @@
+@import "tailwindcss";
+
+/* ============================================================================
+   CORPUSIMMO — DESIGN TOKENS
+   ----------------------------------------------------------------------------
+   Une seule direction artistique, figée. Pas de sélecteur, pas de variantes,
+   pas de cookie lu au rendu : toutes les pages restent statiques par défaut.
+
+   Le registre : un document de banque d'affaires devenu logiciel. Papier chaud
+   plutôt que gris d'écran, bleu nuit pour l'action, bronze pour la marque et la
+   sélection, titrage sérif éditorial, rayons courts, ombres fermes.
+
+   RÈGLE ABSOLUE — un composant n'écrit JAMAIS de couleur, de rayon ni d'ombre
+   en dur. Il consomme un token sémantique : `bg-surface`, `text-ink-muted`,
+   `border-border`, `rounded-md`, `shadow-sm`. Changer l'identité de marque doit
+   rester une modification de CE fichier, et de rien d'autre.
+
+   ACCESSIBILITÉ — chaque couleur portant du texte a été mesurée en sRGB contre
+   les deux fonds réels du produit (`--surface` #FFFFFF et `--canvas` #F6F5F2).
+   Les ratios sont annotés là où le choix n'est pas évident.
+   ========================================================================== */
+:root {
+  /* --- Rampe de marque : bleu nuit ---------------------------------------
+     Le bleu de l'acte notarié, pas le bleu d'application. Il descend vite vers
+     le noir pour que `--primary` porte du blanc sans discussion. */
+  --brand-50: #eef2f7;
+  --brand-100: #dce4ee;
+  --brand-200: #b8c8dc;
+  --brand-300: #8ba4c2;
+  --brand-400: #5c7ba1;
+  --brand-500: #3a5a80;
+  --brand-600: #274461;
+  --brand-700: #1b3349;
+  --brand-800: #142838;
+  --brand-900: #0f1e2b;
+  --brand-950: #08131c;
+
+  /* --- Rampe bronze : la marque, la sélection, les filets -----------------
+     Champagne patiné, jamais jaune. `--bronze-500` (#A8874A) ne tient que
+     3,39:1 sur blanc : il reste un APLAT et un FILET. Le token qui porte du
+     texte est `--accent` (#8A6A2F, 5,02:1), une marche plus bas. */
+  --bronze-50: #faf7f0;
+  --bronze-100: #f3ebd9;
+  --bronze-200: #e7d8b8;
+  --bronze-300: #d5be8e;
+  --bronze-400: #c2a468;
+  --bronze-500: #a8874a;
+  --bronze-600: #8a6a2f;
+  --bronze-700: #6f5525;
+  --bronze-800: #56421d;
+  --bronze-900: #3f3015;
+
+  /* --- Neutres papier ----------------------------------------------------
+     Chauds et non bleutés : c'est ce qui sépare un document d'une interface. */
+  --paper-25: #fdfcfa;
+  --paper-50: #faf9f6;
+  --paper-100: #f4f2ec;
+  --paper-200: #e8e4da;
+  --paper-300: #d5cfc1;
+  --paper-400: #a9a294;
+  --paper-500: #7d786c;
+
+  /* --- Surfaces ----------------------------------------------------------- */
+  --canvas: #f6f5f2;
+  --surface: #ffffff;
+  --surface-2: #faf9f6;
+  --surface-3: #f3ede1;
+  --surface-inverted: #0f1e2b;
+  --overlay: rgb(12 22 36 / 0.52);
+
+  /* --- Encres -------------------------------------------------------------
+     `--ink-subtle` est descendu jusqu'à #5C6B82 pour tenir 4,5:1 sur le canvas
+     chaud, et pas seulement sur le blanc — c'est là qu'il sert le plus. */
+  --ink: #12233d;
+  --ink-muted: #4a5a70;
+  --ink-subtle: #5c6b82;
+  --ink-inverted: #ffffff;
+
+  /* --- Bordures — teintées papier, jamais grises -------------------------- */
+  --border: #e2ded4;
+  --border-soft: #efece4;
+  --border-strong: #cbc4b4;
+
+  /* --- Action primaire ---------------------------------------------------- */
+  --primary: #1b3349;
+  --primary-hover: #12283a;
+  --primary-active: #0d1e2b;
+  --primary-fg: #ffffff;
+  --primary-soft: #eef2f7;
+  --primary-soft-fg: #1b3349;
+
+  /* --- Accent — le bronze. Marque, sélection, comparable retenu. ---------- */
+  --accent: #8a6a2f;
+  --accent-hover: #6f5525;
+  --accent-active: #56421d;
+  --accent-fg: #ffffff;
+  --accent-soft: #f3ebd9;
+  --accent-soft-fg: #56421d;
+  /* Le bronze clair, réservé aux aplats larges et aux filets : jamais du texte. */
+  --accent-rule: #c2a468;
+
+  /* --- Retour d'état — désaturés, à la hauteur du reste ------------------- */
+  --success: #2f6b4f;
+  --success-soft: #e8f0eb;
+  --success-soft-fg: #245741;
+  --warning: #8c6115;
+  --warning-soft: #f7efdf;
+  --warning-soft-fg: #6b4a0f;
+  --danger: #a33a2a;
+  --danger-soft: #f7e9e6;
+  --danger-soft-fg: #7d2c1f;
+  --info: #1b4a87;
+  --info-soft: #e9eff7;
+  --info-soft-fg: #143a6b;
+
+  /* --- Focus --------------------------------------------------------------
+     Bronze moyen : 3,39:1 sur blanc et 3,84:1 sur le bleu nuit du pied de page.
+     Un indicateur de focus est un élément non textuel — 3:1 est le seuil. Il
+     est donc lisible sur les DEUX fonds du produit, ce qu'un bleu ne ferait
+     pas sur une surface déjà bleue. */
+  --ring: #a8874a;
+
+  /* --- Cartographie ------------------------------------------------------- */
+  --map-marker: #1b3349;
+  --map-marker-fg: #ffffff;
+  --map-cluster: #3a5a80;
+  --map-selected: #8a6a2f;
+  --map-subject: #a33a2a;
+
+  /* --- Géométrie ----------------------------------------------------------
+     Courts. Un dossier a des angles ; une application grand public a des
+     galets. On est du côté du dossier. */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 22px;
+  --radius-full: 9999px;
+
+  /* --- Élévation ----------------------------------------------------------
+     Fermes et courtes, teintées du bleu de l'encre plutôt que d'un noir neutre.
+     Aucune ombre ne déborde de plus de 40 px : rien ne flotte ici. */
+  --shadow-xs: 0 1px 1px rgb(18 35 61 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(18 35 61 / 0.06), 0 1px 1px rgb(18 35 61 / 0.04);
+  --shadow-md: 0 2px 4px rgb(18 35 61 / 0.05), 0 8px 20px -8px rgb(18 35 61 / 0.14);
+  --shadow-lg: 0 4px 8px rgb(18 35 61 / 0.05), 0 20px 40px -16px rgb(18 35 61 / 0.20);
+  --shadow-focus: 0 0 0 3px color-mix(in oklab, var(--ring) 34%, transparent);
+
+  /* --- Typographie --------------------------------------------------------
+     Deux familles, deux rôles. Le sérif ne descend jamais dans le corps de
+     texte : il titre, et c'est tout. Son tracking est bien moins négatif que
+     celui d'une grotesque — resserrer un sérif éditorial le rend sale. */
+  --tracking-display: -0.012em;
+  --tracking-eyebrow: 0.14em;
+
+  color-scheme: light;
+}
+
+/* ============================================================================
+   DENSITÉ
+   ----------------------------------------------------------------------------
+   Les écrans d'analyse — observatoire, tableaux de mutations, outils de calcul
+   — ne changent pas de marque, ils changent de RESPIRATION. C'est un attribut
+   posé sur un conteneur, pas un second thème : aucun composant n'est dupliqué,
+   aucune couleur ne bouge, et il n'y a rien à re-rendre côté React.
+   ========================================================================== */
+[data-density="compact"] {
+  --radius-xs: 3px;
+  --radius-sm: 6px;
+  --radius-md: 9px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+}
+
+/* ============================================================================
+   PONT TAILWIND
+   `@theme inline` réexpose les tokens sémantiques en utilitaires. C'est la
+   seule couche que les composants ont le droit de connaître.
+   ========================================================================== */
+@theme inline {
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-surface-3: var(--surface-3);
+  --color-surface-inverted: var(--surface-inverted);
+  --color-overlay: var(--overlay);
+
+  --color-ink: var(--ink);
+  --color-ink-muted: var(--ink-muted);
+  --color-ink-subtle: var(--ink-subtle);
+  --color-ink-inverted: var(--ink-inverted);
+
+  --color-border: var(--border);
+  --color-border-soft: var(--border-soft);
+  --color-border-strong: var(--border-strong);
+
+  --color-primary: var(--primary);
+  --color-primary-hover: var(--primary-hover);
+  --color-primary-active: var(--primary-active);
+  --color-primary-fg: var(--primary-fg);
+  --color-primary-soft: var(--primary-soft);
+  --color-primary-soft-fg: var(--primary-soft-fg);
+
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-active: var(--accent-active);
+  --color-accent-fg: var(--accent-fg);
+  --color-accent-soft: var(--accent-soft);
+  --color-accent-soft-fg: var(--accent-soft-fg);
+  --color-accent-rule: var(--accent-rule);
+
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-success-soft-fg: var(--success-soft-fg);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-warning-soft-fg: var(--warning-soft-fg);
+  --color-danger: var(--danger);
+  --color-danger-soft: var(--danger-soft);
+  --color-danger-soft-fg: var(--danger-soft-fg);
+  --color-info: var(--info);
+  --color-info-soft: var(--info-soft);
+  --color-info-soft-fg: var(--info-soft-fg);
+
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+
+  --color-bronze-50: var(--bronze-50);
+  --color-bronze-100: var(--bronze-100);
+  --color-bronze-200: var(--bronze-200);
+  --color-bronze-300: var(--bronze-300);
+  --color-bronze-400: var(--bronze-400);
+  --color-bronze-500: var(--bronze-500);
+  --color-bronze-600: var(--bronze-600);
+  --color-bronze-700: var(--bronze-700);
+
+  --color-paper-25: var(--paper-25);
+  --color-paper-50: var(--paper-50);
+  --color-paper-100: var(--paper-100);
+  --color-paper-200: var(--paper-200);
+  --color-paper-300: var(--paper-300);
+
+  --color-ring: var(--ring);
+
+  --radius-xs: var(--radius-xs);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+
+  --shadow-xs: var(--shadow-xs);
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  --font-display: var(--font-source-serif), ui-serif, Georgia, "Times New Roman", serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
+}
+
+/* ============================================================================
+   BASE
+   ========================================================================== */
+@layer base {
+  * {
+    border-color: var(--border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Un seul traitement de focus, défini ici et hérité partout. Jamais supprimé. */
+  :focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+    border-radius: var(--radius-xs);
+  }
+
+  ::selection {
+    background: color-mix(in oklab, var(--accent) 24%, transparent);
+    color: var(--ink);
+  }
+
+  /* Le sérif titre, il ne rédige pas. Cette règle est la direction artistique
+     tout entière en six lignes : si un h1 perd sa famille, la page change de
+     registre avant de changer de couleur. */
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-weight: 600;
+    letter-spacing: var(--tracking-display);
+    text-wrap: balance;
+  }
+
+  h4,
+  h5,
+  h6 {
+    letter-spacing: -0.006em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+}
+
+/* ============================================================================
+   UTILITAIRES
+   ========================================================================== */
+
+@utility container-page {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: 1.25rem;
+  max-width: 78rem;
+
+  @media (min-width: 768px) {
+    padding-inline: 2rem;
+  }
+}
+
+/* Chiffres alignés partout où l'on montre de l'argent ou une mesure. Une
+   colonne de prix dont les chiffres ne s'alignent pas se lit comme une erreur. */
+@utility tnum {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+
+/* Le surtitre en capitales espacées : le signal typographique du registre
+   éditorial, emprunté à la mise en page magazine. */
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+/* Le filet bronze sous un titre de section. Un trait, pas une décoration. */
+@utility rule-accent {
+  border-block-end: 2px solid var(--accent-rule);
+}
+
+@utility skeleton {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--border-soft);
+  border-radius: var(--radius-sm);
+
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background-image: linear-gradient(
+      90deg,
+      transparent,
+      color-mix(in oklab, var(--surface) 70%, transparent),
+      transparent
+    );
+    animation: ci-shimmer 1.6s infinite;
+  }
+}
+
+@utility scroll-slim {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+
+  &::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: var(--border-strong);
+    border-radius: 999px;
+  }
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+}
+
+/* ============================================================================
+   MOUVEMENT
+   Cinq animations d'entrée, pas une de plus. Une animation qui ne sert pas à
+   comprendre un changement d'état n'a pas sa place.
+   ========================================================================== */
+@keyframes ci-shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes ci-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ci-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes ci-slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes ci-slide-right {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: none;
+  }
+}
+
+@keyframes ci-zoom-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes ci-pulse-ring {
+  0% {
+    transform: scale(0.9);
+    opacity: 0.7;
+  }
+  70% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@utility animate-fade-up {
+  animation: ci-fade-up 0.45s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility animate-fade-in {
+  animation: ci-fade-in 0.3s ease-out both;
+}
+
+@utility animate-slide-up {
+  animation: ci-slide-up 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility animate-slide-right {
+  animation: ci-slide-right 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@utility animate-zoom-in {
+  animation: ci-zoom-in 0.18s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+/* `prefers-reduced-motion` neutralise tout, globalement et sans exception.
+   Placé hors de @layer base pour rester au-dessus des utilitaires ci-dessus. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ============================================================================
+   MAPLIBRE
+   Le chrome par défaut est le principal signe d'une « vieille carte » : on le
+   remplace entièrement par les tokens du produit.
+   ========================================================================== */
+.maplibregl-map {
+  font-family: var(--font-sans) !important;
+}
+
+.maplibregl-ctrl-group {
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-md) !important;
+  overflow: hidden;
+}
+
+.maplibregl-ctrl-group button {
+  width: 34px !important;
+  height: 34px !important;
+}
+
+.maplibregl-ctrl-group button + button {
+  border-top: 1px solid var(--border-soft) !important;
+}
+
+.maplibregl-ctrl-attrib {
+  background: color-mix(in oklab, var(--surface) 88%, transparent) !important;
+  border-radius: var(--radius-xs) 0 0 0 !important;
+  font-size: 10px !important;
+}
+
+.maplibregl-ctrl-attrib a {
+  color: var(--ink-muted) !important;
+}
+
+.maplibregl-popup-content {
+  padding: 0 !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+  background: var(--surface) !important;
+  border: 1px solid var(--border) !important;
+}
+
+.maplibregl-popup-tip {
+  border-top-color: var(--surface) !important;
+  border-bottom-color: var(--surface) !important;
+}
+
+.maplibregl-popup-close-button {
+  display: none !important;
+}

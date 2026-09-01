@@ -1,0 +1,158 @@
+"use client";
+
+/**
+ * La bibliothèque d'outils, filtrée dans le navigateur.
+ *
+ * Le filtrage est client, et la page reste STATIQUE : dix outils tiennent
+ * largement dans le document, et lire la query string côté serveur ferait
+ * basculer la page en rendu dynamique pour un service que le navigateur rend
+ * instantanément. Le prix d'un rendu dynamique se paie sur chaque visite ; le
+ * prix de ce filtre se paie une fois, en octets.
+ */
+
+import { useMemo, useState } from "react";
+import Link from "next/link";
+import { Search, SlidersHorizontal } from "lucide-react";
+
+import { Badge, Button, Input } from "@/components/ui";
+import { toolAssetTypes, toolUsages } from "@/config/navigation";
+import type { ToolAssetType, ToolUsage } from "@/config/navigation";
+import { cn } from "@/lib/utils/cn";
+import type { ToolCard } from "@/types/tool";
+
+function matches(tool: ToolCard, assetType: ToolAssetType | null, usage: ToolUsage | null, query: string) {
+  // « Tous actifs » répond à n'importe quel filtre de type d'actif : c'est ce
+  // qui évite qu'un comparateur de prêts disparaisse dès qu'on clique
+  // « Bureaux ».
+  if (assetType && !tool.assetTypes.includes(assetType) && !tool.assetTypes.includes("tous-actifs")) {
+    return false;
+  }
+  if (usage && !tool.usages.includes(usage)) return false;
+
+  if (query) {
+    const haystack = `${tool.title} ${tool.summary} ${tool.audience}`.toLowerCase();
+    if (!haystack.includes(query.toLowerCase())) return false;
+  }
+  return true;
+}
+
+export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
+  const [assetType, setAssetType] = useState<ToolAssetType | null>(null);
+  const [usage, setUsage] = useState<ToolUsage | null>(null);
+  const [query, setQuery] = useState("");
+
+  const visible = useMemo(
+    () => tools.filter((tool) => matches(tool, assetType, usage, query)),
+    [tools, assetType, usage, query],
+  );
+
+  const reset = () => {
+    setAssetType(null);
+    setUsage(null);
+    setQuery("");
+  };
+
+  const filtered = assetType !== null || usage !== null || query !== "";
+
+  return (
+    <div className="flex flex-col gap-8">
+      <div className="flex flex-col gap-5 rounded-lg border border-border bg-surface p-5">
+        <div className="relative">
+          <Search
+            aria-hidden="true"
+            className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-ink-subtle"
+          />
+          <Input
+            type="search"
+            value={query}
+            onChange={(event) => setQuery(event.target.value)}
+            placeholder="Rechercher un outil — rentabilité, DCF, plus-value…"
+            aria-label="Rechercher un outil"
+            className="pl-9"
+          />
+        </div>
+
+        <Facets
+          legend="Type d'actif"
+          options={toolAssetTypes}
+          value={assetType}
+          onChange={setAssetType}
+        />
+        <Facets legend="Usage" options={toolUsages} value={usage} onChange={setUsage} />
+
+        {filtered ? (
+          <div className="flex items-center justify-between gap-3 border-t border-border-soft pt-4">
+            <p aria-live="polite" className="text-sm text-ink-muted">
+              {visible.length === 0
+                ? "Aucun outil ne correspond."
+                : `${visible.length} outil${visible.length > 1 ? "s" : ""} sur ${tools.length}`}
+            </p>
+            <Button variant="ghost" size="sm" onClick={reset}>
+              <SlidersHorizontal aria-hidden="true" className="size-4" />
+              Tout afficher
+            </Button>
+          </div>
+        ) : null}
+      </div>
+
+      <ul className="grid gap-4 md:grid-cols-2">
+        {visible.map((tool) => (
+          <li key={tool.id}>
+            <Link
+              href={`/outils/${tool.id}`}
+              className="group flex h-full flex-col gap-3 rounded-lg border border-border bg-surface p-6 transition-shadow hover:shadow-md"
+            >
+              <span className="eyebrow">{tool.audience}</span>
+              <h2 className="font-display text-xl leading-snug text-ink">{tool.title}</h2>
+              <p className="flex-1 text-sm leading-relaxed text-ink-muted">{tool.summary}</p>
+              <span className="flex flex-wrap items-center gap-2 pt-1">
+                {tool.usages.map((id) => (
+                  <Badge key={id} tone="neutral" size="sm">
+                    {toolUsages.find((entry) => entry.id === id)?.label ?? id}
+                  </Badge>
+                ))}
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+function Facets<Id extends string>({
+  legend,
+  options,
+  value,
+  onChange,
+}: {
+  legend: string;
+  options: readonly { id: Id; label: string }[];
+  value: Id | null;
+  onChange: (next: Id | null) => void;
+}) {
+  return (
+    <fieldset className="flex flex-wrap items-center gap-2">
+      <legend className="eyebrow mb-2">{legend}</legend>
+      {options.map((option) => {
+        const active = value === option.id;
+        return (
+          <button
+            key={option.id}
+            type="button"
+            aria-pressed={active}
+            onClick={() => onChange(active ? null : option.id)}
+            className={cn(
+              "rounded-full border px-3 py-1.5 text-sm transition-colors",
+              active
+                ? "border-primary bg-primary text-primary-fg"
+                : "border-border bg-surface text-ink-muted hover:border-border-strong hover:text-ink",
+            )}
+          >
+            {option.label}
+          </button>
+        );
+      })}
+    </fieldset>
+  );
+}

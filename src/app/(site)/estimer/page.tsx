@@ -2,33 +2,41 @@ import type { Metadata } from "next";
 import { Suspense } from "react";
 
 import { LoadingState } from "@/components/ui";
-import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/lib/seo/json-ld-script";
+import { webApplicationNode } from "@/lib/seo/json-ld";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 import { EstimerClient } from "./estimer-client";
 
 const TITLE = "Estimer un bien immobilier gratuitement";
-const DESCRIPTION =
-  "Logement ou local professionnel : obtenez une fourchette de valeur calculée à partir des " +
-  "ventes réellement enregistrées autour du bien. Gratuit, sans compte, méthode publiée.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/estimer" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: siteConfig.locale,
-    siteName: siteConfig.name,
-    url: `${siteConfig.url}/estimer`,
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+  description:
+    "Logement ou local professionnel : une fourchette de valeur calculée sur les ventes " +
+    "comparables enregistrées autour du bien. Gratuit, sans compte, méthode publiée.",
+  path: "/estimer",
+  socialTitle: "Estimer un bien sur les ventes réelles du secteur",
+});
 
 export default function EstimerPage() {
   return (
     <div className="bg-canvas py-10 md:py-14">
+      {/* L'estimateur est une application, pas un article : il se saisit, il
+          calcule, il rend un résultat. Rien n'y est vendu et rien n'y est
+          demandé, d'où l'accès libre déclaré. */}
+      <JsonLd
+        nodes={[
+          webApplicationNode({
+            name: "Estimateur immobilier CorpusImmo",
+            description:
+              "Estimation par comparaison à partir des mutations DVF enregistrées autour du bien.",
+            path: "/estimer",
+            category: "FinanceApplication",
+            accessibleForFree: true,
+          }),
+        ]}
+      />
       <div className="container-page">
         <div className="mx-auto max-w-3xl">
           <p className="eyebrow">Estimation par comparaison</p>

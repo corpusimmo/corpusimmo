@@ -5,11 +5,24 @@ import { ArrowRight, Layers, Map as MapIcon, Scale, Table2 } from "lucide-react"
 import { HeroAddressSearch } from "@/components/marketing/hero-address-search";
 import { Button } from "@/components/ui";
 import { disclaimers, siteConfig } from "@/config/site";
+import { SITE_DESCRIPTION, SITE_TITLE, pageMetadata } from "@/lib/seo/metadata";
 
-export const metadata: Metadata = {
-  alternates: { canonical: "/" },
-  robots: { index: true, follow: true },
-};
+/**
+ * Le seul titre du site qui ne passe PAS par le gabarit « %s · CorpusImmo ».
+ *
+ * Il porte déjà la marque en tête, et l'accueil est la page où l'on cherche le
+ * nom autant que le service. Le titre social, lui, est celui de la page : hors
+ * du site, une promesse marche mieux qu'une raison sociale.
+ */
+export const metadata: Metadata = pageMetadata({
+  title: SITE_TITLE,
+  absoluteTitle: true,
+  description: SITE_DESCRIPTION,
+  path: "/",
+  socialTitle: "Ce qui s'est vraiment vendu, et à quel prix",
+  socialDescription:
+    "Estimation, carte des ventes et observatoire, sur les mutations enregistrées par la DGFiP.",
+});
 
 /**
  * L'accueil, en une seule colonne et pour tout le monde.

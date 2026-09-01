@@ -9,6 +9,7 @@ import { ToolRunner } from "@/components/tools/tool-runner";
 import { UnlockForm } from "@/components/tools/unlock-form";
 import { disclaimers } from "@/config/site";
 import { getToolCard } from "@/data/tools-catalogue";
+import { pageMetadata } from "@/lib/seo/metadata";
 import { readAccess } from "@/lib/access/ledger";
 import { auth, isAuthConfigured } from "@/lib/auth";
 import { getToolSpec } from "@/lib/tools/definitions";
@@ -47,12 +48,17 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const tool = getToolCard(slug);
   if (!tool) return { title: "Outil introuvable" };
 
-  return {
+  // La canonique pointe sur CETTE page, pas sur la fiche : combiner un
+  // `noindex` et une canonique vers une autre URL envoie deux ordres
+  // contradictoires, et Google documente qu'il n'en suit alors aucun.
+  return pageMetadata({
     title: `${tool.title}, le calculateur`,
-    description: tool.summary,
-    alternates: { canonical: `/outils/${tool.id}` },
-    robots: { index: false, follow: true },
-  };
+    description:
+      `${tool.summary} Le calculateur s'ouvre une fois connecté ; la fiche, elle, ` +
+      "reste en consultation libre.",
+    path: `/outils/${tool.id}/calculer`,
+    index: false,
+  });
 }
 
 export default async function CalculerPage({ params }: PageProps) {

@@ -2,32 +2,45 @@ import type { Metadata } from "next";
 
 import { ToolLibrary } from "@/components/tools/tool-library";
 import { toolCatalogue } from "@/data/tools-catalogue";
-import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/lib/seo/json-ld-script";
+import { itemListNode } from "@/lib/seo/json-ld";
+import { pageMetadata } from "@/lib/seo/metadata";
+import { toolMetaDescription } from "@/lib/seo/tool-metadata";
 
-const TITLE = "Outils de calcul immobilier";
-const DESCRIPTION =
-  "Dix calculateurs métier, gratuits, consultables librement : rentabilité locative, coût réel d'un prêt, " +
-  "capacité d'emprunt, arbitrage fiscal, DCF sur dix ans, charge foncière, WAULT, avis de valeur, " +
-  "net vendeur, chiffrage de travaux.";
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/outils" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: siteConfig.locale,
-    siteName: siteConfig.name,
-    url: `${siteConfig.url}/outils`,
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+/**
+ * La description énumère SIX outils sur dix, et pas les dix.
+ *
+ * Une méta-description est coupée autour de 160 signes : la liste complète
+ * serait tronquée en plein milieu d'un nom d'outil. Six suffisent à couvrir les
+ * requêtes qui comptent, la fiche de chacun portant ensuite la sienne.
+ */
+export const metadata: Metadata = pageMetadata({
+  title: "Outils de calcul immobilier",
+  description:
+    "Dix calculateurs métier, gratuits et consultables librement : rentabilité locative, " +
+    "capacité d'emprunt, arbitrage fiscal, DCF, bilan promoteur, WAULT.",
+  path: "/outils",
+  socialTitle: "Dix outils de calcul immobilier, barèmes affichés",
+});
 
 export default function OutilsPage() {
   return (
     <div className="bg-canvas py-10 md:py-14">
+      {/* Un sommaire se balise comme une liste : `ItemList` dit à un moteur
+          que cette page mène à dix fiches, et lesquelles. Rien de plus, et
+          surtout aucune note ni aucun avis, personne n'en ayant laissé. */}
+      <JsonLd
+        nodes={[
+          itemListNode(
+            "Les outils de calcul immobilier de CorpusImmo",
+            toolCatalogue.map((tool) => ({
+              name: tool.title,
+              path: `/outils/${tool.id}`,
+              description: toolMetaDescription(tool.summary),
+            })),
+          ),
+        ]}
+      />
       <div className="container-page">
         <header className="max-w-2xl">
           <p className="eyebrow">Bibliothèque</p>

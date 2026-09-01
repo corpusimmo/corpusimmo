@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 import { ComparablesPanel } from "@/components/observatoire/comparables-panel";
 import { PageContainer } from "@/components/observatoire/page-container";
 import { PageHeader } from "@/components/ui";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 /**
  * `noindex` — et pour deux raisons qui se rejoignent.
@@ -16,11 +17,14 @@ import { PageHeader } from "@/components/ui";
  * `follow` reste vrai : les liens sortants vers l'observatoire et la recherche
  * doivent continuer d'irriguer le reste du site.
  */
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Mes comparables",
-  description: "Votre sélection de références de marché.",
-  robots: { index: false, follow: true },
-};
+  description:
+    "Votre sélection de références de marché, tenue dans ce navigateur : excluez sans " +
+    "supprimer, mesurez la dispersion, emportez-la en tableur.",
+  path: "/observatoire/comparables",
+  index: false,
+});
 
 export default function ObservatoireComparablesPage() {
   return (

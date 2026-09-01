@@ -1,27 +1,29 @@
 import type { Metadata } from "next";
 
 import { OfferPage } from "@/components/marketing/offer-page";
-import { siteConfig } from "@/config/site";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-const TITLE = "Formation à l'IA appliquée à l'immobilier";
-const DESCRIPTION =
-  "Quelles tâches confier à une IA, comment vérifier ce qu'elle produit, où sont les pièges. " +
-  "Des sessions courtes, animées par des analystes qui ont exercé le métier.";
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/solutions/formation" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: siteConfig.locale,
-    siteName: siteConfig.name,
-    url: `${siteConfig.url}/solutions/formation`,
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+/**
+ * NON PUBLIÉE, donc hors index.
+ *
+ * L'offre professionnelle est écrite mais elle n'est pas ouverte : elle a été
+ * retirée du menu (`unpublishedNav` dans `src/config/navigation.ts`). Indexer
+ * une page qui vend un rendez-vous qu'on ne peut pas encore honorer serait la
+ * même faute que promettre un prix qu'on ne sait pas tenir.
+ *
+ * `follow` reste vrai : les liens vers l'estimateur, la carte et les outils
+ * doivent continuer d'irriguer le reste du site. Le sitemap l'exclut tout seul,
+ * en lisant ce `index: false` (voir `src/lib/seo/routes.ts`).
+ */
+export const metadata: Metadata = pageMetadata({
+  title: "Formation à l'IA appliquée à l'immobilier",
+  description:
+    "Quelles tâches confier à une IA, comment vérifier ce qu'elle produit, où sont les "
+    + "pièges. Des sessions courtes, animées par des analystes qui ont exercé le métier.",
+  path: "/solutions/formation",
+  socialTitle: "Apprendre à faire faire, et surtout à vérifier",
+  index: false,
+});
 
 export default function FormationPage() {
   return (

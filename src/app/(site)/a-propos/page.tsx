@@ -1,18 +1,16 @@
 import type { Metadata } from "next";
 
 import { disclaimers, siteConfig } from "@/config/site";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-const TITLE = "À propos";
-const DESCRIPTION =
-  "Pourquoi CorpusImmo existe, d'où viennent les données, et les quatre règles que nous nous " +
-  "sommes fixées sur ce que nous affichons.";
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/a-propos" },
-  robots: { index: true, follow: true },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "À propos",
+  description:
+    "Pourquoi CorpusImmo part d'actes et non d'annonces, d'où viennent les données DVF, et " +
+    "les quatre règles que nous nous sommes fixées sur ce que nous affichons.",
+  path: "/a-propos",
+  socialTitle: "Un corpus, et ce qu'on en fait",
+});
 
 export default function AProposPage() {
   return (

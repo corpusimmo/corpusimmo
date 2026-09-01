@@ -7,6 +7,7 @@ import { SavedTools } from "@/components/account/saved-tools";
 import { Button, PageHeader } from "@/components/ui";
 import { getToolCard } from "@/data/tools-catalogue";
 import { readAccess } from "@/lib/access/ledger";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 /**
  * MON ESPACE, sans compte.
@@ -25,13 +26,14 @@ import { readAccess } from "@/lib/access/ledger";
  */
 export const dynamic = "force-dynamic";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Mon espace",
   description:
-    "Les outils que vous avez ouverts, ceux que vous avez mis de côté, vos estimations et vos accès de la semaine.",
-  alternates: { canonical: "/mon-espace" },
-  robots: { index: false, follow: true },
-};
+    "Les outils que vous avez ouverts, ceux que vous avez mis de côté, vos estimations et " +
+    "vos accès de la semaine.",
+  path: "/mon-espace",
+  index: false,
+});
 
 export default async function MonEspacePage() {
   const access = await readAccess();

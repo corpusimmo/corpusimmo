@@ -1,32 +1,36 @@
 import type { Metadata } from "next";
 
-import { siteConfig } from "@/config/site";
+import { JsonLd } from "@/lib/seo/json-ld-script";
+import { webApplicationNode } from "@/lib/seo/json-ld";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 import { CarteClient } from "./carte-client";
 
-const TITLE = "Carte des ventes immobilières enregistrées";
-const DESCRIPTION =
-  "Explorez sur une carte les ventes immobilières réellement enregistrées en France : prix, " +
-  "surface, date et type de bien, à partir des données publiques DVF publiées par la DGFiP.";
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/carte" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: siteConfig.locale,
-    siteName: siteConfig.name,
-    url: `${siteConfig.url}/carte`,
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Carte des ventes immobilières enregistrées",
+  description:
+    "Explorez sur une carte les ventes immobilières enregistrées en France : prix, surface, " +
+    "date et type de bien, à partir des données publiques DVF publiées par la DGFiP.",
+  path: "/carte",
+  socialTitle: "La carte des ventes réellement enregistrées",
+});
 
 export default function CartePage() {
   return (
     <>
+      {/* La carte est libre : ni compte, ni quota, ni bandeau à fermer. */}
+      <JsonLd
+        nodes={[
+          webApplicationNode({
+            name: "Carte des ventes immobilières CorpusImmo",
+            description:
+              "Les mutations DVF enregistrées en France, situées et consultables sur une carte.",
+            path: "/carte",
+            category: "BusinessApplication",
+            accessibleForFree: true,
+          }),
+        ]}
+      />
       {/* La page EST la carte. Le titre existe pour les technologies
           d'assistance et pour les moteurs, qui ne savent pas lire un canevas. */}
       <h1 className="sr-only">

@@ -3,16 +3,22 @@ import Link from "next/link";
 import { Suspense } from "react";
 
 import { LoadingState } from "@/components/ui";
+import { pageMetadata } from "@/lib/seo/metadata";
 
 import { SignInForm } from "./sign-in-form";
 
-export const metadata: Metadata = {
+// Aucune valeur de référencement : un robot n'y voit qu'un bouton. `follow` est
+// coupé aussi, faute de quoi un moteur arriverait sur le reste du site par un
+// écran d'authentification plutôt que par une page qui dit quelque chose.
+export const metadata: Metadata = pageMetadata({
   title: "Connexion",
-  description: "Se connecter à CorpusImmo avec Google.",
-  // Aucune valeur de référencement, et on évite d'indexer une page
-  // d'authentification.
-  robots: { index: false, follow: false },
-};
+  description:
+    "Se connecter avec Google pour ouvrir les calculateurs et recevoir vos documents sans " +
+    "attendre un courriel de confirmation.",
+  path: "/connexion",
+  index: false,
+  follow: false,
+});
 
 export default function ConnexionPage() {
   return (

@@ -1,27 +1,29 @@
 import type { Metadata } from "next";
 
 import { OfferPage } from "@/components/marketing/offer-page";
-import { siteConfig } from "@/config/site";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-const TITLE = "Leads vendeurs qualifiés pour agences immobilières";
-const DESCRIPTION =
-  "Des propriétaires qui ont estimé leur bien sur CorpusImmo et accepté explicitement d'être " +
-  "contactés par un professionnel de leur secteur.";
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/solutions/leads-vendeurs" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: siteConfig.locale,
-    siteName: siteConfig.name,
-    url: `${siteConfig.url}/solutions/leads-vendeurs`,
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+/**
+ * NON PUBLIÉE, donc hors index.
+ *
+ * L'offre professionnelle est écrite mais elle n'est pas ouverte : elle a été
+ * retirée du menu (`unpublishedNav` dans `src/config/navigation.ts`). Indexer
+ * une page qui vend un rendez-vous qu'on ne peut pas encore honorer serait la
+ * même faute que promettre un prix qu'on ne sait pas tenir.
+ *
+ * `follow` reste vrai : les liens vers l'estimateur, la carte et les outils
+ * doivent continuer d'irriguer le reste du site. Le sitemap l'exclut tout seul,
+ * en lisant ce `index: false` (voir `src/lib/seo/routes.ts`).
+ */
+export const metadata: Metadata = pageMetadata({
+  title: "Leads vendeurs qualifiés pour agences immobilières",
+  description:
+    "Des propriétaires qui ont estimé leur bien sur CorpusImmo et accepté explicitement, "
+    + "par une case distincte et horodatée, d'être contactés par un professionnel.",
+  path: "/solutions/leads-vendeurs",
+  socialTitle: "Des propriétaires qui ont demandé qu'on les rappelle",
+  index: false,
+});
 
 export default function LeadsVendeursPage() {
   return (

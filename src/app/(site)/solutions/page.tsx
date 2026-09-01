@@ -4,28 +4,29 @@ import { ArrowRight, GraduationCap, Target, Workflow } from "lucide-react";
 
 import { Badge, Button } from "@/components/ui";
 import { MODULE_STATUS_LABELS } from "@/config/navigation";
-import { siteConfig } from "@/config/site";
+import { pageMetadata } from "@/lib/seo/metadata";
 
-const TITLE = "Solutions IA pour les professionnels de l'immobilier";
-const DESCRIPTION =
-  "Automatisation sur mesure, formation à l'IA appliquée à l'immobilier et leads vendeurs " +
-  "qualifiés — par une équipe qui a d'abord construit un estimateur et une carte DVF sur données " +
-  "réelles.";
-
-export const metadata: Metadata = {
-  title: TITLE,
-  description: DESCRIPTION,
-  alternates: { canonical: "/solutions" },
-  robots: { index: true, follow: true },
-  openGraph: {
-    type: "website",
-    locale: siteConfig.locale,
-    siteName: siteConfig.name,
-    url: `${siteConfig.url}/solutions`,
-    title: TITLE,
-    description: DESCRIPTION,
-  },
-};
+/**
+ * NON PUBLIÉE, donc hors index.
+ *
+ * L'offre professionnelle est écrite mais elle n'est pas ouverte : elle a été
+ * retirée du menu (`unpublishedNav` dans `src/config/navigation.ts`). Indexer
+ * une page qui vend un rendez-vous qu'on ne peut pas encore honorer serait la
+ * même faute que promettre un prix qu'on ne sait pas tenir.
+ *
+ * `follow` reste vrai : les liens vers l'estimateur, la carte et les outils
+ * doivent continuer d'irriguer le reste du site. Le sitemap l'exclut tout seul,
+ * en lisant ce `index: false` (voir `src/lib/seo/routes.ts`).
+ */
+export const metadata: Metadata = pageMetadata({
+  title: "Solutions IA pour les professionnels de l'immobilier",
+  description:
+    "Automatisation des tâches répétitives, formation à l'IA appliquée au métier et leads "
+    + "vendeurs consentis. Trois offres décrites sans fard, aucune encore ouverte.",
+  path: "/solutions",
+  socialTitle: "Ce que nous préparons pour les agences",
+  index: false,
+});
 
 const OFFERS = [
   {

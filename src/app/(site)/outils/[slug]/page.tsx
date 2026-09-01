@@ -7,9 +7,14 @@ import { FavoriteButton } from "@/components/tools/favorite-button";
 import { PreviewGallery } from "@/components/tools/preview-gallery";
 import { Badge, Button } from "@/components/ui";
 import { toolAssetTypes, toolUsages } from "@/config/navigation";
-import { disclaimers, siteConfig } from "@/config/site";
+import { disclaimers } from "@/config/site";
 import { getToolPreviews } from "@/data/tool-previews";
 import { toolCatalogue, getToolCard } from "@/data/tools-catalogue";
+import { JsonLd } from "@/lib/seo/json-ld-script";
+import { breadcrumbNode, webApplicationNode } from "@/lib/seo/json-ld";
+import { pageMetadata, polishMetaText } from "@/lib/seo/metadata";
+import { relatedTools } from "@/lib/seo/related-tools";
+import { toolMetaDescription } from "@/lib/seo/tool-metadata";
 import { getToolSpec } from "@/lib/tools/definitions";
 
 interface PageProps {
@@ -24,25 +29,30 @@ export function generateStaticParams() {
   return toolCatalogue.map((tool) => ({ slug: tool.id }));
 }
 
+/**
+ * La description méta est COMPOSÉE, pas recopiée (voir
+ * `src/lib/seo/tool-metadata.ts`) : le résumé d'un outil est écrit pour tenir
+ * sous un titre, il fait rarement les 150 signes qu'attend un extrait de
+ * résultat de recherche.
+ *
+ * ATTENTION en éditant ce fichier : l'inventaire du sitemap repère les pages
+ * hors index en cherchant le jeton `index: false` dans le source d'un
+ * `page.tsx` (voir `src/lib/seo/routes.ts`). L'écrire ici, même dans une
+ * branche d'erreur, sortirait les DIX fiches de l'index. Le test
+ * `src/app/sitemap.test.ts` le rattrape, mais autant ne pas l'écrire.
+ */
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const tool = getToolCard(slug);
   if (!tool) return { title: "Outil introuvable" };
 
-  return {
+  return pageMetadata({
     title: tool.title,
-    description: tool.summary,
-    alternates: { canonical: `/outils/${tool.id}` },
-    robots: { index: true, follow: true },
-    openGraph: {
-      type: "website",
-      locale: siteConfig.locale,
-      siteName: siteConfig.name,
-      url: `${siteConfig.url}/outils/${tool.id}`,
-      title: tool.title,
-      description: tool.summary,
-    },
-  };
+    description: toolMetaDescription(tool.summary),
+    path: `/outils/${tool.id}`,
+    socialTitle: tool.title,
+    socialDescription: polishMetaText(tool.summary),
+  });
 }
 
 export default async function OutilPage({ params }: PageProps) {
@@ -52,10 +62,31 @@ export default async function OutilPage({ params }: PageProps) {
 
   const spec = getToolSpec(tool.id);
   const previews = getToolPreviews(tool.id);
+  const neighbours = relatedTools(tool.id);
 
   return (
     <div className="bg-canvas py-8 md:py-12">
       <div className="container-page flex flex-col gap-8">
+        {/* La FICHE est une application décrite, et une page de deuxième
+            niveau : c'est ce qui justifie l'un et l'autre balisage.
+            `isAccessibleForFree` n'est PAS déclaré : la fiche est libre, le
+            calculateur demande une connexion. Voir `src/lib/seo/json-ld.ts`. */}
+        <JsonLd
+          nodes={[
+            webApplicationNode({
+              name: tool.title,
+              description: polishMetaText(tool.summary),
+              path: `/outils/${tool.id}`,
+              category: "FinanceApplication",
+            }),
+            breadcrumbNode([
+              { name: "Accueil", path: "/" },
+              { name: "Outils", path: "/outils" },
+              { name: tool.title, path: `/outils/${tool.id}` },
+            ]),
+          ]}
+        />
+
         <header className="flex flex-col gap-4">
           <Link
             href="/outils"
@@ -174,6 +205,46 @@ export default async function OutilPage({ params }: PageProps) {
             <p className="text-xs leading-relaxed text-ink-subtle">{disclaimers.toolResult}</p>
           </aside>
         </div>
+
+        {/* LES OUTILS VOISINS.
+            Sans ce bloc, les dix fiches sont dix culs-de-sac : on y entre par
+            le sommaire et on n'en ressort que par le bouton retour. Les voisins
+            sont CALCULÉS sur les axes du catalogue (type d'actif × usage, voir
+            `src/lib/seo/related-tools.ts`), pas listés à la main : trois liens,
+            pas un pavé, et ils restent justes quand un outil change d'axe. */}
+        {neighbours.length > 0 ? (
+          <section aria-labelledby="voisins" className="border-t border-border pt-8">
+            <h2 id="voisins" className="font-display text-xl text-ink">
+              Dans la suite du dossier
+            </h2>
+            <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+              Les outils qui servent au même moment, ou sur le même type
+              d&apos;actif.
+            </p>
+            <ul className="mt-5 grid gap-4 md:grid-cols-3">
+              {neighbours.map((neighbour) => (
+                <li key={neighbour.id}>
+                  <Link
+                    href={`/outils/${neighbour.id}`}
+                    className="group flex h-full flex-col gap-2 rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md"
+                  >
+                    <h3 className="text-base font-semibold text-ink">{neighbour.title}</h3>
+                    <p className="flex-1 text-sm leading-relaxed text-ink-muted">
+                      {neighbour.summary}
+                    </p>
+                    <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                      Voir la fiche
+                      <ArrowRight
+                        aria-hidden="true"
+                        className="size-4 transition-transform group-hover:translate-x-0.5"
+                      />
+                    </span>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </div>
     </div>
   );

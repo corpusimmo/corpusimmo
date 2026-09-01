@@ -88,7 +88,7 @@ export interface DiscoveredPage {
  * Le préfixe est donc écarté de la découverte, et le branchement se fait en un
  * seul endroit, dans `src/app/sitemap.ts`, à l'endroit signalé.
  */
-const EXCLUDED_PREFIXES = ["/blog"] as const;
+const EXCLUDED_PREFIXES = ["/blog", "/prix-immobilier"] as const;
 
 /* ------------------------------------------------------- paramètres dynamiques */
 

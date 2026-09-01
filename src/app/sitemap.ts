@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { citiesSitemapEntries } from "@/lib/cities";
 import { canonicalUrl } from "@/lib/seo/metadata";
 import { indexableRoutes } from "@/lib/seo/routes";
 
@@ -70,6 +71,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
    * hors index) couvrira les entrées du journal sans une ligne de plus, parce
    * qu'elles sont vérifiées sur la sortie de cette fonction.
    */
+
+  /**
+   * LES PAGES VILLES, énumérées par leur propre module.
+   *
+   * Elles sont écartées de la découverte automatique (`EXCLUDED_PREFIXES`) pour
+   * la même raison que le journal : le motif `/prix-immobilier/[ville]` ne se
+   * résout pas tout seul, et c'est `src/lib/cities/` qui sait quelles communes
+   * ont assez de ventes pour mériter une page. Une commune sous le seuil n'a
+   * pas de page, donc pas d'entrée : le plan de site suit cette décision au
+   * lieu de la doubler.
+   *
+   * `citiesSitemapEntries()` rend le sommaire ET les communes retenues : un
+   * seul ajout suffit, contrairement au journal.
+   */
+  routes.push(...citiesSitemapEntries());
 
   return routes;
 }

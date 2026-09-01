@@ -73,6 +73,12 @@ export const mainNav: NavEntry[] = [
         description: "Recherche tabulaire des ventes enregistrées",
       },
       {
+        label: "Prix par commune",
+        href: "/prix-immobilier",
+        status: "live",
+        description: "Le prix au m² dans cent communes, sur les ventes enregistrées",
+      },
+      {
         label: "Mes comparables",
         href: "/observatoire/comparables",
         status: "live",

@@ -67,9 +67,10 @@ export function SignInForm() {
         <div className="text-sm leading-relaxed text-warning-soft-fg">
           <p className="font-semibold">La connexion n&apos;est pas encore ouverte</p>
           <p className="mt-1 text-warning-soft-fg/90">
-            L&apos;identification Google n&apos;est pas configurée sur cette installation. Rien de
-            ce que propose le site n&apos;en dépend&nbsp;: l&apos;estimateur, la carte,
-            l&apos;observatoire et les dix outils fonctionnent sans compte.
+            L&apos;identification Google n&apos;est pas configurée sur cette installation.
+            L&apos;essentiel du site n&apos;en dépend pas&nbsp;: l&apos;estimateur, la carte des
+            ventes et l&apos;observatoire fonctionnent sans compte. Seuls les dix calculateurs
+            demandent une connexion, et ils restent consultables.
           </p>
         </div>
       </div>

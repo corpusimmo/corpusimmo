@@ -100,9 +100,9 @@ export default async function OutilPage({ params }: PageProps) {
           <div className="max-w-xl">
             <h2 className="font-display text-xl text-ink">Ouvrir le calculateur</h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              Gratuit, sans compte, dans le navigateur. Une adresse e-mail suffit à déverrouiller
-              deux outils par semaine glissante. Ceux que vous avez déjà ouverts le restent, sans
-              limite.
+              Gratuit, dans le navigateur. Le calculateur s&apos;utilise en étant connecté, à
+              raison de deux outils par semaine glissante. Ceux que vous avez déjà ouverts le
+              restent, sans limite.
             </p>
           </div>
           <Button asChild className="shrink-0">

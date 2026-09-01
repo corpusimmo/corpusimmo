@@ -6,7 +6,7 @@ import { siteConfig } from "@/config/site";
 
 const TITLE = "Outils de calcul immobilier";
 const DESCRIPTION =
-  "Dix calculateurs métier, gratuits et sans compte : rentabilité locative, coût réel d'un prêt, " +
+  "Dix calculateurs métier, gratuits, consultables librement : rentabilité locative, coût réel d'un prêt, " +
   "capacité d'emprunt, arbitrage fiscal, DCF sur dix ans, charge foncière, WAULT, avis de valeur, " +
   "net vendeur, chiffrage de travaux.";
 

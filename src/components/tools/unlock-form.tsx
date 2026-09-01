@@ -1,33 +1,45 @@
 "use client";
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { AlertTriangle, Lock } from "lucide-react";
-
-import { Button, Checkbox, Field, Input } from "@/components/ui";
-
 /**
- * La porte d'un outil.
+ * LA PORTE D'UN OUTIL, une fois la personne connectée.
  *
- * Une adresse, et l'outil s'ouvre — dans la limite de deux par semaine. Le
- * compteur est annoncé AVANT le clic, pas au moment du refus : quelqu'un qui
- * découvre la limite en se la prenant a le sentiment d'un piège, quelqu'un qui
+ * Le site est ouvert : l'estimateur, la carte et l'observatoire ne demandent
+ * rien. Les dix calculateurs, eux, se voient sans compte mais ne s'utilisent
+ * qu'après connexion. Ce n'est pas un péage déguisé : c'est ce qui permet de
+ * savoir à qui ces outils servent, et de tenir un quota qui ne repose pas sur
+ * la bonne volonté du navigateur.
+ *
+ * L'adresse n'est plus saisie ici. Elle vient de la session vérifiée par
+ * Google, et le serveur la relit lui-même : un champ e-mail rempli à la main
+ * serait, à ce stade, une déclaration que rien ne prouve.
+ *
+ * Le compteur est annoncé AVANT le clic, pas au moment du refus. Quelqu'un qui
+ * découvre la limite en se la prenant a le sentiment d'un piège ; quelqu'un qui
  * la connaît d'avance choisit où dépenser.
  */
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { AlertTriangle, Unlock } from "lucide-react";
+
+import { Button, Checkbox } from "@/components/ui";
+import { track } from "@/lib/analytics/track";
+
 export function UnlockForm({
   slug,
   title,
+  email,
   remaining,
   limit,
 }: {
   slug: string;
   title: string;
+  /** L'adresse vérifiée de la session. Affichée, jamais modifiable ici. */
+  email: string;
   remaining: number;
   limit: number;
 }) {
   const router = useRouter();
-  const [email, setEmail] = useState("");
-  const [firstName, setFirstName] = useState("");
   const [newsletter, setNewsletter] = useState(false);
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -39,29 +51,31 @@ export function UnlockForm({
         event.preventDefault();
         setPending(true);
         setError(null);
+        track({ name: "tool_unlock_attempt", params: { tool_id: slug } });
 
         try {
           const response = await fetch(`/api/outils/${slug}/acces`, {
             method: "POST",
             headers: { "content-type": "application/json" },
-            body: JSON.stringify({
-              email: email.trim(),
-              ...(firstName.trim() ? { firstName: firstName.trim() } : {}),
-              newsletter,
-            }),
+            body: JSON.stringify({ newsletter }),
           });
 
           if (!response.ok) {
             const payload: unknown = await response.json().catch(() => null);
             const detail =
               typeof payload === "object" && payload !== null && "error" in payload
-                ? (payload as { error: { message?: string } }).error.message
+                ? (payload as { error: { message?: string; code?: string } }).error
                 : undefined;
-            setError(detail ?? "Le déblocage n'a pas abouti. Réessayez.");
+            setError(detail?.message ?? "Le déblocage n'a pas abouti. Réessayez.");
+            track({
+              name: "tool_unlock_refused",
+              params: { tool_id: slug, reason: detail?.code ?? "erreur" },
+            });
             setPending(false);
             return;
           }
 
+          track({ name: "tool_unlocked", params: { tool_id: slug, newsletter } });
           // Le serveur vient de poser le cookie d'accès : on redemande la page,
           // qui rendra le calculateur au lieu de ce formulaire.
           router.refresh();
@@ -74,37 +88,16 @@ export function UnlockForm({
     >
       <div className="flex flex-col gap-2">
         <span className="eyebrow flex items-center gap-1.5">
-          <Lock aria-hidden="true" className="size-3.5" />
+          <Unlock aria-hidden="true" className="size-3.5" />
           Ouvrir le calculateur
         </span>
         <h2 className="font-display text-xl text-ink">{title}</h2>
         <p className="text-sm leading-relaxed text-ink-muted">
-          L&apos;outil est gratuit. Nous demandons une adresse pour savoir à qui il sert, et parce
-          que c&apos;est ce qui finance le reste&nbsp;: la carte, l&apos;observatoire et
-          l&apos;estimateur, eux, restent ouverts sans rien demander.
+          Vous êtes connecté avec <strong className="text-ink">{email}</strong>. Ouvrir cet outil
+          consommera un de vos {limit} accès de la semaine. Il vous restera ensuite{" "}
+          <strong className="tnum text-ink">{Math.max(0, remaining - 1)}</strong> accès, et cet
+          outil-ci restera ouvert pour de bon.
         </p>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Field label="Prénom" htmlFor="unlock-first-name" hint="Facultatif.">
-          <Input
-            id="unlock-first-name"
-            value={firstName}
-            onChange={(event) => setFirstName(event.target.value)}
-            autoComplete="given-name"
-          />
-        </Field>
-        <Field label="Adresse e-mail" htmlFor="unlock-email" required>
-          <Input
-            id="unlock-email"
-            type="email"
-            required
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            autoComplete="email"
-            placeholder="prenom@exemple.fr"
-          />
-        </Field>
       </div>
 
       <Checkbox
@@ -133,8 +126,8 @@ export function UnlockForm({
           Ouvrir l&apos;outil
         </Button>
         <p className="tnum text-sm text-ink-muted">
-          Il vous reste <strong className="text-ink">{remaining}</strong> outil
-          {remaining > 1 ? "s" : ""} sur {limit} cette semaine.
+          Il vous reste <strong className="text-ink">{remaining}</strong> accès sur {limit} cette
+          semaine.
         </p>
       </div>
     </form>

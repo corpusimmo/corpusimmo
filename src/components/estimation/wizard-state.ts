@@ -124,6 +124,13 @@ export interface WizardConsents {
 export interface WizardState {
   step: number;
   address: GeoAddress | null;
+  /**
+   * Vrai quand l'adresse a été fournie AVANT le parcours, depuis la barre de
+   * recherche de l'accueil ou un lien direct. L'étape « Adresse » est alors
+   * déjà répondue : on la montre validée en tête, et on ne la repose pas.
+   * Le bouton « Changer d'adresse » remet ce drapeau à faux et rend l'étape.
+   */
+  addressLocked: boolean;
   usage: PropertyUsage | null;
   type: WizardPropertyType | null;
   /** Only meaningful when `type === "other"`. */
@@ -155,6 +162,7 @@ export const EMPTY_FEATURES: WizardFeatures = {
 export const INITIAL_STATE: WizardState = {
   step: 0,
   address: null,
+  addressLocked: false,
   usage: null,
   type: null,
   otherType: null,
@@ -279,28 +287,142 @@ export function buildEstimatorHref(address: GeoAddress | null, usage?: PropertyU
   return query ? `/estimer?${query}` : "/estimer";
 }
 
-/** Applique `?address=` / `?usage=` sur un état, sans effacer de réponse. */
-export function applySearchParams(state: WizardState, params: URLSearchParams): WizardState {
-  let next = state;
+/**
+ * L'ADRESSE, L'ÉTAPE OÙ ELLE EST DEMANDÉE, ET CE QUI ARRIVE QUAND LES DEUX
+ * SE CONTREDISENT.
+ *
+ * L'étape « Adresse » est en troisième position quand on part du formulaire :
+ * deux choix fermés l'ont précédée, le parcours a montré qu'il savait de quoi
+ * il parlait avant de demander quoi que ce soit de localisant.
+ *
+ * Mais on peut aussi arriver AVEC une adresse, depuis la barre de recherche de
+ * l'accueil. Elle est alors déjà répondue : la reposer au troisième écran
+ * donnerait le sentiment de n'avoir pas été écouté. On la marque donc validée
+ * (`addressLocked`), on l'affiche en tête, et l'étape est sautée.
+ */
+export const ADDRESS_STEP = WIZARD_STEPS.indexOf("Adresse");
 
-  const rawAddress = params.get("address");
-  if (rawAddress && !next.address) {
-    try {
-      const parsed = parseGeoAddress(JSON.parse(rawAddress));
-      // L'adresse est mémorisée, le pas ne bouge pas : elle sera simplement
-      // déjà remplie quand on arrivera à son étape.
-      if (parsed) next = { ...next, address: parsed };
-    } catch {
-      // Un lien mal formé ne doit jamais casser le parcours : on retape.
-    }
-  }
+/** Les étapes réellement posées : l'adresse disparaît quand elle est déjà connue. */
+export function visibleSteps(state: WizardState): number[] {
+  return WIZARD_STEPS.map((_, index) => index).filter(
+    (index) => !(index === ADDRESS_STEP && state.addressLocked && state.address),
+  );
+}
 
+export function nextStep(state: WizardState): number {
+  const steps = visibleSteps(state);
+  const position = steps.indexOf(state.step);
+  return steps[Math.min(position + 1, steps.length - 1)] ?? state.step;
+}
+
+export function previousStep(state: WizardState): number {
+  const steps = visibleSteps(state);
+  const position = steps.indexOf(state.step);
+  return steps[Math.max(position - 1, 0)] ?? state.step;
+}
+
+export function isLastStep(state: WizardState): boolean {
+  const steps = visibleSteps(state);
+  return state.step === steps[steps.length - 1];
+}
+
+/** Une saisie en cours vaut la peine d'être protégée. */
+export function hasProgress(state: WizardState | null): boolean {
+  if (!state) return false;
+  return (
+    state.step > 0 ||
+    state.address !== null ||
+    state.usage !== null ||
+    state.type !== null ||
+    state.contact.email.trim() !== ""
+  );
+}
+
+/** Deux adresses désignent-elles le même bien ? L'identifiant BAN fait foi. */
+export function sameAddress(a: GeoAddress | null, b: GeoAddress | null): boolean {
+  if (!a || !b) return a === b;
+  if (a.id && b.id) return a.id === b.id;
+  return a.label.trim().toLowerCase() === b.label.trim().toLowerCase();
+}
+
+export interface EntryResolution {
+  /** L'état à retenir quand il n'y a rien à arbitrer. */
+  state: WizardState;
+  /**
+   * Renseigné UNIQUEMENT quand un brouillon en cours et une nouvelle adresse
+   * se contredisent. Le parcours pose alors la question au lieu de trancher :
+   * écraser en silence une saisie de cinq écrans est le genre de détail qui
+   * fait quitter un site.
+   */
+  conflict?: {
+    /** La saisie déjà en cours, telle qu'elle a été retrouvée. */
+    draft: WizardState;
+    /** Le parcours neuf, pour la nouvelle adresse. */
+    fresh: WizardState;
+  };
+}
+
+/**
+ * Décide de l'état de départ à partir du brouillon de session et du lien.
+ *
+ * LE BOGUE QUE CETTE FONCTION CORRIGE. La version précédente n'écrivait
+ * l'adresse du lien que si l'état n'en portait aucune (`if (raw && !address)`).
+ * Conséquence : une estimation commencée pour un bien, puis une seconde lancée
+ * depuis l'accueil pour un AUTRE bien, repartait silencieusement sur la
+ * première adresse. Le lien exprime pourtant une intention explicite et
+ * récente ; il ne peut pas être ignoré. Il ne peut pas non plus écraser sans
+ * demander : d'où le conflit, remonté à l'appelant.
+ */
+export function resolveEntry(
+  stored: WizardState | null,
+  params: URLSearchParams,
+): EntryResolution {
+  const linkedAddress = readAddressParam(params);
   const rawUsage = params.get("usage");
-  if (!next.usage && (rawUsage === "residential" || rawUsage === "professional")) {
-    next = { ...next, usage: rawUsage, step: Math.max(next.step, 1) };
+  const linkedUsage: PropertyUsage | null =
+    rawUsage === "residential" || rawUsage === "professional" ? rawUsage : null;
+
+  // Un parcours neuf pour ce que le lien demande.
+  const fresh: WizardState = {
+    ...INITIAL_STATE,
+    ...(linkedAddress ? { address: linkedAddress, addressLocked: true } : {}),
+    ...(linkedUsage ? { usage: linkedUsage, step: 1 } : {}),
+  };
+
+  if (!hasProgress(stored) || !stored) return { state: fresh };
+
+  // Le lien apporte une AUTRE adresse que celle en cours : on demande.
+  if (linkedAddress && stored.address && !sameAddress(linkedAddress, stored.address)) {
+    return { state: stored, conflict: { draft: stored, fresh } };
   }
 
-  return next;
+  // Sinon le lien complète ce qui manque, sans rien effacer.
+  let merged = stored;
+  if (linkedAddress && !merged.address) {
+    merged = { ...merged, address: linkedAddress, addressLocked: true };
+  }
+  if (linkedUsage && !merged.usage) {
+    merged = { ...merged, usage: linkedUsage, step: Math.max(merged.step, 1) };
+  }
+
+  // Un pas resté sur l'étape d'adresse alors qu'elle est désormais validée
+  // laisserait le parcours sur un écran qui ne s'affiche plus.
+  if (merged.addressLocked && merged.address && merged.step === ADDRESS_STEP) {
+    merged = { ...merged, step: nextStep(merged) };
+  }
+
+  return { state: merged };
+}
+
+function readAddressParam(params: URLSearchParams): GeoAddress | null {
+  const raw = params.get("address");
+  if (!raw) return null;
+  try {
+    return parseGeoAddress(JSON.parse(raw));
+  } catch {
+    // Un lien mal formé ne doit jamais casser le parcours : on retape.
+    return null;
+  }
 }
 
 /* -------------------------------------------------------------------------- */
@@ -326,6 +448,7 @@ export function loadWizardState(): WizardState | null {
     return {
       step: typeof parsed.step === "number" ? Math.min(Math.max(parsed.step, 0), STEP_COUNT - 1) : 0,
       address: parseGeoAddress(parsed.address),
+      addressLocked: parsed.addressLocked === true && parseGeoAddress(parsed.address) !== null,
       usage:
         parsed.usage === "residential" || parsed.usage === "professional" ? parsed.usage : null,
       type: parseWizardType(parsed.type),

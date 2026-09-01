@@ -30,7 +30,7 @@ export const siteConfig = {
   description:
     "Estimez un bien et explorez les transactions immobilières réellement enregistrées, " +
     "à partir des Demandes de Valeurs Foncières publiées par la DGFiP. Résidentiel et " +
-    "professionnel, sans compte et sans frais.",
+    "professionnel, gratuit, sans abonnement.",
 
   url: resolveAppUrl(),
   locale: "fr_FR",

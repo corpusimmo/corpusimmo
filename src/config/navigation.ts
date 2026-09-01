@@ -84,8 +84,21 @@ export const mainNav: NavEntry[] = [
     label: "Outils",
     href: "/outils",
     status: "live",
-    description: "Dix calculateurs métier, gratuits et sans compte",
+    description: "Dix calculateurs métier, gratuits, ouverts une fois connecté",
   },
+];
+
+/**
+ * LES SOLUTIONS, écrites mais pas encore publiées.
+ *
+ * Les trois pages existent et se tiennent, mais l'offre n'est pas ouverte : les
+ * annoncer dans le menu reviendrait à vendre un rendez-vous qu'on ne peut pas
+ * encore honorer, ce que ce site s'interdit ailleurs sur les prix.
+ *
+ * L'entrée est conservée ici, prête à remonter dans `mainNav` le jour où
+ * l'offre existe. La retirer complètement obligerait à la réécrire de mémoire.
+ */
+export const unpublishedNav: NavEntry[] = [
   {
     label: "Solutions",
     href: "/solutions",

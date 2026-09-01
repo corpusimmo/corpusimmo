@@ -1,9 +1,17 @@
 /**
- * `POST /api/outils/[slug]/acces` — la porte d'un outil.
+ * `POST /api/outils/[slug]/acces` : la porte d'un outil.
  *
- * Une adresse contre un déblocage, dans la limite de deux par semaine
- * glissante. Le consentement à la lettre d'information est STRICTEMENT à part :
- * demander un outil n'a jamais valu accord pour recevoir autre chose.
+ * L'ADRESSE N'EST PLUS DANS LE CORPS DE LA REQUÊTE. Elle est lue dans la
+ * session vérifiée par Google, côté serveur. Une adresse postée par le client
+ * serait une déclaration que rien ne prouve, et il suffirait d'en changer à
+ * chaque appel pour se donner autant d'accès qu'on veut.
+ *
+ * Un déblocage, dans la limite de deux par semaine glissante. Le consentement à
+ * la lettre d'information est STRICTEMENT à part : demander un outil n'a jamais
+ * valu accord pour recevoir autre chose.
+ *
+ * Sans authentification configurée sur l'installation, la session n'existe pas
+ * et la route reste ouverte : le dépôt doit démarrer avec un `.env` vide.
  */
 
 import { NextResponse } from "next/server";
@@ -12,6 +20,7 @@ import { z } from "zod";
 import { maskEmail } from "@/lib/email";
 import { leadsListId, syncContact } from "@/lib/email/contacts";
 import { grantAccess } from "@/lib/access/ledger";
+import { auth, isAuthConfigured } from "@/lib/auth";
 import { checkRateLimit, clientKey } from "@/lib/leads/rate-limit";
 import { getToolCard } from "@/data/tools-catalogue";
 
@@ -19,12 +28,6 @@ export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const bodySchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "L'adresse e-mail est obligatoire.")
-    .email("Adresse e-mail invalide."),
-  firstName: z.string().trim().max(80).optional(),
   /** Décoché par défaut, jamais groupé avec le déblocage. */
   newsletter: z.boolean().optional().default(false),
 });
@@ -38,6 +41,19 @@ export async function POST(
     return NextResponse.json(
       { error: { code: "not_found", message: "Cet outil n'existe pas." } },
       { status: 404 },
+    );
+  }
+
+  const session = isAuthConfigured ? await auth() : null;
+  if (isAuthConfigured && !session?.user?.email) {
+    return NextResponse.json(
+      {
+        error: {
+          code: "unauthenticated",
+          message: "Connectez-vous pour ouvrir cet outil.",
+        },
+      },
+      { status: 401, headers: { "cache-control": "no-store" } },
     );
   }
 
@@ -81,6 +97,7 @@ export async function POST(
   }
 
   const input = parsed.data;
+  const email = session?.user?.email ?? null;
   const outcome = await grantAccess(slug);
 
   if (!outcome.granted) {
@@ -100,25 +117,29 @@ export async function POST(
     );
   }
 
-  // Le contact n'est enregistré QUE si la case a été cochée. `syncContact`
-  // refuse d'ailleurs sans `marketing: true`.
-  const subscription = await syncContact(
-    {
-      email: input.email,
-      ...(input.firstName ? { firstName: input.firstName } : {}),
-      source: `outil:${slug}`,
-      consents: {
-        marketing: input.newsletter,
-        professionalContact: false,
-        collectedAt: new Date().toISOString(),
-      },
-    },
-    leadsListId(),
-  );
+  // Le contact n'est enregistré QUE si la case a été cochée, et QUE si une
+  // adresse vérifiée existe. `syncContact` refuse d'ailleurs sans
+  // `marketing: true`.
+  const subscription =
+    email && input.newsletter
+      ? await syncContact(
+          {
+            email,
+            ...(session?.user?.name ? { firstName: session.user.name } : {}),
+            source: `outil:${slug}`,
+            consents: {
+              marketing: true,
+              professionalContact: false,
+              collectedAt: new Date().toISOString(),
+            },
+          },
+          leadsListId(),
+        )
+      : { synced: false as const };
 
   console.info(
     `[api/outils] « ${slug} » ${outcome.alreadyOwned ? "déjà ouvert" : "débloqué"} pour ` +
-      `${maskEmail(input.email.toLowerCase())} — ` +
+      `${email ? maskEmail(email.toLowerCase()) : "visiteur anonyme"}, ` +
       `${outcome.quota.remaining} crédit(s) restant(s)`,
   );
 

@@ -4,11 +4,13 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Check } from "lucide-react";
 
 import { QuotaExhausted } from "@/components/tools/quota-exhausted";
+import { SignInGate } from "@/components/tools/sign-in-gate";
 import { ToolRunner } from "@/components/tools/tool-runner";
 import { UnlockForm } from "@/components/tools/unlock-form";
 import { disclaimers } from "@/config/site";
 import { getToolCard } from "@/data/tools-catalogue";
 import { readAccess } from "@/lib/access/ledger";
+import { auth, isAuthConfigured } from "@/lib/auth";
 import { getToolSpec } from "@/lib/tools/definitions";
 
 interface PageProps {
@@ -26,6 +28,17 @@ interface PageProps {
  * Cette page n'est pas indexable, et c'est volontaire : elle n'a pas de contenu
  * propre à référencer, et une page de résultats vide dans l'index dessert la
  * fiche qui, elle, a quelque chose à dire.
+ *
+ * DEUX PORTES, DANS CET ORDRE
+ *   1. la CONNEXION. Les dix calculateurs se consultent sans compte mais ne
+ *      s'utilisent qu'une fois connecté : c'est la seule chose du site qui le
+ *      demande, l'estimateur, la carte et l'observatoire restant ouverts ;
+ *   2. le QUOTA, deux outils par semaine glissante, une fois la personne
+ *      identifiée.
+ *
+ * Quand l'authentification n'est pas configurée sur l'installation (le dépôt
+ * doit démarrer avec un `.env` vide), la première porte n'existe pas : exiger
+ * une connexion impossible fermerait le site au lieu de le protéger.
  */
 export const dynamic = "force-dynamic";
 
@@ -48,6 +61,7 @@ export default async function CalculerPage({ params }: PageProps) {
   if (!tool) notFound();
 
   const spec = getToolSpec(tool.id);
+  const session = isAuthConfigured ? await auth() : null;
   const access = await readAccess();
   // Sans secret de signature configuré, il n'y a pas de verrou : tout est
   // ouvert. Voir l'en-tête de `src/lib/access/ledger.ts`.
@@ -75,7 +89,9 @@ export default async function CalculerPage({ params }: PageProps) {
           </div>
         </header>
 
-        {owned ? (
+        {isAuthConfigured && !session?.user ? (
+          <SignInGate slug={tool.id} title={tool.title} limit={access.quota.limit} />
+        ) : owned ? (
           <>
             {access.enforced && grant ? (
               <p className="flex flex-wrap items-center gap-2 text-sm text-ink-muted">
@@ -97,6 +113,7 @@ export default async function CalculerPage({ params }: PageProps) {
           <UnlockForm
             slug={tool.id}
             title={tool.title}
+            email={session?.user?.email ?? ""}
             remaining={access.quota.remaining}
             limit={access.quota.limit}
           />

@@ -17,6 +17,12 @@ const schema = z.object({
   // --- Cartographie ---
   NEXT_PUBLIC_MAP_STYLE_URL: z.string().url().optional(),
 
+  // --- Mesure d'audience ---
+  NEXT_PUBLIC_GA_MEASUREMENT_ID: z
+    .string()
+    .regex(/^G-[A-Z0-9]{6,12}$/, "Identifiant de mesure GA4 attendu, de la forme G-XXXXXXXXXX.")
+    .optional(),
+
   // --- Transactions ---
   DVF_PROVIDER: z.enum(["geodvf", "cerema"]).optional(),
   USE_MOCK_DVF: z.enum(["true", "false"]).optional(),
@@ -123,4 +129,18 @@ export const env = {
  */
 export const mapEnv = {
   styleUrl: cleanEnv(process.env.NEXT_PUBLIC_MAP_STYLE_URL),
+} as const;
+
+/**
+ * Mesure d'audience.
+ *
+ * L'identifiant de mesure GA4 n'est pas un secret : il figure en clair dans
+ * chaque page qui charge la balise. Il vit donc dans une variable publique, et
+ * son absence est un cas NORMAL, pas une panne : sans identifiant, aucune
+ * balise n'est posée et le site tourne à l'identique.
+ *
+ * `cleanEnv` et non `??`, pour la raison expliquée dans `lib/utils/env-value.ts`.
+ */
+export const analyticsEnv = {
+  measurementId: cleanEnv(process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID),
 } as const;

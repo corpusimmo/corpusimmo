@@ -1,4 +1,17 @@
-import { Badge, Table, TableBody, TableCell, TableHead, TableHeaderCell, TableRow } from "@/components/ui";
+"use client";
+
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+import {
+  Badge,
+  Button,
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeaderCell,
+  TableRow,
+} from "@/components/ui";
 import {
   formatArea,
   formatDistance,
@@ -18,11 +31,25 @@ const TYPE_LABELS: Record<string, string> = {
 };
 
 /**
- * Mobile reads as a list of cards, desktop as a table. Same data, two shapes —
+ * Combien de ventes on montre avant de demander. Douze, c'est un écran : assez
+ * pour juger de la matière, pas assez pour faire défiler cent lignes avant la
+ * méthode. Le reste s'ouvre d'un clic, et se replie de même.
+ */
+const PREVIEW_ROWS = 12;
+
+/**
+ * Mobile reads as a list of cards, desktop as a table. Same data, two shapes :
  * a squeezed table on a 375px screen is unreadable.
+ *
+ * Les cent vingt ventes d'un centre-ville sont toutes là, mais pas toutes
+ * ouvertes : un résultat qui fait quatorze mille pixels de haut enterre la
+ * méthode et le niveau de confiance, qui sont ce qu'on demande de lire.
  */
 export function ComparablesList({ comparables }: { comparables: Comparable[] }) {
   const rows = comparables.filter((comparable) => !comparable.excluded);
+  const [expanded, setExpanded] = useState(false);
+  const hidden = Math.max(0, rows.length - PREVIEW_ROWS);
+  const visible = expanded || hidden === 0 ? rows : rows.slice(0, PREVIEW_ROWS);
 
   return (
     <section
@@ -41,7 +68,7 @@ export function ComparablesList({ comparables }: { comparables: Comparable[] }) 
 
       {/* Mobile */}
       <ul className="flex flex-col gap-3 md:hidden">
-        {rows.map((comparable) => {
+        {visible.map((comparable) => {
           const t = comparable.transaction;
           return (
             <li
@@ -100,36 +127,39 @@ export function ComparablesList({ comparables }: { comparables: Comparable[] }) 
             </TableRow>
           </TableHead>
           <TableBody>
-            {rows.map((comparable) => {
+            {visible.map((comparable) => {
               const t = comparable.transaction;
               return (
                 <TableRow key={t.id}>
-                  <TableCell>
+                  {/* `min-w-56` : les colonnes chiffrées ne se coupent plus,
+                      c'est donc l'adresse qui reçoit le jeu, et elle ne se
+                      brise plus sur trois lignes. */}
+                  <TableCell className="min-w-56">
                     <span className="font-medium text-ink">{t.addressLabel ?? "Adresse non publiée"}</span>
                     <span className="block text-xs text-ink-muted">
                       {t.postcode ? `${t.postcode} ` : ""}
                       {t.city}
                     </span>
                   </TableCell>
-                  <TableCell>
+                  <TableCell className="whitespace-nowrap">
                     {TYPE_LABELS[t.propertyType] ?? t.propertyType}
                     {t.isMultiLot ? (
                       <span className="block text-xs text-warning-soft-fg">Vente groupée</span>
                     ) : null}
                   </TableCell>
-                  <TableCell className="tnum text-right">
+                  <TableCell className="tnum whitespace-nowrap text-right">
                     {formatDistance(comparable.distance)}
                   </TableCell>
-                  <TableCell className="tnum text-right">
+                  <TableCell className="tnum whitespace-nowrap text-right">
                     {formatMonthYear(t.date)}
                   </TableCell>
-                  <TableCell className="tnum text-right">
+                  <TableCell className="tnum whitespace-nowrap text-right">
                     {formatArea(t.builtArea)}
                   </TableCell>
-                  <TableCell className="tnum text-right font-medium">
+                  <TableCell className="tnum whitespace-nowrap text-right font-medium">
                     {formatPrice(t.price)}
                   </TableCell>
-                  <TableCell className="tnum text-right">
+                  <TableCell className="tnum whitespace-nowrap text-right">
                     {formatPricePerSqm(t.pricePerSqm)}
                   </TableCell>
                 </TableRow>
@@ -138,6 +168,28 @@ export function ComparablesList({ comparables }: { comparables: Comparable[] }) 
           </TableBody>
         </Table>
       </div>
+
+      {hidden > 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="tnum text-sm text-ink-muted">
+            {expanded
+              ? `${rows.length} ventes affichées.`
+              : `${PREVIEW_ROWS} ventes affichées sur ${rows.length}, les plus pesantes dans le calcul.`}
+          </p>
+          <Button
+            variant="outline"
+            size="sm"
+            aria-expanded={expanded}
+            onClick={() => setExpanded((current) => !current)}
+          >
+            {expanded ? "Replier la liste" : `Voir les ${hidden} autres ventes`}
+            <ChevronDown
+              aria-hidden="true"
+              className={expanded ? "size-4 rotate-180 transition-transform" : "size-4 transition-transform"}
+            />
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }

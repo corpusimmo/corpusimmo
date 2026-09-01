@@ -10,6 +10,11 @@ export interface RangeBarProps {
   className?: string;
   /** Overrides the "Estimation centrale" caption above the value. */
   centralLabel?: string;
+  /**
+   * Faux quand le chiffre central est déjà écrit en gros juste au-dessus :
+   * le répéter à quelques pixels d'écart affaiblit les deux.
+   */
+  showCentral?: boolean;
 }
 
 const TRACK_HEIGHT = 22;
@@ -27,6 +32,7 @@ export function RangeBar({
   format = formatPrice,
   className,
   centralLabel = "Estimation centrale",
+  showCentral = true,
 }: RangeBarProps) {
   if (![low, central, high].every((value) => Number.isFinite(value))) {
     return <ChartEmpty height={120} className={className} message="Fourchette indisponible" />;
@@ -54,14 +60,16 @@ export function RangeBar({
       aria-label={`Fourchette d'estimation de ${format(lowValue)} à ${format(highValue)}, valeur centrale ${format(central)}`}
       className={cn("flex w-full flex-col gap-3", className)}
     >
-      <div className="flex flex-col items-center gap-0.5">
-        <span className="text-3xl leading-none font-semibold tabular-nums text-ink sm:text-4xl">
-          {format(central)}
-        </span>
-        <span className="text-xs font-medium tracking-wide text-ink-muted uppercase">
-          {centralLabel}
-        </span>
-      </div>
+      {showCentral ? (
+        <div className="flex flex-col items-center gap-0.5">
+          <span className="text-3xl leading-none font-semibold tabular-nums text-ink sm:text-4xl">
+            {format(central)}
+          </span>
+          <span className="text-xs font-medium tracking-wide text-ink-muted uppercase">
+            {centralLabel}
+          </span>
+        </div>
+      ) : null}
 
       <svg className="block w-full" height={TRACK_HEIGHT} aria-hidden="true">
         <defs>

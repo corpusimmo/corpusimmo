@@ -39,12 +39,6 @@ export function Methodology({ valuation }: { valuation: ValuationResult }) {
         Méthode et traçabilité
       </h2>
 
-      {/* Le tableau dit ce qui a été fait, le schéma dit comment. Les deux
-          ensemble, jamais l'un sans l'autre. */}
-      <div className="rounded-lg bg-surface p-3 sm:p-5">
-        <MethodDiagram caption={false} />
-      </div>
-
       <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
         {rows.map((row) => (
           <div

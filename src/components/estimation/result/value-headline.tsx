@@ -56,19 +56,16 @@ export function ValueHeadline({
           </p>
         </div>
 
-        <div className="flex flex-col gap-3">
-          <div>
-            <RangeBar low={value.low} central={value.central} high={value.high} format={formatPrice} />
-          </div>
-          <div className="flex items-center justify-between text-sm">
-            <span className="text-ink-muted">
-              Basse <span className="tnum font-medium text-ink">{formatPrice(value.low)}</span>
-            </span>
-            <span className="text-ink-muted">
-              Haute <span className="tnum font-medium text-ink">{formatPrice(value.high)}</span>
-            </span>
-          </div>
-        </div>
+        {/* La barre porte déjà les deux bornes avec leurs libellés, et le
+            chiffre central est écrit en gros juste au-dessus : rien n'est
+            répété. */}
+        <RangeBar
+          low={value.low}
+          central={value.central}
+          high={value.high}
+          format={formatPrice}
+          showCentral={false}
+        />
 
         {pricePerSqm !== undefined ? (
           <div className="flex flex-col gap-3 border-t border-border-soft pt-6">

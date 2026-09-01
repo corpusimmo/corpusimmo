@@ -46,7 +46,7 @@ export function ComparablesCart() {
           <Layers className="size-5 shrink-0 text-accent" aria-hidden />
           <span className="min-w-0 flex-1">
             <span className="block truncate text-sm font-semibold">
-              Comparables sélectionnés — {count}
+              Comparables sélectionnés · {count}
             </span>
             <span className="block truncate text-xs text-ink-inverted/70">
               {missing > 0
@@ -65,7 +65,7 @@ export function ComparablesCart() {
       <Drawer
         open={open}
         onClose={() => setOpen(false)}
-        title={`Comparables sélectionnés — ${count}`}
+        title={`Comparables sélectionnés · ${count}`}
         description="Votre panier suit la navigation, de l'observatoire jusqu'à la valorisation."
         size="md"
         footer={

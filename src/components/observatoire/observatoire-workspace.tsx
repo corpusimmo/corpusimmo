@@ -174,7 +174,7 @@ export function ObservatoireWorkspace() {
             )}
             {result?.truncated && (
               <Badge tone="warning" size="sm">
-                Résultat tronqué — affinez les filtres
+                Résultat tronqué, affinez les filtres
               </Badge>
             )}
           </div>

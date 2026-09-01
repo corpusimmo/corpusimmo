@@ -147,7 +147,10 @@ describe("computeConfidence — factors", () => {
     const { factors } = computeConfidence({ ...GOOD, comparableCount: 14, radiusUsed: 600 });
     const first = factors[0];
     expect(first?.label).toContain("14");
-    expect(first?.label).toContain("600 m");
+    // `formatDistance` pose désormais une espace insécable avant l'unité,
+    // comme le veut la typographie française. Le test l'attend explicitement
+    // plutôt que de la voir passer pour une espace ordinaire.
+    expect(first?.label).toContain("600\u00a0m");
     expect(first?.impact).toBe("positive");
   });
 

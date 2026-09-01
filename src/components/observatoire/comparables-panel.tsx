@@ -97,12 +97,12 @@ export function ComparablesPanel() {
           },
           {
             label: "Dispersion",
-            value: stats.dispersion !== undefined ? formatPercent(stats.dispersion, 0) : "—",
+            value: stats.dispersion !== undefined ? formatPercent(stats.dispersion, 0) : "–",
             hint: "Écart interquartile rapporté à la médiane",
           },
           {
             label: "Période couverte",
-            value: stats.yearRange ? `${stats.yearRange[0]} → ${stats.yearRange[1]}` : "—",
+            value: stats.yearRange ? `${stats.yearRange[0]} → ${stats.yearRange[1]}` : "–",
             hint: `${formatArea(stats.totalArea)} de surface cumulée`,
           },
         ].map((stat) => (
@@ -120,9 +120,9 @@ export function ComparablesPanel() {
             {missing} comparable{missing > 1 ? "s" : ""} manquant{missing > 1 ? "s" : ""}
           </p>
           <p className="mt-1">
-            Le moteur d&apos;estimation exige au minimum {MIN_COMPARABLES} comparables retenus —
-            une contrainte de secret statistique, pas un réglage. En dessous, aucune valeur
-            n&apos;est produite.
+            Le moteur d&apos;estimation exige au minimum {MIN_COMPARABLES} comparables retenus.
+            C&apos;est une contrainte de secret statistique, pas un réglage. En dessous, aucune
+            valeur n&apos;est produite.
           </p>
         </div>
       )}
@@ -160,7 +160,7 @@ export function ComparablesPanel() {
         <Card className="xl:col-span-2">
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <CardTitle>Sélection courante — {formatNumber(count)}</CardTitle>
+              <CardTitle>Sélection courante · {formatNumber(count)}</CardTitle>
               <div className="flex flex-wrap gap-2">
                 <Button variant="outline" size="sm" onClick={exportSelection}>
                   <Download className="size-4" aria-hidden />

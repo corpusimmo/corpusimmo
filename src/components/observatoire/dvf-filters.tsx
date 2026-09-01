@@ -175,7 +175,7 @@ export function DvfFilters({
                 inputMode="numeric"
                 min={0}
                 step={10_000}
-                placeholder="—"
+                placeholder="–"
                 value={value.priceMax ?? ""}
                 onChange={(event) =>
                   onChange({ ...value, priceMax: toNumber(event.currentTarget.value) })
@@ -205,7 +205,7 @@ export function DvfFilters({
                 inputMode="numeric"
                 min={0}
                 step={5}
-                placeholder="—"
+                placeholder="–"
                 value={value.areaMax ?? ""}
                 onChange={(event) =>
                   onChange({ ...value, areaMax: toNumber(event.currentTarget.value) })
@@ -235,7 +235,7 @@ export function DvfFilters({
                 inputMode="numeric"
                 min={0}
                 step={100}
-                placeholder="—"
+                placeholder="–"
                 value={value.pricePerSqmMax ?? ""}
                 onChange={(event) =>
                   onChange({ ...value, pricePerSqmMax: toNumber(event.currentTarget.value) })
@@ -255,7 +255,7 @@ export function DvfFilters({
           >
             {DENSITY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label} — {option.value} lignes
+                {option.label} · {option.value} lignes
               </option>
             ))}
           </Select>

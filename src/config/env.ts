@@ -69,7 +69,17 @@ export const env = {
   email: {
     provider: raw.EMAIL_PROVIDER ?? "console",
     apiKey: raw.EMAIL_PROVIDER_KEY,
-    from: raw.EMAIL_FROM ?? "CorpusImmo <estimation@corpusimmo.fr>",
+    /**
+     * L'expéditeur par défaut est la MÊME adresse que celle publiée sur le
+     * site (`siteConfig.contactEmail`), et c'est délibéré.
+     *
+     * Une adresse d'envoi spécialisée — `estimation@`, `notifications@` — se
+     * périme dès le deuxième type de message, et une adresse `no-reply@` est
+     * pire : elle dégrade la délivrabilité et ferme la porte au moment précis
+     * où quelqu'un a une question. Une seule adresse, relevée, qui reçoit les
+     * réponses.
+     */
+    from: raw.EMAIL_FROM ?? "CorpusImmo <contact@corpusimmo.fr>",
     isConfigured:
       raw.EMAIL_PROVIDER !== undefined &&
       raw.EMAIL_PROVIDER !== "console" &&

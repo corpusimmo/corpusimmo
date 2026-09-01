@@ -32,7 +32,7 @@ function isBrevoSuccess(value: unknown): value is BrevoSuccess {
 }
 
 /**
- * `CorpusImmo <estimation@corpusimmo.fr>` → `{ name, email }`.
+ * `CorpusImmo <contact@corpusimmo.fr>` → `{ name, email }`.
  *
  * Brevo veut un expéditeur structuré là où Resend accepte la forme RFC 5322
  * d'une seule pièce. On analyse plutôt que de dupliquer la configuration : une

@@ -34,6 +34,37 @@ envoyer d'autres. Mélanger les deux chemins est la façon la plus courante de
 transformer une base propre en base illégale — d'où deux modules, et
 `syncContact` qui refuse tout sans `marketing: true`.
 
+## L'adresse d'expédition
+
+Une seule adresse, la **même que celle publiée sur le site** :
+
+```
+CorpusImmo <contact@corpusimmo.fr>
+```
+
+Trois raisons de ne pas la spécialiser :
+
+- **`estimation@` se périme au deuxième type de message.** Le lien d'un aimant,
+  la lettre d'information et une réponse commerciale partiraient tous d'une
+  adresse qui annonce autre chose.
+- **`no-reply@` est un mauvais calcul.** Les filtres s'en méfient — donc la
+  délivrabilité baisse — et l'adresse ferme la porte au moment précis où
+  quelqu'un a une question à poser. Une réponse à un e-mail d'estimation est
+  exactement le contact qu'on cherche à obtenir.
+- **La cohérence se voit.** Le pied de page, les mentions légales et
+  l'expéditeur affichent la même chose. C'est un signal de sérieux gratuit.
+
+La condition est que la boîte soit **relevée**. Une adresse qui reçoit et que
+personne ne lit est un `no-reply@` qui s'ignore.
+
+### Quand la séparer
+
+Le jour où les envois marketing prennent du volume, on isole leur réputation sur
+un sous-domaine — `news.corpusimmo.fr` — pour qu'une vague de plaintes sur une
+campagne n'abîme pas la messagerie de l'entreprise. Pas avant : au lancement,
+une adresse en sous-domaine fait surtout bizarre à la lecture, sans rien
+protéger qui existe encore.
+
 ## Ce qu'il faut créer chez Brevo
 
 1. **Un compte**, et le domaine `corpusimmo.fr` **authentifié** (SPF, DKIM,

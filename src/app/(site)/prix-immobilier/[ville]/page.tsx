@@ -290,7 +290,7 @@ export default async function VillePage({ params }: PageProps) {
               </Link>
             </Button>
             <Button asChild variant="secondary">
-              <Link href={mapHref()}>Voir les ventes sur la carte</Link>
+              <Link href={mapHref(city.insee)}>Voir les ventes sur la carte</Link>
             </Button>
             <Button asChild variant="ghost">
               <Link href={transactionsHref()}>Rechercher une vente, ligne à ligne</Link>

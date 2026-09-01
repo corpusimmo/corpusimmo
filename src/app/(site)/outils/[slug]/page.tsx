@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Fragment } from "react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, ArrowRight, FileSpreadsheet } from "lucide-react";
 
 import { FavoriteButton } from "@/components/tools/favorite-button";
+import { DeveloperBalance, WaultDiagram } from "@/components/illustrations";
 import { PreviewGallery } from "@/components/tools/preview-gallery";
 import { Badge, Button } from "@/components/ui";
 import { toolAssetTypes, toolUsages } from "@/config/navigation";
@@ -148,10 +150,24 @@ export default async function OutilPage({ params }: PageProps) {
           <div className="flex flex-col gap-6">
             <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
               <h2 className="font-display text-xl text-ink">Pourquoi cet outil</h2>
-              {tool.body.map((paragraph) => (
-                <p key={paragraph} className="text-sm leading-relaxed text-ink-muted">
-                  {paragraph}
-                </p>
+              {tool.body.map((paragraph, index) => (
+                <Fragment key={paragraph}>
+                  <p className="text-sm leading-relaxed text-ink-muted">{paragraph}</p>
+                  {/* Le schéma sous le PREMIER paragraphe, et seulement là où la
+                      fiche annonce déjà ce qu'il montre : « le bilan se lit à
+                      l'envers », « le mur d'échéances que la moyenne cache ».
+                      Le dessin est la démonstration, pas une décoration. */}
+                  {index === 0 && tool.id === "bilan-promoteur" ? (
+                    <div className="my-2 rounded-md bg-canvas p-3 md:p-4">
+                      <DeveloperBalance />
+                    </div>
+                  ) : null}
+                  {index === 0 && tool.id === "wault" ? (
+                    <div className="my-2 rounded-md bg-canvas p-3 md:p-4">
+                      <WaultDiagram />
+                    </div>
+                  ) : null}
+                </Fragment>
               ))}
             </section>
 

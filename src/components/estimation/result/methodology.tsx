@@ -1,3 +1,4 @@
+import { MethodDiagram } from "@/components/illustrations";
 import { disclaimers } from "@/config/site";
 import { formatDistance, formatNumber, formatPercent } from "@/lib/utils/format";
 import type { ValuationResult } from "@/types/valuation";
@@ -38,6 +39,12 @@ export function Methodology({ valuation }: { valuation: ValuationResult }) {
         Méthode et traçabilité
       </h2>
 
+      {/* Le tableau dit ce qui a été fait, le schéma dit comment. Les deux
+          ensemble, jamais l'un sans l'autre. */}
+      <div className="rounded-lg bg-surface p-3 sm:p-5">
+        <MethodDiagram caption={false} />
+      </div>
+
       <dl className="grid gap-x-8 gap-y-3 sm:grid-cols-2">
         {rows.map((row) => (
           <div
@@ -49,6 +56,12 @@ export function Methodology({ valuation }: { valuation: ValuationResult }) {
           </div>
         ))}
       </dl>
+
+      {/* Le tableau de traçabilité dit ce qui a été fait ; le schéma dit
+          comment. Les deux ensemble, jamais l'un sans l'autre. */}
+      <div className="rounded-lg bg-surface p-3 sm:p-5">
+        <MethodDiagram />
+      </div>
 
       {diagnostics.rejected.length > 0 ? (
         <div className="flex flex-col gap-2">

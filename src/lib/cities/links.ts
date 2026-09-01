@@ -51,8 +51,16 @@ export function estimatorHref(): string {
  * champ de recherche d'adresse. Le lien est donc nu, et le libellé de la page
  * ne promet pas un centrage qui n'aurait pas lieu.
  */
-export function mapHref(): string {
-  return "/carte";
+/**
+ * La carte, centrée sur la commune quand on en a une.
+ *
+ * `/carte` lit `?commune=<code INSEE>` côté client après montage, et retrouve
+ * le centre dans le référentiel figé des pages villes, sans appel réseau. Un
+ * code inconnu est ignoré et la carte s'ouvre sur la France entière : mieux
+ * vaut ça qu'un centre inventé. Sans code, le lien mène à la carte nue.
+ */
+export function mapHref(insee?: string): string {
+  return insee ? `/carte?commune=${encodeURIComponent(insee)}` : "/carte";
 }
 
 /** La recherche tabulaire, pour qui veut les ventes ligne à ligne. */

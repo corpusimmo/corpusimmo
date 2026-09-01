@@ -18,6 +18,7 @@ import { Badge, Button, Input } from "@/components/ui";
 import { toolAssetTypes, toolUsages } from "@/config/navigation";
 import type { ToolAssetType, ToolUsage } from "@/config/navigation";
 import { cn } from "@/lib/utils/cn";
+import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
 import type { ToolCard } from "@/types/tool";
 
 import { FavoriteButton } from "./favorite-button";
@@ -140,7 +141,17 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
               href={`/outils/${tool.id}`}
               className="group flex h-full flex-col gap-3 rounded-lg border border-border bg-surface p-6 transition-shadow hover:shadow-md"
             >
-              <span className="eyebrow">{tool.audience}</span>
+              <span className="flex items-start justify-between gap-3">
+                <span className="eyebrow">{tool.audience}</span>
+                {/* Les familles d'actif en silhouettes, dans la grammaire du
+                    logotype : le classement du catalogue devient lisible d'un
+                    coup d'œil, sans photo. */}
+                <span className="flex shrink-0 gap-1 text-ink-subtle" aria-hidden="true">
+                  {assetIconsFor(tool.assetTypes).map((name) => (
+                    <AssetTypeIcon key={name} name={name} className="size-5" />
+                  ))}
+                </span>
+              </span>
               <h2 className="font-display text-xl leading-snug text-ink">{tool.title}</h2>
               <p className="flex-1 text-sm leading-relaxed text-ink-muted">{tool.summary}</p>
               <span className="flex flex-wrap items-center gap-2 pt-1">
@@ -199,4 +210,27 @@ function Facets<Id extends string>({
       })}
     </fieldset>
   );
+}
+
+/**
+ * La correspondance entre les facettes du catalogue et les icônes.
+ *
+ * `residentiel` donne DEUX silhouettes, appartement et maison : c'est la seule
+ * famille qui en recouvre deux que le public distingue spontanément.
+ * `tous-actifs` donne l'immeuble entier, sans lot désigné. Au-delà de trois
+ * icônes, on tronque : une rangée de six silhouettes ne classe plus rien.
+ */
+const ASSET_ICONS: Record<ToolAssetType, AssetIconName[]> = {
+  residentiel: ["apartment", "house"],
+  bureaux: ["office"],
+  commerce: ["retail"],
+  industriel: ["warehouse"],
+  terrain: ["land"],
+  "tous-actifs": ["building"],
+};
+
+function assetIconsFor(types: readonly ToolAssetType[]): AssetIconName[] {
+  const seen = new Set<AssetIconName>();
+  for (const type of types) for (const name of ASSET_ICONS[type]) seen.add(name);
+  return [...seen].slice(0, 3);
 }

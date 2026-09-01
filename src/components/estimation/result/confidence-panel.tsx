@@ -1,4 +1,5 @@
 import { Minus, TrendingDown, TrendingUp } from "lucide-react";
+import { ConfidenceBand } from "@/components/illustrations";
 import { Progress } from "@/components/ui";
 import { cn } from "@/lib/utils/cn";
 import type { ConfidenceLevel, ValuationConfidence } from "@/types/valuation";
@@ -56,6 +57,20 @@ export function ConfidencePanel({ confidence }: { confidence: ValuationConfidenc
           {Math.round(confidence.score)}
           <span className="text-base font-normal text-ink-subtle">/100</span>
         </p>
+      </div>
+
+      {/* Posé AU-DESSUS du score : il apprend à lire une fourchette et un
+          niveau de confiance avant de les donner. */}
+      <div className="rounded-lg bg-surface-2 p-3 sm:p-4">
+        <ConfidenceBand />
+      </div>
+
+      {/* Posée AU-DESSUS du score : elle apprend à le lire avant de le donner.
+          Un « 63/100 » sans grille de lecture est un chiffre qu'on prend soit
+          pour une note d'école, soit pour une probabilité, et il n'est ni l'un
+          ni l'autre. */}
+      <div className="rounded-lg bg-surface-2 p-3 sm:p-4">
+        <ConfidenceBand />
       </div>
 
       <div>

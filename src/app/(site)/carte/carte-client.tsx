@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Crosshair, Loader2, SlidersHorizontal, ZoomIn } from "lucide-react";
 import { AddressAutocomplete } from "@/components/map/address-autocomplete";
 import type { DvfMapState } from "@/components/map/dvf-map";
@@ -11,6 +11,7 @@ import { median } from "@/lib/valuation/stats";
 import { formatNumber, formatPrice, formatPricePerSqm } from "@/lib/utils/format";
 import type { DvfPropertyType, DvfQueryFilters, DvfResult, DvfTransaction } from "@/types/dvf";
 import type { GeoAddress, LatLng } from "@/types/geo";
+import { readUrlTarget } from "./url-target";
 
 /** Zoomed-out France: the map says "zoom in" rather than pretending to know
  *  which city interests you. */
@@ -69,6 +70,22 @@ export function CarteClient() {
   const [center, setCenter] = useState<LatLng | null>(null);
   const [zoom, setZoom] = useState(FRANCE_ZOOM);
   const [address, setAddress] = useState<GeoAddress | null>(null);
+  /**
+   * L'URL est lue une fois monté (`?commune=` ou `?lat=&lng=&zoom=`, voir
+   * `url-target.ts`), et la carte n'est créée qu'après : la clé du composant
+   * porte le centre, la créer avant reviendrait à la détruire aussitôt.
+   */
+  const [urlRead, setUrlRead] = useState(false);
+
+  useEffect(() => {
+    const target = readUrlTarget(window.location.search);
+    if (target) {
+      setCenter(target.center);
+      setZoom(target.zoom);
+      if (target.address) setAddress(target.address);
+    }
+    setUrlRead(true);
+  }, []);
   const [filters, setFilters] = useState<DvfQueryFilters>(DEFAULT_FILTERS);
   const [typeChip, setTypeChip] = useState("all");
   const [draft, setDraft] = useState<DraftFilters>(EMPTY_DRAFT);
@@ -344,6 +361,7 @@ export function CarteClient() {
 
       <div className="relative flex-1">
         <div className="absolute inset-0">
+          {urlRead ? (
           <LazyDvfMap
             key={`${center?.lat ?? "fr"}-${center?.lng ?? "fr"}-${reloadKey}`}
             className="absolute inset-0 size-full"
@@ -354,6 +372,7 @@ export function CarteClient() {
             onSelect={handleSelect}
             onDataChange={handleData}
           />
+          ) : null}
         </div>
 
         {/* Mobile: floating search + actions over a full-screen map. */}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CircleSlash } from "lucide-react";
+import { RadiusEscalation } from "@/components/illustrations";
 import { Button } from "@/components/ui";
 import { formatDistance, formatNumber } from "@/lib/utils/format";
 import type { ValuationResult } from "@/types/valuation";
@@ -48,6 +49,13 @@ export function FailedResult({ valuation }: { valuation: ValuationResult }) {
           <dd className="tnum text-sm font-medium text-ink">{formatNumber(diagnostics.retained)}</dd>
         </div>
       </dl>
+
+      {/* Le schéma de l'escalade de rayon, ici plus qu'ailleurs : quand le
+          moteur refuse de conclure, le dessin explique le refus mieux qu'un
+          paragraphe. Les rayons dessinés sont ceux du moteur. */}
+      <div className="rounded-lg bg-canvas p-3 sm:p-5">
+        <RadiusEscalation />
+      </div>
 
       {diagnostics.failureReason ? (
         <p className="rounded-lg border-l-2 border-warning bg-warning-soft px-5 py-4 text-sm leading-relaxed text-warning-soft-fg">

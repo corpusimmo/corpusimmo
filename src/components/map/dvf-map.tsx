@@ -448,6 +448,13 @@ export function DvfMap({
     mapRef.current = instance;
     setMap(instance);
 
+    // En développement seulement : l'instance est exposée pour les scripts de
+    // mesure (temps par image sur un déplacement programmé) et le débogage.
+    // Jamais en production, où rien ne doit toucher la carte de l'extérieur.
+    if (process.env.NODE_ENV !== "production") {
+      (window as unknown as { __corpusMap?: MapLibreMap }).__corpusMap = instance;
+    }
+
     instance.addControl(
       new NavigationControl({ showCompass: true, showZoom: !compact, visualizePitch: true }),
       "top-right",

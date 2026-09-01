@@ -1,11 +1,22 @@
 "use client";
 
-import { Briefcase, Building2, Factory, Home, LandPlot, Shapes, Store } from "lucide-react";
-import type { LucideIcon } from "lucide-react";
+import { Shapes } from "lucide-react";
+import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
 import { ChoiceCard, ChoiceGroup } from "@/components/ui";
 import type { StepProps, WizardPropertyType } from "../wizard-state";
 
-type Choix = { id: WizardPropertyType; icon: LucideIcon; title: string; description: string };
+/**
+ * L'icône est une silhouette de la famille du logotype, pas un pictogramme
+ * générique : bureaux, commerce et local d'activité ne se confondent plus, là
+ * où une mallette, une boutique et une usine se lisaient comme trois métiers.
+ * « Autre » garde un pictogramme neutre, puisqu'il ne désigne rien de précis.
+ */
+type Choix = {
+  id: WizardPropertyType;
+  icon: AssetIconName | "other";
+  title: string;
+  description: string;
+};
 
 /**
  * Quatre familles par branche, jamais davantage : au-delà, on hésite au lieu de
@@ -14,25 +25,25 @@ type Choix = { id: WizardPropertyType; icon: LucideIcon; title: string; descript
 const TYPES_PRO: Choix[] = [
   {
     id: "office",
-    icon: Briefcase,
+    icon: "office",
     title: "Bureaux",
     description: "Plateau, immeuble ou lot de bureaux, occupé ou libre.",
   },
   {
     id: "retail",
-    icon: Store,
+    icon: "retail",
     title: "Local commercial",
     description: "Boutique, pied d’immeuble, cellule de centre commercial.",
   },
   {
     id: "business_premises",
-    icon: Factory,
+    icon: "business_premises",
     title: "Local d’activité",
     description: "Atelier, entrepôt, locaux mixtes activité et bureaux.",
   },
   {
     id: "land",
-    icon: LandPlot,
+    icon: "land",
     title: "Terrain",
     description: "Foncier à bâtir ou terrain d’assiette d’une opération.",
   },
@@ -41,25 +52,25 @@ const TYPES_PRO: Choix[] = [
 const TYPES: Choix[] = [
   {
     id: "apartment",
-    icon: Building2,
+    icon: "apartment",
     title: "Appartement",
     description: "Dans une copropriété, avec ou sans ascenseur.",
   },
   {
     id: "house",
-    icon: Home,
+    icon: "house",
     title: "Maison",
     description: "Individuelle ou mitoyenne, avec son terrain.",
   },
   {
     id: "land",
-    icon: LandPlot,
+    icon: "land",
     title: "Terrain",
     description: "Nu, à bâtir ou non, même si vous n’en êtes pas sûr.",
   },
   {
     id: "other",
-    icon: Shapes,
+    icon: "other",
     title: "Autre",
     description: "Immeuble, local, bureaux, parking…",
   },
@@ -80,7 +91,13 @@ export function StepType({ state, errors, update }: StepProps) {
             <ChoiceCard
               key={type.id}
               selected={state.type === type.id}
-              icon={<type.icon aria-hidden="true" />}
+              icon={
+                type.icon === "other" ? (
+                  <Shapes aria-hidden="true" />
+                ) : (
+                  <AssetTypeIcon name={type.icon} className="size-6" />
+                )
+              }
               title={type.title}
               description={type.description}
               onSelect={() => update({ type: type.id })}

@@ -60,9 +60,9 @@ export function renderEstimationReadyEmail(input: EstimationReadyInput): EmailTe
   const area = valuation.subject.features.livingArea;
 
   const hasValue = valuation.value !== undefined;
-  const central = hasValue ? formatPrice(valuation.value?.central) : "—";
-  const low = hasValue ? formatPrice(valuation.value?.low) : "—";
-  const high = hasValue ? formatPrice(valuation.value?.high) : "—";
+  const central = hasValue ? formatPrice(valuation.value?.central) : "–";
+  const low = hasValue ? formatPrice(valuation.value?.low) : "–";
+  const high = hasValue ? formatPrice(valuation.value?.high) : "–";
   const perSqm = formatPricePerSqm(valuation.pricePerSqm);
   const confidence = CONFIDENCE_LABELS[valuation.confidence.level];
   const retained = valuation.diagnostics.retained;
@@ -76,7 +76,7 @@ export function renderEstimationReadyEmail(input: EstimationReadyInput): EmailTe
     : "Nous n'avons pas pu conclure sur une fourchette";
 
   const subline = hasValue
-    ? `Valeur centrale estimée : ${central}${valuation.pricePerSqm ? ` — soit ${perSqm}` : ""}`
+    ? `Valeur centrale estimée : ${central}${valuation.pricePerSqm ? `, soit ${perSqm}` : ""}`
     : "Trop peu de ventes comparables ont été trouvées autour de votre bien.";
 
   // --- HTML ------------------------------------------------------------------
@@ -160,7 +160,7 @@ export function renderEstimationReadyEmail(input: EstimationReadyInput): EmailTe
     `Bonjour ${firstName},`,
     "",
     `Votre estimation ${siteConfig.name} est prête.`,
-    `Bien : ${typeLabel}${area ? ` — ${formatArea(area)}` : ""}`,
+    `Bien : ${typeLabel}${area ? `, ${formatArea(area)}` : ""}`,
     `Adresse : ${address}`,
     "",
     hasValue ? `Fourchette estimée : ${low} – ${high}` : "Fourchette : non concluante",

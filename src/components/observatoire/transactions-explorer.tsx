@@ -410,7 +410,7 @@ export function TransactionsExplorer() {
             </Table>
           </div>
 
-          {/* Mobile: the same rows, stacked — a 8-column table is unusable at 375px */}
+          {/* Mobile: the same rows, stacked, a 8-column table is unusable at 375px */}
           <ul className="space-y-2 md:hidden">
             {pageRows.map(({ transaction, distance }) => (
               <li key={transaction.id} className="rounded-lg border border-border bg-surface p-3">

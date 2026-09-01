@@ -35,7 +35,7 @@ export function LeadCta() {
         open={open}
         onClose={() => setOpen(false)}
         title="Mise en relation avec un professionnel"
-        description="Ce que nous pouvons — et ne pouvons pas encore — faire pour vous."
+        description="Ce que nous pouvons faire pour vous, et ce que nous ne pouvons pas encore."
         footer={
           <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
             <Button variant="ghost" onClick={() => setOpen(false)}>

@@ -90,7 +90,7 @@ export function LineChart({
     return { ...line, tone, points };
   });
 
-  const summary = `${caption ?? "Graphique linéaire"} — ${resolved
+  const summary = `${caption ?? "Graphique linéaire"} : ${resolved
     .map((line) => {
       const last = line.points[line.points.length - 1];
       return `${line.label}${last ? ` : ${valueFormat(last.value)}` : ""}`;
@@ -192,7 +192,7 @@ export function LineChart({
                       strokeWidth="2"
                       className={cn("fill-surface", DOT_TONES[line.tone])}
                     >
-                      <title>{`${line.label} — ${xs[point.index] ?? ""} : ${valueFormat(point.value)}`}</title>
+                      <title>{`${line.label}, ${xs[point.index] ?? ""} : ${valueFormat(point.value)}`}</title>
                     </circle>
                   )),
                 )

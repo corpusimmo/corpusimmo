@@ -77,7 +77,7 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
             type="search"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
-            placeholder="Rechercher un outil — rentabilité, DCF, plus-value…"
+            placeholder="Rechercher un outil : rentabilité, DCF, plus-value…"
             aria-label="Rechercher un outil"
             className="pl-9"
           />

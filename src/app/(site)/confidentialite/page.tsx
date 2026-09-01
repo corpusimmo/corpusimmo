@@ -90,15 +90,15 @@ export default function ConfidentialitePage() {
             <h2 className="font-display text-xl text-ink">Ce qui transite par nos serveurs</h2>
             <ul className="flex flex-col gap-3 leading-relaxed text-ink-muted">
               <li>
-                <strong className="font-semibold text-ink">L&apos;adresse recherchée</strong> — elle
+                <strong className="font-semibold text-ink">L&apos;adresse recherchée</strong>&nbsp;: elle
                 est transmise à la Géoplateforme IGN pour être géocodée. Nous ne la conservons pas.
               </li>
               <li>
-                <strong className="font-semibold text-ink">Les caractéristiques du bien</strong> —
+                <strong className="font-semibold text-ink">Les caractéristiques du bien</strong>&nbsp;:
                 elles servent au calcul, le temps de la requête, puis sont oubliées.
               </li>
               <li>
-                <strong className="font-semibold text-ink">Vos coordonnées</strong> — prénom,
+                <strong className="font-semibold text-ink">Vos coordonnées</strong>&nbsp;: prénom,
                 adresse e-mail et, si vous le souhaitez, téléphone, transmises à la dernière étape
                 pour vous envoyer l&apos;estimation. Elles servent à composer et envoyer cet e-mail,
                 et ne sont enregistrées nulle part à ce stade.

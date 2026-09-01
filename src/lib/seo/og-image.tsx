@@ -187,7 +187,7 @@ export function renderOgImage({ eyebrow, title, subtitle }: OgImageInput): Image
           backgroundColor: PAPER,
         }}
       >
-        {/* ═══════════════════════════════════════════════ CALQUE 1 — LE FOND
+        {/* ═══════════════════════════════════════════════ CALQUE 1, LE FOND
             À REMPLACER PAR UNE PHOTOGRAPHIE le jour où il y en aura : un seul
             `<img src={photo} style={{ position: "absolute", inset: 0, width,
             height, objectFit: "cover" }} />` à la place de ce bloc, et la trame
@@ -203,7 +203,7 @@ export function renderOgImage({ eyebrow, title, subtitle }: OgImageInput): Image
           <img src={brandWatermark(614)} width={614} height={614} alt="" style={{ opacity: 0.1 }} />
         </div>
 
-        {/* ══════════════════════════════════════════════ CALQUE 2 — LE VOILE
+        {/* ══════════════════════════════════════════════ CALQUE 2, LE VOILE
             Presque invisible sur le papier actuel, indispensable sous une
             photographie. Il pousse le filigrane vers la droite et dégage la
             colonne de texte. Avec un visuel derrière, ce dégradé passera au
@@ -222,7 +222,7 @@ export function renderOgImage({ eyebrow, title, subtitle }: OgImageInput): Image
           }}
         />
 
-        {/* ══════════════════════════════════════════════ CALQUE 3 — LE TEXTE */}
+        {/* ══════════════════════════════════════════════ CALQUE 3, LE TEXTE */}
         <div
           style={{
             display: "flex",

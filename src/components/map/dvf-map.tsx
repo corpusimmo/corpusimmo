@@ -920,7 +920,7 @@ export function DvfMap({
           so its `.maplibregl-map { position: relative }` outranks Tailwind's
           `absolute` utility (layered styles always lose to unlayered ones).
           The container would then have no positioning context and collapse to
-          zero height — a blank map with the tiles loading perfectly fine. */}
+          zero height, a blank map with the tiles loading perfectly fine. */}
       <div ref={containerRef} className="size-full" />
 
       {!styleReady && !basemapError ? (

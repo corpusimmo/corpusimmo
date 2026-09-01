@@ -32,7 +32,7 @@ import type { ToolId } from "@/types/tool";
 
 function formatValue(value: number | string, unit: string): string {
   if (typeof value === "string") return value;
-  if (!Number.isFinite(value)) return "—";
+  if (!Number.isFinite(value)) return "–";
 
   const nf = (max: number, min = 0) =>
     new Intl.NumberFormat("fr-FR", { maximumFractionDigits: max, minimumFractionDigits: min });
@@ -332,7 +332,7 @@ export function ToolRunner({ toolId }: { toolId: ToolId }) {
             >
               <span className="flex items-center gap-2 text-sm font-semibold text-ink">
                 <SlidersHorizontal className="size-4 text-ink-muted" aria-hidden />
-                Paramètres réglementaires — millésime 2026
+                Paramètres réglementaires, millésime 2026
               </span>
               <ChevronDown
                 className={`size-4 shrink-0 text-ink-muted transition-transform ${showParams ? "rotate-180" : ""}`}
@@ -585,7 +585,7 @@ function TableInput({
                     <CellInput
                       col={col}
                       value={ligne[j] ?? 0}
-                      label={`${col.label} — ${nom(i)}`}
+                      label={`${col.label}, ${nom(i)}`}
                       onChange={(brut) => setCell(i, j, brut)}
                     />
                   </td>

@@ -56,7 +56,7 @@ export const disclaimers = {
     "ferme.",
 
   dvfSource:
-    "Source : Demandes de Valeurs Foncières (DVF) — DGFiP, diffusées en open data sur " +
+    "Source : Demandes de Valeurs Foncières (DVF), publiées par la DGFiP en open data sur " +
     "data.gouv.fr. Mutations à titre onéreux enregistrées en France, hors Alsace-Moselle et " +
     "Mayotte.",
 

@@ -58,7 +58,7 @@ export default function FormationPage() {
         {
           href: "/outils/arbitrage-fiscal",
           label: "L'arbitrage fiscal",
-          body: "Cinq régimes appliqués au même bien — et la limite du calcul énoncée aussi clairement que le résultat.",
+          body: "Cinq régimes appliqués au même bien, et la limite du calcul énoncée aussi clairement que le résultat.",
         },
         {
           href: "/outils/avis-de-valeur",

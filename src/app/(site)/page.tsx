@@ -44,7 +44,7 @@ export default function HomePage() {
               Ce qui s&apos;est vraiment vendu, et à quel prix
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-relaxed text-ink-muted">
-              Les autres estimateurs partent d&apos;annonces — c&apos;est-à-dire de prix demandés.
+              Les autres estimateurs partent d&apos;annonces, c&apos;est-à-dire de prix demandés.
               Nous partons d&apos;actes : les mutations enregistrées par la DGFiP, publiées en open
               data. Un logement, un commerce, un plateau de bureaux : la même méthode, et elle est
               écrite.
@@ -183,7 +183,7 @@ const ENTRIES = [
     href: "/estimer",
     icon: Scale,
     title: "Estimer un bien",
-    body: "Six questions, puis une fourchette calculée sur les ventes comparables du secteur — avec le détail de ce qui a été retenu et de ce qui a été écarté.",
+    body: "Six questions, puis une fourchette calculée sur les ventes comparables du secteur, avec le détail de ce qui a été retenu et de ce qui a été écarté.",
     cta: "Lancer une estimation",
   },
   {
@@ -220,7 +220,7 @@ const METHOD = [
   },
   {
     title: "On pondère",
-    body: "Distance, récence, surface, typologie — combinées par moyenne géométrique, pour qu'un excellent critère ne rachète jamais un critère catastrophique.",
+    body: "Distance, récence, surface et typologie, combinées par moyenne géométrique, pour qu'un excellent critère ne rachète jamais un critère catastrophique.",
   },
   {
     title: "On donne une fourchette",
@@ -239,7 +239,7 @@ const HONESTY = [
   },
   {
     title: "Aucun comparable ne pèse plus de 40 %",
-    body: "Sans ce plafond, une « valeur de marché » pourrait n'être, en pratique, que le prix d'une seule vente — et sa confidentialité en dépend.",
+    body: "Sans ce plafond, une « valeur de marché » pourrait n'être, en pratique, que le prix d'une seule vente, et sa confidentialité en dépend.",
   },
   {
     title: "Le mot est estimation, jamais expertise",

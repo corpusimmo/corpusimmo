@@ -415,7 +415,7 @@ function primaryLabel(address: GeoAddress): string {
 
 function secondaryLabel(address: GeoAddress): string {
   if (address.kind === "municipality") {
-    return address.context ?? `Commune — ${address.cityCode}`;
+    return address.context ?? `Commune ${address.cityCode}`;
   }
   return [address.postcode, address.city].filter(Boolean).join(" ");
 }

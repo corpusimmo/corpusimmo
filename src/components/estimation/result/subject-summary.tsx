@@ -56,7 +56,7 @@ export function SubjectSummary({ subject }: { subject: PropertyDraft }) {
         <div className="min-w-0">
           <p className="text-sm font-medium leading-snug text-ink">{subject.address.label}</p>
           <p className="text-xs text-ink-muted">
-            {subject.address.city} — {subject.address.postcode ?? subject.address.cityCode}
+            {subject.address.city}, {subject.address.postcode ?? subject.address.cityCode}
           </p>
         </div>
       </div>

@@ -34,7 +34,7 @@ export default function LeadsVendeursPage() {
       delivers={[
         {
           title: "Le consentement, comme un événement daté",
-          body: "Trois accords séparés — recevoir l'estimation, être contacté par un professionnel, recevoir nos informations — dont seul le premier est requis. L'absence d'une case est un refus, et le serveur ne déduit jamais l'un de l'autre.",
+          body: "Trois accords séparés (recevoir l'estimation, être contacté par un professionnel, recevoir nos informations) dont seul le premier est requis. L'absence d'une case est un refus, et le serveur ne déduit jamais l'un de l'autre.",
         },
         {
           title: "Le bien, tel qu'il a été décrit",
@@ -51,7 +51,7 @@ export default function LeadsVendeursPage() {
       ]}
       notYet={[
         "Aucun contact n'est transmis à ce jour : la place de marché, la facturation et les contrats de destinataire ne sont pas construits.",
-        "Rien n'est encore conservé côté serveur. Le consentement est vérifié et journalisé, mais aucune base de contacts n'existe — donc aucun stock à vendre.",
+        "Rien n'est encore conservé côté serveur. Le consentement est vérifié et journalisé, mais aucune base de contacts n'existe, donc aucun stock à vendre.",
         "Le contrat destinataire reste à écrire, notamment l'obligation d'informer la personne dans le mois qui suit la transmission, et la responsabilité propre de l'agence en matière de démarchage téléphonique.",
       ]}
       proof={[

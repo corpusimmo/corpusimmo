@@ -82,7 +82,7 @@ function describeSample(result: ValuationResult): string {
         ? `, enregistrées en ${years[0]}`
         : `, enregistrées entre ${years[0]} et ${years[1]}`;
 
-  return `Nous avons comparé ${subjectLabel}${areaLabel} à ${retained} ${plural(retained, "vente réelle", "ventes réelles")} dans un rayon de ${radius}${period} — les DVF n'étant publiées que deux fois par an, avec environ six mois de décalage, les toutes dernières semaines du marché n'y figurent pas encore.`;
+  return `Nous avons comparé ${subjectLabel}${areaLabel} à ${retained} ${plural(retained, "vente réelle", "ventes réelles")} dans un rayon de ${radius}${period}. Les DVF n'étant publiées que deux fois par an, avec environ six mois de décalage, les toutes dernières semaines du marché n'y figurent pas encore.`;
 }
 
 function describeFiltering(result: ValuationResult): string {
@@ -135,7 +135,7 @@ function describeAdjustments(result: ValuationResult): string | null {
  */
 function describeCoverageCaveat(result: ValuationResult): string | null {
   if (!isPoorlyCoveredByDvf(result.subject.type)) return null;
-  return "Attention : DVF ne recense que les ventes de biens, or une grande partie des transactions d'immobilier d'entreprise se fait par cession de parts de société et n'y apparaît jamais — cette estimation repose donc sur une vision partielle de ce marché.";
+  return "Attention : DVF ne recense que les ventes de biens, or une grande partie des transactions d'immobilier d'entreprise se fait par cession de parts de société et n'y apparaît jamais, cette estimation repose donc sur une vision partielle de ce marché.";
 }
 
 function describeRange(result: ValuationResult): string {

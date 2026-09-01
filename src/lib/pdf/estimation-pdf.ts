@@ -70,7 +70,7 @@ export async function renderEstimationPdf(
   const detailed = options?.detailed ?? true;
 
   const doc = new PdfWriter({
-    title: `Estimation ${siteConfig.name} — ${v.subject.address.city}`,
+    title: `Estimation ${siteConfig.name}, ${v.subject.address.city}`,
     author: siteConfig.legalName,
     margin: 48,
   });
@@ -229,7 +229,7 @@ function drawKeyFigures(doc: PdfWriter, v: ValuationResult): void {
     { label: "Rayon de recherche", value: formatDistance(v.diagnostics.radiusUsed) },
     {
       label: "Médiane du secteur",
-      value: v.medianPricePerSqm ? formatPricePerSqm(v.medianPricePerSqm) : "—",
+      value: v.medianPricePerSqm ? formatPricePerSqm(v.medianPricePerSqm) : "–",
     },
   ];
 
@@ -364,7 +364,7 @@ function drawComparables(doc: PdfWriter, v: ValuationResult): void {
     const values = comparableRow(comparable);
     let cx = doc.margin + 6;
     for (const column of columns) {
-      const raw = values[column.key] ?? "—";
+      const raw = values[column.key] ?? "–";
       const text = doc.truncate(raw, "Helvetica", 8.5, column.width - 12);
       doc.text(text, cx, doc.y + 12, {
         font: "Helvetica",
@@ -390,9 +390,9 @@ function comparableRow(c: Comparable): Record<string, string> {
     date: formatMonthYear(t.date),
     address: t.addressLabel ? `${t.addressLabel}, ${t.city}` : t.city,
     type: DVF_TYPE_LABELS[t.propertyType],
-    area: t.builtArea ? formatArea(t.builtArea) : "—",
+    area: t.builtArea ? formatArea(t.builtArea) : "–",
     price: formatPrice(t.price),
-    perSqm: t.pricePerSqm ? formatPricePerSqm(t.pricePerSqm) : "—",
+    perSqm: t.pricePerSqm ? formatPricePerSqm(t.pricePerSqm) : "–",
     distance: formatDistance(c.distance),
   };
 }
@@ -457,7 +457,7 @@ function drawFooters(doc: PdfWriter): void {
   doc.onEachPage((index, count) => {
     const y = A4.height - 30;
     doc.line(doc.margin, y - 12, doc.margin + doc.contentWidth, y - 12, RULE, 0.4);
-    doc.text(`${siteConfig.name} — estimation statistique, non contractuelle`, doc.margin, y, {
+    doc.text(`${siteConfig.name}, estimation statistique et non contractuelle`, doc.margin, y, {
       font: "Helvetica",
       size: 8,
       color: MUTED,

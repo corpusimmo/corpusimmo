@@ -69,7 +69,7 @@ export function NewsletterForm() {
            */
           if (payload?.subscribed !== true) {
             setMessage(
-              "L'inscription n'est pas encore ouverte. Rien n'a été enregistré — " +
+              "L'inscription n'est pas encore ouverte. Rien n'a été enregistré, " +
                 "revenez dans quelques jours.",
             );
             setStatus("error");

@@ -188,7 +188,7 @@ export async function POST(
   );
 
   console.info(
-    `[api/ressources] lien « ${slug} » émis pour ${maskEmail(email)} — ` +
+    `[api/ressources] lien « ${slug} » émis pour ${maskEmail(email)}, ` +
       `e-mail ${delivery.delivered ? "envoyé" : "non envoyé"}, ` +
       `liste ${subscription.synced ? "alimentée" : `non alimentée (${subscription.reason})`}`,
   );

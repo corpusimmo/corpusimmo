@@ -78,7 +78,7 @@ export function createBrevoMailer(apiKey: string): Mailer {
         if (!response.ok) {
           const detail = await response.text().catch(() => "");
           console.error(
-            `[email:brevo] envoi refusé (${response.status}) pour ${maskEmail(message.to)} — ${detail.slice(0, 200)}`,
+            `[email:brevo] envoi refusé (${response.status}) pour ${maskEmail(message.to)} : ${detail.slice(0, 200)}`,
           );
           return {
             id: `brevo_failed_${Date.now().toString(36)}`,
@@ -93,7 +93,7 @@ export function createBrevoMailer(apiKey: string): Mailer {
         return { id, delivered: true, provider: "brevo" };
       } catch (error) {
         const reason = error instanceof Error ? error.message : "erreur inconnue";
-        console.error(`[email:brevo] envoi impossible pour ${maskEmail(message.to)} — ${reason}`);
+        console.error(`[email:brevo] envoi impossible pour ${maskEmail(message.to)}, ${reason}`);
         return {
           id: `brevo_error_${Date.now().toString(36)}`,
           delivered: false,

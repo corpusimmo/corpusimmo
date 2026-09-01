@@ -51,7 +51,7 @@ export function createResendMailer(apiKey: string): Mailer {
         if (!response.ok) {
           const detail = await response.text().catch(() => "");
           console.error(
-            `[email:resend] envoi refusé (${response.status}) pour ${maskEmail(message.to)} — ${detail.slice(0, 200)}`,
+            `[email:resend] envoi refusé (${response.status}) pour ${maskEmail(message.to)} : ${detail.slice(0, 200)}`,
           );
           return {
             id: `resend_failed_${Date.now().toString(36)}`,
@@ -66,7 +66,7 @@ export function createResendMailer(apiKey: string): Mailer {
         return { id, delivered: true, provider: "resend" };
       } catch (error) {
         const reason = error instanceof Error ? error.message : "erreur inconnue";
-        console.error(`[email:resend] envoi impossible pour ${maskEmail(message.to)} — ${reason}`);
+        console.error(`[email:resend] envoi impossible pour ${maskEmail(message.to)}, ${reason}`);
         return {
           id: `resend_error_${Date.now().toString(36)}`,
           delivered: false,

@@ -43,7 +43,7 @@ export function StepIntent({ state, errors, update }: StepProps) {
         className="rounded-lg bg-surface-2 px-4 py-3 text-xs leading-relaxed text-ink-muted"
       >
         Cette réponse ne modifie pas le calcul de la valeur. Elle nous sert à adapter ce que nous
-        vous proposons ensuite — et, uniquement si vous nous y autorisez à l’étape suivante, à vous
+        vous proposons ensuite et, uniquement si vous nous y autorisez à l’étape suivante, à vous
         orienter vers un professionnel dont le métier correspond à votre situation.
       </p>
     </div>

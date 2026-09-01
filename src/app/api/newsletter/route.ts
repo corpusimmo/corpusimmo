@@ -99,7 +99,7 @@ export async function POST(request: Request): Promise<NextResponse> {
   );
 
   console.info(
-    `[api/newsletter] inscription pour ${maskEmail(input.email.toLowerCase())} — ` +
+    `[api/newsletter] inscription pour ${maskEmail(input.email.toLowerCase())}, ` +
       (outcome.synced
         ? `liste ${outcome.created ? "créée" : "mise à jour"}`
         : `non synchronisée (${outcome.reason})`),

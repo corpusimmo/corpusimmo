@@ -118,13 +118,13 @@ export async function syncContact(
     const detail = await response.text().catch(() => "");
     console.error(
       `[contacts:${provider}] inscription refusée (${response.status}) pour ` +
-        `${maskEmail(input.email)} — ${detail.slice(0, 200)}`,
+        `${maskEmail(input.email)} : ${detail.slice(0, 200)}`,
     );
     return { synced: false, reason: "failed" };
   } catch (error) {
     const reason = error instanceof Error ? error.message : "erreur inconnue";
     console.error(
-      `[contacts:${provider}] inscription impossible pour ${maskEmail(input.email)} — ${reason}`,
+      `[contacts:${provider}] inscription impossible pour ${maskEmail(input.email)}, ${reason}`,
     );
     return { synced: false, reason: "failed" };
   } finally {

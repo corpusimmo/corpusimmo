@@ -77,7 +77,7 @@ export function SiteHeader() {
       </a>
 
       <div className="container-page flex h-16 items-center justify-between gap-4">
-        <Link href="/" aria-label={`${siteConfig.name} — accueil`} className="rounded-sm">
+        <Link href="/" aria-label={`${siteConfig.name}, accueil`} className="rounded-sm">
           <BrandLockup markClassName="size-8" />
         </Link>
 

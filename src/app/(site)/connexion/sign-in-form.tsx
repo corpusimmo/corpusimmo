@@ -53,7 +53,7 @@ export function SignInForm() {
           Vous êtes connecté
         </p>
         <p className="text-sm leading-relaxed text-success-soft-fg/90">
-          {session.user.email} — votre adresse est vérifiée par Google. Les documents de la
+          {session.user.email}, votre adresse est vérifiée par Google. Les documents de la
           bibliothèque s&apos;ouvrent désormais sans repasser par un formulaire.
         </p>
       </div>

@@ -55,7 +55,7 @@ export function StepUsage({ state, errors, update }: StepProps) {
 
       <p className="text-xs leading-relaxed text-ink-muted">
         Les deux parcours ne posent pas les mêmes questions. En professionnel, nous demanderons
-        notamment si le bien est occupé et à quel loyer — un immeuble loué et le même immeuble vide
+        notamment si le bien est occupé et à quel loyer : un immeuble loué et le même immeuble vide
         ne se négocient pas de la même façon. La valorisation par le revenu n’est pas encore
         construite : ces réponses éclairent la lecture du résultat, elles n’entrent pas dans le
         calcul, et nous préférons vous le dire.

@@ -19,7 +19,7 @@ export function StepContact({ state, errors, update }: StepProps) {
 
   return (
     <div className="flex flex-col gap-8">
-      {/* A last look at what is about to be estimated — no surprise result. */}
+      {/* A last look at what is about to be estimated, no surprise result. */}
       <div
         className="flex flex-col gap-2 rounded-lg border border-border bg-surface-2 px-4 py-3.5"
       >
@@ -29,8 +29,8 @@ export function StepContact({ state, errors, update }: StepProps) {
         <p className="text-sm font-medium text-ink">{state.address?.label ?? "Adresse à préciser"}</p>
         <p className="text-sm text-ink-muted">
           {type ? PROPERTY_TYPE_LABELS[type] : "Type à préciser"}
-          {livingArea !== undefined ? ` — ${formatArea(livingArea)}` : ""}
-          {landArea !== undefined ? ` — terrain ${formatArea(landArea)}` : ""}
+          {livingArea !== undefined ? `, ${formatArea(livingArea)}` : ""}
+          {landArea !== undefined ? `, terrain ${formatArea(landArea)}` : ""}
         </p>
       </div>
 

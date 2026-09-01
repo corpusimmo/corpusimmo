@@ -271,7 +271,7 @@ export function CarteClient() {
             ) : null}
             {stats.truncated ? (
               <Badge tone="warning" size="sm">
-                Affichage tronqué — zoomez pour tout voir
+                Affichage tronqué, zoomez pour tout voir
               </Badge>
             ) : null}
           </>
@@ -466,7 +466,7 @@ export function CarteClient() {
         ) : null}
       </div>
 
-      {/* Detail — side sheet on desktop, bottom sheet on mobile. */}
+      {/* Detail : side sheet on desktop, bottom sheet on mobile. */}
       <Drawer
         open={selected !== null}
         onClose={() => setSelected(null)}

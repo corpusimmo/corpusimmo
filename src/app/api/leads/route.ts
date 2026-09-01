@@ -246,7 +246,7 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   console.info(
     `[api/leads] lead reçu (score ${score}, ${leadTemperature(score)}, sans persistance) ` +
-      `pour ${maskEmail(input.contact.email.toLowerCase())} — ` +
+      `pour ${maskEmail(input.contact.email.toLowerCase())}, ` +
       `e-mail ${delivery.delivered ? "envoyé" : "non envoyé"}`,
   );
 

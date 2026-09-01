@@ -55,7 +55,7 @@ const TYPES: Choix[] = [
     id: "land",
     icon: LandPlot,
     title: "Terrain",
-    description: "Nu, à bâtir ou non — même si vous n’en êtes pas sûr.",
+    description: "Nu, à bâtir ou non, même si vous n’en êtes pas sûr.",
   },
   {
     id: "other",

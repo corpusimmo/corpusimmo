@@ -36,7 +36,7 @@ export function StepAddress({ state, errors, update }: StepProps) {
             <div className="min-w-0">
               <p className="truncate text-sm font-medium text-ink">{address.label}</p>
               <p className="text-xs text-ink-muted">
-                Commune de {address.city} — code INSEE {address.cityCode}
+                Commune de {address.city}, code INSEE {address.cityCode}
               </p>
             </div>
           </div>
@@ -57,7 +57,7 @@ export function StepAddress({ state, errors, update }: StepProps) {
           >
             <Info aria-hidden="true" className="mt-px size-3.5 shrink-0" />
             Le repère doit se trouver sur votre bien. Si ce n’est pas le cas, affinez l’adresse
-            ci-dessus — la précision du point change les ventes retenues.
+            ci-dessus : la précision du point change les ventes retenues.
           </p>
         </div>
       ) : (

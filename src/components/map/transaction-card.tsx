@@ -131,7 +131,7 @@ export function TransactionCard({
         <Metric
           icon={<Ruler className="size-3.5" />}
           label="Pièces"
-          value={t.rooms !== undefined ? String(t.rooms) : "—"}
+          value={t.rooms !== undefined ? String(t.rooms) : "–"}
         />
         {t.landArea !== undefined ? (
           <Metric

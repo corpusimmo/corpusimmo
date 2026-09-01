@@ -62,7 +62,7 @@ export function DistributionChart({
       ? -1
       : Math.min(binCount - 1, Math.max(0, Math.floor((highlightValue - min) / binWidth)));
 
-  const summary = `${caption ?? "Répartition des valeurs"} — ${clean.length} valeurs, de ${format(min)} à ${format(max)}${
+  const summary = `${caption ?? "Répartition des valeurs"} : ${clean.length} valeurs, de ${format(min)} à ${format(max)}${
     highlightValue !== undefined ? `, bien étudié à ${format(highlightValue)}` : ""
   }`;
 

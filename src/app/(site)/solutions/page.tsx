@@ -34,7 +34,7 @@ const OFFERS = [
     icon: Workflow,
     label: "Automatisation sur mesure",
     promise:
-      "Les tâches qui reviennent chaque semaine — qualifier, relancer, mettre à jour, reporter — exécutées sans vous.",
+      "Les tâches qui reviennent chaque semaine (qualifier, relancer, mettre à jour, reporter) exécutées sans vous.",
     bullets: [
       "Qualification des demandes entrantes",
       "Relances programmées et sorties automatiques",
@@ -83,7 +83,7 @@ export default function SolutionsPage() {
             <p className="mt-5 text-lg leading-relaxed text-ink-muted">
               Avant de vous vendre quoi que ce soit, nous avons construit un estimateur dont la
               méthode est publiée, une carte de toutes les mutations enregistrées, et dix
-              calculateurs métier — le tout ouvert et gratuit. Vous pouvez les essayer maintenant,
+              calculateurs métier, le tout ouvert et gratuit. Vous pouvez les essayer maintenant,
               et juger sur pièces.
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
@@ -108,7 +108,7 @@ export default function SolutionsPage() {
           </h2>
           <p className="mt-3 leading-relaxed text-ink-muted">
             Aucune n&apos;est encore ouverte à la commande. Les pages ci-dessous décrivent
-            exactement ce qui est prêt et ce qui ne l&apos;est pas — nous préférons le dire que le
+            exactement ce qui est prêt et ce qui ne l&apos;est pas&nbsp;: nous préférons le dire que le
             laisser découvrir.
           </p>
         </div>

@@ -54,7 +54,7 @@ export function ComparablesList({ comparables }: { comparables: Comparable[] }) 
                     {t.addressLabel ?? t.city}
                   </p>
                   <p className="text-xs text-ink-muted">
-                    {TYPE_LABELS[t.propertyType] ?? t.propertyType} — {formatMonthYear(t.date)}
+                    {TYPE_LABELS[t.propertyType] ?? t.propertyType}, {formatMonthYear(t.date)}
                   </p>
                 </div>
                 <p className="tnum shrink-0 text-sm font-semibold text-ink">{formatPrice(t.price)}</p>
@@ -75,7 +75,7 @@ export function ComparablesList({ comparables }: { comparables: Comparable[] }) 
               </dl>
               {t.isMultiLot ? (
                 <Badge tone="warning" size="sm">
-                  Vente groupée — prix au m² peu fiable
+                  Vente groupée, prix au m² peu fiable
                 </Badge>
               ) : null}
             </li>

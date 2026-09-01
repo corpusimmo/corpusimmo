@@ -28,7 +28,7 @@ export function renderMagnetReadyEmail(input: MagnetReadyInput): EmailTemplate {
   const greeting = firstName ? `Bonjour ${firstName},` : "Bonjour,";
   const validity = `Ce lien est valable jusqu'au ${formatDate(expiresAt)}.`;
 
-  const subject = `${title} — votre lien de téléchargement`;
+  const subject = `${title}, votre lien de téléchargement`;
 
   const text = [
     greeting,
@@ -40,7 +40,7 @@ export function renderMagnetReadyEmail(input: MagnetReadyInput): EmailTemplate {
     "",
     validity,
     "",
-    `— ${siteConfig.name}, ${siteConfig.signature}`,
+    `${siteConfig.name}, ${siteConfig.signature}`,
     "",
     "Vous recevez ce message parce que vous avez demandé ce document sur " +
       `${siteConfig.url}. Pour toute question : ${siteConfig.contactEmail}`,

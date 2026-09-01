@@ -221,7 +221,7 @@ export function StepFeatures({ state, errors, update, updateFeatures }: StepProp
 
         <p className="text-xs leading-relaxed text-ink-muted">
           Les mutations tertiaires sont rares dans DVF, et souvent vendues en bloc avec plusieurs
-          lots. L’estimation sera d’autant plus large — et pourra ne pas aboutir. Nous vous le
+          lots. L’estimation sera d’autant plus large, et pourra ne pas aboutir. Nous vous le
           dirons franchement plutôt que d’avancer un chiffre que la donnée ne soutient pas.
         </p>
       </div>
@@ -455,7 +455,7 @@ export function StepFeatures({ state, errors, update, updateFeatures }: StepProp
         </div>
         <p className="text-xs leading-relaxed text-ink-muted">
           Les biens atypiques comptent peu de ventes comparables dans DVF. L’estimation sera
-          d’autant plus large — et pourra ne pas aboutir. Nous vous le dirons franchement.
+          d’autant plus large, et pourra ne pas aboutir. Nous vous le dirons franchement.
         </p>
       </Group>
     </div>

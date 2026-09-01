@@ -27,7 +27,7 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     usages: ["acquisition", "financement"],
     body: [
       "Un bien peut afficher 7 % de rendement brut et vous coûter de l'argent chaque mois. L'écart tient à trois choses que le brut ignore : les charges non récupérables, la vacance, et la mensualité de crédit.",
-      "Cet outil calcule les trois rendements — brut, net de charges, net-net après impôt — et surtout le cash-flow mensuel, qui est le seul chiffre que votre compte en banque connaisse.",
+      "Cet outil calcule les trois rendements (brut, net de charges, net-net après impôt) et surtout le cash-flow mensuel, qui est le seul chiffre que votre compte en banque connaisse.",
     ],
     contents: [
       "Rendement brut, net de charges et net-net après fiscalité",
@@ -67,7 +67,7 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     usages: ["financement"],
     body: [
       "Le taux d'endettement de 35 % est une règle, pas une loi : ce qui décide vraiment, c'est le reste à vivre, et il dépend de la composition du foyer autant que des revenus.",
-      "L'outil part des revenus et des charges réelles, applique le taux d'effort et le reste à vivre, puis remonte au prix d'achat maximal — frais de notaire déduits.",
+      "L'outil part des revenus et des charges réelles, applique le taux d'effort et le reste à vivre, puis remonte au prix d'achat maximal, frais de notaire déduits.",
     ],
     contents: [
       "Capacité de remboursement mensuelle",
@@ -87,7 +87,7 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     usages: ["acquisition"],
     body: [
       "Le budget travaux est le premier poste qui dérape, et c'est presque toujours pour la même raison : il a été estimé au ratio global (« comptons 800 € du m² ») au lieu d'être décomposé par lot.",
-      "L'outil chiffre poste par poste — gros œuvre, second œuvre, lots techniques, finitions — et assume une fourchette plutôt qu'un chiffre unique.",
+      "L'outil chiffre poste par poste (gros œuvre, second œuvre, lots techniques, finitions) et assume une fourchette plutôt qu'un chiffre unique.",
     ],
     contents: [
       "Chiffrage par lot, avec quantité et prix unitaire",
@@ -127,7 +127,7 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     usages: ["valorisation"],
     body: [
       "Un avis de valeur se défend devant un vendeur qui a une idée en tête. Ce qui le tient, ce n'est pas le chiffre : ce sont les ventes citées et les ajustements assumés, ligne par ligne.",
-      "L'outil part de comparables réels, applique des ajustements explicites — surface, état, étage, extérieur — et produit une fourchette dont on peut expliquer chaque euro.",
+      "L'outil part de comparables réels, applique des ajustements explicites (surface, état, étage, extérieur) et produit une fourchette dont on peut expliquer chaque euro.",
     ],
     contents: [
       "Prix au m² pondéré des comparables retenus",

@@ -47,7 +47,7 @@ export function BarChart({
 
   const yFor = (value: number) => height - (value / axisMax) * plotHeight;
 
-  const summary = `${caption ?? "Graphique en barres"} — ${data
+  const summary = `${caption ?? "Graphique en barres"} : ${data
     .map((item) => `${item.label} : ${valueFormat(item.value)}`)
     .join(", ")}`;
 

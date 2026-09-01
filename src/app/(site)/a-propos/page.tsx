@@ -33,7 +33,7 @@ export default function AProposPage() {
             <p>
               Les Demandes de Valeurs Foncières sont exactement cela&nbsp;: l&apos;ensemble des
               mutations à titre onéreux enregistrées par la DGFiP, publiées en open data. Pas des
-              prix demandés — des prix payés, portés à un acte.
+              prix demandés, mais des prix payés, portés à un acte.
             </p>
             <p>
               C&apos;est toute la différence avec un estimateur qui extrapole depuis des annonces.
@@ -83,7 +83,7 @@ export default function AProposPage() {
 const RULES = [
   {
     title: "Jamais de repli silencieux.",
-    body: "Si la source est indisponible, l'interface le dit et propose de réessayer. Elle ne substitue jamais une valeur inventée à une valeur manquante — un site qui bascule en douce sur des données fictives ne peut plus jamais être cru sur rien.",
+    body: "Si la source est indisponible, l'interface le dit et propose de réessayer. Elle ne substitue jamais une valeur inventée à une valeur manquante : un site qui bascule en douce sur des données fictives ne peut plus jamais être cru sur rien.",
   },
   {
     title: "Un plancher statistique de cinq mutations.",

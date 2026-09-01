@@ -181,7 +181,7 @@ const pretAmortissement: ToolSpec = {
   id: "pret-amortissement",
   title: "Coût réel d'un prêt immobilier",
   intro:
-    "Ce que le crédit coûte vraiment, assurance, dossier et garantie compris — pas seulement le taux affiché.",
+    "Ce que le crédit coûte vraiment, assurance, dossier et garantie compris, pas seulement le taux affiché.",
   sections: [
     {
       title: "L'emprunt",
@@ -207,7 +207,7 @@ const pretAmortissement: ToolSpec = {
       id: "offres",
       title: "Comparer plusieurs offres",
       hint:
-        "Une ligne par proposition de banque. Le taux nominal ne suffit pas à départager : c'est le coût TOTAL, assurance, dossier et garantie compris, qui dit laquelle coûte le moins cher. Comparez d'abord à durée égale — une offre plus courte coûte presque toujours moins d'intérêts, mais pèse davantage chaque mois.",
+        "Une ligne par proposition de banque. Le taux nominal ne suffit pas à départager : c'est le coût TOTAL, assurance, dossier et garantie compris, qui dit laquelle coûte le moins cher. Comparez d'abord à durée égale, une offre plus courte coûte presque toujours moins d'intérêts, mais pèse davantage chaque mois.",
       addLabel: "Ajouter une offre",
       min: 1,
       rowLabels: ["Offre A", "Offre B", "Offre C"],
@@ -264,11 +264,11 @@ const pretAmortissement: ToolSpec = {
       unit: "texte",
       compute: (v, c, t) => {
         const couts = coutsDesOffres(t.offres);
-        if (couts.length === 0) return "—";
+        if (couts.length === 0) return "–";
         const mini = Math.min(...couts);
         const rang = couts.indexOf(mini);
         const nom = ["Offre A", "Offre B", "Offre C"][rang] ?? `Offre ${rang + 1}`;
-        return `${nom} — ${fr(mini)} € de coût total`;
+        return `${nom}, ${fr(mini)} € de coût total`;
       },
       strong: true,
     },
@@ -324,8 +324,8 @@ const capaciteEmprunt: ToolSpec = {
     {
       title: "Revenus mensuels nets",
       fields: [
-        { id: "salaire1", label: "Salaire net — emprunteur 1", value: 2600, unit: "eur", hint: "Net avant impôt, hors primes exceptionnelles. Pour un indépendant, la banque retient la moyenne des trois derniers bilans." },
-        { id: "salaire2", label: "Salaire net — emprunteur 2", value: 1900, unit: "eur" },
+        { id: "salaire1", label: "Salaire net, emprunteur 1", value: 2600, unit: "eur", hint: "Net avant impôt, hors primes exceptionnelles. Pour un indépendant, la banque retient la moyenne des trois derniers bilans." },
+        { id: "salaire2", label: "Salaire net, emprunteur 2", value: 1900, unit: "eur" },
         { id: "primes", label: "Primes et variables", value: 200, unit: "eur", hint: "Moyenne mensuelle sur trois ans, si récurrentes." },
         { id: "loyers", label: "Revenus locatifs actuels", value: 700, unit: "eur", hint: "Bruts : la banque les pondère, le calcul le fait aussi." },
       ],
@@ -342,7 +342,7 @@ const capaciteEmprunt: ToolSpec = {
       title: "Foyer et projet",
       fields: [
         { id: "adultes", label: "Nombre d'adultes", value: 2, unit: "nombre", min: 1, max: 2 },
-        { id: "enfants", label: "Enfants à charge", value: 1, unit: "nombre", min: 0, max: 10, hint: "Chaque enfant relève le reste à vivre minimal exigé — c'est ce qui fait refuser des dossiers pourtant sous les 35 %." },
+        { id: "enfants", label: "Enfants à charge", value: 1, unit: "nombre", min: 0, max: 10, hint: "Chaque enfant relève le reste à vivre minimal exigé, c'est ce qui fait refuser des dossiers pourtant sous les 35 %." },
         { id: "apport", label: "Apport personnel", value: 30000, unit: "eur", hint: "Au minimum les frais de notaire, que les banques financent rarement. Plus d'apport réduit la mensualité, pas le rendement du bien." },
         { id: "taux", label: "Taux du prêt envisagé", value: 3.35, unit: "pct", step: 0.05 },
         { id: "duree", label: "Durée envisagée", value: 25, unit: "an", min: 5, max: 27, hint: "Plus la durée est longue, plus la mensualité baisse et plus le coût total monte. Comparez toujours deux offres à durée égale." },
@@ -362,10 +362,10 @@ const capaciteEmprunt: ToolSpec = {
   params: [
     { id: "effortMax", label: "Taux d'effort maximal", value: 35, unit: "pct", hint: "Recommandation HCSF, assurance comprise. Des dérogations existent." },
     { id: "ponderation", label: "Pondération des revenus locatifs", value: 70, unit: "pct" },
-    { id: "ravAdulte", label: "Reste à vivre minimal — adulte", value: 800, unit: "eur" },
-    { id: "ravEnfant", label: "Reste à vivre minimal — enfant", value: 300, unit: "eur" },
-    { id: "notaireAncien", label: "Frais de notaire — ancien", value: 7.5, unit: "pct" },
-    { id: "notaireNeuf", label: "Frais de notaire — neuf", value: 2.5, unit: "pct" },
+    { id: "ravAdulte", label: "Reste à vivre minimal, adulte", value: 800, unit: "eur" },
+    { id: "ravEnfant", label: "Reste à vivre minimal, enfant", value: 300, unit: "eur" },
+    { id: "notaireAncien", label: "Frais de notaire, ancien", value: 7.5, unit: "pct" },
+    { id: "notaireNeuf", label: "Frais de notaire, neuf", value: 2.5, unit: "pct" },
     { id: "assurance", label: "Taux d'assurance emprunteur", value: 0.3, unit: "pct" },
   ],
   headlines: [
@@ -445,9 +445,9 @@ const chiffrageTravaux: ToolSpec = {
           label: "Ampleur des travaux",
           value: "renovation",
           options: [
-            { value: "rafraichissement", label: "Rafraîchissement — peinture, sols" },
-            { value: "renovation", label: "Rénovation — électricité, plomberie, cuisine, bains" },
-            { value: "restructuration", label: "Restructuration — murs, réseaux, tout refait" },
+            { value: "rafraichissement", label: "Rafraîchissement : peinture, sols" },
+            { value: "renovation", label: "Rénovation : électricité, plomberie, cuisine, bains" },
+            { value: "restructuration", label: "Restructuration : murs, réseaux, tout refait" },
           ],
         },
         {
@@ -466,9 +466,9 @@ const chiffrageTravaux: ToolSpec = {
           label: "Taux de TVA",
           value: "10",
           options: [
-            { value: "20", label: "20 % — cas général" },
-            { value: "10", label: "10 % — logement de plus de 2 ans" },
-            { value: "5.5", label: "5,5 % — rénovation énergétique éligible" },
+            { value: "20", label: "20 %, cas général" },
+            { value: "10", label: "10 %, logement de plus de 2 ans" },
+            { value: "5.5", label: "5,5 %, rénovation énergétique éligible" },
           ],
         },
       ],
@@ -521,7 +521,7 @@ const arbitrageFiscal: ToolSpec = {
   id: "arbitrage-fiscal",
   title: "Nu, LMNP ou SCI à l'IS ?",
   intro:
-    "Cinq régimes appliqués au même bien, et le classement par revenu net après impôt — la première année.",
+    "Cinq régimes appliqués au même bien, et le classement par revenu net après impôt, la première année.",
   sections: [
     {
       title: "Le bien et son exploitation",
@@ -543,9 +543,9 @@ const arbitrageFiscal: ToolSpec = {
     { id: "dureeBati", label: "Durée d'amortissement du bâti", value: 30, unit: "an" },
     { id: "dureeMobilier", label: "Durée d'amortissement du mobilier", value: 7, unit: "an" },
     { id: "partTerrain", label: "Part du terrain dans le prix", value: 15, unit: "pct", hint: "Le terrain ne s'amortit jamais." },
-    { id: "isReduit", label: "IS — taux réduit", value: 15, unit: "pct" },
-    { id: "isSeuil", label: "IS — seuil du taux réduit", value: 42500, unit: "eur" },
-    { id: "isNormal", label: "IS — taux normal", value: 25, unit: "pct" },
+    { id: "isReduit", label: "IS, taux réduit", value: 15, unit: "pct" },
+    { id: "isSeuil", label: "IS, seuil du taux réduit", value: 42500, unit: "eur" },
+    { id: "isNormal", label: "IS, taux normal", value: 25, unit: "pct" },
   ],
   headlines: [
     {
@@ -559,15 +559,15 @@ const arbitrageFiscal: ToolSpec = {
     { id: "resultat", label: "Résultat avant impôt et amortissement", unit: "eur", compute: (v) => resultatBrut(v), strong: true },
     { id: "amoBati", label: "Amortissement annuel du bâti", unit: "eur", compute: (v) => amoBati(v) },
     { id: "amoMob", label: "Amortissement annuel du mobilier", unit: "eur", compute: (v) => ratio(v.mobilier ?? 0, v.dureeMobilier ?? 7) },
-    { id: "r1", label: "Micro-foncier — revenu net", unit: "eur", compute: (v) => regimes(v)[0]!.net },
-    { id: "r2", label: "Réel foncier — revenu net", unit: "eur", compute: (v) => regimes(v)[1]!.net },
-    { id: "r3", label: "LMNP micro-BIC — revenu net", unit: "eur", compute: (v) => regimes(v)[2]!.net },
-    { id: "r4", label: "LMNP au réel — revenu net", unit: "eur", compute: (v) => regimes(v)[3]!.net, strong: true },
-    { id: "r5", label: "SCI à l'IS — revenu net", unit: "eur", compute: (v) => regimes(v)[4]!.net },
+    { id: "r1", label: "Micro-foncier, revenu net", unit: "eur", compute: (v) => regimes(v)[0]!.net },
+    { id: "r2", label: "Réel foncier, revenu net", unit: "eur", compute: (v) => regimes(v)[1]!.net },
+    { id: "r3", label: "LMNP micro-BIC, revenu net", unit: "eur", compute: (v) => regimes(v)[2]!.net },
+    { id: "r4", label: "LMNP au réel, revenu net", unit: "eur", compute: (v) => regimes(v)[3]!.net, strong: true },
+    { id: "r5", label: "SCI à l'IS, revenu net", unit: "eur", compute: (v) => regimes(v)[4]!.net },
     { id: "ecart", label: "Écart entre le meilleur et le pire régime", unit: "eur", compute: (v) => { const n = regimes(v).map((r) => r.net); return Math.max(...n) - Math.min(...n); }, strong: true },
   ],
   caveat:
-    "La comparaison porte sur la première année, pas sur la durée de détention. Elle ne modélise pas la plus-value de revente, qui inverse souvent le classement — d'autant que depuis le 15 février 2025, les amortissements déduits en LMNP réel sont réintégrés dans la plus-value. Consultez un expert-comptable avant tout passage à l'IS.",
+    "La comparaison porte sur la première année, pas sur la durée de détention. Elle ne modélise pas la plus-value de revente, qui inverse souvent le classement, d'autant que depuis le 15 février 2025, les amortissements déduits en LMNP réel sont réintégrés dans la plus-value. Consultez un expert-comptable avant tout passage à l'IS.",
 };
 
 function resultatBrut(v: Record<string, number>): number {
@@ -714,7 +714,7 @@ const avisDeValeur: ToolSpec = {
     { id: "cParking", label: "Présence d'un stationnement", value: 4, unit: "pct" },
     {
       id: "cDerive",
-      label: "Dérive du marché — par mois",
+      label: "Dérive du marché, par mois",
       value: 0.15,
       unit: "pct",
       hint: "Positive en marché haussier, négative en marché baissier.",
@@ -877,7 +877,7 @@ const netVendeur: ToolSpec = {
           value: "non",
           options: [
             { value: "non", label: "Non" },
-            { value: "oui", label: "Oui — plus-value exonérée" },
+            { value: "oui", label: "Oui, plus-value exonérée" },
           ],
         },
       ],
@@ -886,8 +886,8 @@ const netVendeur: ToolSpec = {
   params: [
     { id: "tauxIR", label: "Impôt sur la plus-value", value: 19, unit: "pct" },
     { id: "tauxPS", label: "Prélèvements sociaux sur la plus-value", value: 17.2, unit: "pct" },
-    { id: "exoIR", label: "Exonération totale — impôt", value: 22, unit: "an" },
-    { id: "exoPS", label: "Exonération totale — prélèvements sociaux", value: 30, unit: "an" },
+    { id: "exoIR", label: "Exonération totale, impôt", value: 22, unit: "an" },
+    { id: "exoPS", label: "Exonération totale, prélèvements sociaux", value: 30, unit: "an" },
     { id: "forfaitTravaux", label: "Forfait travaux au-delà de 5 ans", value: 15, unit: "pct" },
     { id: "forfaitFrais", label: "Forfait frais d'acquisition", value: 7.5, unit: "pct" },
   ],
@@ -905,8 +905,8 @@ const netVendeur: ToolSpec = {
     { id: "netVente", label: "Prix net vendeur", unit: "eur", compute: (v, c) => (v.prix ?? 0) - honoraires(v, c), strong: true },
     { id: "acqMaj", label: "Prix d'acquisition majoré", unit: "eur", compute: (v) => acquisitionMajoree(v), hint: "Forfait de frais, et le plus favorable du réel ou du forfait travaux." },
     { id: "pvBrute", label: "Plus-value brute", unit: "eur", compute: (v, c) => Math.max(0, (v.prix ?? 0) - honoraires(v, c) - acquisitionMajoree(v)) },
-    { id: "abtIR", label: "Abattement — impôt", unit: "pct", compute: (v) => abattement(v.detention ?? 0, v.exoIR ?? 22) },
-    { id: "abtPS", label: "Abattement — prélèvements sociaux", unit: "pct", compute: (v) => abattement(v.detention ?? 0, v.exoPS ?? 30) },
+    { id: "abtIR", label: "Abattement, impôt", unit: "pct", compute: (v) => abattement(v.detention ?? 0, v.exoIR ?? 22) },
+    { id: "abtPS", label: "Abattement, prélèvements sociaux", unit: "pct", compute: (v) => abattement(v.detention ?? 0, v.exoPS ?? 30) },
     { id: "impot", label: "Impôt de plus-value", unit: "eur", compute: (v, c) => impotPlusValue(v, c), strong: true },
   ],
   caveat:
@@ -951,7 +951,7 @@ const dcf: ToolSpec = {
   id: "dcf",
   title: "DCF immobilier sur 10 ans",
   intro:
-    "Flux actualisés, valeur terminale, TRI et valeur vénale — la lecture d'un investisseur professionnel.",
+    "Flux actualisés, valeur terminale, TRI et valeur vénale : la lecture d'un investisseur professionnel.",
   sections: [
     {
       title: "L'actif",
@@ -959,7 +959,7 @@ const dcf: ToolSpec = {
         { id: "prix", label: "Prix d'acquisition, hors droits", value: 3200000, unit: "eur", hint: "Le prix inscrit à l'acte, hors frais. C'est la base de tout le reste : le majorer « pour arrondir » fausse les trois rendements." },
         { id: "droits", label: "Droits et frais d'acquisition", value: 6.9, unit: "pct", step: 0.1 },
         { id: "surface", label: "Surface locative", value: 1450, unit: "m2", min: 1, hint: "Surface habitable au sens Carrez pour un appartement. C'est le dénominateur du prix au m² : une erreur ici décale tous les repères de comparaison." },
-        { id: "loyer", label: "Loyer facial annuel — année 1", value: 232000, unit: "eur", hint: "Hors charges, c'est-à-dire ce qui vous reste réellement. Le loyer charges comprises surestime la rentabilité de 10 à 15 %." },
+        { id: "loyer", label: "Loyer facial annuel, année 1", value: 232000, unit: "eur", hint: "Hors charges, c'est-à-dire ce qui vous reste réellement. Le loyer charges comprises surestime la rentabilité de 10 à 15 %." },
       ],
     },
     {
@@ -968,7 +968,7 @@ const dcf: ToolSpec = {
         { id: "indexation", label: "Indexation annuelle", value: 2, unit: "pct", step: 0.1 },
         { id: "vacance", label: "Vacance financière", value: 5, unit: "pct", step: 0.5, hint: "En pourcentage du loyer facial : vacance réelle, franchises et impayés confondus. 4 à 8 % en bureaux de seconde main." },
         { id: "cnr", label: "Charges non récupérables", value: 8, unit: "pct", hint: "En % du loyer facial." },
-        { id: "gestion", label: "Frais de gestion et honoraires", value: 3, unit: "pct", hint: "7 à 9 % du loyer encaissé en agence. À zéro si vous gérez vous-même — mais comptez alors votre temps." },
+        { id: "gestion", label: "Frais de gestion et honoraires", value: 3, unit: "pct", hint: "7 à 9 % du loyer encaissé en agence. À zéro si vous gérez vous-même, mais comptez alors votre temps." },
         { id: "taxeFonciere", label: "Taxe foncière annuelle", value: 18500, unit: "eur", hint: "Elle figure sur l'avis d'imposition du vendeur : demandez-le avant l'offre. Elle augmente presque chaque année." },
         { id: "capex", label: "CAPEX annuel moyen", value: 12, unit: "eurm2", hint: "Par m² et par an. Exclu du NOI, c'est la convention de marché." },
       ],
@@ -1047,7 +1047,7 @@ const dcf: ToolSpec = {
           value: "amortissable",
           options: [
             { value: "amortissable", label: "Amortissable" },
-            { value: "infine", label: "In fine — intérêts seuls" },
+            { value: "infine", label: "In fine, intérêts seuls" },
           ],
           hint: "Un crédit in fine améliore le DSCR mais laisse tout le capital à rembourser à la sortie.",
         },
@@ -1113,11 +1113,11 @@ const dcf: ToolSpec = {
       label: "Service de la dette annuel",
       unit: "eur",
       compute: (v, c) => serviceDette(v, c),
-      hint: "Capital et intérêts. En crédit in fine, les intérêts seuls — le capital tombe à la sortie.",
+      hint: "Capital et intérêts. En crédit in fine, les intérêts seuls : le capital tombe à la sortie.",
     },
     {
       id: "dscr",
-      label: "DSCR — couverture du service de la dette",
+      label: "DSCR, couverture du service de la dette",
       unit: "fois",
       compute: (v, c) => ratio(noi(v, 1), serviceDette(v, c)),
       strong: true,
@@ -1154,7 +1154,7 @@ const dcf: ToolSpec = {
         return Number.isNaN(t) ? 0 : t;
       },
       strong: true,
-      hint: "Le TRI que touche l'investisseur, dette déduite. Supérieur au TRI de l'actif tant que le coût de la dette reste sous le rendement — c'est l'effet de levier, et il joue dans les deux sens.",
+      hint: "Le TRI que touche l'investisseur, dette déduite. Supérieur au TRI de l'actif tant que le coût de la dette reste sous le rendement, c'est l'effet de levier, et il joue dans les deux sens.",
     },
     {
       id: "breakeven",
@@ -1169,7 +1169,7 @@ const dcf: ToolSpec = {
     },
   ],
   caveat:
-    "Le service de la dette est calculé à taux fixe et sans différé. Il ne gère pas les échéanciers de baux réels — voir le rent roll — ni la fiscalité de l'investisseur, qui dépend du véhicule de détention.",
+    "Le service de la dette est calculé à taux fixe et sans différé. Il ne gère pas les échéanciers de baux réels, voir le rent roll, ni la fiscalité de l'investisseur, qui dépend du véhicule de détention.",
 };
 
 /**
@@ -1439,7 +1439,7 @@ const wault: ToolSpec = {
   params: [],
   headlines: [
     {
-      label: "WAULB — durée ferme moyenne",
+      label: "WAULB, durée ferme moyenne",
       unit: "annees",
       compute: (v, c, t) => pondere(t.baux, 2, v.dateRef ?? 0),
       caption: (v, c, t) => {
@@ -1465,13 +1465,13 @@ const wault: ToolSpec = {
     },
     {
       id: "wault",
-      label: "WAULT — jusqu'au terme des baux",
+      label: "WAULT, jusqu'au terme des baux",
       unit: "annees",
       compute: (v, c, t) => pondere(t.baux, 1, v.dateRef ?? 0),
     },
     {
       id: "waulb",
-      label: "WAULB — jusqu'à la prochaine sortie",
+      label: "WAULB, jusqu'à la prochaine sortie",
       unit: "annees",
       compute: (v, c, t) => pondere(t.baux, 2, v.dateRef ?? 0),
       strong: true,

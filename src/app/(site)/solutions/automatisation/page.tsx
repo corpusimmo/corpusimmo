@@ -34,7 +34,7 @@ export default function AutomatisationPage() {
       delivers={[
         {
           title: "Un chronométrage avant de toucher à quoi que ce soit",
-          body: "Une demi-journée à mesurer ce que coûtent réellement les tâches répétitives de l'agence, poste par poste. Sans cette mesure, aucune promesse de gain n'est vérifiable — ni par vous, ni par nous.",
+          body: "Une demi-journée à mesurer ce que coûtent réellement les tâches répétitives de l'agence, poste par poste. Sans cette mesure, aucune promesse de gain n'est vérifiable : ni par vous, ni par nous.",
         },
         {
           title: "L'automatisme, monté sur vos outils",

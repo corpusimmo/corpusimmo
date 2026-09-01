@@ -44,6 +44,6 @@ export const NOT_CONFIGURED: WriteFailure = { stored: false, reason: "not_config
  */
 export function writeFailed(operation: string, error: unknown): WriteFailure {
   const detail = error instanceof Error ? error.message : "erreur inconnue";
-  console.error(`[db] ${operation} a échoué — ${detail}`);
+  console.error(`[db] ${operation} a échoué, ${detail}`);
   return { stored: false, reason: "failed" };
 }

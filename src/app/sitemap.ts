@@ -1,5 +1,6 @@
 import type { MetadataRoute } from "next";
 
+import { blogSitemapEntries } from "@/lib/blog";
 import { citiesSitemapEntries } from "@/lib/cities";
 import { canonicalUrl } from "@/lib/seo/metadata";
 import { indexableRoutes } from "@/lib/seo/routes";
@@ -86,6 +87,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
    * seul ajout suffit, contrairement au journal.
    */
   routes.push(...citiesSitemapEntries());
+
+  /**
+   * LE JOURNAL, branché mais muet tant que `BLOG_IS_PUBLIC` vaut faux.
+   *
+   * Brancher aujourd'hui n'expose rien, et c'est précisément pourquoi on le
+   * fait aujourd'hui : le jour de l'ouverture, il n'y aura qu'un drapeau à
+   * basculer, pas un plan de site à retoucher sous pression. La fonction rend
+   * l'index ET les articles, dans cet ordre, et refuse un index sans article.
+   */
+  routes.push(...blogSitemapEntries());
 
   return routes;
 }

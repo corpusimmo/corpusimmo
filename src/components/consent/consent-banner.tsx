@@ -30,14 +30,20 @@ import { Cookie } from "lucide-react";
 import { Button } from "@/components/ui";
 import { useConsent } from "@/lib/consent/consent";
 import { privacySignalRefuses, pushConsentState } from "@/lib/analytics/track";
+import { reportConsentChoice } from "@/lib/leads/consent-beacon";
 
 export function ConsentBanner() {
   const { status, choices, hydrated, acceptAll, refuseAll } = useConsent();
 
   // Google doit être tenu au courant d'un retrait comme d'un accord, sans
-  // attendre un rechargement.
+  // attendre un rechargement. Et le registre côté serveur reçoit la même
+  // décision, dans les deux sens : prouver qu'on a demandé et essuyé un non
+  // vaut autant que prouver un oui. Le dépôt ne se rejoue que si la décision a
+  // changé, sinon chaque page vue écrirait une ligne.
   useEffect(() => {
-    if (status === "answered") pushConsentState(choices.analytics);
+    if (status !== "answered") return;
+    pushConsentState(choices.analytics);
+    void reportConsentChoice(choices.analytics);
   }, [status, choices.analytics]);
 
   // Le navigateur a déjà dit non pour la personne : lui reposer la question

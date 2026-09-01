@@ -41,7 +41,7 @@ describe("scoreLead — bornes", () => {
         consents: { estimationDelivery: true, professionalContact: true, marketing: true },
         contact: { phone: "06 12 34 56 78", lastName: "Dupont" },
         features: { livingArea: 78, rooms: 3, condition: "good" },
-        estimatedValue: 1_450_000,
+        verifiedValue: 1_450_000,
       }),
     );
     expect(best.score).toBe(100);
@@ -55,7 +55,7 @@ describe("scoreLead — bornes", () => {
             baseInput({
               intent,
               consents: { estimationDelivery: true, professionalContact },
-              estimatedValue: value,
+              verifiedValue: value,
             }),
           );
           expect(score).toBeGreaterThanOrEqual(0);
@@ -116,7 +116,7 @@ describe("scoreLead — consentement", () => {
         consents: { estimationDelivery: true, professionalContact: false },
         contact: { phone: "0612345678", lastName: "Dupont" },
         features: { livingArea: 78, rooms: 3, condition: "good" },
-        estimatedValue: 2_000_000,
+        verifiedValue: 2_000_000,
       }),
     );
     expect(best.score).toBe(75);
@@ -129,7 +129,7 @@ describe("scoreLead — consentement", () => {
         consents: { estimationDelivery: true, professionalContact: true },
         contact: { phone: "0612345678", lastName: "Dupont" },
         features: { livingArea: 78, rooms: 3, condition: "good" },
-        estimatedValue: 2_000_000,
+        verifiedValue: 2_000_000,
       }),
     );
     expect(withConsent.score).toBe(100);
@@ -159,7 +159,7 @@ describe("scoreLead — complétude, valeur, fraîcheur", () => {
 
   it("la valeur estimée est monotone par paliers", () => {
     const values = [undefined, 100_000, 200_000, 400_000, 700_000, 1_200_000];
-    const scores = values.map((v) => scoreLead(baseInput({ estimatedValue: v })).score);
+    const scores = values.map((v) => scoreLead(baseInput({ verifiedValue: v })).score);
     for (let i = 1; i < scores.length; i += 1) {
       expect(scores[i] as number).toBeGreaterThanOrEqual(scores[i - 1] as number);
     }
@@ -179,7 +179,7 @@ describe("scoreLead — breakdown", () => {
         intent: "selling_under_6m",
         consents: { estimationDelivery: true, professionalContact: true },
         contact: { phone: "0612345678" },
-        estimatedValue: 420_000,
+        verifiedValue: 420_000,
       }),
     );
     expect(result.breakdown).toHaveLength(5);

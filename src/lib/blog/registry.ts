@@ -111,12 +111,19 @@ export function hasPublishedBlogPosts(): boolean {
 }
 
 /**
- * LES ENTRÉES DE PLAN DE SITE, articles publiés uniquement.
+ * LES ENTRÉES DE PLAN DE SITE&nbsp;: l'index, puis les articles publiés.
  *
  * Volontairement isolée pour être branchée en une ligne dans
  * `src/app/sitemap.ts`, sans que ce fichier ait à savoir ce qu'est un
  * brouillon. Un brouillon ne peut pas atteindre cette liste&nbsp;: le filtre
  * est dans `sitemapEntriesFor`, avec son test.
+ *
+ * L'INDEX `/blog` EST RENDU ICI, et non découvert par `src/lib/seo/routes.ts`.
+ * Ce détecteur lit le TEXTE d'une page pour savoir si elle est indexable, or
+ * l'indexabilité de `/blog` est calculée au build (`blogRobots`), donc
+ * invisible pour lui. Le module du journal est le seul à savoir si l'index a
+ * quelque chose à montrer, et sa date est celle de l'article le plus récent&nbsp;:
+ * c'est bien la dernière fois que la page a changé.
  *
  * LE SECOND FILTRE, sur `BLOG_IS_PUBLIC`, existe pour une raison précise&nbsp;:
  * un plan de site ne doit jamais contredire les métadonnées d'une page. Tant
@@ -130,5 +137,23 @@ export function hasPublishedBlogPosts(): boolean {
  */
 export function blogSitemapEntries(): BlogSitemapEntry[] {
   if (!BLOG_IS_PUBLIC) return [];
-  return sitemapEntriesFor(allBlogPosts(), siteConfig.url);
+
+  const posts = sitemapEntriesFor(allBlogPosts(), siteConfig.url);
+  // Un index sans article n'a rien à annoncer, et l'annoncer serait promettre
+  // une page vide aux moteurs.
+  if (posts.length === 0) return [];
+
+  const newest = posts.reduce((latest, post) =>
+    post.lastModified > latest.lastModified ? post : latest,
+  );
+
+  return [
+    {
+      url: `${siteConfig.url.replace(/\/+$/, "")}/blog`,
+      lastModified: newest.lastModified,
+      changeFrequency: "weekly",
+      priority: 0.7,
+    },
+    ...posts,
+  ];
 }

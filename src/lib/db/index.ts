@@ -8,10 +8,13 @@ import "server-only";
  * l'adaptateur Auth.js en a besoin et qu'il doit pouvoir le prendre sans
  * traîner tout le reste.
  *
- * CE MODULE N'EST PAS ENCORE BRANCHÉ. Rien dans `src/app`, `src/components`
- * ni `src/lib/auth` ne l'appelle : la couche est livrée testée mais inerte, et
- * le branchement (variables d'environnement, adaptateur, bascule des couches
- * navigateur) est décrit pas à pas dans `docs/database.md`.
+ * QUI L'APPELLE, ET POUR QUOI. L'adaptateur Auth.js (`src/lib/auth/config.ts`)
+ * y écrit les comptes ; le registre d'accès (`src/lib/access/ledger.ts`) y lit
+ * et y verse les déblocages ; `POST /api/estimation` y enregistre les
+ * résultats ; les routes de prospects, de lettre d'information et de
+ * consentement (`src/lib/leads/persistence.ts`) y déposent la preuve ; et
+ * l'espace compte y lit l'historique et le profil. Ce qui reste en navigateur,
+ * et pourquoi, est dans `docs/database.md`.
  */
 
 export { DatabaseNotConfiguredError, getDb, isDatabaseConfigured, tryGetDb } from "./client";

@@ -14,6 +14,23 @@
  *   complétude du dossier 0 → 20   un dossier vide ne se travaille pas
  *   valeur estimée        0 → 10   proxy de la commission potentielle
  *   fraîcheur             0 →  5   un lead de trois mois est un lead froid
+ *
+ * LA BANDE « VALEUR » NE SE NOURRIT QUE DE CE QUE NOUS AVONS CALCULÉ.
+ * Les quatre autres bandes portent sur ce que la personne déclare légitimement
+ * sur elle-même : son intention, son accord, son téléphone, la date de sa
+ * demande. Se tromper sur l'une coûte un lead mal classé. La valeur du bien,
+ * elle, est la seule bande qui porte sur un CHIFFRE, donc la seule qu'il soit
+ * rentable de gonfler : « je suis propriétaire d'une villa à deux millions »
+ * est gratuit à écrire dans un corps de requête, et vaudrait dix points.
+ *
+ * D'où le nom du champ, `verifiedValue` plutôt que `estimatedValue` : il dit
+ * d'où le nombre doit venir. Depuis que les estimations sont rangées dans
+ * `estimation_results`, la valeur peut être RELUE dans notre base, où elle a
+ * été écrite par notre moteur à partir des ventes DVF. Elle redevient alors une
+ * donnée que nous avons produite, et non une déclaration que nous croyons sur
+ * parole. Un appelant qui recopierait ici une valeur venue du réseau
+ * réintroduirait la faille à lui tout seul, et le nom du champ est là pour que
+ * personne ne le fasse par distraction.
  */
 
 import type { PropertyFeatures, ProjectIntent } from "@/types/property";
@@ -41,8 +58,13 @@ export interface LeadScoreInput {
     lastName?: string;
   };
   features?: PropertyFeatures;
-  /** Central estimated value, in euros. */
-  estimatedValue?: number;
+  /**
+   * Valeur centrale, en euros, RELUE DEPUIS NOTRE BASE (ou portée par un
+   * `Lead` déjà enregistré). Jamais lue dans un corps de requête : voir
+   * l'en-tête. Absente quand aucune estimation ne nous appartient, auquel cas
+   * la bande vaut zéro plutôt que d'accorder des points sur parole.
+   */
+  verifiedValue?: number;
   /** ISO timestamp of collection. Defaults to `now`. */
   createdAt?: string;
   /** Injected in tests so freshness is deterministic. */
@@ -149,7 +171,7 @@ export function scoreLead(input: LeadScoreInput): LeadScoreResult {
     ? LEAD_SCORE_MAX_POINTS.professionalContact
     : 0;
   const completeness = completenessPoints(input.contact, input.features);
-  const value = valuePoints(input.estimatedValue);
+  const value = valuePoints(input.verifiedValue);
   const freshness = freshnessPoints(input.createdAt, now);
 
   const breakdown: LeadScoreBreakdownItem[] = [
@@ -185,7 +207,11 @@ export function scoreExistingLead(lead: Lead, features?: PropertyFeatures): Lead
     consents: lead.consents,
     contact: { phone: lead.contact.phone, lastName: lead.contact.lastName },
     features: features ?? (lead.livingArea ? { livingArea: lead.livingArea } : undefined),
-    estimatedValue: central,
+    // La fourchette d'un `Lead` a déjà été écrite par nous, au moment de la
+    // demande, depuis une estimation relue en base : elle est donc vérifiée au
+    // même titre. Rescorer un prospect ne rouvre pas la porte au corps de
+    // requête.
+    verifiedValue: central,
     createdAt: lead.createdAt,
   });
 }

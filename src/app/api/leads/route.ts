@@ -14,15 +14,27 @@
  * RÈGLE DE JOURNALISATION : l'adresse e-mail n'apparaît jamais en clair dans un
  * journal applicatif. Tout ce qui s'imprime passe par `maskEmail`.
  *
- * CE QUE CETTE VERSION NE FAIT PAS ENCORE
- *   Rien n'est persisté : le lead est scoré, l'e-mail part, et la requête
- *   répond `202 Accepted`. Conséquence assumée sur le score — la bande
- *   « valeur estimée du bien » n'est PAS comptée, parce que la valeur nous
- *   arrive du client et qu'un client peut se déclarer propriétaire d'une villa
- *   à 2 M€ pour gonfler sa propre note. Les quatre autres bandes portent sur ce
- *   que le client déclare légitimement sur lui-même. La bande valeur revient le
- *   jour où une estimation est relue depuis le stockage, pas depuis le corps de
- *   la requête.
+ * CE QUI EST DÉSORMAIS CONSERVÉ
+ *   Trois lignes de consentement (livraison, contact professionnel, lettre
+ *   d'information), la fiche de contact dédupliquée par adresse, et la demande
+ *   elle-même. Les refus s'écrivent comme les accords : `granted` vaut faux, la
+ *   ligne existe, et c'est ce qui permet de prouver qu'on a demandé et essuyé
+ *   un non.
+ *
+ * LE CODE DE STATUT DIT LA VÉRITÉ, ET RIEN QUE CE QU'ON PEUT TENIR
+ *   201 quand la demande a VRAIMENT été créée en base, 202 sinon (pas de base
+ *   configurée, ou base en panne). Dans les deux cas le champ `persistence` dit
+ *   ce qui a été gardé. Répondre 201 sans ligne écrite coûterait le jour où un
+ *   client s'y fiera pour ne pas rejouer sa requête, et surtout ce serait un
+ *   mensonge sur une preuve, ce qui est le seul mensonge que ce produit ne
+ *   puisse pas se permettre.
+ *
+ * UNE BASE EN PANNE NE COÛTE RIEN À LA PERSONNE : l'estimation part quand même,
+ * le score est rendu quand même, et seul `persistence` change. Un formulaire
+ * qui échoue parce que la base tousse serait une régression, pas une sécurité.
+ *
+ * LA BANDE « VALEUR » DU SCORE est comptée uniquement quand l'estimation a pu
+ * être RELUE en base. Voir `scoreLead` et le commentaire à l'endroit du calcul.
  *
  * Accepte du JSON et de l'`application/x-www-form-urlencoded` /
  * `multipart/form-data`, pour qu'un formulaire fonctionne sans JavaScript.
@@ -36,6 +48,13 @@ import { getMailer, maskEmail, renderEstimationReadyEmail } from "@/lib/email";
 import { leadsListId, syncContact } from "@/lib/email/contacts";
 import type { EmailProvider } from "@/lib/email";
 import { checkRateLimit, clientKey } from "@/lib/leads/rate-limit";
+import {
+  accountId,
+  saveConsents,
+  saveLead,
+  verifiedEstimation,
+  type ConsentDecision,
+} from "@/lib/leads/persistence";
 import { leadTemperature, scoreLead } from "@/lib/leads/score";
 import type { ProjectIntent, PropertyType } from "@/types/property";
 import type { ValuationResult } from "@/types/valuation";
@@ -197,8 +216,51 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const input = parsed.data;
   const valuation = readValuation((raw as { valuation?: unknown })?.valuation);
+  const email = input.contact.email.toLowerCase();
 
-  const collectedAt = new Date().toISOString();
+  /**
+   * Le compte, s'il y en a un. Il rattache la fiche de contact et le registre à
+   * une personne identifiée, et c'est lui qui autorise la relecture d'une
+   * estimation : on ne relit que les siennes.
+   */
+  const userId = await accountId();
+
+  /**
+   * L'ESTIMATION RELUE DEPUIS LA BASE, seule source admise pour la valeur.
+   *
+   * Le corps de la requête porte bien une valeur (`valuation.value`), et elle
+   * n'est PAS utilisée : elle est déclarative, donc gonflable à volonté. Relue
+   * ici, la fourchette est celle que notre moteur a produite à partir des
+   * ventes DVF. Cela ne rend pas le chiffre infalsifiable (les caractéristiques
+   * du bien restent déclarées par la personne), mais il devient un nombre que
+   * nous avons CALCULÉ, cohérent avec la surface et la commune annoncées, au
+   * lieu d'un nombre écrit à la main dans un `fetch`.
+   *
+   * `null` quand la personne n'est pas connectée, quand la base est absente, ou
+   * quand l'estimation n'a pas été enregistrée : la bande vaut alors zéro.
+   */
+  const estimation = userId && valuation?.id ? await verifiedEstimation(valuation.id, userId) : null;
+
+  /**
+   * Trois décisions, trois lignes. La livraison est nécessairement accordée
+   * (zod l'exige), les deux autres portent la réponse telle quelle : une case
+   * décochée s'écrit `granted: false`, elle ne disparaît pas.
+   */
+  const decisions: ConsentDecision[] = [
+    { purpose: "estimation_delivery", granted: true },
+    { purpose: "professional_contact", granted: input.consents.professionalContact },
+    { purpose: "marketing", granted: input.consents.marketing },
+  ];
+  const consentWrite = await saveConsents(decisions, { source: "estimation", email, userId });
+
+  /**
+   * L'HORODATAGE VIENT DU SERVEUR, dans les deux branches : de Postgres quand
+   * le registre a écrit (c'est la date qui fait preuve), du processus qui
+   * traite la requête sinon. Jamais du corps de la requête, où il ne prouverait
+   * rien.
+   */
+  const collectedAt = (consentWrite.recorded ? consentWrite.collectedAt : new Date()).toISOString();
+
   const consents = {
     estimationDelivery: true as const,
     professionalContact: input.consents.professionalContact,
@@ -213,16 +275,42 @@ export async function POST(request: Request): Promise<NextResponse> {
     consents,
     contact: { phone: input.contact.phone, lastName: input.contact.lastName },
     features: valuation?.subject.features,
-    // Volontairement absent : voir la note en tête de fichier.
-    estimatedValue: undefined,
+    // La bande « valeur » ne compte que si l'estimation vient de NOTRE base.
+    // Absente ici, c'est zéro point, jamais un point de confiance.
+    verifiedValue: estimation?.value?.central,
     createdAt: collectedAt,
   });
 
-  const delivery = await deliverEstimationEmail(
-    input.contact.firstName,
-    input.contact.email.toLowerCase(),
-    valuation,
-  );
+  /**
+   * La demande elle-même. La fourchette recopiée dans la fiche suit la même
+   * règle que le score : elle vient de la base ou elle reste vide, sans quoi la
+   * place de marché afficherait un prix que personne n'a calculé.
+   */
+  const leadWrite = await saveLead({
+    contact: {
+      email,
+      firstName: input.contact.firstName,
+      lastName: input.contact.lastName,
+      phone: input.contact.phone,
+      userId,
+    },
+    source: "estimation",
+    // NOTRE identifiant de ligne, jamais celui du moteur : la colonne est une
+    // clé étrangère.
+    estimationId: estimation?.estimationId ?? null,
+    propertyType: input.propertyType,
+    city: valuation?.subject.address.city ?? input.city,
+    cityCode: valuation?.subject.address.cityCode ?? input.cityCode,
+    postcode: valuation?.subject.address.postcode ?? input.postcode,
+    livingArea: input.livingArea ?? valuation?.subject.features.livingArea,
+    intent,
+    estimatedLow: estimation?.value?.low,
+    estimatedHigh: estimation?.value?.high,
+    score,
+    scoreBreakdown: breakdown,
+  });
+
+  const delivery = await deliverEstimationEmail(input.contact.firstName, email, valuation);
 
   // La liste marketing n'est alimentée QUE si la case correspondante a été
   // cochée. Recevoir son estimation n'a jamais valu accord pour recevoir autre
@@ -244,17 +332,37 @@ export async function POST(request: Request): Promise<NextResponse> {
     leadsListId(),
   );
 
+  /**
+   * `stored` : la demande ET le registre sont en base.
+   * `partial` : l'un des deux seulement, ce qui arrive si la base tombe entre
+   *             les deux écritures (le pilote HTTP de Neon ne fait pas de
+   *             transaction, voir `src/lib/db/client.ts`).
+   * `none` : rien n'a été gardé, exactement comme avant la base.
+   */
+  const persistence: "stored" | "partial" | "none" =
+    leadWrite.stored && consentWrite.recorded
+      ? "stored"
+      : leadWrite.stored || consentWrite.recorded
+        ? "partial"
+        : "none";
+
   console.info(
-    `[api/leads] lead reçu (score ${score}, ${leadTemperature(score)}, sans persistance) ` +
-      `pour ${maskEmail(input.contact.email.toLowerCase())}, ` +
-      `e-mail ${delivery.delivered ? "envoyé" : "non envoyé"}`,
+    `[api/leads] lead reçu (score ${score}, ${leadTemperature(score)}) ` +
+      `pour ${maskEmail(email)}, ` +
+      `demande ${leadWrite.stored ? "enregistrée" : `non enregistrée (${leadWrite.reason})`}, ` +
+      `consentements ${
+        consentWrite.recorded
+          ? `enregistrés (${consentWrite.count})`
+          : `non enregistrés (${consentWrite.reason})`
+      }, e-mail ${delivery.delivered ? "envoyé" : "non envoyé"}`,
   );
 
-  // 202 et non 201 : rien n'a été créé côté serveur. Mentir sur le code de
-  // statut coûterait le jour où un client s'y fiera pour rejouer une requête.
+  // 201 seulement si la demande existe vraiment quelque part. Sinon 202, comme
+  // avant : la requête est reçue et traitée, rien n'est conservé.
   return NextResponse.json(
     {
       lead: {
+        ...(leadWrite.stored ? { id: leadWrite.leadId } : {}),
         score,
         temperature: leadTemperature(score),
         breakdown,
@@ -262,9 +370,13 @@ export async function POST(request: Request): Promise<NextResponse> {
       },
       email: { delivered: delivery.delivered, provider: delivery.provider },
       newsletter: { subscribed: subscription.synced },
-      persistence: "none" as const,
+      consents: {
+        recorded: consentWrite.recorded,
+        ...(consentWrite.recorded ? { count: consentWrite.count } : {}),
+      },
+      persistence,
     },
-    { status: 202, headers: { "cache-control": "no-store" } },
+    { status: leadWrite.stored ? 201 : 202, headers: { "cache-control": "no-store" } },
   );
 }
 

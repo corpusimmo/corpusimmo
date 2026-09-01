@@ -366,12 +366,15 @@ par `mappers.test.ts`, et aucun composant n'a besoin de changer.
 a une session, `localStorage` sinon. La forme est identique, `SavedComparable`
 étant structurellement `ComparableEntry`.
 
-**8. Brancher les consentements et les leads.** `POST /api/leads` appelle
-`recordConsents` puis `recordLead`, et peut alors répondre **201** au lieu de
-202. C'est aussi le moment de rendre à `scoreLead` la bande « valeur estimée », en
-la relisant depuis `estimation_results` plutôt que depuis le corps de la requête.
-Ne pas oublier `answerConsent()` côté bandeau cookies, qui doit désormais écrire
-aussi côté serveur.
+**8. Les consentements et les leads.** FAIT. `POST /api/leads` enregistre les
+trois décisions (refus compris), le contact dédupliqué et la demande, et ne
+répond **201** que si la demande a réellement été écrite ; sans base, le 202
+reste la réponse, avec `persistence: "none"`. L'horodatage est celui de
+Postgres, jamais celui du corps de requête. Le bandeau cookies dépose sa
+décision par `POST /api/consentement`, dans les deux sens, et ne la redépose
+que si elle a changé. La bande « valeur » de `scoreLead` est rétablie sous le
+nom `verifiedValue` : elle ne s'alimente que depuis une estimation relue en
+base pour la personne connectée, jamais depuis le corps d'une requête.
 
 **9. Le compte.** `readProfile` et `upsertProfile` alimentent une page de compte,
 `eraseUser` un bouton de suppression, `listConsents` un export de ce qu'on

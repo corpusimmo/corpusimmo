@@ -10,6 +10,16 @@
  * la lettre d'information est STRICTEMENT à part : demander un outil n'a jamais
  * valu accord pour recevoir autre chose.
  *
+ * LA CASE DÉCOCHÉE EST UN REFUS, ET LE REFUS S'ENREGISTRE. C'est la différence
+ * entre ce registre et une liste de diffusion : la liste ne retient que les
+ * oui, le registre retient la DÉCISION. Une ligne `granted: false` datée sert
+ * deux fois, pour prouver qu'on n'a pas inscrit quelqu'un qui n'avait rien
+ * demandé, et pour ne pas lui reposer la question indéfiniment.
+ *
+ * Le consentement n'est écrit que si l'on sait DE QUI il émane (adresse
+ * vérifiée ou compte) : une ligne sans sujet ne se rattacherait à personne et
+ * ne prouverait rien.
+ *
  * Sans authentification configurée sur l'installation, la session n'existe pas
  * et la route reste ouverte : le dépôt doit démarrer avec un `.env` vide.
  */
@@ -21,6 +31,7 @@ import { maskEmail } from "@/lib/email";
 import { leadsListId, syncContact } from "@/lib/email/contacts";
 import { grantAccess } from "@/lib/access/ledger";
 import { auth, isAuthConfigured } from "@/lib/auth";
+import { accountId, saveConsents } from "@/lib/leads/persistence";
 import { checkRateLimit, clientKey } from "@/lib/leads/rate-limit";
 import { getToolCard } from "@/data/tools-catalogue";
 
@@ -117,8 +128,25 @@ export async function POST(
     );
   }
 
-  // Le contact n'est enregistré QUE si la case a été cochée, et QUE si une
-  // adresse vérifiée existe. `syncContact` refuse d'ailleurs sans
+  /**
+   * LA DÉCISION EST ENREGISTRÉE DANS LES DEUX SENS, cochée comme décochée. Ce
+   * n'est pas l'inscription à la liste : c'est la trace de ce que la personne a
+   * répondu à la question qu'on lui a posée, sur cette page, ce jour-là. Sans
+   * identité (installation sans authentification), il n'y a personne à qui
+   * rattacher la ligne et on n'écrit rien.
+   */
+  const userId = await accountId();
+  const consentWrite =
+    email || userId
+      ? await saveConsents([{ purpose: "marketing", granted: input.newsletter }], {
+          source: `outil:${slug}`,
+          email,
+          userId,
+        })
+      : ({ recorded: false, reason: "empty" } as const);
+
+  // Le contact n'est inscrit à la liste QUE si la case a été cochée, et QUE si
+  // une adresse vérifiée existe. `syncContact` refuse d'ailleurs sans
   // `marketing: true`.
   const subscription =
     email && input.newsletter
@@ -130,7 +158,12 @@ export async function POST(
             consents: {
               marketing: true,
               professionalContact: false,
-              collectedAt: new Date().toISOString(),
+              // Posé par le serveur, comme la ligne du registre : la date qui
+              // voyage avec le contact ne vient jamais du navigateur.
+              collectedAt: (consentWrite.recorded
+                ? consentWrite.collectedAt
+                : new Date()
+              ).toISOString(),
             },
           },
           leadsListId(),
@@ -140,7 +173,9 @@ export async function POST(
   console.info(
     `[api/outils] « ${slug} » ${outcome.alreadyOwned ? "déjà ouvert" : "débloqué"} pour ` +
       `${email ? maskEmail(email.toLowerCase()) : "visiteur anonyme"}, ` +
-      `${outcome.quota.remaining} crédit(s) restant(s)`,
+      `${outcome.quota.remaining} crédit(s) restant(s), ` +
+      `lettre d'information ${input.newsletter ? "acceptée" : "refusée"} ` +
+      `(${consentWrite.recorded ? "consentement enregistré" : `non enregistré : ${consentWrite.reason}`})`,
   );
 
   return NextResponse.json(
@@ -152,7 +187,13 @@ export async function POST(
         limit: outcome.quota.limit,
         remaining: outcome.quota.remaining,
       },
-      newsletter: { subscribed: subscription.synced },
+      newsletter: {
+        subscribed: subscription.synced,
+        /** Le choix, tel qu'il a été fait. */
+        granted: input.newsletter,
+        /** Vrai seulement si la ligne existe vraiment dans le registre. */
+        consentRecorded: consentWrite.recorded,
+      },
     },
     { status: 200, headers: { "cache-control": "no-store" } },
   );

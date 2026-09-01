@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import type { ValuationResult } from "@/types/valuation";
 
@@ -55,6 +55,18 @@ const validBody = {
 describe("POST /api/leads", () => {
   beforeEach(() => {
     vi.spyOn(console, "info").mockImplementation(() => {});
+    /**
+     * Ce fichier décrit la route SANS base : c'est le contrat d'un dépôt au
+     * `.env` vide. On neutralise donc `DATABASE_URL`, qui peut très bien être
+     * renseignée dans l'environnement de développement, sans quoi ces cas
+     * écriraient dans une vraie base et ne prouveraient plus rien.
+     * Le comportement avec base est décrit dans `persistance.test.ts`.
+     */
+    vi.stubEnv("DATABASE_URL", "");
+  });
+
+  afterEach(() => {
+    vi.unstubAllEnvs();
   });
 
   it("refuse une demande sans consentement à la livraison de l'estimation", async () => {

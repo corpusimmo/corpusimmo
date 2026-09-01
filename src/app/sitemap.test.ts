@@ -14,6 +14,7 @@
 import { describe, expect, it } from "vitest";
 
 import { unpublishedNav } from "@/config/navigation";
+import { BLOG_IS_PUBLIC } from "@/lib/blog";
 import { toolCatalogue } from "@/data/tools-catalogue";
 import { canonicalUrl } from "@/lib/seo/metadata";
 import { discoverPages, noindexPatterns, unresolvedDynamicPatterns } from "@/lib/seo/routes";
@@ -177,7 +178,10 @@ describe("sitemap", () => {
    * que `blogSitemapEntries()` ne rend pas. Les autres tests de ce fichier
    * couvriront le reste sans une ligne de plus.
    */
-  it("n'annonce aucune URL de journal tant que le module n'est pas branché", () => {
+  it("n'annonce aucune URL de journal tant que celui-ci n'est pas ouvert", () => {
+    // Le module EST branché : ce silence est celui de `BLOG_IS_PUBLIC`, pas
+    // d'un import oublié. Le jour de l'ouverture, ce test s'inverse.
+    expect(BLOG_IS_PUBLIC).toBe(false);
     expect(urls.filter((url) => pathOf(url).startsWith("/blog"))).toEqual([]);
   });
 });

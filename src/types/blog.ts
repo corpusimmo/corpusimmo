@@ -80,6 +80,7 @@ export interface BlogPost {
 export interface BlogSitemapEntry {
   url: string;
   lastModified: Date;
-  changeFrequency: "monthly";
+  /** `weekly` pour l'index, qui bouge à chaque publication ; `monthly` pour un article. */
+  changeFrequency: "weekly" | "monthly";
   priority: number;
 }

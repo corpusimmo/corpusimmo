@@ -2,16 +2,36 @@
 
 ## À quoi elle sert, et à quoi elle ne sert pas
 
-Un compte ne sert **pas** à protéger quoi que ce soit : l'estimateur, la carte,
-l'observatoire et les dix outils sont ouverts, sans compte, et le resteront —
-c'est la doctrine d'accès du produit.
+**L'estimateur, la carte des ventes et l'observatoire sont ouverts, sans compte,
+et le resteront.** C'est la doctrine d'accès du produit, et elle ne bouge pas.
 
-Il sert à une seule chose aujourd'hui : disposer d'une **adresse e-mail vérifiée
-par un tiers**. C'est ce qui permet de remettre un document sans repasser par un
-formulaire et sans attendre un aller-retour de courriel.
+Les **dix calculateurs** font exception depuis peu. Leur fiche reste publique,
+statique et indexable : on y voit ce que l'outil calcule, ce qu'il ne fait pas,
+et à quoi ressemble le classeur. Seule l'utilisation du calculateur, sur
+`/outils/[slug]/calculer`, demande une connexion, puis passe le quota de deux
+outils par semaine glissante.
+
+La distinction n'est pas cosmétique. Une bibliothèque qu'on ne peut pas regarder
+avant d'ouvrir un compte n'est pas une bibliothèque, c'est une porte fermée avec
+une affiche. Ici, la personne sait exactement ce qu'elle vient chercher avant
+qu'on lui demande quoi que ce soit.
+
+La connexion sert donc à deux choses : savoir à qui ces outils servent, et
+disposer d'une **adresse e-mail vérifiée par un tiers**, ce qui permet de
+remettre un document sans repasser par un formulaire ni attendre un aller-retour
+de courriel.
 
 D'où le fournisseur unique : Google vérifie l'adresse. Ajouter un fournisseur
 qui ne la vérifie pas retirerait tout l'intérêt du dispositif.
+
+**La route de déblocage ne lit jamais l'adresse envoyée par le client**, mais
+celle de la session. Une adresse postée dans un corps de requête serait une
+déclaration que rien ne prouve, et il suffirait d'en changer à chaque appel pour
+se donner autant d'accès qu'on veut.
+
+**Sans authentification configurée, la porte n'existe pas** et les outils
+restent ouverts : le dépôt doit démarrer avec un `.env` vide, et exiger une
+connexion impossible fermerait le site au lieu de le protéger.
 
 ## Deux décisions d'architecture
 

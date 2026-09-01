@@ -59,15 +59,20 @@ src/
 │   │   ├── estimer/                 /estimer
 │   │   ├── carte/                   /carte
 │   │   ├── observatoire/            /observatoire, /transactions, /comparables
-│   │   ├── outils/                  /outils, /outils/[slug]
-│   │   ├── solutions/               /solutions et ses trois offres
+│   │   ├── outils/                  /outils, /outils/[slug], .../calculer
+│   │   ├── mon-espace/              /mon-espace, dynamique
+│   │   ├── blog/                    écrit, pas publié (voir docs/blog.md)
+│   │   ├── solutions/               écrites, retirées du menu, noindex
+│   │   ├── hors-ligne/              repli du service worker
 │   │   ├── a-propos/
-│   │   ├── mentions-legales/ · confidentialite/
+│   │   ├── mentions-legales/ · confidentialite/ · cookies/
 │   │   └── layout.tsx               en-tête + pied de page, partagés
 │   ├── api/                 route handlers — la seule porte vers l'extérieur
 │   ├── globals.css          les tokens de la direction artistique
-│   ├── layout.tsx           polices, métadonnées, ToastProvider
-│   ├── robots.ts · sitemap.ts
+│   ├── layout.tsx           polices, métadonnées, fournisseurs, consentement
+│   ├── manifest.ts          manifeste PWA (convention de fichier)
+│   ├── opengraph-image.tsx  image sociale, composée en trois calques
+│   ├── robots.ts · sitemap.ts       dérivés, jamais écrits à la main
 │   └── error.tsx · not-found.tsx
 ├── components/
 │   ├── ui/                  design system — 25 primitives
@@ -77,7 +82,12 @@ src/
 │   ├── marketing/           sections d'accueil et trame des pages d'offre
 │   ├── estimation/          parcours en six étapes + affichage du résultat
 │   ├── observatoire/        carte augmentée, recherche tabulaire, comparables
-│   └── tools/               moteur des dix calculateurs + bibliothèque
+│   ├── tools/               moteur des dix calculateurs + bibliothèque
+│   ├── account/             espace compte : outils débloqués, signets, historique
+│   ├── consent/             bandeau et réglage du consentement
+│   ├── analytics/           chargement de la balise, après accord seulement
+│   ├── illustrations/       schémas SVG et icônes d'actifs
+│   └── pwa/                 service worker et invite d'installation
 ├── lib/
 │   ├── dvf/                 adapters de données de transactions
 │   ├── geo/                 géocodage, distances, communes
@@ -85,7 +95,14 @@ src/
 │   ├── tools/               spécification et définitions des dix outils
 │   ├── email/               adapter d'envoi
 │   ├── pdf/                 génération du rapport
-│   └── leads/               scoring et limitation de débit
+│   ├── leads/               scoring et limitation de débit
+│   ├── access/              registre signé des déblocages et quota
+│   ├── consent/             état du consentement, versionné
+│   ├── analytics/           plan de marquage typé et transport
+│   ├── history/             historique d'estimations, côté navigateur
+│   ├── browser/             magasin local partagé
+│   ├── blog/                lecture, tri et flux du journal
+│   └── seo/                 inventaire des routes, métadonnées, JSON-LD
 ├── types/                   contrats partagés — la colonne vertébrale
 ├── config/                  site, env, navigation
 └── data/                    catalogue éditorial des outils
@@ -162,12 +179,51 @@ L'objet qui fait l'aller-retour est revalidé par zod au retour
 (`lib/valuation/result-schema.ts`) : il a quitté le serveur, il redevient une
 entrée non fiable.
 
-### Pas d'authentification
+### Une seule porte, et elle est étroite
 
-Rien n'est verrouillé : consulter, filtrer, exporter en CSV, télécharger un
-rapport, utiliser les dix outils. Le compte n'apparaîtra qu'au moment où quelque
-chose devra **survivre à l'appareil** — retrouver une sélection ailleurs,
-reprendre une recherche. Jamais avant, et jamais pour un simple téléchargement.
+Presque tout est ouvert : consulter, filtrer, exporter en CSV, télécharger un
+rapport d'estimation, parcourir la carte et l'observatoire. Rien de tout cela ne
+demande de compte, et c'est un engagement du produit.
+
+**Les dix calculateurs font exception, depuis peu.** Leur fiche reste publique,
+statique et indexable : on voit ce que l'outil calcule, ce qu'il ne fait pas, et
+à quoi ressemble le classeur. Seule l'utilisation du calculateur, sur
+`/outils/[slug]/calculer`, demande une connexion Google, puis passe le quota de
+deux outils par semaine glissante.
+
+Trois choses rendent ce verrou honnête plutôt que décoratif :
+
+1. **la fiche ne contient jamais le calculateur.** Il vit sur une page à part,
+   dynamique, qui relit le registre à chaque rendu. Deviner l'URL ne donne rien ;
+2. **le registre est un cookie signé en HMAC-SHA256** (`lib/access/`), avec le
+   même secret que les liens de téléchargement. Un visiteur ne peut pas
+   s'attribuer un outil qu'il n'a pas demandé ;
+3. **la route de déblocage ne lit pas l'adresse envoyée par le client** mais
+   celle de la session vérifiée par Google. Une adresse postée serait une
+   déclaration que rien ne prouve, et il suffirait d'en changer à chaque appel.
+
+Sans secret de signature configuré, il n'y a PAS de verrou et les outils restent
+ouverts. C'est délibéré : l'application doit démarrer avec un `.env` vide, et un
+verrou qu'on ne peut pas signer ne doit pas devenir une porte close pour tout le
+monde.
+
+### Ce qui survit, et où
+
+Rien n'est encore persisté côté serveur. Trois couches, par ordre de solidité :
+
+| Couche | Contenu | Portée |
+|---|---|---|
+| Cookie signé | déblocages d'outils, quota hebdomadaire | l'appareil, six mois |
+| Cookie de session | l'identité Google, jeton signé | l'appareil, trente jours |
+| Stockage du navigateur | signets, historique d'estimations, comparables, consentement, saisie en cours | l'appareil, jusqu'à effacement |
+
+Le cookie porte ce qui est un DROIT ; le stockage du navigateur porte ce qui
+n'est qu'un confort. La raison est architecturale autant que juridique : lire un
+cookie dans une page la ferait basculer en rendu dynamique, et ranger un signet
+côté serveur coûterait le rendu statique de toute la bibliothèque.
+
+**Conséquence à ne pas taire : changer d'appareil perd tout.** C'est le chantier
+bloquant, et il est ouvert.
 
 ### Pas de données de démonstration
 
@@ -191,4 +247,11 @@ L'architecture réserve la place, sans code inutile aujourd'hui :
   l'écran.
 - **Pages villes** : `/prix-immobilier/[ville]`, 50 à 100 pages programmatiques.
   C'est le pari de référencement principal, et il n'est pas encore posé.
-- **Persistance et comptes** : voir ci-dessus.
+- **Persistance** : `neon.ts` existe, les paquets sont installés, mais il n'y a
+  ni schéma, ni client, ni requête, ni adaptateur Auth.js. Tant que ce n'est pas
+  fait, aucune des trois couches du tableau ci-dessus ne suit d'un appareil à
+  l'autre. C'est le chantier qui commande tous les autres.
+- **Connexion par lien magique** : une seconde voie d'entrée à côté de Google,
+  avec nom, prénom et téléphone facultatif. Elle dépend de la base.
+- **Le journal** : toute l'infrastructure est écrite et testée, rien n'est
+  publié. Trois lignes suffisent le jour venu (`docs/blog.md`).

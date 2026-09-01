@@ -16,15 +16,18 @@ export const metadata: Metadata = pageMetadata({
   title: "Rechercher une transaction immobilière",
   description:
     "Recherchez les ventes enregistrées autour d'une adresse, triez-les par prix, surface, " +
-    "date ou prix au m², et emportez votre sélection en tableur. Données publiques DVF.",
+    "date ou prix au m², et emportez la sélection en tableur. Données publiques DVF.",
   path: "/observatoire/transactions",
   socialTitle: "Rechercher une vente enregistrée, adresse par adresse",
 });
 
 export default function ObservatoireTransactionsPage() {
   return (
-    <PageContainer className="space-y-4">
-      {/* Page de deuxième niveau : le fil d'Ariane double le lien de retour
+    <>
+      {/* Hors du conteneur : `space-y-4` décalerait l'en-tête si le <script>
+          en était le premier enfant.
+
+          Page de deuxième niveau : le fil d'Ariane double le lien de retour
           que l'écran propose déjà, il n'invente aucune arborescence. */}
       <JsonLd
         nodes={[
@@ -35,11 +38,13 @@ export default function ObservatoireTransactionsPage() {
           ]),
         ]}
       />
-      <PageHeader
-        title="Rechercher une transaction"
-        description="Triez, filtrez, et alimentez votre sélection de comparables ligne par ligne. Consultation et export sont libres."
-      />
-      <TransactionsExplorer />
-    </PageContainer>
+      <PageContainer className="space-y-4">
+        <PageHeader
+          title="Rechercher une transaction"
+          description="Triez, filtrez, et alimentez votre sélection de comparables ligne par ligne. Consultation et export sont libres."
+        />
+        <TransactionsExplorer />
+      </PageContainer>
+    </>
   );
 }

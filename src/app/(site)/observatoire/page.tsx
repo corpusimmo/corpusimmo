@@ -26,8 +26,12 @@ export const metadata: Metadata = pageMetadata({
 
 export default function ObservatoirePage() {
   return (
-    <PageContainer className="space-y-4">
-      {/* `WebApplication` et pas `Dataset` : la page rend un OUTIL, et le
+    <>
+      {/* Hors du conteneur, et pas dedans : `space-y-4` pose une marge sur tout
+          enfant qui suit un frère, et le <script> en deviendrait le premier,
+          décalant l'en-tête de seize pixels pour rien.
+
+          `WebApplication` et pas `Dataset` : la page rend un OUTIL, et le
           serveur n'y publie aucune mutation. Le jeu de données, lui, est celui
           de la DGFiP et vit sur data.gouv.fr. Voir `src/lib/seo/json-ld.ts`. */}
       <JsonLd
@@ -42,11 +46,13 @@ export default function ObservatoirePage() {
           }),
         ]}
       />
-      <PageHeader
-        title="Observatoire"
-        description="Les mutations réellement enregistrées, à l'échelle de la rue, avec les indicateurs qui vont avec. Ajoutez les ventes pertinentes à votre sélection : elle vous suit d'un écran à l'autre."
-      />
-      <ObservatoireWorkspace />
-    </PageContainer>
+      <PageContainer className="space-y-4">
+        <PageHeader
+          title="Observatoire"
+          description="Les mutations réellement enregistrées, à l'échelle de la rue, avec les indicateurs qui vont avec. Ajoutez les ventes pertinentes à votre sélection : elle vous suit d'un écran à l'autre."
+        />
+        <ObservatoireWorkspace />
+      </PageContainer>
+    </>
   );
 }

@@ -156,16 +156,20 @@ export default function HomePage() {
               Les outils sont la démonstration, pas le produit
             </h2>
             <p className="mt-4 leading-relaxed text-ink-muted">
-              Ce que vous voyez ici — un estimateur, une carte, un observatoire, dix calculateurs —
-              a été construit par des gens qui automatisent des tâches immobilières pour des
-              agences. Si ces outils vous semblent sérieux, c&apos;est le meilleur argument que nous
-              ayons.
+              Ce que vous voyez ici, un estimateur, une carte, un observatoire et dix
+              calculateurs, a été construit par des gens qui automatisent des tâches immobilières
+              pour des agences. Si ces outils vous semblent sérieux, c&apos;est le meilleur
+              argument que nous ayons.
             </p>
+            {/* Pas de lien vers `/solutions` : l'offre n'est pas ouverte, la page
+                est `noindex` et interdite aux robots. Renvoyer vers elle depuis
+                l'accueil promettrait un rendez-vous qu'on ne peut pas honorer, et
+                enverrait les robots sur une porte fermée. */}
             <Button asChild className="mt-7">
-              <Link href="/solutions">
-                Voir ce que nous faisons pour les agences
+              <a href={`mailto:${siteConfig.contactEmail}`}>
+                Nous écrire
                 <ArrowRight aria-hidden="true" className="size-4" />
-              </Link>
+              </a>
             </Button>
           </div>
         </div>

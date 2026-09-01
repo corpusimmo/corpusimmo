@@ -144,8 +144,12 @@ const SECTION_POLICIES: Readonly<Record<string, SectionPolicy>> = {
   // politique qu'il faut réinventer à ce moment-là ne sert à rien.
   solutions: { changeFrequency: "monthly", priority: 0.6 },
   "a-propos": { changeFrequency: "yearly", priority: 0.4 },
+  // Les pages d'information légale. Elles doivent être indexées (une politique
+  // de cookies introuvable est une politique de cookies inexistante) mais elles
+  // ne se disputent aucune requête : priorité basse, cadence annuelle.
   "mentions-legales": { changeFrequency: "yearly", priority: 0.2 },
   confidentialite: { changeFrequency: "yearly", priority: 0.2 },
+  cookies: { changeFrequency: "yearly", priority: 0.2 },
 };
 
 /** Une section inconnue entre quand même, sobrement. Mieux vaut 0,5 qu'absente. */

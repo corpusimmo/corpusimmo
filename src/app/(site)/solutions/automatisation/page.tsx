@@ -18,8 +18,8 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "Automatisation sur mesure pour agences immobilières",
   description:
-    "Qualifier les demandes, relancer, mettre à jour, produire le reporting : les tâches "
-    + "hebdomadaires exécutées en parallèle de votre process, jusqu'à ce qu'elles tiennent.",
+    "Qualifier les demandes, relancer, mettre à jour, produire le reporting : les tâches de "
+    + "chaque semaine, exécutées en parallèle de votre process actuel.",
   path: "/solutions/automatisation",
   socialTitle: "Ce qui vous prend six heures par semaine",
   index: false,

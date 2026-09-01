@@ -165,16 +165,19 @@ describe("sitemap", () => {
   });
 
   /**
-   * LE BLOG, PAS ENCORE LÀ.
+   * LE JOURNAL, PAS ENCORE BRANCHÉ.
    *
-   * `src/lib/blog/` est livré en parallèle et exposera `blogSitemapEntries()`.
-   * Ce test documente l'état actuel et ce qu'il faudra faire : au branchement,
-   * remplacer l'assertion « aucune URL de blog » par la vérification que les
-   * articles publiés y sont, et les brouillons non. Les autres tests de ce
-   * fichier (pas de doublon, pas d'URL relative, pas de page hors index)
-   * couvriront alors les entrées du blog sans une ligne de plus.
+   * `src/lib/blog/` existe désormais et expose `blogSitemapEntries()`, mais le
+   * branchement n'est pas de cette livraison (voir le commentaire dans
+   * `src/app/sitemap.ts`). Ce test fige l'état actuel plutôt que de le laisser
+   * implicite.
+   *
+   * AU BRANCHEMENT : remplacer cette assertion par la vérification que les
+   * articles publiés sont là et les brouillons non, et ajouter l'index `/blog`,
+   * que `blogSitemapEntries()` ne rend pas. Les autres tests de ce fichier
+   * couvriront le reste sans une ligne de plus.
    */
-  it("n'annonce aucun article de blog tant que le module n'existe pas", () => {
+  it("n'annonce aucune URL de journal tant que le module n'est pas branché", () => {
     expect(urls.filter((url) => pathOf(url).startsWith("/blog"))).toEqual([]);
   });
 });

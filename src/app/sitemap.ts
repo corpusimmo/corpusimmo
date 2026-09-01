@@ -40,22 +40,35 @@ export default function sitemap(): MetadataRoute.Sitemap {
   }));
 
   /*
-   * POINT D'EXTENSION — LE BLOG.
+   * POINT D'EXTENSION — LE JOURNAL.
    *
-   * `src/lib/blog/` est livré en parallèle et exposera `blogSitemapEntries()`.
-   * Quand ce module existera, le branchement tient en deux lignes, ici :
+   * `src/lib/blog/` a atterri pendant l'écriture de ce fichier et expose bien
+   * `blogSitemapEntries()`. Le branchement tient en deux lignes, ici :
    *
    *     import { blogSitemapEntries } from "@/lib/blog";
    *     routes.push(...blogSitemapEntries());
    *
-   * Il n'est pas importé aujourd'hui parce qu'un import d'un module absent
-   * casse le build entier, pour toutes les pages. Le préfixe `/blog` est par
-   * ailleurs écarté de la découverte automatique (voir `EXCLUDED_PREFIXES`
-   * dans `src/lib/seo/routes.ts`) : sans énumération des articles, elle
-   * produirait l'URL littérale « /blog/[slug] », ce qui serait pire que rien.
+   * Il n'est PAS fait dans cette livraison, sur consigne : le journal est écrit
+   * en parallèle et son auteur reste maître de son ouverture. La fonction rend
+   * de toute façon un tableau vide tant que `BLOG_IS_PUBLIC` vaut `false`, donc
+   * brancher aujourd'hui n'exposerait rien.
    *
-   * Trois choses à respecter au branchement, elles sont testées :
-   * des URL absolues sur le domaine canonique, aucun doublon, aucun brouillon.
+   * DEUX POINTS À RÉGLER AU BRANCHEMENT, et ils ne sont pas cosmétiques :
+   *
+   *   · `blogSitemapEntries()` ne rend que les ARTICLES, pas l'index `/blog`.
+   *     Celui-ci doit donc être ajouté, ici ou là-bas, sans quoi la page de
+   *     tête du journal n'entrera jamais dans le plan de site.
+   *   · `/blog` est écarté de la découverte automatique (voir
+   *     `EXCLUDED_PREFIXES` dans `src/lib/seo/routes.ts`) pour deux raisons :
+   *     l'énumération des articles n'est pas de son ressort, et l'indexabilité
+   *     de `/blog` est CALCULÉE au build (`blogRobots(...)`) au lieu d'être
+   *     écrite dans le source. Le détecteur de `noindex`, qui lit le texte du
+   *     fichier, ne peut donc pas la voir : l'inclure de force ferait dire au
+   *     sitemap l'inverse de ce que la page dit aux moteurs.
+   *
+   * Le reste des garanties du fichier (URL absolues, aucun doublon, aucune page
+   * hors index) couvrira les entrées du journal sans une ligne de plus, parce
+   * qu'elles sont vérifiées sur la sortie de cette fonction.
    */
 
   return routes;

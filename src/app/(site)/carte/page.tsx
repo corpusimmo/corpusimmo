@@ -10,7 +10,7 @@ export const metadata: Metadata = pageMetadata({
   title: "Carte des ventes immobilières enregistrées",
   description:
     "Explorez sur une carte les ventes immobilières enregistrées en France : prix, surface, " +
-    "date et type de bien, à partir des données publiques DVF publiées par la DGFiP.",
+    "date et type de bien, à partir des données publiques DVF de la DGFiP.",
   path: "/carte",
   socialTitle: "La carte des ventes réellement enregistrées",
 });

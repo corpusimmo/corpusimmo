@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
 
+import { Analytics } from "@/components/analytics/analytics";
+import { ConsentBanner } from "@/components/consent/consent-banner";
 import { AuthSessionProvider } from "@/components/layout/session-provider";
+import { PwaRuntime } from "@/components/pwa";
 import { ToastProvider } from "@/components/ui/toast";
 import { safeUrl } from "@/config/app-url";
 import { siteConfig } from "@/config/site";
@@ -86,6 +89,10 @@ export const metadata: Metadata = {
     },
   },
   formatDetection: { telephone: false, address: false, email: false },
+  // Depuis iOS 16.4 Safari lit les icônes du manifeste, mais les versions
+  // antérieures ne connaissent que celle-ci : la déclarer coûte une ligne et
+  // évite une vignette pixelisée sur l'écran d'accueil d'un iPhone un peu âgé.
+  icons: { apple: "/icons/apple-touch-icon.png" },
 };
 
 export const viewport: Viewport = {
@@ -114,6 +121,21 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <AuthSessionProvider>
           <ToastProvider>{children}</ToastProvider>
         </AuthSessionProvider>
+
+        {/* Le bandeau de consentement, puis la mesure d'audience qu'il commande.
+            L'ORDRE N'EST PAS DÉCORATIF : `Analytics` ne rend rien tant que la
+            réponse n'est pas donnée, et la balise de Google n'est alors même pas
+            téléchargée. Voir l'en-tête de `src/components/analytics/analytics.tsx`
+            pour ce que ce choix coûte, et pourquoi il est payé. */}
+        <ConsentBanner />
+        <Analytics />
+
+        {/* Enregistrement du service worker et invite d'installation. Hors des
+            fournisseurs, délibérément : le sujet ne dépend ni de la session ni
+            des notifications. Ne rend rien dans le flux, donc aucun décalage de
+            mise en page possible. Le manifeste, lui, est posé par la convention
+            de fichier `app/manifest.ts`. */}
+        <PwaRuntime />
       </body>
     </html>
   );

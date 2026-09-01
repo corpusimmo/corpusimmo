@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="CorpusImmo">
+  <!--
+    L'icône d'onglet, en RÉSERVE dans un carré bleu nuit.
+
+    Le logotype de l'application pose une page bleu nuit sur fond clair ; ici le
+    rapport est inversé, et c'est volontaire : une icône d'onglet est posée sur
+    un fond que nous ne choisissons pas, clair ou sombre selon le thème du
+    navigateur. Le carré plein garantit le contraste dans les deux cas.
+
+    Les couleurs sont littérales — un fichier servi hors de l'application ne
+    peut pas lire les variables CSS de `globals.css`. Elles doivent donc être
+    tenues à jour à la main si la palette bouge.
+      #1B3349 bleu nuit · #F6F5F2 papier · #D5CFC1 papier ombré · #C2A468 bronze
+  -->
+  <rect width="32" height="32" rx="6" fill="#1B3349"/>
+  <path d="M10.5 5h6.5L23 11v14.5a1 1 0 0 1-1 1H10.5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="#F6F5F2"/>
+  <path d="M17 5l6 6h-6z" fill="#D5CFC1"/>
+  <g fill="none" stroke="#1B3349" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M12.5 18.5l3.75-3.5 3.75 3.5"/>
+    <path d="M13.9 18.5v3.4M18.6 18.5v3.4"/>
+  </g>
+  <path d="M12.25 23.9h8" stroke="#C2A468" stroke-width="1.9" stroke-linecap="round"/>
+</svg>

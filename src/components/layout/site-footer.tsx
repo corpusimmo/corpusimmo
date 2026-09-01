@@ -21,7 +21,7 @@ export function SiteFooter() {
         <div className="grid gap-10 md:grid-cols-[minmax(0,1fr)_auto]">
           <div className="max-w-md">
             <span className="inline-flex items-center gap-2.5">
-              <BrandMark className="size-8" />
+              <BrandMark className="size-8" tone="inverted" />
               <span className="font-display text-lg font-semibold">{siteConfig.name}</span>
             </span>
             <p className="mt-3 font-display text-xl italic text-white/90">

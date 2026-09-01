@@ -47,6 +47,49 @@ avant de changer de couleur.
 
 ---
 
+## Le logotype
+
+**Un titre de propriété.** C'est la seule forme où les deux moitiés du nom ne
+sont pas juxtaposées mais confondues : un titre de propriété est à la fois la
+pièce et le bien. La page porte une maison, et la ligne bronze en dessous est
+celle de la signature de l'acte.
+
+Trois décisions de dessin, toutes vérifiables à l'œil en réduisant la marque :
+
+- **La maison a des murs.** Le toit seul se lit comme un chevron — une flèche
+  vers le haut, un bouton « replier » — dès qu'on descend sous 32 px. Deux
+  traits verticaux suffisent à lever l'ambiguïté.
+- **La ligne bronze porte deux rôles.** Les murs s'arrêtent juste au-dessus
+  d'elle : elle est le sol sur lequel la maison est posée autant que la ligne de
+  signature. Un seul trait, deux lectures.
+- **Le coin corné n'est pas décoratif.** C'est lui qui empêche la forme d'être
+  lue comme une simple carte, et il rappelle qu'un corpus est fait de feuillets.
+
+### Deux tirages
+
+`BrandMark` accepte un `tone`. Ce n'est pas un thème :
+
+| | |
+|---|---|
+| `default` | page pleine en bleu nuit — l'en-tête, sur fond clair |
+| `inverted` | page en trait blanc — le pied de page, où un aplat bleu nuit sur bleu nuit disparaîtrait |
+
+Le bronze ne bouge dans aucun des deux.
+
+### Le favicon
+
+`src/app/icon.svg` inverse le rapport : page claire dans un carré bleu nuit.
+Une icône d'onglet est posée sur un fond que nous ne choisissons pas — clair ou
+sombre selon le thème du navigateur — et le carré plein garantit le contraste
+dans les deux cas.
+
+Ses couleurs sont **littérales** : un fichier servi hors de l'application ne peut
+pas lire les variables de `globals.css`. C'est la seconde et dernière exception
+à la règle « aucune couleur en dur », après le fond de carte. Elle est annotée
+dans le fichier, et il faudra la tenir à jour à la main si la palette bouge.
+
+---
+
 ## Les tokens
 
 Trois couches, de la plus concrète à la plus abstraite.

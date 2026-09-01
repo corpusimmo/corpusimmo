@@ -39,7 +39,7 @@ transformer une base propre en base illégale — d'où deux modules, et
 Une seule adresse, la **même que celle publiée sur le site** :
 
 ```
-CorpusImmo <contact@corpusimmo.fr>
+CorpusImmo <contact@corpus.immo>
 ```
 
 Trois raisons de ne pas la spécialiser :
@@ -60,14 +60,14 @@ personne ne lit est un `no-reply@` qui s'ignore.
 ### Quand la séparer
 
 Le jour où les envois marketing prennent du volume, on isole leur réputation sur
-un sous-domaine — `news.corpusimmo.fr` — pour qu'une vague de plaintes sur une
+un sous-domaine — `news.corpus.immo` — pour qu'une vague de plaintes sur une
 campagne n'abîme pas la messagerie de l'entreprise. Pas avant : au lancement,
 une adresse en sous-domaine fait surtout bizarre à la lecture, sans rien
 protéger qui existe encore.
 
 ## Ce qu'il faut créer chez Brevo
 
-1. **Un compte**, et le domaine `corpusimmo.fr` **authentifié** (SPF, DKIM,
+1. **Un compte**, et le domaine `corpus.immo` **authentifié** (SPF, DKIM,
    DMARC). Sans authentification de domaine, les envois partent en indésirables
    et la réputation du domaine se dégrade dès les premiers messages.
 2. **Une clé d'API** → `EMAIL_PROVIDER_KEY`, avec `EMAIL_PROVIDER=brevo`.

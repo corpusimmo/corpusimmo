@@ -79,7 +79,7 @@ export const env = {
      * où quelqu'un a une question. Une seule adresse, relevée, qui reçoit les
      * réponses.
      */
-    from: raw.EMAIL_FROM ?? "CorpusImmo <contact@corpusimmo.fr>",
+    from: raw.EMAIL_FROM ?? "CorpusImmo <contact@corpus.immo>",
     isConfigured:
       raw.EMAIL_PROVIDER !== undefined &&
       raw.EMAIL_PROVIDER !== "console" &&

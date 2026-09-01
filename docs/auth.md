@@ -36,7 +36,7 @@ et seul l'en-tête change d'aspect une fois la réponse arrivée.
 
    ```
    http://localhost:3000/api/auth/callback/google
-   https://<votre-domaine>/api/auth/callback/google
+   https://corpus.immo/api/auth/callback/google
    ```
 
    Une URI qui ne correspond pas au caractère près donne `redirect_uri_mismatch`,

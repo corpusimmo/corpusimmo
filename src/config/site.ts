@@ -34,7 +34,7 @@ export const siteConfig = {
 
   url: resolveAppUrl(),
   locale: "fr_FR",
-  contactEmail: "contact@corpusimmo.fr",
+  contactEmail: "contact@corpus.immo",
 } as const;
 
 /**

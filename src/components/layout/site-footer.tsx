@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { NewsletterForm } from "@/components/marketing/newsletter-form";
+import { ConsentFooterLink } from "@/components/consent/consent-footer-link";
 import { mainNav, secondaryNav } from "@/config/navigation";
 import { disclaimers, siteConfig } from "@/config/site";
 
@@ -70,6 +71,9 @@ export function SiteFooter() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <ConsentFooterLink className="text-sm text-white/75 transition-colors hover:text-white" />
+                </li>
                 <li>
                   <a
                     href={`mailto:${siteConfig.contactEmail}`}

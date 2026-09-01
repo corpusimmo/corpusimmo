@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 
+import Link from "next/link";
+
 import { siteConfig } from "@/config/site";
 
 export const metadata: Metadata = {
@@ -35,14 +37,52 @@ export default function ConfidentialitePage() {
           <section className="flex flex-col gap-2">
             <h2 className="font-display text-xl text-ink">Ce que le site ne fait pas</h2>
             <p className="leading-relaxed text-ink-muted">
-              Il n&apos;y a ni compte, ni mot de passe, ni base de données de contacts. Aucun
-              traceur publicitaire, aucun outil de mesure d&apos;audience tiers, aucun cookie
-              déposé à des fins de suivi.
+              Il n&apos;y a pas de mot de passe à retenir, pas de base de données de contacts, et
+              aucun traceur publicitaire. Rien n&apos;est revendu ni partagé à des fins de ciblage.
             </p>
             <p className="leading-relaxed text-ink-muted">
-              Votre saisie d&apos;estimation en cours et votre sélection de comparables sont
-              conservées <strong>dans votre navigateur</strong>, sur votre appareil. Elles ne nous
-              sont pas transmises et ne survivent pas à un changement de machine.
+              Votre saisie d&apos;estimation en cours, votre historique d&apos;estimations, vos
+              outils mis de côté et votre sélection de comparables sont conservés{" "}
+              <strong>dans votre navigateur</strong>, sur votre appareil. Ils ne nous sont pas
+              transmis et ne survivent pas à un changement de machine.
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-2">
+            <h2 className="font-display text-xl text-ink">Le compte, et ce qu&apos;il ouvre</h2>
+            <p className="leading-relaxed text-ink-muted">
+              L&apos;estimateur, la carte des ventes et l&apos;observatoire s&apos;utilisent sans
+              compte, et c&apos;est un engagement. Seuls les dix calculateurs demandent une
+              connexion Google&nbsp;: leurs fiches restent consultables librement, mais leur
+              utilisation est réservée aux personnes connectées, à raison de deux outils par semaine
+              glissante.
+            </p>
+            <p className="leading-relaxed text-ink-muted">
+              De cette connexion, nous recevons de Google votre adresse e-mail vérifiée, votre nom
+              et votre photo de profil, et rien d&apos;autre&nbsp;: ni contacts, ni agenda, ni
+              fichiers. La session est un jeton signé déposé dans un cookie&nbsp;; aucun profil
+              n&apos;est enregistré sur nos serveurs à ce jour. La liste de vos outils débloqués
+              vit dans un second cookie, signé lui aussi, sur votre appareil.
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-2">
+            <h2 className="font-display text-xl text-ink">Mesure d&apos;audience</h2>
+            <p className="leading-relaxed text-ink-muted">
+              Nous utilisons Google Analytics pour compter les visites, et uniquement si vous
+              l&apos;acceptez. Tant que vous n&apos;avez pas répondu au bandeau, le script
+              n&apos;est pas téléchargé&nbsp;: il n&apos;est pas silencieux, il n&apos;est pas là.
+              Refuser ne retire aucune fonctionnalité, et votre choix se retire aussi facilement
+              qu&apos;il se donne.
+            </p>
+            <p className="leading-relaxed text-ink-muted">
+              Ce qui est envoyé est délibérément grossier&nbsp;: un type de bien, un département,
+              une tranche de confiance. Jamais une adresse e-mail, jamais une adresse postale,
+              jamais une surface ni un montant estimé. Le détail de chaque traceur figure sur la{" "}
+              <Link href="/cookies" className="font-semibold text-primary underline">
+                page dédiée aux cookies
+              </Link>
+              .
             </p>
           </section>
 
@@ -94,12 +134,49 @@ export default function ConfidentialitePage() {
           </section>
 
           <section className="flex flex-col gap-2">
+            <h2 className="font-display text-xl text-ink">Qui intervient dans le service</h2>
+            <ul className="flex flex-col gap-3 leading-relaxed text-ink-muted">
+              <li>
+                <strong className="font-semibold text-ink">Vercel</strong>, hébergement du site et
+                des fonctions serveur, avec des serveurs en Europe.
+              </li>
+              <li>
+                <strong className="font-semibold text-ink">Google</strong>, connexion par compte
+                Google et, sous réserve de votre accord, mesure d&apos;audience.
+              </li>
+              <li>
+                <strong className="font-semibold text-ink">Resend</strong>, acheminement des e-mails
+                que vous nous demandez d&apos;envoyer.
+              </li>
+              <li>
+                <strong className="font-semibold text-ink">IGN Géoplateforme</strong>, service
+                public de géocodage des adresses.
+              </li>
+              <li>
+                <strong className="font-semibold text-ink">Etalab et la DGFiP</strong>, publication
+                des Demandes de Valeurs Foncières.
+              </li>
+              <li>
+                <strong className="font-semibold text-ink">OpenFreeMap</strong> et les contributeurs
+                d&apos;OpenStreetMap, fonds de carte.
+              </li>
+            </ul>
+            <p className="leading-relaxed text-ink-muted">
+              Certains de ces traitements impliquent un transfert hors de l&apos;Union européenne,
+              encadré par les mécanismes prévus par le règlement.
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-2">
             <h2 className="font-display text-xl text-ink">Vos droits</h2>
             <p className="leading-relaxed text-ink-muted">
               Vous disposez d&apos;un droit d&apos;accès, de rectification, d&apos;effacement,
-              d&apos;opposition et de portabilité sur vos données. Comme rien n&apos;est conservé à
-              ce jour, une demande d&apos;effacement recevra une réponse indiquant qu&apos;aucune
-              donnée vous concernant n&apos;est détenue.
+              d&apos;opposition, de limitation et de portabilité sur vos données, ainsi que du droit
+              de définir des directives sur leur sort après votre décès. Comme aucune base de
+              données n&apos;est branchée à ce jour, une demande d&apos;effacement recevra une
+              réponse indiquant qu&apos;aucune donnée vous concernant n&apos;est détenue sur nos
+              serveurs&nbsp;; ce qui est stocké l&apos;est dans votre navigateur, et vous pouvez
+              l&apos;effacer vous-même à tout instant depuis les réglages de celui-ci.
             </p>
             <p className="leading-relaxed text-ink-muted">
               Pour exercer un droit ou poser une question&nbsp;:{" "}

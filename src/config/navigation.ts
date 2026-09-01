@@ -132,6 +132,7 @@ export const secondaryNav: NavItem[] = [
   { label: "À propos", href: "/a-propos" },
   { label: "Mentions légales", href: "/mentions-legales" },
   { label: "Confidentialité", href: "/confidentialite" },
+  { label: "Cookies", href: "/cookies" },
 ];
 
 /** Le CTA persistant du header. */

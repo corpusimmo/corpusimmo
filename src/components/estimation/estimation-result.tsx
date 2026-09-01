@@ -20,6 +20,7 @@ import { ArrowLeft, Download } from "lucide-react";
 import { DistributionChart } from "@/components/charts";
 import { Badge, Button } from "@/components/ui";
 import { disclaimers } from "@/config/site";
+import { track } from "@/lib/analytics/track";
 import { formatDate } from "@/lib/utils/format";
 import { explainValuation } from "@/lib/valuation";
 import type { ValuationResult } from "@/types/valuation";
@@ -63,6 +64,7 @@ export function EstimationResult({
       link.remove();
       // Libérer l'objet tout de suite : le téléchargement est déjà parti.
       URL.revokeObjectURL(url);
+      track({ name: "estimation_pdf", params: { property_type: valuation.subject.type } });
     } catch {
       setDownloadError("Le rapport n'a pas pu être généré. Réessayez dans quelques instants.");
     } finally {

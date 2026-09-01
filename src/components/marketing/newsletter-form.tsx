@@ -12,6 +12,8 @@ interface SubscribeResponse {
   error?: { message?: string };
 }
 
+import { track } from "@/lib/analytics/track";
+
 /**
  * L'inscription à la lettre d'information.
  *
@@ -74,6 +76,7 @@ export function NewsletterForm() {
             return;
           }
 
+          track({ name: "newsletter_subscribed", params: { source: "pied-de-page" } });
           setStatus("done");
         } catch {
           setMessage("Réseau indisponible. Réessayez dans un instant.");

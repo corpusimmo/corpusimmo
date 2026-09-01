@@ -2,6 +2,7 @@
 
 import { Bookmark, BookmarkCheck } from "lucide-react";
 
+import { track } from "@/lib/analytics/track";
 import { cn } from "@/lib/utils/cn";
 
 import { useFavorites } from "./favorites";
@@ -36,6 +37,7 @@ export function FavoriteButton({
         event.preventDefault();
         event.stopPropagation();
         toggle(slug);
+        track({ name: active ? "tool_unsaved" : "tool_saved", params: { tool_id: slug } });
       }}
       className={cn(
         "inline-flex items-center gap-1.5 rounded-sm px-2 py-1.5 text-sm transition-colors",

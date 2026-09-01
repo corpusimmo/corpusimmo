@@ -33,6 +33,8 @@ import { z } from "zod";
 
 import { env } from "@/config/env";
 import { getMailer, maskEmail, renderEstimationReadyEmail } from "@/lib/email";
+import { leadsListId, syncContact } from "@/lib/email/contacts";
+import type { EmailProvider } from "@/lib/email";
 import { checkRateLimit, clientKey } from "@/lib/leads/rate-limit";
 import { leadTemperature, scoreLead } from "@/lib/leads/score";
 import type { ProjectIntent, PropertyType } from "@/types/property";
@@ -222,6 +224,26 @@ export async function POST(request: Request): Promise<NextResponse> {
     valuation,
   );
 
+  // La liste marketing n'est alimentée QUE si la case correspondante a été
+  // cochée. Recevoir son estimation n'a jamais valu accord pour recevoir autre
+  // chose, et `syncContact` refuse d'ailleurs sans `marketing: true`.
+  const subscription = await syncContact(
+    {
+      email: input.contact.email,
+      firstName: input.contact.firstName,
+      ...(input.contact.lastName ? { lastName: input.contact.lastName } : {}),
+      source: "estimation",
+      consents: {
+        marketing: consents.marketing,
+        professionalContact: consents.professionalContact,
+        collectedAt,
+      },
+      ...(valuation?.subject.address.city ? { city: valuation.subject.address.city } : {}),
+      ...(input.propertyType ? { propertyType: input.propertyType } : {}),
+    },
+    leadsListId(),
+  );
+
   console.info(
     `[api/leads] lead reçu (score ${score}, ${leadTemperature(score)}, sans persistance) ` +
       `pour ${maskEmail(input.contact.email.toLowerCase())} — ` +
@@ -239,6 +261,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         collectedAt,
       },
       email: { delivered: delivery.delivered, provider: delivery.provider },
+      newsletter: { subscribed: subscription.synced },
       persistence: "none" as const,
     },
     { status: 202, headers: { "cache-control": "no-store" } },
@@ -253,7 +276,7 @@ async function deliverEstimationEmail(
   firstName: string,
   to: string,
   valuation: ValuationResult | null,
-): Promise<{ delivered: boolean; provider: "console" | "resend" }> {
+): Promise<{ delivered: boolean; provider: EmailProvider }> {
   const mailer = getMailer();
   if (!valuation) return { delivered: false, provider: mailer.provider };
 

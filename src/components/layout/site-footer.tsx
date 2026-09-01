@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { NewsletterForm } from "@/components/marketing/newsletter-form";
 import { mainNav, secondaryNav } from "@/config/navigation";
 import { disclaimers, siteConfig } from "@/config/site";
 
@@ -27,6 +28,16 @@ export function SiteFooter() {
               {siteConfig.signature}
             </p>
             <p className="mt-4 text-sm leading-relaxed text-white/70">{siteConfig.tagline}</p>
+
+            <div className="mt-7 border-t border-white/15 pt-6">
+              <h2 className="eyebrow !text-[color:var(--accent-rule)]">
+                Ce qui bouge sur le marché
+              </h2>
+              <p className="mt-2 mb-4 text-sm leading-relaxed text-white/70">
+                Les chiffres qui sortent, les méthodes qui tiennent. Pas de publicité.
+              </p>
+              <NewsletterForm />
+            </div>
           </div>
 
           <nav aria-label="Plan du site" className="grid gap-8 sm:grid-cols-2">

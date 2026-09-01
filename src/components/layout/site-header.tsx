@@ -25,6 +25,7 @@ import type { NavEntry, NavItem } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils/cn";
 
+import { AccountMenu } from "./account-menu";
 import { BrandLockup } from "./brand-mark";
 
 /** Actif sur la page elle-même ET sur ses sous-pages : `/outils/dcf` allume « Outils ». */
@@ -113,6 +114,7 @@ export function SiteHeader() {
         </div>
 
         <div className="flex items-center gap-2">
+          <AccountMenu className="hidden lg:inline-flex" />
           <Button asChild size="sm" className="hidden sm:inline-flex">
             <Link href={primaryCta.href}>{primaryCta.label}</Link>
           </Button>
@@ -252,9 +254,12 @@ function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => vo
           ))}
         </ul>
 
-        <Button asChild fullWidth className="mt-5">
-          <Link href={primaryCta.href}>{primaryCta.label}</Link>
-        </Button>
+        <div className="mt-5 flex flex-col gap-3">
+          <AccountMenu />
+          <Button asChild fullWidth>
+            <Link href={primaryCta.href}>{primaryCta.label}</Link>
+          </Button>
+        </div>
       </nav>
     </div>
   );

@@ -5,6 +5,17 @@
  * action; failing it must not fail the action. Callers inspect `delivered`.
  */
 
+/**
+ * Les fournisseurs implémentés.
+ *
+ * `console` n'est pas un bouchon : c'est le mode par défaut, et il journalise
+ * réellement le message. `brevo` est le fournisseur retenu pour la production —
+ * voir `docs/emails.md`. `resend` reste implémenté comme repli : il ne coûte
+ * qu'un fichier, et une bascule de fournisseur ne doit jamais demander une
+ * réécriture.
+ */
+export type EmailProvider = "console" | "resend" | "brevo";
+
 export interface EmailMessage {
   to: string;
   subject: string;
@@ -17,13 +28,13 @@ export interface EmailSendResult {
   id: string;
   delivered: boolean;
   /** `console` when the message was only logged. */
-  provider: "console" | "resend";
+  provider: EmailProvider;
   /** French, safe to surface in a server log. Never contains the address. */
   error?: string;
 }
 
 export interface Mailer {
-  readonly provider: "console" | "resend";
+  readonly provider: EmailProvider;
   send(message: EmailMessage): Promise<EmailSendResult>;
 }
 

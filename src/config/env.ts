@@ -22,9 +22,16 @@ const schema = z.object({
   USE_MOCK_DVF: z.enum(["true", "false"]).optional(),
 
   // --- E-mail ---
-  EMAIL_PROVIDER: z.enum(["console", "resend"]).optional(),
+  EMAIL_PROVIDER: z.enum(["console", "resend", "brevo"]).optional(),
   EMAIL_PROVIDER_KEY: z.string().optional(),
   EMAIL_FROM: z.string().optional(),
+  /** Liste Brevo qui reçoit les inscrits à la lettre d'information. */
+  BREVO_NEWSLETTER_LIST_ID: z.coerce.number().int().positive().optional(),
+  /** Liste Brevo qui reçoit les contacts issus d'une estimation. */
+  BREVO_LEADS_LIST_ID: z.coerce.number().int().positive().optional(),
+
+  // --- Signature des liens de téléchargement ---
+  DOWNLOAD_SIGNING_SECRET: z.string().min(32).optional(),
 });
 
 const parsed = schema.safeParse(process.env);
@@ -63,8 +70,30 @@ export const env = {
     provider: raw.EMAIL_PROVIDER ?? "console",
     apiKey: raw.EMAIL_PROVIDER_KEY,
     from: raw.EMAIL_FROM ?? "CorpusImmo <estimation@corpusimmo.fr>",
-    isConfigured: raw.EMAIL_PROVIDER === "resend" && Boolean(raw.EMAIL_PROVIDER_KEY),
+    isConfigured:
+      raw.EMAIL_PROVIDER !== undefined &&
+      raw.EMAIL_PROVIDER !== "console" &&
+      Boolean(raw.EMAIL_PROVIDER_KEY),
   },
+
+  /**
+   * Les listes marketing. Absentes, la synchronisation de contact est
+   * simplement sautée — jamais devinée : écrire dans une liste au hasard
+   * mélangerait des consentements qui ne se recouvrent pas.
+   */
+  contacts: {
+    newsletterListId: raw.BREVO_NEWSLETTER_LIST_ID,
+    leadsListId: raw.BREVO_LEADS_LIST_ID,
+  },
+
+  /**
+   * Secret de signature des liens de téléchargement.
+   *
+   * Absent, aucun lien n'est émis et la route de téléchargement refuse tout.
+   * On ne se rabat PAS sur un secret par défaut : un secret connu de tous ne
+   * signe rien, et un lien signé avec lui serait forgeable par n'importe qui.
+   */
+  downloadSecret: raw.DOWNLOAD_SIGNING_SECRET,
 
   isProduction,
 } as const;

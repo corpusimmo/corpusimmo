@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Source_Serif_4 } from "next/font/google";
 
+import { AuthSessionProvider } from "@/components/layout/session-provider";
 import { ToastProvider } from "@/components/ui/toast";
 import { safeUrl } from "@/config/app-url";
 import { siteConfig } from "@/config/site";
@@ -68,7 +69,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="fr" className={`${inter.variable} ${sourceSerif.variable}`}>
       <body>
-        <ToastProvider>{children}</ToastProvider>
+        <AuthSessionProvider>
+          <ToastProvider>{children}</ToastProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   );

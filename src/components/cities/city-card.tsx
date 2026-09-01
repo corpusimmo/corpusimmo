@@ -3,8 +3,51 @@ import { ArrowRight } from "lucide-react";
 
 import { canPublishFigure } from "@/lib/cities/thresholds";
 import { cityPath } from "@/lib/cities/links";
-import type { CityAggregate } from "@/lib/cities/types";
+import type { CityAggregate, CityFigure } from "@/lib/cities/types";
 import { formatNumber, formatPricePerSqm } from "@/lib/utils/format";
+
+/**
+ * Ce que la vignette a besoin de savoir d'une commune, et rien de plus.
+ *
+ * Le sommaire filtre ses cent vignettes côté navigateur : les agrégats
+ * complets (histogrammes, millésimes, secteurs) pèseraient des centaines de
+ * kilo-octets dans la page pour n'y servir à rien. On ne fait voyager que les
+ * deux médianes et leurs effectifs, qui sont tout ce que la vignette affiche.
+ */
+export interface CityCardFigure {
+  sample: number;
+  total: number;
+  median?: number;
+}
+
+export interface CityCardData {
+  slug: string;
+  name: string;
+  departmentCode: string;
+  departmentName: string;
+  apartment?: CityCardFigure;
+  house?: CityCardFigure;
+}
+
+function pick(figure: CityFigure | undefined): CityCardFigure | undefined {
+  if (!figure) return undefined;
+  return figure.median === undefined
+    ? { sample: figure.sample, total: figure.total }
+    : { sample: figure.sample, total: figure.total, median: figure.median };
+}
+
+export function toCityCardData(city: CityAggregate): CityCardData {
+  const apartment = pick(city.byType.apartment);
+  const house = pick(city.byType.house);
+  return {
+    slug: city.slug,
+    name: city.name,
+    departmentCode: city.departmentCode,
+    departmentName: city.departmentName,
+    ...(apartment ? { apartment } : {}),
+    ...(house ? { house } : {}),
+  };
+}
 
 /**
  * La vignette d'une commune, au sommaire.
@@ -14,10 +57,7 @@ import { formatNumber, formatPricePerSqm } from "@/lib/utils/format";
  * noms oblige à ouvrir dix pages pour comparer deux communes, alors que la
  * donnée tient en une ligne.
  */
-export function CityCard({ city }: { city: CityAggregate }) {
-  const flats = city.byType.apartment;
-  const houses = city.byType.house;
-
+export function CityCard({ city }: { city: CityCardData }) {
   return (
     <Link
       href={cityPath(city.slug)}
@@ -31,8 +71,8 @@ export function CityCard({ city }: { city: CityAggregate }) {
       </div>
 
       <dl className="flex flex-1 flex-col gap-1.5 text-sm">
-        <Line label="Appartement" figure={flats} />
-        <Line label="Maison" figure={houses} />
+        <Line label="Appartement" figure={city.apartment} />
+        <Line label="Maison" figure={city.house} />
       </dl>
 
       <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
@@ -46,18 +86,12 @@ export function CityCard({ city }: { city: CityAggregate }) {
   );
 }
 
-function Line({
-  label,
-  figure,
-}: {
-  label: string;
-  figure: CityAggregate["byType"]["apartment"];
-}) {
+function Line({ label, figure }: { label: string; figure: CityCardFigure | undefined }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
       <dt className="text-ink-muted">{label}</dt>
       <dd className="text-right tabular-nums">
-        {canPublishFigure(figure) ? (
+        {canPublishFigure(figure) && figure?.median !== undefined ? (
           <>
             <span className="font-semibold text-ink">{formatPricePerSqm(figure.median)}</span>
             <span className="block text-xs text-ink-subtle">

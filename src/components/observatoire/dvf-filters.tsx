@@ -1,32 +1,55 @@
 "use client";
 
-import { RotateCcw, SlidersHorizontal } from "lucide-react";
+import { useId, useState } from "react";
+import { ChevronDown, RotateCcw, SlidersHorizontal } from "lucide-react";
+import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
 import { Badge, Button, Field, Input, Select } from "@/components/ui";
 import type { DvfPropertyType, DvfQueryFilters } from "@/types/dvf";
 import { cn } from "@/lib/utils/cn";
 
 /**
- * Pro filter bar over `DvfQueryFilters`.
+ * La barre de filtres de l'observatoire, en deux étages.
  *
- * The type list is exactly what DVF's `type_local` can distinguish — including
- * "Local industriel, commercial ou assimilé". We do not split commerce from
- * industry, because the source does not.
+ * Le premier étage tient sur une ligne et reste toujours visible : le type de
+ * local, qui est le filtre qu'on touche à chaque visite. Le second (période,
+ * prix, surface, densité) se replie, parce que huit champs numériques ouverts
+ * en permanence poussaient la carte sous le pli de l'écran, et une carte qu'on
+ * ne voit pas au chargement est une carte qu'on ne consulte pas.
+ *
+ * Le second étage s'ouvre tout seul quand un de ses critères est actif : un
+ * filtre invisible qui retire des ventes serait une source de confusion.
+ *
+ * La liste des types est exactement ce que le `type_local` de DVF distingue,
+ * « Local industriel, commercial ou assimilé » compris. On ne sépare pas le
+ * commerce de l'industrie, parce que la source ne le fait pas.
  */
 
-export const DVF_TYPE_OPTIONS: { value: DvfPropertyType; label: string; hint?: string }[] = [
-  { value: "apartment", label: "Appartements" },
-  { value: "house", label: "Maisons" },
-  { value: "commercial", label: "Locaux commerciaux / industriels", hint: "type_local « Local industriel, commercial ou assimilé »" },
-  { value: "land", label: "Terrains" },
-  { value: "dependency", label: "Dépendances" },
+export const DVF_TYPE_OPTIONS: {
+  value: DvfPropertyType;
+  label: string;
+  icon: AssetIconName;
+  hint?: string;
+}[] = [
+  { value: "apartment", label: "Appartements", icon: "apartment" },
+  { value: "house", label: "Maisons", icon: "house" },
+  {
+    value: "commercial",
+    label: "Locaux commerciaux / industriels",
+    icon: "retail",
+    hint: "type_local « Local industriel, commercial ou assimilé »",
+  },
+  { value: "land", label: "Terrains", icon: "land" },
+  { value: "dependency", label: "Dépendances", icon: "parking" },
 ];
 
-/** Rows fetched per view. More density = more rows, at the cost of latency. */
+/** Lignes chargées par vue. Plus de densité, c'est plus de lignes, au prix de la latence. */
 export const DENSITY_OPTIONS = [
   { value: 400, label: "Standard" },
   { value: 1200, label: "Dense" },
   { value: 2500, label: "Maximale" },
 ];
+
+const DEFAULT_DENSITY = DENSITY_OPTIONS[1]?.value ?? 1200;
 
 const CURRENT_YEAR = new Date().getFullYear();
 const YEARS = Array.from({ length: 6 }, (_, i) => CURRENT_YEAR - i);
@@ -35,6 +58,21 @@ function toNumber(value: string): number | undefined {
   if (value.trim() === "") return undefined;
   const parsed = Number(value);
   return Number.isFinite(parsed) ? parsed : undefined;
+}
+
+/** Vrai dès qu'un critère du second étage retire des ventes ou change la densité. */
+function hasDetailedCriteria(value: DvfQueryFilters): boolean {
+  return (
+    value.yearMin !== undefined ||
+    value.yearMax !== undefined ||
+    value.priceMin !== undefined ||
+    value.priceMax !== undefined ||
+    value.areaMin !== undefined ||
+    value.areaMax !== undefined ||
+    value.pricePerSqmMin !== undefined ||
+    value.pricePerSqmMax !== undefined ||
+    (value.limit !== undefined && value.limit !== DEFAULT_DENSITY)
+  );
 }
 
 export function DvfFilters({
@@ -48,16 +86,28 @@ export function DvfFilters({
   onChange: (next: DvfQueryFilters) => void;
   onReset: () => void;
   className?: string;
-  /** Compact drops the price/area block, for narrow side panels. */
+  /** Compact retire le bloc prix et surface, pour les panneaux étroits. */
   compact?: boolean;
 }) {
+  const panelId = useId();
+  const detailed = hasDetailedCriteria(value);
+  const [open, setOpen] = useState(detailed);
+  // Un critère posé de l'extérieur (une URL, une reprise) rouvre l'étage, mais
+  // ne l'empêche pas de se replier ensuite : le compteur du titre continue de
+  // dire qu'un filtre agit.
+  const [lastDetailed, setLastDetailed] = useState(detailed);
+  if (detailed !== lastDetailed) {
+    setLastDetailed(detailed);
+    if (detailed) setOpen(true);
+  }
+
   const selectedTypes = value.propertyTypes ?? [];
 
   const toggleType = (type: DvfPropertyType) => {
     const next = selectedTypes.includes(type)
       ? selectedTypes.filter((t) => t !== type)
       : [...selectedTypes, type];
-    // An empty list would mean "nothing"; the API reads absent as "everything".
+    // Une liste vide voudrait dire « rien » ; l'API lit l'absence comme « tout ».
     onChange({ ...value, propertyTypes: next.length === 0 ? undefined : next });
   };
 
@@ -65,14 +115,15 @@ export function DvfFilters({
     (value.propertyTypes ? 1 : 0) +
     (value.yearMin || value.yearMax ? 1 : 0) +
     (value.priceMin || value.priceMax ? 1 : 0) +
-    (value.areaMin || value.areaMax ? 1 : 0);
+    (value.areaMin || value.areaMax ? 1 : 0) +
+    (value.pricePerSqmMin || value.pricePerSqmMax ? 1 : 0);
 
   return (
     <section
       aria-label="Filtres des mutations"
-      className={cn("rounded-lg border border-border bg-surface p-4", className)}
+      className={cn("rounded-lg border border-border bg-surface", className)}
     >
-      <div className="flex items-center justify-between gap-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 px-4 py-3">
         <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
           <SlidersHorizontal className="size-4 text-ink-subtle" aria-hidden />
           Filtres
@@ -82,17 +133,8 @@ export function DvfFilters({
             </Badge>
           )}
         </h2>
-        <Button variant="ghost" size="sm" onClick={onReset}>
-          <RotateCcw className="size-4" aria-hidden />
-          Réinitialiser
-        </Button>
-      </div>
 
-      <fieldset className="mt-4">
-        <legend className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">
-          Type de local
-        </legend>
-        <div className="mt-2 flex flex-wrap gap-2">
+        <div role="group" aria-label="Type de local" className="flex flex-wrap gap-2">
           {DVF_TYPE_OPTIONS.map((option) => {
             const active = selectedTypes.includes(option.value);
             return (
@@ -103,164 +145,199 @@ export function DvfFilters({
                 title={option.hint}
                 onClick={() => toggleType(option.value)}
                 className={cn(
-                  "min-h-9 rounded-full border px-3 text-xs font-medium transition-colors",
+                  "inline-flex min-h-9 items-center gap-1.5 rounded-full border py-1 pl-2.5 pr-3 text-xs font-medium transition-colors",
                   active
                     ? "border-accent bg-accent-soft text-accent-soft-fg"
                     : "border-border bg-surface-2 text-ink-muted hover:border-border-strong hover:text-ink",
                 )}
               >
+                <AssetTypeIcon name={option.icon} className="size-4" strokeWidth={2.5} />
                 {option.label}
               </button>
             );
           })}
         </div>
-      </fieldset>
 
-      <div className={cn("mt-4 grid gap-3", compact ? "grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4")}>
-        <Field label="Année min." htmlFor="filter-year-min">
-          <Select
-            id="filter-year-min"
-            value={value.yearMin ?? ""}
-            onChange={(event) =>
-              onChange({ ...value, yearMin: toNumber(event.currentTarget.value) })
-            }
+        <div className="ml-auto flex items-center gap-1">
+          {activeCount > 0 && (
+            <Button variant="ghost" size="sm" onClick={onReset}>
+              <RotateCcw className="size-4" aria-hidden />
+              Réinitialiser
+            </Button>
+          )}
+          <Button
+            variant="ghost"
+            size="sm"
+            aria-expanded={open}
+            aria-controls={panelId}
+            onClick={() => setOpen((current) => !current)}
           >
-            <option value="">Toutes</option>
-            {YEARS.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </Select>
-        </Field>
-
-        <Field label="Année max." htmlFor="filter-year-max">
-          <Select
-            id="filter-year-max"
-            value={value.yearMax ?? ""}
-            onChange={(event) =>
-              onChange({ ...value, yearMax: toNumber(event.currentTarget.value) })
-            }
-          >
-            <option value="">Toutes</option>
-            {YEARS.map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </Select>
-        </Field>
-
-        {!compact && (
-          <>
-            <Field label="Prix min. (€)" htmlFor="filter-price-min">
-              <Input
-                id="filter-price-min"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={10_000}
-                placeholder="0"
-                value={value.priceMin ?? ""}
-                onChange={(event) =>
-                  onChange({ ...value, priceMin: toNumber(event.currentTarget.value) })
-                }
-              />
-            </Field>
-
-            <Field label="Prix max. (€)" htmlFor="filter-price-max">
-              <Input
-                id="filter-price-max"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={10_000}
-                placeholder="–"
-                value={value.priceMax ?? ""}
-                onChange={(event) =>
-                  onChange({ ...value, priceMax: toNumber(event.currentTarget.value) })
-                }
-              />
-            </Field>
-
-            <Field label="Surface min. (m²)" htmlFor="filter-area-min">
-              <Input
-                id="filter-area-min"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={5}
-                placeholder="0"
-                value={value.areaMin ?? ""}
-                onChange={(event) =>
-                  onChange({ ...value, areaMin: toNumber(event.currentTarget.value) })
-                }
-              />
-            </Field>
-
-            <Field label="Surface max. (m²)" htmlFor="filter-area-max">
-              <Input
-                id="filter-area-max"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={5}
-                placeholder="–"
-                value={value.areaMax ?? ""}
-                onChange={(event) =>
-                  onChange({ ...value, areaMax: toNumber(event.currentTarget.value) })
-                }
-              />
-            </Field>
-
-            <Field label="€/m² min." htmlFor="filter-sqm-min">
-              <Input
-                id="filter-sqm-min"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={100}
-                placeholder="0"
-                value={value.pricePerSqmMin ?? ""}
-                onChange={(event) =>
-                  onChange({ ...value, pricePerSqmMin: toNumber(event.currentTarget.value) })
-                }
-              />
-            </Field>
-
-            <Field label="€/m² max." htmlFor="filter-sqm-max">
-              <Input
-                id="filter-sqm-max"
-                type="number"
-                inputMode="numeric"
-                min={0}
-                step={100}
-                placeholder="–"
-                value={value.pricePerSqmMax ?? ""}
-                onChange={(event) =>
-                  onChange({ ...value, pricePerSqmMax: toNumber(event.currentTarget.value) })
-                }
-              />
-            </Field>
-          </>
-        )}
-
-        <Field label="Densité affichée" htmlFor="filter-density" hint="Nombre de mutations chargées par vue">
-          <Select
-            id="filter-density"
-            value={value.limit ?? DENSITY_OPTIONS[1]?.value ?? 1200}
-            onChange={(event) =>
-              onChange({ ...value, limit: toNumber(event.currentTarget.value) })
-            }
-          >
-            {DENSITY_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label} · {option.value} lignes
-              </option>
-            ))}
-          </Select>
-        </Field>
+            {open ? "Replier les critères" : "Période, prix, surface"}
+            <ChevronDown
+              aria-hidden
+              className={cn("size-4 transition-transform", open && "rotate-180")}
+            />
+          </Button>
+        </div>
       </div>
+
+      {open && (
+        <div
+          id={panelId}
+          className={cn(
+            "grid gap-3 border-t border-border-soft px-4 py-4",
+            compact ? "grid-cols-2" : "sm:grid-cols-2 lg:grid-cols-4",
+          )}
+        >
+          <Field label="Année min." htmlFor="filter-year-min">
+            <Select
+              id="filter-year-min"
+              value={value.yearMin ?? ""}
+              onChange={(event) =>
+                onChange({ ...value, yearMin: toNumber(event.currentTarget.value) })
+              }
+            >
+              <option value="">Toutes</option>
+              {YEARS.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </Select>
+          </Field>
+
+          <Field label="Année max." htmlFor="filter-year-max">
+            <Select
+              id="filter-year-max"
+              value={value.yearMax ?? ""}
+              onChange={(event) =>
+                onChange({ ...value, yearMax: toNumber(event.currentTarget.value) })
+              }
+            >
+              <option value="">Toutes</option>
+              {YEARS.map((year) => (
+                <option key={year} value={year}>
+                  {year}
+                </option>
+              ))}
+            </Select>
+          </Field>
+
+          {!compact && (
+            <>
+              <Field label="Prix min. (€)" htmlFor="filter-price-min">
+                <Input
+                  id="filter-price-min"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={10_000}
+                  placeholder="0"
+                  value={value.priceMin ?? ""}
+                  onChange={(event) =>
+                    onChange({ ...value, priceMin: toNumber(event.currentTarget.value) })
+                  }
+                />
+              </Field>
+
+              <Field label="Prix max. (€)" htmlFor="filter-price-max">
+                <Input
+                  id="filter-price-max"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={10_000}
+                  placeholder="–"
+                  value={value.priceMax ?? ""}
+                  onChange={(event) =>
+                    onChange({ ...value, priceMax: toNumber(event.currentTarget.value) })
+                  }
+                />
+              </Field>
+
+              <Field label="Surface min. (m²)" htmlFor="filter-area-min">
+                <Input
+                  id="filter-area-min"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={5}
+                  placeholder="0"
+                  value={value.areaMin ?? ""}
+                  onChange={(event) =>
+                    onChange({ ...value, areaMin: toNumber(event.currentTarget.value) })
+                  }
+                />
+              </Field>
+
+              <Field label="Surface max. (m²)" htmlFor="filter-area-max">
+                <Input
+                  id="filter-area-max"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={5}
+                  placeholder="–"
+                  value={value.areaMax ?? ""}
+                  onChange={(event) =>
+                    onChange({ ...value, areaMax: toNumber(event.currentTarget.value) })
+                  }
+                />
+              </Field>
+
+              <Field label="€/m² min." htmlFor="filter-sqm-min">
+                <Input
+                  id="filter-sqm-min"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={100}
+                  placeholder="0"
+                  value={value.pricePerSqmMin ?? ""}
+                  onChange={(event) =>
+                    onChange({ ...value, pricePerSqmMin: toNumber(event.currentTarget.value) })
+                  }
+                />
+              </Field>
+
+              <Field label="€/m² max." htmlFor="filter-sqm-max">
+                <Input
+                  id="filter-sqm-max"
+                  type="number"
+                  inputMode="numeric"
+                  min={0}
+                  step={100}
+                  placeholder="–"
+                  value={value.pricePerSqmMax ?? ""}
+                  onChange={(event) =>
+                    onChange({ ...value, pricePerSqmMax: toNumber(event.currentTarget.value) })
+                  }
+                />
+              </Field>
+            </>
+          )}
+
+          <Field
+            label="Densité affichée"
+            htmlFor="filter-density"
+            hint="Nombre de mutations chargées par vue"
+          >
+            <Select
+              id="filter-density"
+              value={value.limit ?? DEFAULT_DENSITY}
+              onChange={(event) =>
+                onChange({ ...value, limit: toNumber(event.currentTarget.value) })
+              }
+            >
+              {DENSITY_OPTIONS.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label} · {option.value} lignes
+                </option>
+              ))}
+            </Select>
+          </Field>
+        </div>
+      )}
     </section>
   );
 }

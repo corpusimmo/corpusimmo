@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { AlertTriangle, Crosshair, Loader2, SlidersHorizontal, ZoomIn } from "lucide-react";
+import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
 import { AddressAutocomplete } from "@/components/map/address-autocomplete";
 import type { DvfMapState } from "@/components/map/dvf-map";
 import { LazyDvfMap } from "@/components/map/map-loader";
@@ -33,13 +34,19 @@ const DEFAULT_FILTERS: DvfQueryFilters = { limit: 400 };
  * m² si on les mélange au reste, d'où une pastille à part plutôt qu'un
  * regroupement.
  */
-const TYPE_CHIPS: { id: string; label: string; types?: DvfPropertyType[] }[] = [
+const TYPE_CHIPS: {
+  id: string;
+  label: string;
+  types?: DvfPropertyType[];
+  /** La silhouette du type, tirée de la même bibliothèque que les fiches outils. */
+  icon?: AssetIconName;
+}[] = [
   { id: "all", label: "Toutes" },
-  { id: "apartment", label: "Appartement", types: ["apartment"] },
-  { id: "house", label: "Maison", types: ["house"] },
-  { id: "commercial", label: "Local pro", types: ["commercial"] },
-  { id: "land", label: "Terrain", types: ["land"] },
-  { id: "dependency", label: "Dépendance", types: ["dependency"] },
+  { id: "apartment", label: "Appartement", types: ["apartment"], icon: "apartment" },
+  { id: "house", label: "Maison", types: ["house"], icon: "house" },
+  { id: "commercial", label: "Local pro", types: ["commercial"], icon: "retail" },
+  { id: "land", label: "Terrain", types: ["land"], icon: "land" },
+  { id: "dependency", label: "Dépendance", types: ["dependency"], icon: "parking" },
 ];
 
 // Le type vient de la carte : c'est elle qui produit ces états.
@@ -303,7 +310,9 @@ export function CarteClient() {
       <div className="hidden border-b border-border bg-surface lg:block">
         <div className="container-page flex flex-col gap-3 py-4">
           <div className="flex items-center gap-3">
-            <div className="w-full max-w-md">
+            {/* `min-w-64` : les pastilles à leur droite ne se compriment pas,
+                et sans plancher c'est le champ d'adresse qui s'écrasait. */}
+            <div className="w-full min-w-64 max-w-md">
               <AddressAutocomplete
                 id="observatory-search"
                 value={address}
@@ -325,10 +334,13 @@ export function CarteClient() {
                   aria-pressed={typeChip === chip.id}
                   className={
                     typeChip === chip.id
-                      ? "rounded-full border border-primary bg-primary-soft px-3.5 py-2 text-sm font-medium text-primary-soft-fg"
-                      : "rounded-full border border-border bg-surface px-3.5 py-2 text-sm font-medium text-ink-muted transition-colors duration-150 hover:border-border-strong hover:text-ink"
+                      ? "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-primary bg-primary-soft py-2 pl-3 pr-3.5 text-sm font-medium text-primary-soft-fg"
+                      : "inline-flex items-center gap-1.5 whitespace-nowrap rounded-full border border-border bg-surface py-2 pl-3 pr-3.5 text-sm font-medium text-ink-muted transition-colors duration-150 hover:border-border-strong hover:text-ink"
                   }
                 >
+                  {chip.icon ? (
+                    <AssetTypeIcon name={chip.icon} className="size-4" strokeWidth={2.5} />
+                  ) : null}
                   {chip.label}
                 </button>
               ))}
@@ -530,10 +542,13 @@ export function CarteClient() {
                 aria-pressed={typeChip === chip.id}
                 className={
                   typeChip === chip.id
-                    ? "min-h-11 rounded-full border border-primary bg-primary-soft px-4 text-sm font-medium text-primary-soft-fg"
-                    : "min-h-11 rounded-full border border-border bg-surface px-4 text-sm font-medium text-ink-muted"
+                    ? "inline-flex min-h-11 items-center gap-1.5 rounded-full border border-primary bg-primary-soft pl-3 pr-4 text-sm font-medium text-primary-soft-fg"
+                    : "inline-flex min-h-11 items-center gap-1.5 rounded-full border border-border bg-surface pl-3 pr-4 text-sm font-medium text-ink-muted"
                 }
               >
+                {chip.icon ? (
+                  <AssetTypeIcon name={chip.icon} className="size-4" strokeWidth={2.5} />
+                ) : null}
                 {chip.label}
               </button>
             ))}

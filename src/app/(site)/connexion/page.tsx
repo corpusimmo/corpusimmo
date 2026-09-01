@@ -13,8 +13,8 @@ import { SignInForm } from "./sign-in-form";
 export const metadata: Metadata = pageMetadata({
   title: "Connexion",
   description:
-    "Se connecter avec Google pour ouvrir les calculateurs et recevoir vos documents sans " +
-    "attendre un courriel de confirmation.",
+    "Se connecter avec Google, ou par un lien envoyé à votre adresse, pour ouvrir les " +
+    "calculateurs et retrouver vos estimations et vos comparables.",
   path: "/connexion",
   index: false,
   follow: false,
@@ -26,12 +26,12 @@ export default function ConnexionPage() {
       <div className="container-page">
         <div className="mx-auto max-w-md">
           <p className="eyebrow">Connexion</p>
-          <h1 className="mt-2 font-display text-3xl leading-tight text-ink">
-            Se connecter avec Google
-          </h1>
+          <h1 className="mt-2 font-display text-3xl leading-tight text-ink">Se connecter</h1>
           <p className="mt-3 leading-relaxed text-ink-muted">
             Un compte ne sert qu&apos;à une chose ici&nbsp;: prouver que votre adresse est bien la
-            vôtre, pour vous remettre un document sans vous faire attendre un courriel.
+            vôtre, pour ouvrir les calculateurs et retrouver, d&apos;une visite à l&apos;autre,
+            vos estimations et vos comparables. Avec Google, ou par un lien envoyé à votre
+            adresse.
           </p>
 
           <div className="mt-8">

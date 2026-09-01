@@ -18,48 +18,45 @@ const LINK =
  * navigateur. Le faire dépendre de l'authentification laisserait croire à une
  * porte fermée là où il n'y en a pas.
  *
- * Le reste, en revanche, ne rend RIEN tant que la session n'est pas résolue.
- * Afficher « Connexion » puis le remplacer par un nom une demi-seconde plus
- * tard fait sauter la barre et donne l'impression d'un site mal réveillé ; sur
- * la plupart des visites la réponse est « personne », donc l'attente ne coûte
+ * Une fois la personne connectée, sa photo prend la place du pictogramme dans
+ * ce même lien : un seul chemin vers l'espace, et non deux liens côte à côte
+ * qui mènent au même endroit. La déconnexion reste à côté, réduite à son
+ * pictogramme sur le bandeau (le libellé est lu par les lecteurs d'écran et
+ * s'affiche en toutes lettres dans le menu mobile, où la place ne manque pas).
+ *
+ * Le reste ne rend RIEN tant que la session n'est pas résolue. Afficher
+ * « Connexion » puis le remplacer par une photo une demi-seconde plus tard
+ * fait sauter la barre et donne l'impression d'un site mal réveillé ; sur la
+ * plupart des visites la réponse est « personne », donc l'attente ne coûte
  * presque jamais rien.
  */
 export function AccountMenu({ className }: { className?: string }) {
   const { data: session, status } = useSession();
+  const user = session?.user;
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
-      <Link href="/mon-espace" className={LINK}>
-        <LayoutGrid aria-hidden="true" className="size-4" />
+      <Link href="/mon-espace" className={LINK} title={user?.email ?? undefined}>
+        {user ? (
+          <Avatar src={user.image ?? null} name={user.name ?? user.email ?? "Compte"} />
+        ) : (
+          <LayoutGrid aria-hidden="true" className="size-4" />
+        )}
         Mon espace
       </Link>
 
       {status === "loading" ? (
         <span aria-hidden="true" className="h-9 w-9" />
-      ) : session?.user ? (
-        <>
-          <Link
-            href="/mon-espace"
-            className="flex items-center gap-2 rounded-sm px-1.5 py-1 transition-colors hover:bg-surface-2"
-            title={session.user.email ?? undefined}
-          >
-            <Avatar
-              src={session.user.image ?? null}
-              name={session.user.name ?? session.user.email ?? "Compte"}
-            />
-            <span className="hidden max-w-[10rem] truncate text-sm text-ink-muted lg:inline">
-              {session.user.name ?? session.user.email}
-            </span>
-          </Link>
-          <button
-            type="button"
-            onClick={() => void signOut({ redirectTo: "/" })}
-            className="inline-flex h-9 items-center gap-1.5 rounded-sm px-2.5 text-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink"
-          >
-            <LogOut aria-hidden="true" className="size-4" />
-            <span className="sr-only sm:not-sr-only">Se déconnecter</span>
-          </button>
-        </>
+      ) : user ? (
+        <button
+          type="button"
+          onClick={() => void signOut({ redirectTo: "/" })}
+          title="Se déconnecter"
+          className="inline-flex h-9 items-center gap-1.5 rounded-sm px-2.5 text-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink"
+        >
+          <LogOut aria-hidden="true" className="size-4" />
+          <span className="lg:sr-only">Se déconnecter</span>
+        </button>
       ) : (
         <Link href="/connexion" className={LINK}>
           <UserRound aria-hidden="true" className="size-4" />
@@ -82,7 +79,7 @@ export function AccountMenu({ className }: { className?: string }) {
  *
  * `<img>` et non `next/image` : l'optimiseur d'images demanderait de déclarer
  * `googleusercontent.com` dans les domaines autorisés, pour une vignette de
- * 32 px déjà servie à la bonne taille par Google. Le jeu n'en vaut pas la
+ * 24 px déjà servie à la bonne taille par Google. Le jeu n'en vaut pas la
  * chandelle, et la règle ESLint est donc désactivée ici en connaissance de cause.
  */
 function Avatar({ src, name }: { src: string | null; name: string }) {
@@ -98,7 +95,7 @@ function Avatar({ src, name }: { src: string | null; name: string }) {
     return (
       <span
         aria-hidden="true"
-        className="grid size-7 shrink-0 place-items-center rounded-full bg-surface-2 text-[0.6875rem] font-semibold text-ink-muted"
+        className="grid size-6 shrink-0 place-items-center rounded-full bg-primary text-[0.625rem] font-semibold text-primary-fg"
       >
         {initials || "?"}
       </span>
@@ -110,13 +107,13 @@ function Avatar({ src, name }: { src: string | null; name: string }) {
     <img
       src={src}
       alt=""
-      width={28}
-      height={28}
+      width={24}
+      height={24}
       loading="lazy"
       decoding="async"
       referrerPolicy="no-referrer"
       onError={() => setBroken(true)}
-      className="size-7 shrink-0 rounded-full border border-border object-cover"
+      className="size-6 shrink-0 rounded-full border border-border object-cover"
     />
   );
 }

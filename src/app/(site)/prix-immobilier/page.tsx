@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowRight, MapPinned } from "lucide-react";
 
-import { CityCard } from "@/components/cities/city-card";
+import { toCityCardData } from "@/components/cities/city-card";
+import { CityFinder } from "@/components/cities/city-finder";
 import { Button } from "@/components/ui";
 import { disclaimers, dvfCoverage } from "@/config/site";
 import {
@@ -123,13 +124,7 @@ export default function PrixImmobilierPage() {
             </p>
           </div>
 
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-            {cities.map((city) => (
-              <li key={city.slug}>
-                <CityCard city={city} />
-              </li>
-            ))}
-          </ul>
+          <CityFinder cities={cities.map(toCityCardData)} />
         </section>
 
         <section className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">

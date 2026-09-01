@@ -134,7 +134,7 @@ export function ObservatoireWorkspace() {
         <div className="overflow-hidden rounded-lg border border-border bg-surface">
           <LazyDvfMap
             key={`${center.lat.toFixed(5)},${center.lng.toFixed(5)}`}
-            className="h-[58vh] min-h-[380px] w-full lg:h-[calc(100vh-21rem)]"
+            className="h-[58vh] min-h-[420px] w-full lg:h-[calc(100vh-18rem)]"
             initialCenter={center}
             initialZoom={address ? 15 : 13}
             filters={filters}
@@ -183,7 +183,7 @@ export function ObservatoireWorkspace() {
         {/* -------------------------------------------------------- panel */}
         <aside
           aria-label="Mutations de la vue courante"
-          className="flex max-h-[calc(100vh-21rem)] min-h-[380px] flex-col overflow-hidden rounded-lg border border-border bg-surface"
+          className="flex max-h-[calc(100vh-18rem)] min-h-[420px] flex-col overflow-hidden rounded-lg border border-border bg-surface"
         >
           <div className="shrink-0 border-b border-border px-4 py-3">
             <h2 className="text-sm font-semibold text-ink">Mutations de la vue</h2>

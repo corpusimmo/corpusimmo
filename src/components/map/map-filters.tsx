@@ -15,6 +15,7 @@
 import * as React from "react";
 import { SlidersHorizontal, X } from "lucide-react";
 import type { DvfPropertyType, DvfQueryFilters } from "@/types/dvf";
+import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
 import { Badge, Button, Drawer, Field, Select } from "@/components/ui";
 import { isPartialYear } from "@/lib/dvf/coverage";
 import { cn } from "@/lib/utils/cn";
@@ -22,6 +23,14 @@ import { PROPERTY_TYPE_LABELS } from "./transaction-card";
 
 /** Types a buyer or a seller actually reasons about. */
 const TYPE_OPTIONS: DvfPropertyType[] = ["apartment", "house", "land", "commercial"];
+
+/** La silhouette de chaque type, tirée de la même bibliothèque que les fiches outils. */
+const TYPE_ICONS: Partial<Record<DvfPropertyType, AssetIconName>> = {
+  apartment: "apartment",
+  house: "house",
+  land: "land",
+  commercial: "retail",
+};
 
 const PRICE_STEPS = [50_000, 100_000, 150_000, 200_000, 300_000, 400_000, 600_000, 1_000_000];
 const AREA_STEPS = [20, 30, 40, 60, 80, 100, 150, 200];
@@ -82,6 +91,7 @@ export function MapFilters({
         <div className="flex flex-wrap gap-1.5">
           {TYPE_OPTIONS.map((type) => {
             const active = value.propertyTypes?.includes(type) ?? false;
+            const icon = TYPE_ICONS[type];
             return (
               <button
                 key={type}
@@ -89,12 +99,13 @@ export function MapFilters({
                 aria-pressed={active}
                 onClick={() => toggleType(type)}
                 className={cn(
-                  "min-h-11 rounded-full border px-3.5 text-sm font-medium transition-colors md:min-h-9",
+                  "inline-flex min-h-11 items-center gap-1.5 rounded-full border py-1 pl-2.5 pr-3.5 text-sm font-medium transition-colors md:min-h-9",
                   active
                     ? "border-primary bg-primary text-primary-fg shadow-xs"
                     : "border-border bg-surface text-ink-muted hover:border-border-strong hover:text-ink",
                 )}
               >
+                {icon ? <AssetTypeIcon name={icon} className="size-4" strokeWidth={2.5} /> : null}
                 {PROPERTY_TYPE_LABELS[type]}
               </button>
             );

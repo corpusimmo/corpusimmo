@@ -4,6 +4,7 @@ import { useCallback, useState } from "react";
 
 import { EstimationResult } from "@/components/estimation/estimation-result";
 import { EstimatorWizard } from "@/components/estimation/estimator-wizard";
+import { recordEstimation } from "@/lib/history/estimations";
 import type { ValuationResult } from "@/types/valuation";
 
 /**
@@ -14,10 +15,20 @@ import type { ValuationResult } from "@/types/valuation";
  * « Faire une autre estimation » remonte le composant à neuf — `key` force le
  * remontage, ce qui vide l'état du parcours sans avoir à le réinitialiser
  * champ par champ.
+ *
+ * Le résumé est en revanche déposé dans l'historique du navigateur au passage :
+ * l'estimation reste retrouvable depuis `/mon-espace` après la fermeture de
+ * l'onglet, sans compte et sans base. Voir `src/lib/history/estimations.ts`
+ * pour ce qui est gardé, et ce qui ne l'est pas.
  */
 export function EstimerClient() {
   const [result, setResult] = useState<ValuationResult | null>(null);
   const [attempt, setAttempt] = useState(0);
+
+  const keep = useCallback((valuation: ValuationResult) => {
+    recordEstimation(valuation);
+    setResult(valuation);
+  }, []);
 
   const restart = useCallback(() => {
     setResult(null);
@@ -29,5 +40,5 @@ export function EstimerClient() {
     return <EstimationResult valuation={result} onRestart={restart} />;
   }
 
-  return <EstimatorWizard key={attempt} onResult={setResult} />;
+  return <EstimatorWizard key={attempt} onResult={keep} />;
 }

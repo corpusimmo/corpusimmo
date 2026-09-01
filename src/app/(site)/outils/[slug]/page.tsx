@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, FileSpreadsheet } from "lucide-react";
+import { ArrowLeft, ArrowRight, FileSpreadsheet } from "lucide-react";
 
 import { FavoriteButton } from "@/components/tools/favorite-button";
 import { PreviewGallery } from "@/components/tools/preview-gallery";
-import { ToolRunner } from "@/components/tools/tool-runner";
-import { Badge } from "@/components/ui";
+import { Badge, Button } from "@/components/ui";
 import { toolAssetTypes, toolUsages } from "@/config/navigation";
 import { disclaimers, siteConfig } from "@/config/site";
 import { getToolPreviews } from "@/data/tool-previews";
@@ -94,8 +93,25 @@ export default async function OutilPage({ params }: PageProps) {
           </div>
         </header>
 
-        {/* L'outil d'abord : la personne est venue calculer, pas lire. */}
-        <ToolRunner toolId={tool.id} />
+        {/* L'outil d'abord : la personne est venue calculer, pas lire. Il vit
+            sur une page à part parce que le verrou se vérifie côté serveur, et
+            que cette fiche-ci doit rester statique donc indexable. */}
+        <section className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
+          <div className="max-w-xl">
+            <h2 className="font-display text-xl text-ink">Ouvrir le calculateur</h2>
+            <p className="mt-1 text-sm leading-relaxed text-ink-muted">
+              Gratuit, sans compte, dans le navigateur. Une adresse e-mail suffit à déverrouiller
+              deux outils par semaine glissante. Ceux que vous avez déjà ouverts le restent, sans
+              limite.
+            </p>
+          </div>
+          <Button asChild className="shrink-0">
+            <Link href={`/outils/${tool.id}/calculer`}>
+              Ouvrir le calculateur
+              <ArrowRight aria-hidden="true" className="size-4" />
+            </Link>
+          </Button>
+        </section>
 
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="flex flex-col gap-6">

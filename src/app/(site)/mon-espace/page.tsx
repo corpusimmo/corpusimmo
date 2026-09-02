@@ -10,6 +10,7 @@ import { getToolCard } from "@/data/tools-catalogue";
 import { readAccess } from "@/lib/access/ledger";
 import { currentUserId } from "@/lib/auth/current-user";
 import { listEstimations, readProfile } from "@/lib/db";
+import { attempt } from "@/lib/db/attempt";
 
 import { clearEstimationsAction, forgetEstimationAction, saveProfileAction } from "./actions";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -46,8 +47,17 @@ export default async function MonEspacePage() {
   // Pour une personne connectée, l'historique vient de la base et suit d'un
   // appareil à l'autre. Sinon il reste dans le navigateur, et la page le dit.
   const userId = await currentUserId();
-  const stored = userId ? await listEstimations(userId) : null;
-  const profile = userId ? await readProfile(userId) : null;
+  // Une lecture qui échoue ne fait pas tomber la page : elle se dit, et le
+  // reste de l'espace s'affiche. Voir `lib/db/attempt.ts`.
+  const storedRead = userId
+    ? await attempt("historique des estimations", () => listEstimations(userId), null)
+    : { value: null, failed: false };
+  const profileRead = userId
+    ? await attempt("profil", () => readProfile(userId), null)
+    : { value: null, failed: false };
+  const stored = storedRead.value;
+  const profile = profileRead.value;
+  const degraded = storedRead.failed || profileRead.failed;
   const unlocked = access.unlocked
     .map((grant) => ({ grant, tool: getToolCard(grant.slug) }))
     .filter((entry): entry is { grant: (typeof access.unlocked)[number]; tool: NonNullable<ReturnType<typeof getToolCard>> } =>
@@ -71,6 +81,16 @@ export default async function MonEspacePage() {
               : "Ce que vous avez ouvert, ce que vous avez mis de côté, et ce que vous avez estimé. Sans compte : tout est rattaché à ce navigateur."
           }
         />
+
+        {degraded ? (
+          <p
+            role="status"
+            className="rounded-lg border border-warning/25 bg-warning-soft px-4 py-3 text-sm leading-relaxed text-warning-soft-fg"
+          >
+            Une partie de vos données n&apos;a pas pu être relue à l&apos;instant. Rien
+            n&apos;est perdu&nbsp;: rechargez la page dans un moment.
+          </p>
+        ) : null}
 
         {/* ----------------------------------------------------- le quota -- */}
         <section

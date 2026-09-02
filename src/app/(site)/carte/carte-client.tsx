@@ -93,6 +93,16 @@ export function CarteClient() {
     }
     setUrlRead(true);
   }, []);
+
+  // La barre flottante n'existe que sous 1024 px : c'est la seule largeur où
+  // les commandes de la carte doivent lui céder le haut de l'écran.
+  useEffect(() => {
+    const query = window.matchMedia("(max-width: 1023px)");
+    const sync = () => setCompact(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
   const [filters, setFilters] = useState<DvfQueryFilters>(DEFAULT_FILTERS);
   const [typeChip, setTypeChip] = useState("all");
   const [draft, setDraft] = useState<DraftFilters>(EMPTY_DRAFT);
@@ -102,6 +112,8 @@ export function CarteClient() {
   const [mapState, setMapState] = useState<MapState>("loading");
   const [selected, setSelected] = useState<DvfTransaction | null>(null);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  /** Vrai sous 1024 px, où la page superpose sa propre barre à la carte. */
+  const [compact, setCompact] = useState(false);
   const [reloadKey, setReloadKey] = useState(0);
   const [locating, setLocating] = useState(false);
   const [locationError, setLocationError] = useState<string | null>(null);
@@ -383,6 +395,10 @@ export function CarteClient() {
             selectedId={selected?.id ?? null}
             onSelect={handleSelect}
             onDataChange={handleData}
+            // La recherche flottante et ses deux boutons occupent le haut de
+            // l'écran étroit : sans ce décalage, les commandes de la carte se
+            // retrouveraient dessous. Au large, la barre est hors de la carte.
+            chromeOffset={compact ? "8.5rem" : undefined}
           />
           ) : null}
         </div>

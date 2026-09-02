@@ -116,6 +116,14 @@ C'est ce que les composants consomment.
 | Retour | `--success`, `--warning`, `--danger`, `--info` (+ variantes `-soft`, `-soft-fg`) |
 | Focus | `--ring` |
 | Carte | `--map-marker`, `--map-cluster`, `--map-selected`, `--map-subject` |
+
+La carte porte en plus deux rampes qui ne peuvent pas être des tokens, puisque
+MapLibre peint sur un canevas WebGL sans lire le CSS : `PRICE_RAMP` (cinq
+classes de prix au m², sauge → sang-de-bœuf) et `HEAT_RAMP` (densité des
+ventes, sable → bleu nuit), toutes deux dans `components/map/base-palette.ts`.
+Les bornes des classes sont les quintiles des ventes à l'écran, jamais des
+seuils fixes (`components/map/price-scale.ts`, testé), et la légende les
+affiche pour le dire.
 | Géométrie | `--radius-xs … --radius-xl`, `--shadow-xs … --shadow-lg` |
 
 ### 3. Pont Tailwind

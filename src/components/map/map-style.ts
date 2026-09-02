@@ -386,6 +386,8 @@ export interface PointProperties {
   id: string;
   label: string;
   price: number;
+  /** Prix au m², ou -1 quand la surface manque : les expressions le lisent. */
+  ppsm: number;
   type: string;
   multi: number;
 }
@@ -533,6 +535,7 @@ export function toFeatureCollection(
         id: row.id,
         label: markerLabel(row, mode),
         price: row.price,
+        ppsm: row.pricePerSqm !== undefined && row.pricePerSqm > 0 ? Math.round(row.pricePerSqm) : -1,
         type: row.propertyType,
         // MapLibre expressions handle numbers more predictably than booleans.
         multi: row.isMultiLot ? 1 : 0,
@@ -764,7 +767,7 @@ export function detectBuildingCapability(map: MapLibreMap): BuildingCapability |
 export function stateExpression<T extends string | number>(
   selectedId: string | null,
   comparableIds: readonly string[],
-  values: { selected: T; comparable: T; base: T },
+  values: { selected: T; comparable: T; base: T | StyleExpression },
 ): T | StyleExpression {
   const cases: unknown[] = ["case"];
   if (selectedId) cases.push(["==", ["get", "id"], selectedId], values.selected);

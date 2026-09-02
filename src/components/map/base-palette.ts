@@ -93,3 +93,18 @@ const CORPUS_DENSE: CartoPalette = { ...CORPUS, labelScale: 0.82 };
 export function getCartoPalette(dense = false): CartoPalette {
   return dense ? CORPUS_DENSE : CORPUS;
 }
+
+/**
+ * L'échelle des prix au m², du plus bas au plus haut : sauge, sable, ambre,
+ * brique, sang-de-bœuf. Cinq classes, calées sur les quintiles des ventes
+ * chargées (voir `price-scale.ts`), jamais sur des bornes fixes : un centre-ville
+ * et une périphérie n'ont pas la même échelle, et une échelle nationale
+ * peindrait l'un tout en rouge et l'autre tout en vert.
+ *
+ * Les deux extrémités restent lisibles à côté du bronze de sélection et du vert
+ * des comparables, qui gardent leurs contours propres.
+ */
+export const PRICE_RAMP = ["#7fae9c", "#c9c17f", "#e0a458", "#c2633c", "#872f2f"] as const;
+
+/** La chaleur des ventes : du sable au bronze, puis au bleu nuit de la marque. */
+export const HEAT_RAMP = ["#e6d7b3", "#c2a468", "#8a6a2f", "#1b3349"] as const;

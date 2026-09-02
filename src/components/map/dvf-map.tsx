@@ -39,7 +39,17 @@ import {
   type MapMouseEvent,
 } from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
-import { Box, Layers, Loader2, RotateCw, Search, Square, TriangleAlert } from "lucide-react";
+import {
+  Box,
+  CircleDot,
+  Flame,
+  Layers,
+  Loader2,
+  RotateCw,
+  Search,
+  Square,
+  TriangleAlert,
+} from "lucide-react";
 import type { DvfQueryFilters, DvfResult, DvfTransaction } from "@/types/dvf";
 import type { BBox, LatLng } from "@/types/geo";
 import { cleanEnv } from "@/lib/utils/env-value";
@@ -70,6 +80,9 @@ import {
 import { TransactionPopup } from "./transaction-popup";
 import { TransactionCard } from "./transaction-card";
 import { useDvfData } from "./use-dvf-data";
+import { HEAT_RAMP, PRICE_RAMP } from "./base-palette";
+import { PriceLegend, type LayerMode } from "./price-legend";
+import { buildPriceScale, byPriceClass, type PriceScale } from "./price-scale";
 
 /** Below this zoom a viewport covers whole départements: we refuse to query. */
 export const MIN_DATA_ZOOM = 13;
@@ -115,10 +128,20 @@ const LAYER_CLUSTER_COUNT = "corpusimmo-cluster-count";
 const LAYER_DOT = "corpusimmo-dot";
 const LAYER_PRICE = "corpusimmo-price";
 const LAYER_BUILDINGS = "corpusimmo-buildings";
+/** Une seconde source, non agrégée : la chaleur se calcule sur chaque vente. */
+const SOURCE_HEAT = "corpusimmo-dvf-heat";
+const LAYER_HEAT = "corpusimmo-heat";
+/** Les calques qui disparaissent quand la chaleur prend l'écran. */
+const POINT_LAYERS = [LAYER_CLUSTER, LAYER_CLUSTER_COUNT, LAYER_DOT, LAYER_PRICE] as const;
 
 const IMG_PILL = "corpusimmo-pill";
 const IMG_PILL_SELECTED = "corpusimmo-pill-selected";
 const IMG_PILL_COMPARABLE = "corpusimmo-pill-comparable";
+
+/** Une pastille par couleur de l'échelle, nommée par sa teinte. */
+function pillImageId(color: string): string {
+  return `corpusimmo-pill-${color.replace("#", "")}`;
+}
 
 const DEFAULT_CENTER: LatLng = { lat: 47.2184, lng: -1.5536 };
 
@@ -144,6 +167,15 @@ export interface DvfMapProps {
    */
   density?: "standard" | "dense";
   interactive3d?: boolean;
+  /**
+   * Décale les commandes de la carte vers le bas, en unités CSS.
+   *
+   * La page « Carte des ventes » pose sa propre recherche flottante par-dessus
+   * la carte sur mobile : sans ce décalage, les commandes de la carte se
+   * retrouvent DERRIÈRE elle, visibles mais inatteignables. L'écran qui
+   * superpose est le seul à savoir de combien, donc c'est lui qui le dit.
+   */
+  chromeOffset?: string;
 }
 
 interface InstallContext {
@@ -168,6 +200,7 @@ export function DvfMap({
   // 3D is the default posture, not an opt-in: the volumes are what make the
   // observatory read as a 2026 product rather than an administrative plan.
   interactive3d = true,
+  chromeOffset,
 }: DvfMapProps) {
   const isDense = density === "dense";
   const controlled = transactions !== undefined;
@@ -189,6 +222,7 @@ export function DvfMap({
   const [zoomTooLow, setZoomTooLow] = React.useState(false);
   const [isCompact, setIsCompact] = React.useState(false);
   const [priceMode, setPriceMode] = React.useState<PriceMode>("total");
+  const [layerMode, setLayerMode] = React.useState<LayerMode>("points");
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
   const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(null);
@@ -211,6 +245,11 @@ export function DvfMap({
     [rows, effectiveSelectedId],
   );
   const comparables = React.useMemo(() => comparableIds ?? [], [comparableIds]);
+  /** L'échelle de couleur, recalculée sur les ventes à l'écran. */
+  const scale = React.useMemo(
+    () => buildPriceScale(rows.map((row) => row.pricePerSqm)),
+    [rows],
+  );
 
   const dark = getCartoPalette(isDense).dark;
 
@@ -224,6 +263,10 @@ export function DvfMap({
   rowsRef.current = rows;
   const priceModeRef = React.useRef<PriceMode>(priceMode);
   priceModeRef.current = priceMode;
+  const layerModeRef = React.useRef<LayerMode>(layerMode);
+  layerModeRef.current = layerMode;
+  const scaleRef = React.useRef<PriceScale | null>(scale);
+  scaleRef.current = scale;
   const subjectRef = React.useRef(subject);
   subjectRef.current = subject;
   const onSelectRef = React.useRef(onSelect);
@@ -258,6 +301,8 @@ export function DvfMap({
     const sel = selectedIdRef.current;
     const comp = comparablesRef.current;
     const hovered = hoveredIdRef.current ?? " ";
+    const scale = scaleRef.current;
+    const ppsm: unknown[] = ["get", "ppsm"];
 
     instance.setPaintProperty(
       LAYER_DOT,
@@ -265,9 +310,39 @@ export function DvfMap({
       stateExpression(sel, comp, {
         selected: tokens.selected,
         comparable: tokens.success,
-        base: tokens.marker,
+        base: scale ? byPriceClass(scale, ppsm, scale.colors, tokens.marker) : tokens.marker,
       }),
     );
+
+    // Les grappes prennent la couleur de leur prix au m² moyen, calculé par
+    // MapLibre lui-même (`clusterProperties`). Une grappe sans surface connue
+    // garde le bleu neutre plutôt qu'une classe inventée.
+    if (instance.getLayer(LAYER_CLUSTER) && instance.getLayer(LAYER_CLUSTER_COUNT)) {
+      const mean: unknown[] = ["/", ["get", "ppsmSum"], ["max", ["get", "ppsmCount"], 1]];
+      const known: unknown[] = [">", ["get", "ppsmCount"], 0];
+      instance.setPaintProperty(
+        LAYER_CLUSTER,
+        "circle-color",
+        scale ? ["case", known, byPriceClass(scale, mean, scale.colors, tokens.cluster), tokens.cluster] : tokens.cluster,
+      );
+      instance.setPaintProperty(
+        LAYER_CLUSTER_COUNT,
+        "text-color",
+        scale
+          ? [
+              "case",
+              known,
+              byPriceClass(
+                scale,
+                mean,
+                scale.colors.map((color) => readableInk(color, tokens)),
+                tokens.markerFg,
+              ),
+              tokens.markerFg,
+            ]
+          : tokens.markerFg,
+      );
+    }
     instance.setPaintProperty(LAYER_DOT, "circle-radius", [
       "interpolate",
       ["linear"],
@@ -280,13 +355,14 @@ export function DvfMap({
 
     if (!instance.getLayer(LAYER_PRICE)) return;
 
+    const pillText = markerChrome(tokens, contextRef.current.dark).pillText;
     instance.setLayoutProperty(
       LAYER_PRICE,
       "icon-image",
       stateExpression(sel, comp, {
         selected: IMG_PILL_SELECTED,
         comparable: IMG_PILL_COMPARABLE,
-        base: IMG_PILL,
+        base: scale ? byPriceClass(scale, ppsm, scale.colors.map(pillImageId), IMG_PILL) : IMG_PILL,
       }),
     );
     instance.setPaintProperty(
@@ -295,7 +371,14 @@ export function DvfMap({
       stateExpression(sel, comp, {
         selected: readableInk(tokens.selected, tokens),
         comparable: readableInk(tokens.success, tokens),
-        base: markerChrome(tokens, contextRef.current.dark).pillText,
+        base: scale
+          ? byPriceClass(
+              scale,
+              ppsm,
+              scale.colors.map((color) => readableInk(color, tokens)),
+              pillText,
+            )
+          : pillText,
       }),
     );
     instance.setLayoutProperty(LAYER_PRICE, "symbol-sort-key", [
@@ -377,9 +460,10 @@ export function DvfMap({
     const instance = mapRef.current;
     if (!instance) return;
 
-    geojsonSource(instance, SOURCE_POINTS)?.setData(
-      toFeatureCollection(rowsRef.current, priceModeRef.current),
-    );
+    const collection = toFeatureCollection(rowsRef.current, priceModeRef.current);
+    geojsonSource(instance, SOURCE_POINTS)?.setData(collection);
+    geojsonSource(instance, SOURCE_HEAT)?.setData(collection);
+    applyLayerMode(instance, layerModeRef.current);
 
     const current = subjectRef.current;
     geojsonSource(instance, SOURCE_SUBJECT)?.setData(
@@ -730,11 +814,19 @@ export function DvfMap({
     const source = geojsonSource(instance, SOURCE_POINTS);
     if (!source) return;
 
-    source.setData(
-      zoomTooLow && !controlled ? EMPTY_POINTS : toFeatureCollection(rows, priceMode),
-    );
+    const collection = zoomTooLow && !controlled ? EMPTY_POINTS : toFeatureCollection(rows, priceMode);
+    source.setData(collection);
+    geojsonSource(instance, SOURCE_HEAT)?.setData(collection);
     applyInteractionStyles();
   }, [rows, priceMode, styleReady, zoomTooLow, controlled, applyInteractionStyles]);
+
+  /* ── Points ou chaleur ─────────────────────────────────────────────────── */
+
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    if (!instance || !styleReady) return;
+    applyLayerMode(instance, layerMode);
+  }, [layerMode, styleReady]);
 
   React.useEffect(() => {
     applyInteractionStyles();
@@ -918,6 +1010,8 @@ export function DvfMap({
    * l'écran d'erreur qu'il recouvre. Une seule chose à lire à la fois.
    */
   const chrome = styleReady && !basemapError;
+  /** Une légende sans ventes à l'écran ne décrit rien. */
+  const showLegend = rows.length > 0 && !(zoomTooLow && !controlled);
   const distanceToSubject = (row: DvfTransaction): number | undefined =>
     subject ? haversineMeters(subject.point, row.coordinates) : undefined;
 
@@ -966,53 +1060,103 @@ export function DvfMap({
         </div>
       ) : null}
 
+      {/* Les commandes tiennent en UNE colonne, et pas en quatre blocs
+          positionnés chacun de son côté : c'est ce qui permet à l'écran qui
+          superpose sa propre barre (la carte plein écran, sur mobile) de tout
+          décaler d'un seul décalage, sans que rien ne passe dessous. */}
       {chrome ? (
         <div
-          className="absolute left-3 top-3 z-10 flex rounded-md border border-border bg-surface p-0.5 shadow-md"
-          role="group"
-          aria-label="Unité affichée sur les marqueurs"
+          className="pointer-events-none absolute left-3 z-10 flex flex-col items-start gap-2"
+          style={{ top: chromeOffset ?? "0.75rem" }}
         >
-          {(
-            [
-              { id: "total", label: "Prix" },
-              { id: "perSqm", label: "€/m²" },
-            ] as const
-          ).map((option) => (
+          <div
+            className="pointer-events-auto flex rounded-md border border-border bg-surface p-0.5 shadow-md"
+            role="group"
+            aria-label="Unité affichée sur les marqueurs"
+          >
+            {(
+              [
+                { id: "total", label: "Prix" },
+                { id: "perSqm", label: "€/m²" },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                aria-pressed={priceMode === option.id}
+                onClick={() => setPriceMode(option.id)}
+                className={cn(
+                  "min-h-9 rounded-sm px-3 text-xs font-medium transition-colors",
+                  priceMode === option.id
+                    ? "bg-primary text-primary-fg shadow-xs"
+                    : "text-ink-muted hover:bg-surface-2 hover:text-ink",
+                )}
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          <div
+            className="pointer-events-auto flex rounded-md border border-border bg-surface p-0.5 shadow-md"
+            role="group"
+            aria-label="Représentation des ventes"
+          >
+            {(
+              [
+                { id: "points", label: "Points", icon: CircleDot },
+                { id: "heat", label: "Chaleur", icon: Flame },
+              ] as const
+            ).map((option) => (
+              <button
+                key={option.id}
+                type="button"
+                aria-pressed={layerMode === option.id}
+                onClick={() => setLayerMode(option.id)}
+                className={cn(
+                  "inline-flex min-h-9 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium transition-colors",
+                  layerMode === option.id
+                    ? "bg-primary text-primary-fg shadow-xs"
+                    : "text-ink-muted hover:bg-surface-2 hover:text-ink",
+                )}
+              >
+                <option.icon aria-hidden="true" className="size-3.5" />
+                {option.label}
+              </button>
+            ))}
+          </div>
+
+          {has3d ? (
             <button
-              key={option.id}
               type="button"
-              aria-pressed={priceMode === option.id}
-              onClick={() => setPriceMode(option.id)}
+              onClick={togglePitch}
+              aria-pressed={pitched}
               className={cn(
-                "min-h-9 rounded-sm px-3 text-xs font-medium transition-colors",
-                priceMode === option.id
-                  ? "bg-primary text-primary-fg shadow-xs"
-                  : "text-ink-muted hover:bg-surface-2 hover:text-ink",
+                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
+                pitched ? "bg-primary text-primary-fg" : "bg-surface text-ink-muted hover:text-ink",
               )}
             >
-              {option.label}
+              {pitched ? (
+                <Square aria-hidden="true" className="size-3.5" />
+              ) : (
+                <Box aria-hidden="true" className="size-3.5" />
+              )}
+              {pitched ? "Vue à plat" : "Vue 3D"}
             </button>
-          ))}
+          ) : null}
+
+          {/* Sur un écran étroit la légende suit les commandes ; au large elle
+              descend dans le coin, où elle ne mange pas la carte. */}
+          {isCompact && showLegend ? <PriceLegend scale={scale} mode={layerMode} compact /> : null}
         </div>
       ) : null}
 
-      {chrome && has3d ? (
-        <button
-          type="button"
-          onClick={togglePitch}
-          aria-pressed={pitched}
-          className={cn(
-            "absolute left-3 top-[3.4rem] z-10 flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
-            pitched ? "bg-primary text-primary-fg" : "bg-surface text-ink-muted hover:text-ink",
-          )}
-        >
-          {pitched ? (
-            <Square aria-hidden="true" className="size-3.5" />
-          ) : (
-            <Box aria-hidden="true" className="size-3.5" />
-          )}
-          {pitched ? "Vue à plat" : "Vue 3D"}
-        </button>
+      {chrome && !isCompact && showLegend ? (
+        <PriceLegend
+          scale={scale}
+          mode={layerMode}
+          className="absolute bottom-[4.4rem] left-2 z-10 max-w-[16rem]"
+        />
       ) : null}
 
       {/* Status band: never more than one message at a time. */}
@@ -1129,7 +1273,14 @@ function installDvfLayers(map: MapLibreMap, ctx: InstallContext): void {
     // as its own marker — in a dense city centre that is several hundred
     // markers and the basemap disappears underneath them.
     clusterMaxZoom: Math.floor(pillZoom(dense)),
+    // Somme et effectif des prix au m² connus, pour colorer chaque grappe à
+    // sa moyenne sans renvoyer les points au navigateur.
+    clusterProperties: {
+      ppsmSum: ["+", ["case", [">", ["get", "ppsm"], 0], ["get", "ppsm"], 0]],
+      ppsmCount: ["+", ["case", [">", ["get", "ppsm"], 0], 1, 0]],
+    },
   });
+  map.addSource(SOURCE_HEAT, { type: "geojson", data: EMPTY_POINTS });
 
   map.addLayer({
     id: LAYER_SUBJECT_FILL,
@@ -1146,6 +1297,36 @@ function installDvfLayers(map: MapLibreMap, ctx: InstallContext): void {
       "line-width": 1.5,
       "line-opacity": 0.6,
       "line-dasharray": [3, 3],
+    },
+  });
+
+  // La chaleur est une DENSITÉ de ventes, pas un prix : deux quantités sur la
+  // même teinte se liraient l'une pour l'autre. Le prix, lui, colore les points.
+  map.addLayer({
+    id: LAYER_HEAT,
+    type: "heatmap",
+    source: SOURCE_HEAT,
+    layout: { visibility: "none" },
+    paint: {
+      "heatmap-weight": 1,
+      "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], MIN_DATA_ZOOM, 0.9, 17, 2.2],
+      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], MIN_DATA_ZOOM, 16, 16, 30, 19, 46],
+      "heatmap-opacity": 0.78,
+      "heatmap-color": [
+        "interpolate",
+        ["linear"],
+        ["heatmap-density"],
+        0,
+        withAlpha(HEAT_RAMP[0], 0),
+        0.15,
+        HEAT_RAMP[0],
+        0.45,
+        HEAT_RAMP[1],
+        0.75,
+        HEAT_RAMP[2],
+        1,
+        HEAT_RAMP[3],
+      ],
     },
   });
 
@@ -1239,6 +1420,7 @@ function addPillImages(map: MapLibreMap, tokens: MapTokens, dark: boolean): void
     [IMG_PILL, chrome.pillFill, chrome.pillStroke],
     [IMG_PILL_SELECTED, tokens.selected, tokens.selected],
     [IMG_PILL_COMPARABLE, tokens.success, tokens.success],
+    ...PRICE_RAMP.map((color): [string, string, string] => [pillImageId(color), color, color]),
   ];
   for (const [id, fill, stroke] of variants) {
     const image = createPillImage(fill, stroke);
@@ -1261,6 +1443,25 @@ function repaintOverlay(map: MapLibreMap, tokens: MapTokens, dark: boolean): voi
   set(LAYER_CLUSTER_COUNT, "text-color", tokens.markerFg);
   set(LAYER_DOT, "circle-stroke-color", chrome.dotStroke);
   addPillImages(map, tokens, dark);
+}
+
+/** Montre les points ou la chaleur, jamais les deux : ils se cacheraient. */
+function applyLayerMode(map: MapLibreMap, mode: LayerMode): void {
+  for (const layer of POINT_LAYERS) {
+    if (map.getLayer(layer)) {
+      map.setLayoutProperty(layer, "visibility", mode === "points" ? "visible" : "none");
+    }
+  }
+  if (map.getLayer(LAYER_HEAT)) {
+    map.setLayoutProperty(LAYER_HEAT, "visibility", mode === "heat" ? "visible" : "none");
+  }
+}
+
+/** La même teinte, à l'opacité voulue : le début transparent du dégradé de chaleur. */
+function withAlpha(color: string, alpha: number): string {
+  const rgb = parseColor(color);
+  if (!rgb) return color;
+  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
 
 /** Zoom at which individual price pills replace the dots. */

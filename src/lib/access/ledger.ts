@@ -98,6 +98,12 @@ function secret(): string | undefined {
   return value;
 }
 
+/** Le message d'origine reste dans les journaux serveur : il peut nommer une table. */
+function logDatabaseFailure(step: string, error: unknown): void {
+  const reason = error instanceof Error ? error.message : String(error);
+  console.error(`[accès] ${step} impossible, repli sur le cookie (${reason})`);
+}
+
 /** Lecture seule côté cookie, utilisable depuis un Server Component. */
 async function readCookieGrants(key: string): Promise<Grant[]> {
   return decodeGrants((await cookies()).get(ACCESS_COOKIE)?.value, key);
@@ -111,13 +117,21 @@ export async function readAccess(now: Date = new Date()): Promise<AccessState> {
   const userId = await currentUserId();
 
   if (userId) {
-    // La reprise d'abord : sans elle, la lecture qui suit ignorerait ce que la
-    // personne avait obtenu avant de se connecter.
-    await importGrants(userId, await readCookieGrants(key));
+    try {
+      // La reprise d'abord : sans elle, la lecture qui suit ignorerait ce que
+      // la personne avait obtenu avant de se connecter.
+      await importGrants(userId, await readCookieGrants(key));
 
-    const stored = await readStoredAccess(userId, now);
-    if (stored.configured) {
-      return { unlocked: stored.unlocked, quota: stored.quota, enforced: true };
+      const stored = await readStoredAccess(userId, now);
+      if (stored.configured) {
+        return { unlocked: stored.unlocked, quota: stored.quota, enforced: true };
+      }
+    } catch (error) {
+      // Une base injoignable ne ferme pas l'espace : le cookie porte encore
+      // ce que la personne a obtenu, et la page tient sans la base. L'erreur
+      // est journalisée côté serveur, où elle sert ; le visiteur, lui, ne
+      // verrait qu'un numéro de référence.
+      logDatabaseFailure("lecture des accès", error);
     }
   }
 
@@ -153,17 +167,22 @@ export async function grantAccess(slug: string, now: Date = new Date()): Promise
   const userId = await currentUserId();
 
   if (userId) {
-    await importGrants(userId, await readCookieGrants(key));
-    const outcome = await grantStoredAccess(userId, slug, now);
+    try {
+      await importGrants(userId, await readCookieGrants(key));
+      const outcome = await grantStoredAccess(userId, slug, now);
 
-    // `not_configured` ne peut survenir que si la base a disparu entre les deux
-    // appels. On retombe alors sur le cookie plutôt que de refuser : perdre la
-    // base ne doit pas fermer la porte à quelqu'un qui a le droit d'entrer.
-    if (outcome.granted) {
-      return { granted: true, alreadyOwned: outcome.alreadyOwned, quota: outcome.quota };
-    }
-    if (outcome.reason === "quota_exhausted") {
-      return { granted: false, reason: "quota_exhausted", quota: outcome.quota };
+      // `not_configured` ne peut survenir que si la base a disparu entre les
+      // deux appels. On retombe alors sur le cookie plutôt que de refuser :
+      // perdre la base ne doit pas fermer la porte à quelqu'un qui a le droit
+      // d'entrer. Une base qui LÈVE est traitée de la même façon.
+      if (outcome.granted) {
+        return { granted: true, alreadyOwned: outcome.alreadyOwned, quota: outcome.quota };
+      }
+      if (outcome.reason === "quota_exhausted") {
+        return { granted: false, reason: "quota_exhausted", quota: outcome.quota };
+      }
+    } catch (error) {
+      logDatabaseFailure("déblocage en base", error);
     }
   }
 

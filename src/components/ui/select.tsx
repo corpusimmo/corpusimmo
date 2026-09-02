@@ -17,7 +17,7 @@ export function Select({ className, invalid, children, ...props }: SelectProps) 
         {...props}
         aria-invalid={invalid || props["aria-invalid"]}
         className={cn(
-          "h-11 w-full appearance-none rounded-md border border-border bg-surface pr-10 pl-3.5",
+          "h-11 w-full appearance-none rounded-sm border border-border bg-surface pr-10 pl-3.5",
           "text-sm text-ink shadow-xs",
           "transition-[border-color,background-color,box-shadow] duration-150 ease-out",
           "hover:border-border-strong",

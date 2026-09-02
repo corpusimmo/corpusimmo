@@ -60,7 +60,10 @@ pondération plafonnée, la fourchette qui en sort.
 les ajustements qualitatifs plafonnés à ±12&nbsp;% ne sont pas dessinés&nbsp;: ils
 sont dits dans la légende.
 
-`viewBox` 680 × 250, rapport 2,7:1.
+**Forme.** Hybride : quatre cartes HTML (`DiagramGroup`), chacune avec un
+pictogramme muet (`Pictogram`, `viewBox` 160 × 96) et son texte en vrai HTML.
+La grille passe de quatre colonnes à deux (sous 1024 px) puis à une (sous
+640 px) ; les mots ne rétrécissent jamais.
 
 ### `RadiusEscalation`
 
@@ -76,7 +79,9 @@ ventes sont un exemple. Le cas du marché dense (plus de 120 ventes candidates
 dès 500 m, où 5 retenues suffisent) est écrit dans le schéma&nbsp;; le refus de
 conclure sous 5 ventes est dans la légende.
 
-`viewBox` 680 × 330, rapport 2,1:1.
+**Forme.** Hybride : les couronnes sont un pictogramme (`viewBox` 320 × 320),
+le tableau des paliers est un vrai `<table>`. Côte à côte à partir de 768 px,
+l’un sous l’autre en dessous.
 
 ### `WeightingDiagram`
 
@@ -198,6 +203,12 @@ Concrètement&nbsp;:
 
 En dessous de 620 px, il ne faut pas rétrécir le schéma&nbsp;: il faut le faire
 défiler, exactement comme le projet le fait déjà des tableaux denses.
+
+Cette table ne concerne que les quatre schémas encore dessinés d’un bloc.
+`MethodDiagram` et `RadiusEscalation`, les deux qui portent le plus de mots et
+qui sont posés sur l’accueil, ont quitté ce régime&nbsp;: leur texte est du HTML
+(`DiagramGroup` dans `frame.tsx`), et ils se lisent à 360 px sans défilement.
+C’est la voie à suivre pour tout schéma qui doit vivre sur mobile.
 
 ```tsx
 {/* Sous 620 px, le schéma défile dans son propre conteneur, jamais la page. */}

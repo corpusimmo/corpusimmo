@@ -3,7 +3,11 @@ import { BrandMark } from "@/components/layout/brand-mark";
 import { canPublishFigure } from "@/lib/cities/thresholds";
 import { cityPath } from "@/lib/cities/links";
 import type { CityAggregate } from "@/lib/cities/types";
-import { formatNumber, formatPrice, formatPricePerSqm } from "@/lib/utils/format";
+import {
+  formatNumber,
+  formatPrice,
+  formatPricePerSqm,
+} from "@/lib/utils/format";
 import Link from "next/link";
 
 /**
@@ -39,16 +43,16 @@ export function HeroExhibit({ city }: { city: CityAggregate }) {
     <Link
       href={cityPath(city.slug)}
       aria-label={`Prix immobilier à ${city.name}, la page complète`}
-      className="group relative block rounded-lg border border-border bg-surface shadow-lg transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-lg focus-visible:-translate-y-1"
+      className="group relative block rounded-xl border border-border bg-surface shadow-lg transition-[transform,box-shadow] duration-300 ease-out hover:-translate-y-1 hover:shadow-lg focus-visible:-translate-y-1"
     >
       {/* Le coin corné : un triangle de papier replié, deux tokens et rien
           d'autre. Il transforme une carte en feuillet. */}
       <span
         aria-hidden="true"
-        className="absolute top-0 right-0 size-7 rounded-tr-lg bg-[linear-gradient(225deg,var(--canvas)_50%,var(--paper-200)_50%)]"
+        className="absolute top-0 right-0 size-7 rounded-tr-xl bg-[linear-gradient(225deg,var(--canvas)_50%,var(--paper-200)_50%)]"
       />
 
-      <div className="flex items-center justify-between gap-4 border-b border-border-soft px-6 pt-5 pb-4">
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 border-b border-border-soft px-5 pt-5 pb-4 sm:px-6">
         <div className="flex items-center gap-2.5">
           <BrandMark className="size-[22px]" />
           <span className="eyebrow">Relevé de ventes</span>
@@ -56,14 +60,17 @@ export function HeroExhibit({ city }: { city: CityAggregate }) {
         <span className="tnum text-xs text-ink-subtle">Millésimes {years}</span>
       </div>
 
-      <div className="px-6 pt-5">
-        <p className="font-display text-2xl leading-tight text-ink">{city.name}</p>
+      <div className="px-5 pt-5 sm:px-6">
+        <p className="font-display text-2xl leading-tight text-ink">
+          {city.name}
+        </p>
         <p className="mt-0.5 text-sm text-ink-muted">
-          {city.departmentName} · {formatNumber(city.dwellingSales)} ventes de logement enregistrées
+          {city.departmentName} · {formatNumber(city.dwellingSales)} ventes de
+          logement enregistrées
         </p>
       </div>
 
-      <dl className="grid grid-cols-2 gap-x-6 gap-y-4 px-6 pt-5">
+      <dl className="grid grid-cols-2 gap-x-5 gap-y-4 px-5 pt-5 sm:gap-x-6 sm:px-6">
         <Figure
           label="Appartement, médiane"
           value={formatPricePerSqm(flats.median)}
@@ -73,13 +80,19 @@ export function HeroExhibit({ city }: { city: CityAggregate }) {
         <Figure
           label="Prix de vente médian"
           value={formatPrice(flats.medianPrice)}
-          hint={flats.medianArea ? `pour ${formatNumber(flats.medianArea)} m² en médiane` : undefined}
+          hint={
+            flats.medianArea
+              ? `pour ${formatNumber(flats.medianArea)} m² en médiane`
+              : undefined
+          }
         />
       </dl>
 
-      <div className="px-6 pt-5">
-        <div className="flex items-baseline justify-between">
-          <p className="text-xs font-medium text-ink-muted">Répartition des prix au m²</p>
+      <div className="px-5 pt-5 sm:px-6">
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
+          <p className="text-xs font-medium text-ink-muted">
+            Répartition des prix au m²
+          </p>
           <p className="tnum text-xs text-ink-subtle">
             {formatPricePerSqm(flats.d1)} à {formatPricePerSqm(flats.d9)}
           </p>
@@ -94,7 +107,7 @@ export function HeroExhibit({ city }: { city: CityAggregate }) {
         />
       </div>
 
-      <div className="mt-5 flex items-center justify-between gap-3 rounded-b-lg border-t border-border-soft bg-surface-2 px-6 py-3">
+      <div className="mt-5 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 rounded-b-xl border-t border-border-soft bg-surface-2 px-5 py-3 sm:px-6">
         <p className="text-xs leading-relaxed text-ink-subtle">
           Source&nbsp;: DVF, DGFiP. Ventes de gré à gré, lot unique.
         </p>
@@ -118,7 +131,7 @@ function Figure({
   strong?: boolean;
 }) {
   return (
-    <div className="flex flex-col gap-0.5">
+    <div className="flex min-w-0 flex-col gap-0.5">
       <dt className="text-xs font-medium text-ink-muted">{label}</dt>
       <dd
         className={

@@ -18,7 +18,7 @@
  * dans `docs/illustrations.md`.
  */
 
-export { DiagramFigure, ArrowRight } from "./frame";
+export { DiagramFigure, DiagramGroup, Pictogram, ArrowRight } from "./frame";
 export type { DiagramProps, DiagramFigureProps } from "./frame";
 
 export { MethodDiagram } from "./method-diagram";

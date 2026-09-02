@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { ArrowRight, DiagramFigure, type DiagramProps } from "./frame";
+import { DiagramGroup, Pictogram, type DiagramProps } from "./frame";
 
 /**
  * LA MÉTHODE PAR COMPARAISON, EN QUATRE TEMPS.
@@ -12,17 +12,67 @@ import { ArrowRight, DiagramFigure, type DiagramProps } from "./frame";
  * Ce qu’il montre est vrai et vérifiable dans `src/lib/valuation/` : les seuils
  * affichés (60 mois, ±30 %, plafond de 40 %, ajustements ±12 %) sont les
  * constantes réelles du moteur. Ce qu’il tait est dit dans la légende.
+ *
+ * FORME — quatre cartes HTML et quatre pictogrammes muets, pas un seul SVG.
+ * La grille passe de quatre colonnes à deux puis à une, et le texte garde sa
+ * taille à toutes les largeurs : c’est ce qu’un SVG fluide ne sait pas faire.
  */
 
-/** Les quatre colonnes. Une seule source pour le dessin ET pour la description. */
-const COLUMN_X = [6, 180, 354, 528] as const;
-const COLUMN_W = 146;
+const STEPS: ReadonlyArray<{
+  title: string;
+  body: ReactNode;
+  art: ReactNode;
+  legend?: ReactNode;
+}> = [
+  {
+    title: "Le bien",
+    body: "Un type, une surface, une adresse géocodée. Rien d’autre n’est demandé pour commencer.",
+    art: <SubjectArt />,
+  },
+  {
+    title: "Les ventes",
+    body: (
+      <>
+        Les mutations DVF de moins de 60&nbsp;mois autour de l’adresse, de
+        surface comparable à ±30&nbsp;%. Les autres sont écartées, et comptées.
+      </>
+    ),
+    art: <SalesArt />,
+    legend: (
+      <>
+        <LegendDot className="bg-accent" /> retenue <LegendCross /> écartée
+      </>
+    ),
+  },
+  {
+    title: "La pondération",
+    body: "Distance, récence, surface et typologie. Aucune vente ne pèse plus de 40 % du résultat.",
+    art: <WeightsArt />,
+    legend: "La verticale : le plafond de 40 %.",
+  },
+  {
+    title: "La fourchette",
+    body: (
+      <>
+        Le prix au m² pondéré, multiplié par la surface, puis des ajustements
+        plafonnés à ±12&nbsp;%. Jamais un prix ferme.
+      </>
+    ),
+    art: <BracketArt />,
+    legend: (
+      <span className="flex justify-between gap-2 whitespace-nowrap">
+        <span>borne basse</span>
+        <span>valeur centrale</span>
+        <span>borne haute</span>
+      </span>
+    ),
+  },
+];
 
 export function MethodDiagram({ className, caption = true }: DiagramProps) {
   return (
-    <DiagramFigure
+    <DiagramGroup
       className={className}
-      viewBox="0 0 680 250"
       title="La méthode par comparaison, en quatre étapes"
       description={
         "Étape 1, le bien : type, surface et adresse géocodée. Étape 2, les ventes DVF " +
@@ -34,233 +84,285 @@ export function MethodDiagram({ className, caption = true }: DiagramProps) {
       caption={
         caption ? (
           <>
-            Schéma simplifié. Entre les étapes 2 et 3, le moteur écarte encore les prix au
-            m<sup>2</sup> aberrants (bornes de Tukey à 1,5 fois l’écart interquartile, plus des
-            garde-fous absolus), et l’étape 4 applique des ajustements plafonnés à ±12&nbsp;% pour
-            ce que DVF ne publie pas&nbsp;: état, étage, extérieur, stationnement. Sous 5 ventes
-            retenues, aucune fourchette n’est publiée.
+            Schéma simplifié. Entre les étapes 2 et 3, le moteur écarte encore
+            les prix au m<sup>2</sup> aberrants (bornes de Tukey à 1,5 fois
+            l’écart interquartile, plus des garde-fous absolus), et l’étape 4
+            applique des ajustements plafonnés à ±12&nbsp;% pour ce que DVF ne
+            publie pas&nbsp;: état, étage, extérieur, stationnement. Sous 5
+            ventes retenues, aucune fourchette n’est publiée.
           </>
         ) : null
       }
     >
-      {/* Les quatre panneaux, puis les trois flèches qui les relient. */}
-      <Panel index={0} step="1" title="Le bien" lines={["Type, surface,", "adresse géocodée."]}>
-        <Subject cx={COLUMN_X[0] + COLUMN_W / 2} cy={121} />
-      </Panel>
+      {/* Requête de CONTENEUR, pas de fenêtre : le schéma vit dans une colonne
+          de 560 px sur l'accueil et dans une page de 700 px sur le résultat.
+          Quatre cartes n'ont de place qu'au-delà de 64 rem de conteneur ; en
+          dessous elles vont par deux, et par une sous 30 rem. */}
+      <div className="@container">
+        <ol className="grid gap-3 @[30rem]:grid-cols-2 @[64rem]:grid-cols-4">
+          {STEPS.map((step, index) => (
+            <li
+              key={step.title}
+              className="relative flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-xs"
+            >
+              <div className="flex items-center gap-2.5">
+                <span className="grid size-7 shrink-0 place-items-center rounded-full bg-accent-soft text-xs font-semibold text-accent-soft-fg">
+                  {index + 1}
+                </span>
+                <span className="font-display text-lg leading-tight text-ink">
+                  {step.title}
+                </span>
+              </div>
 
-      <Panel
-        index={1}
-        step="2"
-        title="Les ventes"
-        lines={["Ventes DVF de moins", "de 60 mois, surface", "à ±30 %."]}
-      >
-        <Sales cx={COLUMN_X[1] + COLUMN_W / 2} cy={121} />
-      </Panel>
+              <div className="rounded-md bg-canvas px-3 pt-3 pb-2">
+                {step.art}
+                {step.legend ? (
+                  <p className="mt-1.5 text-[11px] leading-snug text-ink-subtle">
+                    {step.legend}
+                  </p>
+                ) : null}
+              </div>
 
-      <Panel
-        index={2}
-        step="3"
-        title="La pondération"
-        lines={["Distance, récence,", "surface, typologie."]}
-      >
-        <Weights x={COLUMN_X[2] + 18} />
-      </Panel>
+              <p className="text-sm leading-relaxed text-ink-muted">
+                {step.body}
+              </p>
 
-      <Panel
-        index={3}
-        step="4"
-        title="La fourchette"
-        lines={["Prix au m² pondéré", "× la surface, puis", "ajustements ±12 %."]}
-      >
-        <Bracket x={COLUMN_X[3] + 22} />
-      </Panel>
-
-      <ArrowRight x1={157} y={125} x2={175} />
-      <ArrowRight x1={331} y={125} x2={349} />
-      <ArrowRight x1={505} y={125} x2={523} />
-    </DiagramFigure>
+              {/* La flèche vers l’étape suivante, sur la gouttière de 12 px, uniquement
+                quand les quatre cartes sont en ligne : en grille ou en colonne,
+                l’ordre se lit seul. */}
+              {index < STEPS.length - 1 ? (
+                <span
+                  aria-hidden="true"
+                  className="absolute top-1/2 -right-[18px] z-10 hidden size-6 -translate-y-1/2 place-items-center rounded-full border border-border bg-canvas text-ink-subtle @[64rem]:grid"
+                >
+                  <svg
+                    viewBox="0 0 12 12"
+                    width="10"
+                    height="10"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden="true"
+                  >
+                    <path d="M2 6h8M6 2l4 4-4 4" />
+                  </svg>
+                </span>
+              ) : null}
+            </li>
+          ))}
+        </ol>
+      </div>
+    </DiagramGroup>
   );
 }
 
-function Panel({
-  index,
-  step,
-  title,
-  lines,
-  children,
-}: {
-  index: number;
-  step: string;
-  title: string;
-  lines: string[];
-  children: ReactNode;
-}) {
-  const x = COLUMN_X[index] ?? 0;
+function LegendDot({ className }: { className: string }) {
   return (
-    <g>
-      <rect
-        x={x}
-        y={10}
-        width={COLUMN_W}
-        height={230}
-        rx={10}
-        className="fill-surface stroke-border"
-        strokeWidth="1"
-      />
-      <circle cx={x + 24} cy={36} r={11} className="fill-accent-soft" />
-      <text
-        x={x + 24}
-        y={36}
-        textAnchor="middle"
-        dominantBaseline="central"
-        fontSize="11"
-        fontWeight="600"
-        className="fill-accent-soft-fg"
-      >
-        {step}
-      </text>
-      <text x={x + 42} y={40} fontSize="12" fontWeight="600" className="fill-ink">
-        {title}
-      </text>
-      <line x1={x + 14} y1={56} x2={x + COLUMN_W - 14} y2={56} className="stroke-border-soft" />
-
-      {children}
-
-      {lines.map((line, i) => (
-        <text key={line} x={x + 14} y={196 + i * 14} fontSize="10" className="fill-ink-subtle">
-          {line}
-        </text>
-      ))}
-    </g>
+    <span
+      aria-hidden="true"
+      className={`mr-1 inline-block size-2 rounded-full ${className}`}
+    />
   );
 }
+
+function LegendCross() {
+  return (
+    <span aria-hidden="true" className="ml-2 mr-1 inline-block text-ink-subtle">
+      ×
+    </span>
+  );
+}
+
+/** Le rapport commun des quatre pictogrammes : un paysage large et bas. */
+const ART = "0 0 160 96";
 
 /**
- * Le bien étudié, dessiné dans la grammaire du logotype : un toit, deux murs,
- * et la ligne bronze qui sert de sol. La marque se retrouve dans les schémas.
+ * Le bien étudié, dans la grammaire du logotype : un toit, deux murs, et la
+ * ligne bronze qui sert de sol. Dessous, une cote : la surface est la seule
+ * mesure que la méthode exige.
  */
-function Subject({ cx, cy }: { cx: number; cy: number }) {
+function SubjectArt() {
   return (
-    <g fill="none" strokeLinecap="round" strokeLinejoin="round">
-      <path
-        d={`M${cx - 19} ${cy - 2} L${cx} ${cy - 20} L${cx + 19} ${cy - 2}`}
-        className="stroke-primary"
-        strokeWidth="2"
-      />
-      <path
-        d={`M${cx - 13} ${cy - 2} v20 M${cx + 13} ${cy - 2} v20`}
-        className="stroke-primary"
-        strokeWidth="2"
-      />
-      <path d={`M${cx - 24} ${cy + 24} h48`} className="stroke-accent-rule" strokeWidth="2.5" />
-    </g>
+    <Pictogram viewBox={ART}>
+      <g fill="none" strokeLinecap="round" strokeLinejoin="round">
+        <path
+          d="M44 48 L80 18 L116 48"
+          className="stroke-primary"
+          strokeWidth="3"
+        />
+        <path
+          d="M54 42 v30 M106 42 v30"
+          className="stroke-primary"
+          strokeWidth="3"
+        />
+        <path
+          d="M72 72 v-16 h16 v16"
+          className="stroke-primary"
+          strokeWidth="2.5"
+        />
+        <path d="M34 74 h92" className="stroke-accent-rule" strokeWidth="3.5" />
+        <path
+          d="M54 88 h52 M54 84 v8 M106 84 v8"
+          className="stroke-ink-subtle"
+          strokeWidth="1.5"
+        />
+      </g>
+    </Pictogram>
   );
 }
 
 /** Les ventes candidates : celles qu’on garde, celles qu’on écarte. */
 const RETAINED = [
-  [-30, -22],
-  [18, -30],
-  [34, 10],
-  [-14, 32],
-  [26, 30],
-  [-36, 6],
+  [-24, -20],
+  [16, -26],
+  [30, 8],
+  [-12, 26],
+  [22, 26],
+  [-32, 4],
 ] as const;
 
 const REJECTED = [
-  [44, -24],
-  [-8, -40],
-  [12, 42],
+  [40, -22],
+  [-6, -36],
+  [10, 38],
 ] as const;
 
-function Sales({ cx, cy }: { cx: number; cy: number }) {
+function SalesArt() {
+  const cx = 80;
+  const cy = 48;
   return (
-    <g>
+    <Pictogram viewBox={ART}>
       <circle
         cx={cx}
         cy={cy}
-        r={46}
+        r={40}
         fill="none"
-        strokeDasharray="3 3"
+        strokeDasharray="4 4"
+        strokeWidth="1.5"
         className="stroke-border-strong"
       />
       {RETAINED.map(([dx, dy]) => (
-        <circle key={`k${dx}${dy}`} cx={cx + dx} cy={cy + dy} r={4.5} className="fill-accent" />
+        <circle
+          key={`k${dx}${dy}`}
+          cx={cx + dx}
+          cy={cy + dy}
+          r={5}
+          className="fill-accent"
+        />
       ))}
       {REJECTED.map(([dx, dy]) => (
-        <g key={`r${dx}${dy}`} className="stroke-ink-subtle" strokeWidth="1.4" strokeLinecap="round">
-          <line x1={cx + dx - 3.4} y1={cy + dy - 3.4} x2={cx + dx + 3.4} y2={cy + dy + 3.4} />
-          <line x1={cx + dx + 3.4} y1={cy + dy - 3.4} x2={cx + dx - 3.4} y2={cy + dy + 3.4} />
+        <g
+          key={`r${dx}${dy}`}
+          className="stroke-ink-subtle"
+          strokeWidth="1.8"
+          strokeLinecap="round"
+        >
+          <line
+            x1={cx + dx - 4}
+            y1={cy + dy - 4}
+            x2={cx + dx + 4}
+            y2={cy + dy + 4}
+          />
+          <line
+            x1={cx + dx + 4}
+            y1={cy + dy - 4}
+            x2={cx + dx - 4}
+            y2={cy + dy + 4}
+          />
         </g>
       ))}
       {/* Le bien étudié, au centre : un losange, pour ne jamais le confondre
           avec une vente. */}
       <path
-        d={`M${cx} ${cy - 7} L${cx + 7} ${cy} L${cx} ${cy + 7} L${cx - 7} ${cy} Z`}
+        d={`M${cx} ${cy - 8} L${cx + 8} ${cy} L${cx} ${cy + 8} L${cx - 8} ${cy} Z`}
         className="fill-primary"
       />
-    </g>
+    </Pictogram>
   );
 }
 
 /** Les poids, du plus lourd au plus léger, et le plafond qui coupe le premier. */
 const WEIGHT_BARS = [0.4, 0.24, 0.15, 0.12, 0.09] as const;
-const WEIGHT_SCALE = 250;
+const WEIGHT_SCALE = 300;
+const WEIGHT_X = 22;
 
-function Weights({ x }: { x: number }) {
-  const capX = x + WEIGHT_SCALE * 0.4;
+function WeightsArt() {
+  const capX = WEIGHT_X + WEIGHT_SCALE * 0.4;
   return (
-    <g>
+    <Pictogram viewBox={ART}>
       {WEIGHT_BARS.map((weight, i) => (
         <rect
           key={weight}
-          x={x}
-          y={80 + i * 18}
+          x={WEIGHT_X}
+          y={10 + i * 16}
           width={weight * WEIGHT_SCALE}
-          height={10}
+          height={11}
           rx={3}
           className={i === 0 ? "fill-accent-rule" : "fill-brand-300"}
         />
       ))}
       <line
         x1={capX}
-        y1={72}
+        y1={4}
         x2={capX}
-        y2={166}
-        strokeDasharray="3 3"
+        y2={92}
+        strokeDasharray="4 3"
+        strokeWidth="1.5"
         className="stroke-ink-subtle"
       />
-      <text x={capX + 12} y={177} textAnchor="end" fontSize="9.5" className="fill-ink-subtle">
-        plafond 40 %
-      </text>
-    </g>
+    </Pictogram>
   );
 }
 
 /** La fourchette : le composant signature du produit, réduit à son squelette. */
-function Bracket({ x }: { x: number }) {
-  const low = x + 22;
-  const high = x + 80;
+function BracketArt() {
+  const low = 42;
+  const high = 118;
   const mid = (low + high) / 2;
+  const y = 50;
   return (
-    <g>
-      <rect x={x} y={115} width={102} height={6} rx={3} className="fill-border-soft" />
-      <rect x={low} y={113} width={high - low} height={10} rx={5} className="fill-brand-200" />
-      <rect x={low - 1} y={108} width={2} height={20} className="fill-primary" />
-      <rect x={high - 1} y={108} width={2} height={20} className="fill-primary" />
-      <circle cx={mid} cy={118} r={6.5} className="fill-primary stroke-surface" strokeWidth="2.5" />
-      <text x={mid} y={102} textAnchor="middle" fontSize="9.5" className="fill-ink-muted">
-        valeur centrale
-      </text>
-      {/* Les deux bornes sont décalées d’une ligne : côte à côte, elles se
-          touchent dans une colonne de 146 unités, et « bornebasse borne haute »
-          se lit comme un seul mot. */}
-      <text x={low} y={146} textAnchor="middle" fontSize="9.5" className="fill-ink-subtle">
-        borne basse
-      </text>
-      <text x={high} y={162} textAnchor="middle" fontSize="9.5" className="fill-ink-subtle">
-        borne haute
-      </text>
-    </g>
+    <Pictogram viewBox={ART}>
+      <rect
+        x={14}
+        y={y - 3}
+        width={132}
+        height={6}
+        rx={3}
+        className="fill-border-soft"
+      />
+      <rect
+        x={low}
+        y={y - 6}
+        width={high - low}
+        height={12}
+        rx={6}
+        className="fill-brand-200"
+      />
+      <rect
+        x={low - 1.5}
+        y={y - 16}
+        width={3}
+        height={32}
+        rx={1.5}
+        className="fill-primary"
+      />
+      <rect
+        x={high - 1.5}
+        y={y - 16}
+        width={3}
+        height={32}
+        rx={1.5}
+        className="fill-primary"
+      />
+      <circle
+        cx={mid}
+        cy={y}
+        r={8}
+        className="fill-primary stroke-surface"
+        strokeWidth="3"
+      />
+    </Pictogram>
   );
 }

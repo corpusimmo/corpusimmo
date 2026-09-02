@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, GraduationCap, Target, Workflow } from "lucide-react";
 
@@ -74,7 +75,7 @@ export default function SolutionsPage() {
   return (
     <>
       <section className="border-b border-border bg-surface">
-        <div className="container-page py-16 md:py-20">
+        <div className="container-page grid gap-10 py-16 md:py-20 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-16">
           <div className="max-w-3xl">
             <p className="eyebrow">Pour les professionnels</p>
             <h1 className="mt-3 font-display text-4xl leading-[1.1] text-ink md:text-5xl">
@@ -98,6 +99,20 @@ export default function SolutionsPage() {
               </Button>
             </div>
           </div>
+
+          {/* Un plateau de bureaux vide en fin de journée : l'outil de travail,
+              sans personne dedans. Illustration générée (voir docs/images.md). */}
+          <figure className="hidden lg:block">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs">
+              <Image
+                src="/illustrations/interieur-bureaux-plateau.webp"
+                alt="Illustration : plateau de bureaux contemporain, postes de travail vides devant des fenêtres donnant sur des toits de ville."
+                fill
+                sizes="(min-width: 1024px) 480px, 0px"
+                className="object-cover"
+              />
+            </div>
+          </figure>
         </div>
       </section>
 

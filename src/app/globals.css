@@ -6,9 +6,12 @@
    Une seule direction artistique, figée. Pas de sélecteur, pas de variantes,
    pas de cookie lu au rendu : toutes les pages restent statiques par défaut.
 
-   Le registre : un document de banque d'affaires devenu logiciel. Papier chaud
-   plutôt que gris d'écran, bleu nuit pour l'action, bronze pour la marque et la
-   sélection, titrage sérif éditorial, rayons courts, ombres fermes.
+   Le registre : une fintech institutionnelle. Blanc froid à peine bleuté,
+   bleu nuit pour l'action, or pour la marque et la sélection, titrage en
+   grotesque géométrique serrée (Manrope), rayons généreux, ombres douces
+   teintées de marine. Ce qui reste institutionnel : le surtitre en capitales
+   espacées, les chiffres tabulaires, les filets or, le sérif réservé à la
+   citation.
 
    RÈGLE ABSOLUE — un composant n'écrit JAMAIS de couleur, de rayon ni d'ombre
    en dur. Il consomme un token sémantique : `bg-surface`, `text-ink-muted`,
@@ -52,41 +55,41 @@
 
   /* --- Neutres papier ----------------------------------------------------
      Chauds et non bleutés : c'est ce qui sépare un document d'une interface. */
-  --paper-25: #fdfcfa;
-  --paper-50: #faf9f6;
-  --paper-100: #f4f2ec;
-  --paper-200: #e8e4da;
-  --paper-300: #d5cfc1;
-  --paper-400: #a9a294;
-  --paper-500: #7d786c;
+  --paper-25: #fbfcfe;
+  --paper-50: #f7f9fc;
+  --paper-100: #eff3f8;
+  --paper-200: #e2e8f0;
+  --paper-300: #cbd5e1;
+  --paper-400: #94a3b8;
+  --paper-500: #64748b;
 
   /* --- Surfaces ----------------------------------------------------------- */
-  --canvas: #f6f5f2;
+  --canvas: #f4f7fb;
   --surface: #ffffff;
-  --surface-2: #faf9f6;
-  --surface-3: #f3ede1;
+  --surface-2: #f9fbfd;
+  --surface-3: #eaf0f7;
   --surface-inverted: #0f1e2b;
   --overlay: rgb(12 22 36 / 0.52);
 
   /* --- Encres -------------------------------------------------------------
-     `--ink-subtle` est descendu jusqu'à #5C6B82 pour tenir 4,5:1 sur le canvas
-     chaud, et pas seulement sur le blanc — c'est là qu'il sert le plus. */
-  --ink: #12233d;
-  --ink-muted: #4a5a70;
-  --ink-subtle: #5c6b82;
+     `--ink-subtle` tient 4,5:1 sur le canvas bleuté, pas seulement sur le
+     blanc — c'est là qu'il sert le plus. */
+  --ink: #0f1e33;
+  --ink-muted: #4a5a72;
+  --ink-subtle: #5f6f88;
   --ink-inverted: #ffffff;
 
-  /* --- Bordures — teintées papier, jamais grises -------------------------- */
-  --border: #e2ded4;
-  --border-soft: #efece4;
-  --border-strong: #cbc4b4;
+  /* --- Bordures — teintées de marine, jamais grises ----------------------- */
+  --border: #e1e7f0;
+  --border-soft: #edf1f6;
+  --border-strong: #c7d1de;
 
   /* --- Action primaire ---------------------------------------------------- */
   --primary: #1b3349;
   --primary-hover: #12283a;
   --primary-active: #0d1e2b;
   --primary-fg: #ffffff;
-  --primary-soft: #eef2f7;
+  --primary-soft: #eaf0f7;
   --primary-soft-fg: #1b3349;
 
   /* --- Accent — le bronze. Marque, sélection, comparable retenu. ---------- */
@@ -94,8 +97,8 @@
   --accent-hover: #6f5525;
   --accent-active: #56421d;
   --accent-fg: #ffffff;
-  --accent-soft: #f3ebd9;
-  --accent-soft-fg: #56421d;
+  --accent-soft: #f6efdf;
+  --accent-soft-fg: #6a5024;
   /* Le bronze clair, réservé aux aplats larges et aux filets : jamais du texte. */
   --accent-rule: #c2a468;
 
@@ -128,30 +131,33 @@
   --map-subject: #a33a2a;
 
   /* --- Géométrie ----------------------------------------------------------
-     Courts. Un dossier a des angles ; une application grand public a des
-     galets. On est du côté du dossier. */
-  --radius-xs: 4px;
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 22px;
+     Généreux, à la manière d'une application grand public : les contrôles
+     sont des pastilles, les cartes des galets, les grandes sections des
+     panneaux. `--radius-2xl` est réservé à ces panneaux de section. */
+  --radius-xs: 8px;
+  --radius-sm: 12px;
+  --radius-md: 16px;
+  --radius-lg: 22px;
+  --radius-xl: 28px;
+  --radius-2xl: 36px;
   --radius-full: 9999px;
 
   /* --- Élévation ----------------------------------------------------------
-     Fermes et courtes, teintées du bleu de l'encre plutôt que d'un noir neutre.
-     Aucune ombre ne déborde de plus de 40 px : rien ne flotte ici. */
-  --shadow-xs: 0 1px 1px rgb(18 35 61 / 0.05);
-  --shadow-sm: 0 1px 2px rgb(18 35 61 / 0.06), 0 1px 1px rgb(18 35 61 / 0.04);
-  --shadow-md: 0 2px 4px rgb(18 35 61 / 0.05), 0 8px 20px -8px rgb(18 35 61 / 0.14);
-  --shadow-lg: 0 4px 8px rgb(18 35 61 / 0.05), 0 20px 40px -16px rgb(18 35 61 / 0.20);
+     En deux temps : un contact net et court, puis un halo large et diffus
+     teinté de marine plutôt que de noir. C'est ce halo qui fait flotter les
+     panneaux sans jamais les salir. */
+  --shadow-xs: 0 1px 2px rgb(16 34 72 / 0.05);
+  --shadow-sm: 0 1px 2px rgb(16 34 72 / 0.05), 0 8px 20px -12px rgb(24 46 92 / 0.18);
+  --shadow-md: 0 2px 4px rgb(16 34 72 / 0.04), 0 18px 40px -20px rgb(24 46 92 / 0.26);
+  --shadow-lg: 0 4px 8px rgb(16 34 72 / 0.04), 0 40px 72px -28px rgb(24 46 92 / 0.30);
   --shadow-focus: 0 0 0 3px color-mix(in oklab, var(--ring) 34%, transparent);
 
   /* --- Typographie --------------------------------------------------------
-     Deux familles, deux rôles. Le sérif ne descend jamais dans le corps de
-     texte : il titre, et c'est tout. Son tracking est bien moins négatif que
-     celui d'une grotesque — resserrer un sérif éditorial le rend sale. */
-  --tracking-display: -0.012em;
-  --tracking-eyebrow: 0.14em;
+     Inter pour l'interface et le corps, Manrope pour le titrage, resserrée
+     comme une grotesque de produit. Le sérif ne titre plus : il ne reste que
+     pour la citation, où il signe le registre institutionnel. */
+  --tracking-display: -0.028em;
+  --tracking-eyebrow: 0.12em;
 
   color-scheme: light;
 }
@@ -165,11 +171,12 @@
    aucune couleur ne bouge, et il n'y a rien à re-rendre côté React.
    ========================================================================== */
 [data-density="compact"] {
-  --radius-xs: 3px;
-  --radius-sm: 6px;
-  --radius-md: 9px;
-  --radius-lg: 12px;
-  --radius-xl: 16px;
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --radius-2xl: 24px;
 }
 
 /* ============================================================================
@@ -256,6 +263,7 @@
   --radius-md: var(--radius-md);
   --radius-lg: var(--radius-lg);
   --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
 
   --shadow-xs: var(--shadow-xs);
   --shadow-sm: var(--shadow-sm);
@@ -264,7 +272,9 @@
 
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system,
     "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  --font-display: var(--font-source-serif), ui-serif, Georgia, "Times New Roman", serif;
+  --font-display: var(--font-manrope), ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", Roboto, sans-serif;
+  --font-serif: var(--font-source-serif), ui-serif, Georgia, "Times New Roman", serif;
   --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
 }
 
@@ -301,14 +311,14 @@
     color: var(--ink);
   }
 
-  /* Le sérif titre, il ne rédige pas. Cette règle est la direction artistique
-     tout entière en six lignes : si un h1 perd sa famille, la page change de
-     registre avant de changer de couleur. */
+  /* Le titrage est une grotesque serrée et grasse : c'est ce qui fait
+     basculer la page du registre document au registre produit. Le sérif n'y
+     revient que par `font-serif`, pour une citation. */
   h1,
   h2,
   h3 {
     font-family: var(--font-display);
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: var(--tracking-display);
     text-wrap: balance;
   }
@@ -347,15 +357,44 @@
   font-feature-settings: "tnum";
 }
 
-/* Le surtitre en capitales espacées : le signal typographique du registre
-   éditorial, emprunté à la mise en page magazine. */
+/* Le surtitre : capitales espacées dans une pastille or pâle. Les capitales
+   sont le signal institutionnel, la pastille est le signal produit ; les deux
+   ensemble sont la direction artistique en un composant. */
 @utility eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 1.625rem;
+  padding-inline: 0.75rem;
+  border-radius: var(--radius-full);
+  background-color: var(--accent-soft);
   font-size: 0.6875rem;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1;
+  letter-spacing: var(--tracking-eyebrow);
+  text-transform: uppercase;
+  color: var(--accent-soft-fg);
+}
+
+/* Le même surtitre sans pastille, pour les textes longs (une audience de
+   trois métiers) et les fonds sombres, où la pastille serait un bloc. */
+@utility eyebrow-text {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  line-height: 1.3;
   letter-spacing: var(--tracking-eyebrow);
   text-transform: uppercase;
   color: var(--accent);
+}
+
+/* Le panneau de section : une grande carte blanche posée sur le canvas, à
+   la manière des interfaces grand public. Les sections d'une page marketing
+   alternent panneau et canvas nu, jamais deux panneaux collés. */
+@utility panel {
+  border-radius: var(--radius-2xl);
+  background-color: var(--surface);
+  box-shadow: var(--shadow-md);
+  border: 1px solid color-mix(in oklab, var(--border) 60%, transparent);
 }
 
 /* Le filet bronze sous un titre de section. Un trait, pas une décoration. */

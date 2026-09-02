@@ -3,7 +3,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils/cn";
 
 const CONTROL_BASE =
-  "w-full rounded-md border border-border bg-surface text-sm text-ink shadow-xs " +
+  "w-full rounded-sm border border-border bg-surface text-sm text-ink shadow-xs " +
   "placeholder:text-ink-subtle " +
   "transition-[border-color,background-color,box-shadow] duration-150 ease-out " +
   "hover:border-border-strong " +

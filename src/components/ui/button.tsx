@@ -31,7 +31,7 @@ const BASE =
 
 const VARIANTS: Record<ButtonVariant, string> = {
   primary:
-    "bg-primary text-primary-fg shadow-xs hover:bg-primary-hover hover:shadow-sm active:bg-primary-active",
+    "bg-primary text-primary-fg shadow-sm hover:bg-primary-hover hover:shadow-md active:bg-primary-active",
   secondary:
     "border border-border bg-surface text-ink shadow-xs hover:border-border-strong hover:bg-surface-2",
   outline:
@@ -41,11 +41,13 @@ const VARIANTS: Record<ButtonVariant, string> = {
   danger: "bg-danger text-ink-inverted shadow-xs hover:bg-danger-soft-fg",
 };
 
+/* Des pastilles, à toutes les tailles : le bouton est la forme la plus
+   répétée du produit, et c'est elle qui donne le registre. */
 const SIZES: Record<ButtonSize, string> = {
-  sm: "h-9 rounded-sm px-3.5 text-sm",
-  md: "h-11 rounded-md px-5 text-sm",
-  lg: "h-13 rounded-md px-7 text-base",
-  icon: "size-11 rounded-md",
+  sm: "h-9 rounded-full px-4 text-sm",
+  md: "h-11 rounded-full px-6 text-sm",
+  lg: "h-13 rounded-full px-8 text-base",
+  icon: "size-11 rounded-full",
 };
 
 export function Button({

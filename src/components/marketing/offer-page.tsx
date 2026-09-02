@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 
@@ -15,6 +16,12 @@ export interface OfferPageProps {
   notYet: string[];
   /** Ce qu'on peut essayer tout de suite, comme preuve. */
   proof: { href: string; label: string; body: string }[];
+  /**
+   * Une image d'ambiance pour la colonne de droite de l'en-tête, à partir de
+   * 1024 px. Toujours une illustration générée (voir docs/images.md), jamais
+   * un lieu réel, et son `alt` commence par « Illustration : ».
+   */
+  illustration?: { src: string; alt: string };
 }
 
 /**
@@ -24,7 +31,15 @@ export interface OfferPageProps {
  * modestie : une page de vente qui promet trois choses dont deux n'existent pas
  * se paie au premier rendez-vous, et beaucoup plus cher que l'aveu.
  */
-export function OfferPage({ eyebrow, title, lede, delivers, notYet, proof }: OfferPageProps) {
+export function OfferPage({
+  eyebrow,
+  title,
+  lede,
+  delivers,
+  notYet,
+  proof,
+  illustration,
+}: OfferPageProps) {
   return (
     <div className="bg-canvas py-10 md:py-14">
       <div className="container-page flex flex-col gap-10">
@@ -37,30 +52,58 @@ export function OfferPage({ eyebrow, title, lede, delivers, notYet, proof }: Off
             Toutes les solutions
           </Link>
 
-          <div className="max-w-3xl">
-            <span className="flex flex-wrap items-center gap-3">
-              <p className="eyebrow">{eyebrow}</p>
-              <Badge tone="neutral" size="sm">
-                {MODULE_STATUS_LABELS.preview}
-              </Badge>
-            </span>
-            <h1 className="mt-3 font-display text-3xl leading-tight text-ink md:text-4xl">
-              {title}
-            </h1>
-            <p className="mt-4 text-lg leading-relaxed text-ink-muted">{lede}</p>
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-12">
+            <div className="max-w-3xl">
+              <span className="flex flex-wrap items-center gap-3">
+                <p className="eyebrow">{eyebrow}</p>
+                <Badge tone="neutral" size="sm">
+                  {MODULE_STATUS_LABELS.preview}
+                </Badge>
+              </span>
+              <h1 className="mt-3 font-display text-3xl leading-tight text-ink md:text-4xl">
+                {title}
+              </h1>
+              <p className="mt-4 text-lg leading-relaxed text-ink-muted">
+                {lede}
+              </p>
+            </div>
+
+            {illustration ? (
+              <figure className="hidden lg:block">
+                <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs">
+                  <Image
+                    src={illustration.src}
+                    alt={illustration.alt}
+                    fill
+                    sizes="(min-width: 1024px) 480px, 0px"
+                    className="object-cover"
+                  />
+                </div>
+              </figure>
+            ) : null}
           </div>
         </header>
 
-        <section aria-labelledby="livre" className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
+        <section
+          aria-labelledby="livre"
+          className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]"
+        >
           <div className="flex flex-col gap-4">
             <h2 id="livre" className="font-display text-2xl text-ink">
               Ce qui est livré
             </h2>
             <ul className="flex flex-col gap-3">
               {delivers.map((item) => (
-                <li key={item.title} className="rounded-lg border border-border bg-surface p-5">
-                  <h3 className="text-base font-semibold text-ink">{item.title}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+                <li
+                  key={item.title}
+                  className="rounded-lg border border-border bg-surface p-5"
+                >
+                  <h3 className="text-base font-semibold text-ink">
+                    {item.title}
+                  </h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
+                    {item.body}
+                  </p>
                 </li>
               ))}
             </ul>
@@ -72,14 +115,20 @@ export function OfferPage({ eyebrow, title, lede, delivers, notYet, proof }: Off
             </h2>
             <ul className="flex flex-col gap-2.5">
               {notYet.map((item) => (
-                <li key={item} className="text-sm leading-relaxed text-warning-soft-fg/90">
+                <li
+                  key={item}
+                  className="text-sm leading-relaxed text-warning-soft-fg/90"
+                >
                   {item}
                 </li>
               ))}
             </ul>
             <p className="border-t border-warning/25 pt-4 text-sm leading-relaxed text-warning-soft-fg/90">
               Écrivez à{" "}
-              <a href={`mailto:${siteConfig.contactEmail}`} className="font-semibold underline">
+              <a
+                href={`mailto:${siteConfig.contactEmail}`}
+                className="font-semibold underline"
+              >
                 {siteConfig.contactEmail}
               </a>{" "}
               si vous voulez en parler avant que ce soit ouvert.
@@ -87,7 +136,10 @@ export function OfferPage({ eyebrow, title, lede, delivers, notYet, proof }: Off
           </aside>
         </section>
 
-        <section aria-labelledby="preuve" className="border-t border-border pt-10">
+        <section
+          aria-labelledby="preuve"
+          className="border-t border-border pt-10"
+        >
           <h2 id="preuve" className="font-display text-2xl text-ink">
             En attendant, jugez sur pièces
           </h2>
@@ -98,8 +150,12 @@ export function OfferPage({ eyebrow, title, lede, delivers, notYet, proof }: Off
                   href={item.href}
                   className="group flex h-full flex-col gap-2 rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md"
                 >
-                  <h3 className="text-base font-semibold text-ink">{item.label}</h3>
-                  <p className="flex-1 text-sm leading-relaxed text-ink-muted">{item.body}</p>
+                  <h3 className="text-base font-semibold text-ink">
+                    {item.label}
+                  </h3>
+                  <p className="flex-1 text-sm leading-relaxed text-ink-muted">
+                    {item.body}
+                  </p>
                   <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
                     Essayer
                     <ArrowRight

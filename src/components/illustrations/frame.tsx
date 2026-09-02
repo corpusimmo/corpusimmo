@@ -94,3 +94,62 @@ export function ArrowRight({ x1, x2, y }: { x1: number; x2: number; y: number })
     </g>
   );
 }
+
+/**
+ * LE CADRE HYBRIDE : du HTML pour le texte, du SVG pour le dessin seulement.
+ *
+ * Le cadre `DiagramFigure` a une limite que le mobile rend cruelle : un texte
+ * dessiné dans un SVG fluide rétrécit avec lui, et à 360 px un libellé de
+ * 10 unités mesure 5 px. Les schémas qui portent beaucoup de mots (la méthode,
+ * l’escalade de rayon) sortent donc du SVG : la mise en page est une grille
+ * HTML qui se réorganise, les mots sont du vrai texte qui garde sa taille, et
+ * chaque SVG ne contient plus qu’un pictogramme muet, `aria-hidden`.
+ *
+ * Le nom accessible est porté par la figure (`role="group"` + `aria-label`),
+ * la description longue par un paragraphe visuellement masqué : un lecteur
+ * d’écran reçoit exactement ce que `DiagramFigure` lui donnait.
+ */
+export function DiagramGroup({
+  title,
+  description,
+  caption,
+  className,
+  children,
+}: Omit<DiagramFigureProps, "viewBox">) {
+  return (
+    <figure
+      role="group"
+      aria-label={title}
+      className={cn("flex w-full flex-col gap-4", className)}
+    >
+      <p className="sr-only">{description}</p>
+      {children}
+      {caption ? (
+        <figcaption className="text-xs leading-relaxed text-ink-subtle">{caption}</figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
+/** Un pictogramme muet : fluide, sans texte, sans nom. Le HTML autour parle. */
+export function Pictogram({
+  viewBox,
+  className,
+  children,
+}: {
+  viewBox: string;
+  className?: string;
+  children: ReactNode;
+}) {
+  return (
+    <svg
+      viewBox={viewBox}
+      width="100%"
+      aria-hidden="true"
+      focusable="false"
+      className={cn("block h-auto w-full text-ink", className)}
+    >
+      {children}
+    </svg>
+  );
+}

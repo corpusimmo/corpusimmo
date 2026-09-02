@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Source_Serif_4 } from "next/font/google";
+import { Inter, Manrope, Source_Serif_4 } from "next/font/google";
 
 import { Analytics } from "@/components/analytics/analytics";
 import { ConsentBanner } from "@/components/consent/consent-banner";
@@ -15,14 +15,22 @@ import { SITE_DESCRIPTION, SITE_TITLE, canonicalUrl } from "@/lib/seo/metadata";
 import "./globals.css";
 
 /**
- * Deux familles, deux rôles, et rien d'autre à charger.
+ * Trois familles, trois rôles, et rien d'autre à charger.
  *
- * Inter porte l'interface et le corps de texte. Source Serif 4 ne titre que les
- * h1/h2/h3 — c'est le sérif qui fait basculer la page du registre application
- * vers le registre document. Aucune police alternative n'est déclarée : la
+ * Inter porte l'interface et le corps de texte. Manrope titre les h1/h2/h3,
+ * serrée et grasse : c'est elle qui fait lire la page comme un produit.
+ * Source Serif 4 ne sert plus qu'à la citation (`font-serif`), où elle signe
+ * le registre institutionnel. Aucune police alternative n'est déclarée : la
  * direction artistique est figée, il n'y a rien à prévisualiser.
  */
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  weight: ["600", "700", "800"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 
 const sourceSerif = Source_Serif_4({
   subsets: ["latin"],
@@ -110,7 +118,7 @@ export const viewport: Viewport = {
  */
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${sourceSerif.variable}`}>
+    <html lang="fr" className={`${inter.variable} ${manrope.variable} ${sourceSerif.variable}`}>
       <body>
         {/* Les données structurées de SITE, posées une fois pour toutes les
             pages : l'éditeur et le site lui-même. Les schémas propres à une

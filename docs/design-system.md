@@ -29,21 +29,45 @@ elle, lit bien les tokens, par `getComputedStyle`.
 
 ## Le registre
 
-Un document de banque d'affaires devenu logiciel. Concrètement :
+Une fintech institutionnelle. Concrètement :
 
 | | |
 |---|---|
-| Fond | papier chaud `#F6F5F2`, non bleuté — c'est ce qui sépare un document d'une interface |
+| Fond | blanc froid à peine bleuté `#F4F7FB`, les sections marketing posées dessus en **panneaux** blancs (`panel`, rayon 36 px) |
 | Encre et action | bleu nuit `#1B3349`, le bleu de l'acte notarié, pas le bleu d'application |
-| Accent | bronze `#8A6A2F` — la marque, la sélection, les filets. Jamais jaune |
-| Titrage | Source Serif 4, sérif éditorial, **h1 à h3 uniquement** |
+| Accent | or `#8A6A2F` en texte, `#C2A468` en filet — la marque, la sélection, le trait sous le chrome. Jamais jaune |
+| Titrage | Manrope 700, resserrée (`-0.028em`), **h1 à h3** |
 | Interface et corps | Inter |
-| Rayons | courts : 4 / 8 / 12 / 16 / 22 px. Un dossier a des angles |
-| Ombres | fermes et courtes, teintées de l'encre. Rien ne déborde de plus de 40 px |
+| Citation | Source Serif 4 italique, par `font-serif` : le seul endroit où le sérif survit |
+| Surtitre | capitales espacées **dans une pastille or pâle** (`eyebrow`) |
+| Rayons | généreux : 8 / 12 / 16 / 22 / 28 px, 36 px pour les panneaux. Les boutons sont des pastilles |
+| Ombres | en deux temps : contact court, puis halo large teinté de marine |
 
-Le sérif titre, il ne rédige pas. Cette règle est la direction artistique tout
-entière en une phrase : si un `h1` perd sa famille, la page change de registre
-avant de changer de couleur.
+Ce qui reste institutionnel dans un registre produit : les capitales espacées,
+les chiffres tabulaires, les filets or, le sérif de la citation, et le refus
+de tout dégradé criard — le seul dégradé autorisé est le filet or du chrome.
+
+---
+
+## Le héros de l'accueil
+
+Un **diaporama** de cinq vues urbaines en fondu enchaîné
+(`marketing/hero-slideshow.tsx`), sous un voile de marine qui s'ouvre vers la
+droite : le texte est en réserve, le relevé de ventes flotte sur l'image.
+
+Trois règles, dans le composant :
+
+- `prefers-reduced-motion` arrête le fondu **et** ne charge que la première
+  image : un fond qui bouge sans qu'on l'ait demandé est une gêne réelle, et
+  quatre fichiers pour un fond fixe sont un gâchis ;
+- toutes les vues sont des illustrations générées (`docs/images.md`), jamais un
+  bien du corpus, et le fond est `alt=""` — décoratif ;
+- le voile n'est jamais moins opaque que 58 % à droite : c'est le seuil mesuré
+  sous lequel le blanc du titre passe sous 4,5:1 sur l'image la plus claire.
+
+Le texte du héros tient en **deux lignes** sous le titre. L'argument y est
+entier (« des actes, pas des annonces ») ; la démonstration appartient aux
+sections suivantes, qui ont la place de la porter.
 
 ---
 

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight, MapPinned } from "lucide-react";
 
@@ -58,17 +59,38 @@ export default function PrixImmobilierPage() {
           ]}
         />
 
-        <header className="max-w-3xl">
-          <p className="eyebrow">Observatoire des prix</p>
-          <h1 className="mt-2 font-display text-3xl leading-tight text-ink md:text-4xl">
-            Le prix immobilier, commune par commune
-          </h1>
-          <p className="mt-3 text-lg leading-relaxed text-ink-muted">
-            {cities.length} communes, {formatNumber(totalSales(cities))} ventes de logement
-            enregistrées entre {firstYear} et {lastYear}. Chaque chiffre de ces pages est
-            accompagné du nombre de ventes qui le fonde, et rien n&apos;y est extrapolé depuis
-            des annonces.
-          </p>
+        <header className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center">
+          <div className="max-w-3xl">
+            <p className="eyebrow">Observatoire des prix</p>
+            <h1 className="mt-2 font-display text-3xl leading-tight text-ink md:text-4xl">
+              Le prix immobilier, commune par commune
+            </h1>
+            <p className="mt-3 text-lg leading-relaxed text-ink-muted">
+              {cities.length} communes, {formatNumber(totalSales(cities))} ventes de logement
+              enregistrées entre {firstYear} et {lastYear}. Chaque chiffre de ces pages est
+              accompagné du nombre de ventes qui le fonde, et rien n&apos;y est extrapolé depuis
+              des annonces.
+            </p>
+          </div>
+
+          {/* Une ville moyenne vue du ciel, calme et ordinaire : c'est le cœur du
+              marché DVF, et c'est ce que ces pages documentent. Illustration
+              générée, aucune commune identifiable (voir docs/images.md). */}
+          <figure>
+            <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs lg:aspect-[4/3]">
+              <Image
+                src="/illustrations/ville-moyenne-aerienne.webp"
+                alt="Illustration : vue aérienne oblique d'une ville moyenne française, cœur ancien, clocher, rivière et quartiers pavillonnaires."
+                fill
+                priority
+                sizes="(min-width: 1024px) 480px, 100vw"
+                className="object-cover"
+              />
+            </div>
+            <figcaption className="mt-2 text-xs text-ink-subtle">
+              Illustration, pas une commune du corpus.
+            </figcaption>
+          </figure>
         </header>
 
         <section

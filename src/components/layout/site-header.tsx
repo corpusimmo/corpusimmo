@@ -20,7 +20,12 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 
 import { Button } from "@/components/ui";
-import { MODULE_STATUS_LABELS, mainNav, primaryCta, secondaryNav } from "@/config/navigation";
+import {
+  MODULE_STATUS_LABELS,
+  mainNav,
+  primaryCta,
+  secondaryNav,
+} from "@/config/navigation";
 import type { NavEntry, NavItem } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils/cn";
@@ -68,7 +73,13 @@ export function SiteHeader() {
   }, [openMenu, close]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-surface/95 backdrop-blur-sm">
+    <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/80 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/70">
+      {/* Le filet or en tête de page : un trait de deux pixels, c'est toute
+          la part institutionnelle que le chrome se permet. */}
+      <div
+        aria-hidden="true"
+        className="h-0.5 w-full bg-[linear-gradient(90deg,var(--accent-rule),var(--accent)_45%,var(--accent-rule))]"
+      />
       <a
         href="#contenu"
         className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-sm focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:text-primary-fg"
@@ -97,7 +108,11 @@ export function SiteHeader() {
                       entry={entry}
                       active={isActive(pathname, entry.href)}
                       open={openMenu === entry.href}
-                      onToggle={() => setOpenMenu((current) => (current === entry.href ? null : entry.href))}
+                      onToggle={() =>
+                        setOpenMenu((current) =>
+                          current === entry.href ? null : entry.href,
+                        )
+                      }
                       onOpen={() => setOpenMenu(entry.href)}
                     />
                   ) : (
@@ -106,10 +121,10 @@ export function SiteHeader() {
                       className={cn(
                         // h-11 et non h-9 : ces entrées n'ont pas de fond, la
                         // hauteur ne se voit donc pas, mais elle se touche.
-                        "inline-flex h-11 items-center rounded-sm px-3 text-[0.9375rem] transition-colors",
+                        "inline-flex h-10 items-center rounded-full px-3.5 text-[0.9375rem] transition-colors",
                         isActive(pathname, entry.href)
-                          ? "font-semibold text-ink"
-                          : "text-ink-muted hover:text-ink",
+                          ? "bg-surface-3 font-semibold text-ink"
+                          : "text-ink-muted hover:bg-surface-3 hover:text-ink",
                       )}
                     >
                       {entry.label}
@@ -125,18 +140,24 @@ export function SiteHeader() {
           <AccountMenu className="hidden lg:inline-flex" />
           {/* `tap-target` : le CTA est dessiné en `sm` (36 px) pour ne pas
               écraser le bandeau, sa zone d'appui monte seule à 44 px. */}
-          <Button asChild size="sm" className="tap-target hidden sm:inline-flex">
+          <Button
+            asChild
+            size="sm"
+            className="tap-target hidden sm:inline-flex"
+          >
             <Link href={primaryCta.href}>{primaryCta.label}</Link>
           </Button>
 
           <button
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-sm text-ink-muted transition-colors hover:bg-surface-2 hover:text-ink lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-full text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink lg:hidden"
             aria-expanded={mobileOpen}
             aria-controls="menu-mobile"
             onClick={() => setMobileOpen((open) => !open)}
           >
-            <span className="sr-only">{mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}</span>
+            <span className="sr-only">
+              {mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
+            </span>
             {mobileOpen ? (
               <X aria-hidden="true" className="size-5" />
             ) : (
@@ -146,7 +167,9 @@ export function SiteHeader() {
         </div>
       </div>
 
-      {mobileOpen ? <MobileMenu pathname={pathname} onClose={() => setMobileOpen(false)} /> : null}
+      {mobileOpen ? (
+        <MobileMenu pathname={pathname} onClose={() => setMobileOpen(false)} />
+      ) : null}
     </header>
   );
 }
@@ -175,8 +198,10 @@ function DropdownEntry({
         onClick={onToggle}
         className={cn(
           // Même hauteur que les entrées simples, pour la même raison.
-          "inline-flex h-11 items-center gap-1 rounded-sm px-3 text-[0.9375rem] transition-colors",
-          active || open ? "font-semibold text-ink" : "text-ink-muted hover:text-ink",
+          "inline-flex h-10 items-center gap-1 rounded-full px-3.5 text-[0.9375rem] transition-colors",
+          active || open
+            ? "bg-surface-3 font-semibold text-ink"
+            : "text-ink-muted hover:bg-surface-3 hover:text-ink",
         )}
       >
         {entry.label}
@@ -189,19 +214,23 @@ function DropdownEntry({
       {open ? (
         <div
           id={panelId}
-          className="animate-fade-up absolute left-0 top-full z-50 mt-1 w-[26rem] rounded-md border border-border bg-surface p-2 shadow-lg"
+          className="animate-fade-up absolute left-0 top-full z-50 mt-2 w-[26rem] rounded-lg border border-border bg-surface p-2 shadow-lg"
         >
           <ul>
             {entry.children?.map((child) => (
               <li key={child.href}>
                 <Link
                   href={child.href}
-                  className="block rounded-sm px-3 py-2.5 transition-colors hover:bg-surface-2"
+                  className="block rounded-md px-3 py-2.5 transition-colors hover:bg-surface-3"
                 >
                   <span className="flex items-baseline justify-between gap-3">
-                    <span className="text-sm font-semibold text-ink">{child.label}</span>
+                    <span className="text-sm font-semibold text-ink">
+                      {child.label}
+                    </span>
                     {child.status && child.status !== "live" ? (
-                      <span className="eyebrow shrink-0">{MODULE_STATUS_LABELS[child.status]}</span>
+                      <span className="eyebrow shrink-0">
+                        {MODULE_STATUS_LABELS[child.status]}
+                      </span>
                     ) : null}
                   </span>
                   {child.description ? (
@@ -219,7 +248,13 @@ function DropdownEntry({
   );
 }
 
-function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => void }) {
+function MobileMenu({
+  pathname,
+  onClose,
+}: {
+  pathname: string;
+  onClose: () => void;
+}) {
   return (
     <div
       id="menu-mobile"
@@ -230,7 +265,7 @@ function MobileMenu({ pathname, onClose }: { pathname: string; onClose: () => vo
         <button
           type="button"
           onClick={onClose}
-          className="inline-flex size-11 items-center justify-center rounded-sm text-ink-muted hover:bg-surface-2 hover:text-ink"
+          className="inline-flex size-11 items-center justify-center rounded-full text-ink-muted hover:bg-surface-3 hover:text-ink"
         >
           <span className="sr-only">Fermer le menu</span>
           <X aria-hidden="true" className="size-5" />
@@ -299,7 +334,9 @@ function MobileLink({
         // touché au pouce, jamais pointé.
         "block rounded-sm px-1 py-3",
         strong ? "text-[0.9375rem]" : "text-sm",
-        isActive(pathname, item.href) ? "font-semibold text-ink" : "text-ink-muted",
+        isActive(pathname, item.href)
+          ? "font-semibold text-ink"
+          : "text-ink-muted",
       )}
     >
       {item.label}

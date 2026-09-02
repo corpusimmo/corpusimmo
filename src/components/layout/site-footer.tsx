@@ -31,7 +31,7 @@ export function SiteFooter() {
             <p className="mt-4 text-sm leading-relaxed text-white/70">{siteConfig.tagline}</p>
 
             <div className="mt-7 border-t border-white/15 pt-6">
-              <h2 className="eyebrow !text-[color:var(--accent-rule)]">
+              <h2 className="eyebrow-text !text-[color:var(--accent-rule)]">
                 Ce qui bouge sur le marché
               </h2>
               <p className="mt-2 mb-4 text-sm leading-relaxed text-white/70">
@@ -43,7 +43,7 @@ export function SiteFooter() {
 
           <nav aria-label="Plan du site" className="grid gap-8 sm:grid-cols-2">
             <div>
-              <h2 className="eyebrow !text-[color:var(--accent-rule)]">Le produit</h2>
+              <h2 className="eyebrow-text !text-[color:var(--accent-rule)]">Le produit</h2>
               {/* Un lien de plan de site est une cible ISOLÉE, pas un mot dans
                   une phrase : il peut donc prendre la hauteur d'un doigt sans
                   abîmer d'interligne. Chaque lien monte à 44 px (`min-h-11`)
@@ -66,7 +66,7 @@ export function SiteFooter() {
             </div>
 
             <div>
-              <h2 className="eyebrow !text-[color:var(--accent-rule)]">La maison</h2>
+              <h2 className="eyebrow-text !text-[color:var(--accent-rule)]">La maison</h2>
               {/* Même règle que la colonne « Le produit » : cibles isolées,
                   donc 44 px de haut chacune, espacement resserré en regard. */}
               <ul className="mt-2 space-y-0.5">

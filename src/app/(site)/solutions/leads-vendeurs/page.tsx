@@ -18,8 +18,8 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "Leads vendeurs qualifiés pour agences immobilières",
   description:
-    "Des propriétaires qui ont estimé leur bien sur CorpusImmo et accepté explicitement, "
-    + "par une case distincte et horodatée, d'être contactés par un professionnel.",
+    "Des propriétaires qui ont estimé leur bien sur CorpusImmo et accepté explicitement, " +
+    "par une case distincte et horodatée, d'être contactés par un professionnel.",
   path: "/solutions/leads-vendeurs",
   socialTitle: "Des propriétaires qui ont demandé qu'on les rappelle",
   index: false,
@@ -28,6 +28,10 @@ export const metadata: Metadata = pageMetadata({
 export default function LeadsVendeursPage() {
   return (
     <OfferPage
+      illustration={{
+        src: "/illustrations/interieur-commerce.webp",
+        alt: "Illustration : local commercial vide en rez-de-chaussée, vitrines sur une rue arborée.",
+      }}
       eyebrow="Leads vendeurs"
       title="Des propriétaires qui ont demandé qu'on les rappelle"
       lede="Un contact qui n'a pas dit oui n'est pas un lead, c'est un problème juridique. Sur CorpusImmo, l'accord d'être contacté par un professionnel est une case distincte, jamais pré-cochée, jamais groupée avec l'envoi de l'estimation, et horodatée côté serveur."

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 
 import { disclaimers, siteConfig } from "@/config/site";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -17,6 +18,27 @@ export default function AProposPage() {
     <div className="bg-canvas py-12 md:py-16">
       <div className="container-page">
         <article className="mx-auto max-w-2xl">
+          {/* Une rue vue d'une fenêtre : le point de vue de quelqu'un qui
+              observe un marché, pas de quelqu'un qui vend un bien. C'est la
+              posture du produit, et c'est pour ça que l'image ouvre cette page
+              et aucune autre. Illustration générée (voir docs/images.md). */}
+          <figure className="mb-10">
+            <div className="relative aspect-[21/9] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs">
+              <Image
+                src="/illustrations/ville-rue-fenetre.webp"
+                alt="Illustration : une rue de maisons de ville du XIXe siècle vue d'une fenêtre du premier étage, en fin d'après-midi."
+                fill
+                priority
+                sizes="(min-width: 768px) 672px, 100vw"
+                className="object-cover object-[50%_35%]"
+              />
+            </div>
+            <figcaption className="mt-2 text-xs text-ink-subtle">
+              Illustration. Aucune adresse réelle n&apos;est identifiable, et aucun bien du corpus
+              n&apos;est photographié.
+            </figcaption>
+          </figure>
+
           <p className="eyebrow">À propos</p>
           <h1 className="mt-3 font-display text-4xl leading-tight text-ink">
             Un corpus, et ce qu&apos;on en fait

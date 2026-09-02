@@ -18,8 +18,8 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "Formation à l'IA appliquée à l'immobilier",
   description:
-    "Quelles tâches confier à une IA, comment vérifier ce qu'elle produit, où sont les "
-    + "pièges. Des sessions courtes, animées par des analystes qui ont exercé le métier.",
+    "Quelles tâches confier à une IA, comment vérifier ce qu'elle produit, où sont les " +
+    "pièges. Des sessions courtes, animées par des analystes qui ont exercé le métier.",
   path: "/solutions/formation",
   socialTitle: "Apprendre à faire faire, et surtout à vérifier",
   index: false,
@@ -28,6 +28,10 @@ export const metadata: Metadata = pageMetadata({
 export default function FormationPage() {
   return (
     <OfferPage
+      illustration={{
+        src: "/illustrations/interieur-bureaux-hall.webp",
+        alt: "Illustration : hall de bureaux contemporain en béton et verre, mezzanine et salle de réunion vitrée.",
+      }}
       eyebrow="Formation"
       title="Apprendre à faire faire, et surtout à vérifier"
       lede="La compétence rare n'est pas de savoir rédiger une consigne : c'est de savoir reconnaître, en trente secondes, qu'un résultat est faux. C'est ce que la formation travaille, sur vos propres dossiers plutôt que sur des cas d'école."

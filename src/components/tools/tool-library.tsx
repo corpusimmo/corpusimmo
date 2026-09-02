@@ -142,7 +142,7 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
               className="group flex h-full flex-col gap-3 rounded-lg border border-border bg-surface p-6 transition-shadow hover:shadow-md"
             >
               <span className="flex items-start justify-between gap-3">
-                <span className="eyebrow">{tool.audience}</span>
+                <span className="eyebrow-text">{tool.audience}</span>
                 {/* Les familles d'actif en silhouettes, dans la grammaire du
                     logotype : le classement du catalogue devient lisible d'un
                     coup d'œil, sans photo. */}

@@ -34,20 +34,36 @@ const ICON_NAMES = Object.keys(assetTypeIcons) as AssetIconName[];
 describe.each(DIAGRAMS)("$name", ({ Component }) => {
   it("s’annonce comme une image nommée, et décrite", () => {
     const { container } = render(<Component />);
-    const svg = container.querySelector("svg");
 
-    expect(svg?.getAttribute("role")).toBe("img");
-    expect(svg?.getAttribute("aria-label")?.length ?? 0).toBeGreaterThan(20);
-    expect(svg?.querySelector("desc")?.textContent?.length ?? 0).toBeGreaterThan(80);
+    // Deux cadres, une même promesse : soit le SVG porte le nom (`role="img"`
+    // + `<desc>`), soit la figure hybride le porte (`role="group"` + un
+    // paragraphe masqué). Dans les deux cas, un lecteur d’écran reçoit un nom
+    // court et une description longue.
+    const named = container.querySelector('svg[role="img"], figure[role="group"]');
+    expect(named).not.toBeNull();
+    expect(named?.getAttribute("aria-label")?.length ?? 0).toBeGreaterThan(20);
+
+    const description =
+      named?.tagName === "svg"
+        ? named.querySelector("desc")?.textContent
+        : named?.querySelector(":scope > p.sr-only")?.textContent;
+    expect(description?.length ?? 0).toBeGreaterThan(80);
   });
 
   it("est fluide : un viewBox, une largeur en pourcentage, aucune largeur en pixels", () => {
     const { container } = render(<Component />);
-    const svg = container.querySelector("svg");
+    // Les flèches de liaison entre étapes sont des glyphes à taille fixe,
+    // pas des dessins : elles sont exclues par leur `role`-moins-`viewBox` 12.
+    const drawings = Array.from(container.querySelectorAll("svg")).filter(
+      (svg) => svg.getAttribute("viewBox") !== "0 0 12 12",
+    );
+    expect(drawings.length).toBeGreaterThan(0);
 
-    expect(svg?.getAttribute("viewBox")).toMatch(/^0 0 \d+ \d+$/);
-    expect(svg?.getAttribute("width")).toBe("100%");
-    expect(svg?.getAttribute("height")).toBeNull();
+    for (const svg of drawings) {
+      expect(svg.getAttribute("viewBox")).toMatch(/^0 0 \d+ \d+$/);
+      expect(svg.getAttribute("width")).toBe("100%");
+      expect(svg.getAttribute("height")).toBeNull();
+    }
   });
 
   it("n’écrit aucune couleur en dur : tout passe par les tokens", () => {

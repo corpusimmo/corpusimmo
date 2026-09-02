@@ -28,7 +28,7 @@ export function ChoiceCard({
       onClick={onSelect}
       aria-pressed={selected}
       className={cn(
-        "group relative flex w-full items-start gap-3 rounded-lg border p-4 text-left",
+        "group relative flex w-full items-start gap-3 rounded-md border p-4 text-left",
         "transition-[border-color,background-color,box-shadow,transform] duration-150 ease-out",
         "active:translate-y-px",
         selected
@@ -41,7 +41,7 @@ export function ChoiceCard({
         <span
           aria-hidden="true"
           className={cn(
-            "grid size-10 shrink-0 place-items-center rounded-md transition-colors duration-150 [&_svg]:size-5",
+            "grid size-10 shrink-0 place-items-center rounded-full transition-colors duration-150 [&_svg]:size-5",
             selected
               ? "bg-primary text-primary-fg"
               : "bg-surface-2 text-ink-muted group-hover:text-ink",

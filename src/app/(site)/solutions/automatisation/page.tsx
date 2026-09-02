@@ -18,8 +18,8 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "Automatisation sur mesure pour agences immobilières",
   description:
-    "Qualifier les demandes, relancer, mettre à jour, produire le reporting : les tâches de "
-    + "chaque semaine, exécutées en parallèle de votre process actuel.",
+    "Qualifier les demandes, relancer, mettre à jour, produire le reporting : les tâches de " +
+    "chaque semaine, exécutées en parallèle de votre process actuel.",
   path: "/solutions/automatisation",
   socialTitle: "Ce qui vous prend six heures par semaine",
   index: false,
@@ -28,6 +28,10 @@ export const metadata: Metadata = pageMetadata({
 export default function AutomatisationPage() {
   return (
     <OfferPage
+      illustration={{
+        src: "/illustrations/interieur-bureaux-openspace.webp",
+        alt: "Illustration : plateau de bureaux en open space, postes vides devant des baies vitrées.",
+      }}
       eyebrow="Automatisation"
       title="Ce qui vous prend six heures par semaine peut en prendre zéro"
       lede="Nous ne remplaçons rien du premier coup. L'automatisme tourne d'abord en parallèle de votre process actuel, sur les mêmes dossiers, jusqu'à ce que les deux produisent le même résultat. Vous ne basculez que le jour où vous n'avez plus de raison de ne pas le faire."

@@ -25,7 +25,28 @@
  * comporte mieux hors du pool.
  */
 
+import { existsSync } from "node:fs";
+
 import { defineConfig } from "drizzle-kit";
+
+/**
+ * `.env.local`, LU EXPLICITEMENT.
+ *
+ * `drizzle-kit` ne charge aucun fichier d'environnement : il lit
+ * `process.env`, et rien d'autre. Sans ces quatre lignes, une chaîne de
+ * connexion rangée dans `.env.local` — l'endroit où Next la cherche, donc
+ * l'endroit où tout le monde la met — produisait un `url: ''` et un message
+ * qui n'expliquait pas pourquoi. Il fallait la répéter en préfixe de commande,
+ * ce qui la laisse dans l'historique du terminal.
+ *
+ * `loadEnvFile` est du Node standard (20.12+). Sur une version plus ancienne
+ * la fonction n'existe pas : on ne casse rien, on retombe simplement sur les
+ * variables déjà présentes dans l'environnement. Et les variables du shell
+ * gagnent toujours, `loadEnvFile` n'écrasant pas ce qui est déjà défini.
+ */
+if (existsSync(".env.local") && typeof process.loadEnvFile === "function") {
+  process.loadEnvFile(".env.local");
+}
 
 export default defineConfig({
   dialect: "postgresql",

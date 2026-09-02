@@ -15,6 +15,15 @@
  * zero configuration.
  */
 
+/**
+ * Le domaine de production, écrit une fois.
+ *
+ * `NEXT_PUBLIC_APP_URL` et les variables de la plateforme restent prioritaires :
+ * une préversion doit s'annoncer sous SON adresse, jamais sous celle-ci, sinon
+ * elle se déclare canonique et se met en concurrence avec le site.
+ */
+const PRODUCTION_URL = "https://www.corpus.immo";
+
 function clean(value: string | undefined): string | undefined {
   const trimmed = value?.trim();
   return trimmed ? trimmed : undefined;
@@ -38,6 +47,12 @@ export function resolveAppUrl(): string {
     clean(process.env.VERCEL_URL);
 
   if (platformHost) return withProtocol(platformHost).replace(/\/+$/, "");
+
+  // Hors plateforme et hors variable : le domaine de production en production,
+  // localhost ailleurs. Sans cette ligne, un rendu de production fait hors
+  // Vercel — une image sociale exportée, un PDF, une preuve d'impression —
+  // affichait « localhost:3000 » et le publiait.
+  if (process.env.NODE_ENV === "production") return PRODUCTION_URL;
 
   return "http://localhost:3000";
 }

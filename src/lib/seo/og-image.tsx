@@ -244,7 +244,10 @@ export function renderOgImage({
                   marginTop: 2,
                 }}
               >
-                {siteConfig.signature}
+                {/* Pas la signature ici : elle est le titre juste en dessous,
+                    et une marque qui se répète à deux lignes d'écart perd les
+                    deux fois. */}
+                Données publiques DVF
               </span>
             </div>
           </div>
@@ -329,7 +332,7 @@ export function renderOgImage({
             }}
           />
           <span style={{ fontSize: 23, color: "rgba(255,255,255,0.7)" }}>
-            Données publiques DVF
+            Estimateur, carte, observatoire et outils
           </span>
         </div>
       </div>

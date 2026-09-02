@@ -24,7 +24,7 @@ export const metadata: Metadata = pageMetadata({
   absoluteTitle: true,
   description: SITE_DESCRIPTION,
   path: "/",
-  socialTitle: "Ce qui s'est vraiment vendu, et à quel prix",
+  socialTitle: siteConfig.signature,
   socialDescription:
     "Estimation, carte des ventes et observatoire, sur les mutations enregistrées par la DGFiP.",
 });
@@ -63,21 +63,32 @@ export default function HomePage() {
               tous ceux qui n'y habitent pas. La mesure du corpus, elle, est
               nationale et vit dans le bandeau juste en dessous. */}
           <div className="animate-fade-up max-w-3xl">
+            {/* La pastille dit la SOURCE, pas la signature : celle-ci est
+                juste sous le titre, et une marque répétée à deux lignes
+                d'écart perd les deux fois. */}
             <p className="eyebrow !bg-white/10 !text-[color:var(--accent-rule)] backdrop-blur-sm">
+              Données publiques DVF
+            </p>
+            {/* LE NOM, ET RIEN D'AUTRE. Le titre portait une phrase — « ce qui
+                s'est vraiment vendu, et à quel prix » — qui disait bien la
+                thèse mais laissait la marque sans place : sur une page
+                d'accueil, le premier mot lu doit être celui qu'on retient. La
+                thèse descend d'un cran, dans la signature, où elle est écrite
+                pour être répétée. */}
+            <h1 className="mt-6 font-display text-[3.25rem] leading-[0.98] font-extrabold tracking-[-0.04em] text-ink-inverted md:text-[4.5rem] lg:text-[5.25rem]">
+              {siteConfig.name}
+            </h1>
+            {/* LA SIGNATURE EST ICI, pas dans la pastille : cinquante signes
+                en capitales espacées y passeraient à la ligne, et une pastille
+                sur deux lignes n'est plus une pastille. Sous le titre, elle a
+                la place d'être lue, et la phrase qui suit dit ce qu'il y a
+                derrière les trois verbes. */}
+            <p className="mt-5 max-w-2xl font-display text-2xl leading-snug font-semibold text-ink-inverted md:text-[1.75rem]">
               {siteConfig.signature}
             </p>
-            <h1 className="mt-6 font-display text-[2.75rem] leading-[1.02] font-extrabold text-ink-inverted md:text-[3.75rem] lg:text-[4.25rem]">
-              Ce qui s&apos;est vraiment vendu, et à quel prix
-            </h1>
-            {/* L'ACCROCHE DIT L'ÉTENDUE, PAS SEULEMENT LA THÈSE. Quelqu'un qui
-                arrive ici doit comprendre en une phrase qu'il a devant lui de
-                quoi mener un projet de bout en bout, et pas un estimateur de
-                plus. La preuve (« enregistrées par la DGFiP ») est dans la même
-                phrase : l'étendue sans la source ferait catalogue. */}
-            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">
+            <p className="mt-3 max-w-2xl leading-relaxed text-white/75">
               Estimateur, carte des ventes, observatoire et outils de calcul,
-              sur les mutations réellement enregistrées par la DGFiP. Partout en
-              France.
+              sur les mutations enregistrées par la DGFiP. Partout en France.
             </p>
 
             <div className="mt-9 max-w-xl">

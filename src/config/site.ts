@@ -15,17 +15,24 @@ export const siteConfig = {
   /**
    * La signature de marque.
    *
-   * Un *corpus* est un ensemble fini, clos et structuré de pièces authentiques,
-   * réunies pour être analysées : rien n'y entre qui n'ait été constaté. C'est
-   * exactement ce qu'est DVF. « Sur pièces » est le pendant juridique — juger
-   * sur pièces, c'est juger sur documents produits, par opposition à juger sur
-   * parole. Les concurrents extrapolent depuis des ANNONCES, c'est-à-dire des
-   * prix demandés ; nous partons d'ACTES, c'est-à-dire de prix payés.
+   * Trois verbes et une preuve. Les trois verbes sont le PARCOURS réel du
+   * produit — on estime, on compare les ventes autour, on décide — et ils
+   * disent l'étendue là où « l'immobilier sur pièces », la signature
+   * précédente, ne parlait que de la preuve : juste, mais muette sur le fait
+   * qu'il y a quatre outils derrière. La seconde phrase garde exactement ce
+   * que l'ancienne portait : les concurrents extrapolent depuis des ANNONCES,
+   * c'est-à-dire des prix demandés ; nous partons d'ACTES, c'est-à-dire de
+   * prix payés.
+   *
+   * Elle est reprise telle quelle par le pied de page, l'image sociale, le
+   * balisage `slogan` de schema.org et la signature des e-mails : la changer
+   * ici la change partout, et c'est le seul endroit où elle est écrite.
    */
-  signature: "L'immobilier sur pièces.",
+  signature: "Estimer, comparer, décider. Sur les ventes réelles.",
 
   /** La version descriptive, celle qui travaille pour le référencement. */
-  tagline: "Estimation et observatoire de l'immobilier, à partir des ventes réellement enregistrées.",
+  tagline:
+    "Estimation et observatoire de l'immobilier, à partir des ventes réellement enregistrées.",
 
   description:
     "Estimez un bien et explorez les transactions immobilières réellement enregistrées, " +

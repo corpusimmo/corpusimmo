@@ -100,19 +100,28 @@ export function SiteHeader() {
           deux actions à droite, la navigation se retrouvait poussée hors de
           l'axe. Les deux colonnes latérales font `1fr` chacune, donc la
           colonne centrale tombe au milieu de la barre quelle que soit la
-          largeur du lockup ou du nombre d'actions. */}
+          largeur du lockup ou du nombre d'actions.
+
+          CHAQUE ENFANT DÉCLARE SA COLONNE, et ce n'est pas de la coquetterie :
+          un élément en `display: none` n'est PAS un élément de grille. Sous
+          1024 px la navigation disparaît, le placement automatique remontait
+          donc les actions dans la colonne du milieu, et elles s'affichaient
+          centrées entre 768 et 1023 px au lieu d'être collées à droite. */}
       <div className="mx-auto grid h-14 max-w-[76rem] grid-cols-[auto_1fr_auto] items-center gap-4 rounded-full border border-white/70 bg-surface/85 pr-2 pl-4 shadow-md backdrop-blur-xl md:h-15 md:grid-cols-[1fr_auto_1fr] md:pr-3 md:pl-6">
         {/* `min-h-11` : le lockup dessine 38 px, et c'est la première cible de
             chaque page. Le bandeau fait 64 px, la hauteur est disponible. */}
         <Link
           href="/"
           aria-label={`${siteConfig.name}, accueil`}
-          className="inline-flex min-h-11 items-center rounded-sm"
+          className="col-start-1 inline-flex min-h-11 items-center rounded-sm"
         >
           <BrandLockup markClassName="size-8" />
         </Link>
 
-        <div ref={navRef} className="hidden justify-self-center lg:block">
+        <div
+          ref={navRef}
+          className="col-start-2 hidden justify-self-center lg:block"
+        >
           <nav aria-label="Navigation principale">
             <ul className="flex items-center gap-1">
               {mainNav.map((entry) => (
@@ -150,7 +159,7 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2 justify-self-end">
+        <div className="col-start-3 flex items-center gap-2 justify-self-end">
           <AccountMenu className="hidden lg:inline-flex" />
           {/* `tap-target` : le CTA est dessiné en `sm` (36 px) pour ne pas
               écraser le bandeau, sa zone d'appui monte seule à 44 px. */}

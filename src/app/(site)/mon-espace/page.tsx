@@ -53,33 +53,43 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function MonEspacePage() {
-  // `readAccess` parle à la base et au cookie signé. Elle rattrape déjà ses
-  // propres pannes, mais pas celles qui viendraient d'ailleurs — un rôle sans
-  // droits sur `tool_unlocks`, par exemple, faisait tomber la page ENTIÈRE
-  // alors que le reste de l'espace n'en dépend pas. Une lecture qui échoue se
-  // dit ; elle ne ferme pas la porte.
-  const accessRead = await attempt(
-    "accès de la semaine",
-    () => readAccess(),
-    UNKNOWN_ACCESS,
-  );
-  const access = accessRead.value;
-
   // Pour une personne connectée, l'historique vient de la base et suit d'un
   // appareil à l'autre. Sinon il reste dans le navigateur, et la page le dit.
   const userId = await currentUserId();
-  // Une lecture qui échoue ne fait pas tomber la page : elle se dit, et le
-  // reste de l'espace s'affiche. Voir `lib/db/attempt.ts`.
-  const storedRead = userId
-    ? await attempt(
-        "historique des estimations",
-        () => listEstimations(userId),
-        null,
-      )
-    : { value: null, failed: false };
-  const profileRead = userId
-    ? await attempt("profil", () => readProfile(userId), null)
-    : { value: null, failed: false };
+
+  /*
+   * LES TROIS LECTURES PARTENT ENSEMBLE, et c'est ce qui décide si la page
+   * s'affiche.
+   *
+   * Elles étaient enchaînées, chacune attendant la précédente. Sur une base
+   * qui dort — Neon suspend une base inactive, et la réveiller coûte plusieurs
+   * secondes — trois allers-retours en série suffisaient à dépasser le délai
+   * de la fonction : pas d'erreur, pas de page, juste une requête qui ne
+   * répond jamais. Elles ne dépendent pas les unes des autres, seulement de
+   * `userId` : elles partent donc en même temps, et la page attend la plus
+   * lente au lieu de leur somme.
+   *
+   * Chacune garde son garde-fou. `readAccess` rattrape déjà ses propres
+   * pannes, mais pas celles qui viennent d'ailleurs — un rôle sans droits sur
+   * `tool_unlocks` faisait tomber la page ENTIÈRE, alors que le profil et les
+   * estimations n'en dépendent pas. Une lecture qui échoue se dit dans le
+   * bandeau ; elle ne ferme pas la porte. Voir `lib/db/attempt.ts`.
+   */
+  const [accessRead, storedRead, profileRead] = await Promise.all([
+    attempt("accès de la semaine", () => readAccess(), UNKNOWN_ACCESS),
+    userId
+      ? attempt(
+          "historique des estimations",
+          () => listEstimations(userId),
+          null,
+        )
+      : Promise.resolve({ value: null, failed: false }),
+    userId
+      ? attempt("profil", () => readProfile(userId), null)
+      : Promise.resolve({ value: null, failed: false }),
+  ]);
+
+  const access = accessRead.value;
   const stored = storedRead.value;
   const profile = profileRead.value;
   const degraded = accessRead.failed || storedRead.failed || profileRead.failed;

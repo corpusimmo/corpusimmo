@@ -104,12 +104,19 @@ export default async function MonEspacePage() {
       } => entry.tool !== undefined,
     );
 
-  const renews = access.quota.renewsAt
-    ? new Intl.DateTimeFormat("fr-FR", {
-        dateStyle: "long",
-        timeStyle: "short",
-      }).format(access.quota.renewsAt)
-    : null;
+  /*
+   * Même précaution que dans l'historique : `Intl.format()` LÈVE sur une date
+   * invalide, il ne rend pas « Invalid Date ». Un horodatage illisible venu de
+   * la base ferait tomber la page entière pour une ligne de texte.
+   */
+  const renewsAt = access.quota.renewsAt;
+  const renews =
+    renewsAt && !Number.isNaN(renewsAt.getTime())
+      ? new Intl.DateTimeFormat("fr-FR", {
+          dateStyle: "long",
+          timeStyle: "short",
+        }).format(renewsAt)
+      : null;
 
   return (
     <div className="bg-canvas py-8 md:py-12">

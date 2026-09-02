@@ -25,11 +25,30 @@ import Link from "next/link";
 import { Trash2 } from "lucide-react";
 
 import { Badge, Button, EmptyState, SkeletonText } from "@/components/ui";
-import { useEstimationHistory, type EstimationRecord } from "@/lib/history/estimations";
+import {
+  useEstimationHistory,
+  type EstimationRecord,
+} from "@/lib/history/estimations";
 import { formatArea, formatPrice, formatPricePerSqm } from "@/lib/utils/format";
 import { PROPERTY_TYPE_LABELS } from "@/types/property";
 
-const dateFormat = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short" });
+const dateFormat = new Intl.DateTimeFormat("fr-FR", {
+  dateStyle: "long",
+  timeStyle: "short",
+});
+
+/**
+ * UNE DATE QUI N'EN EST PAS UNE NE DOIT PAS EMPORTER LA PAGE.
+ *
+ * `Intl.DateTimeFormat.format()` ne rend pas « Invalid Date » : il LÈVE un
+ * `RangeError`. Une seule ligne d'historique dont l'horodatage est illisible —
+ * une migration, un import, une colonne nulle — et c'est tout l'espace compte
+ * qui tombe sur la page d'incident, pour une date.
+ */
+function formatDate(value: number): string | null {
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : dateFormat.format(date);
+}
 
 export function EstimationHistory({
   stored,
@@ -89,10 +108,12 @@ export function EstimationHistory({
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 <Badge tone="neutral" size="sm">
-                  {PROPERTY_TYPE_LABELS[record.propertyType]}
+                  {PROPERTY_TYPE_LABELS[record.propertyType] ?? "Bien"}
                 </Badge>
                 {record.surface > 0 ? (
-                  <span className="tnum text-sm text-ink-muted">{formatArea(record.surface)}</span>
+                  <span className="tnum text-sm text-ink-muted">
+                    {formatArea(record.surface)}
+                  </span>
                 ) : null}
                 {record.value ? null : (
                   <Badge tone="warning" size="sm">
@@ -101,14 +122,17 @@ export function EstimationHistory({
                 )}
               </div>
 
-              <p className="mt-1.5 truncate font-medium text-ink">{record.address}</p>
+              <p className="mt-1.5 truncate font-medium text-ink">
+                {record.address}
+              </p>
 
               <p className="tnum mt-0.5 text-sm text-ink-subtle">
-                {dateFormat.format(new Date(record.at))}
+                {formatDate(record.at) ?? "Date inconnue"}
                 {record.value ? (
                   <>
                     {" · "}
-                    {record.comparables} vente{record.comparables > 1 ? "s" : ""} retenue
+                    {record.comparables} vente
+                    {record.comparables > 1 ? "s" : ""} retenue
                     {record.comparables > 1 ? "s" : ""}
                     {" · "}confiance {record.confidence}/100
                   </>
@@ -120,7 +144,8 @@ export function EstimationHistory({
               {record.value ? (
                 <>
                   <p className="tnum font-display text-lg text-ink">
-                    {formatPrice(record.value.low)} à {formatPrice(record.value.high)}
+                    {formatPrice(record.value.low)} à{" "}
+                    {formatPrice(record.value.high)}
                   </p>
                   {record.pricePerSqm ? (
                     <p className="tnum text-sm text-ink-subtle">
@@ -137,7 +162,9 @@ export function EstimationHistory({
               <button
                 type="button"
                 onClick={() => forget(record.id)}
-                aria-label={`Effacer l'estimation du ${dateFormat.format(new Date(record.at))}`}
+                aria-label={`Effacer l'estimation${
+                  formatDate(record.at) ? ` du ${formatDate(record.at)}` : ""
+                }`}
                 className="inline-flex size-9 items-center justify-center rounded-sm text-ink-subtle transition-colors hover:bg-surface-2 hover:text-danger sm:mt-1"
               >
                 <Trash2 aria-hidden="true" className="size-4" />

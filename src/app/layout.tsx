@@ -23,7 +23,11 @@ import "./globals.css";
  * le registre institutionnel. Aucune police alternative n'est déclarée : la
  * direction artistique est figée, il n'y a rien à prévisualiser.
  */
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter", display: "swap" });
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -97,10 +101,27 @@ export const metadata: Metadata = {
     },
   },
   formatDetection: { telephone: false, address: false, email: false },
-  // Depuis iOS 16.4 Safari lit les icônes du manifeste, mais les versions
-  // antérieures ne connaissent que celle-ci : la déclarer coûte une ligne et
-  // évite une vignette pixelisée sur l'écran d'accueil d'un iPhone un peu âgé.
-  icons: { apple: "/icons/apple-touch-icon.png" },
+  /**
+   * LES ICÔNES, TOUTES DÉCLARÉES ICI — ET C'EST OBLIGATOIRE.
+   *
+   * `src/app/icon.svg` est une convention de fichier : Next pose tout seul le
+   * `<link rel="icon">` correspondant… tant que `metadata.icons` n'existe pas.
+   * Dès qu'on déclare ce champ, il REMPLACE ce que la convention aurait
+   * produit — il ne s'y ajoute pas. En ne nommant que l'icône Apple, on
+   * supprimait donc la favicon du site : `/icon.svg` répondait bien, mais
+   * aucune balise ne la désignait, et l'onglet restait vide.
+   *
+   * L'icône Apple, elle, doit rester déclarée : depuis iOS 16.4 Safari lit les
+   * icônes du manifeste, mais les versions antérieures ne connaissent que
+   * celle-ci, et une vignette pixelisée sur un écran d'accueil se remarque.
+   */
+  icons: {
+    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    shortcut: [
+      { url: "/icons/icone-192.png", type: "image/png", sizes: "192x192" },
+    ],
+    apple: "/icons/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {
@@ -116,9 +137,16 @@ export const viewport: Viewport = {
  * en rendu dynamique. Le site reste donc statique par défaut, ce dont un
  * domaine neuf a besoin.
  */
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html lang="fr" className={`${inter.variable} ${manrope.variable} ${sourceSerif.variable}`}>
+    <html
+      lang="fr"
+      className={`${inter.variable} ${manrope.variable} ${sourceSerif.variable}`}
+    >
       <body>
         {/* Les données structurées de SITE, posées une fois pour toutes les
             pages : l'éditeur et le site lui-même. Les schémas propres à une

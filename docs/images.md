@@ -70,6 +70,7 @@ emplacement. Aucune image n’est la photographie d’un lieu réel.
 | `/blog` | `bien-appartement-ancien-2.webp` | Colonne de droite de l’en-tête |
 | `/solutions` | `interieur-bureaux-plateau.webp` | Colonne de droite du héros, à partir de 1024 px |
 | `/solutions/*` (`marketing/offer-page.tsx`, prop `illustration`) | un `interieur-…` par offre | Colonne de droite de l’en-tête, à partir de 1024 px |
+| `/estimer` (`estimation/estimator-backdrop.tsx`) | un `bien-…` par typologie, un `ville-…`/`interieur-…` avant le choix | Fond fixe du parcours, à 28 % sous un voile de canvas, `alt=""`. Il change quand la typologie change : c’est un accusé de réception, pas une décoration. Le RÉSULTAT, lui, n’en porte aucune (règle du prix ci-dessous) |
 
 ## Les règles
 

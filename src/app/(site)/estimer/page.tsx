@@ -21,7 +21,10 @@ export const metadata: Metadata = pageMetadata({
 
 export default function EstimerPage() {
   return (
-    <div className="bg-canvas py-10 md:py-14">
+    // Pas de `bg-canvas` ici : le fond du parcours est une photographie posée
+    // par le wizard, en `fixed` derrière la page. Un aplat opaque la masquerait
+    // entièrement, ce qui était le cas jusqu'ici.
+    <div className="py-10 md:py-14">
       {/* L'estimateur est une application, pas un article : il se saisit, il
           calcule, il rend un résultat. Rien n'y est vendu et rien n'y est
           demandé, d'où l'accès libre déclaré. */}
@@ -38,20 +41,23 @@ export default function EstimerPage() {
         ]}
       />
       <div className="container-page">
-        <div className="mx-auto max-w-3xl">
+        <div className="mx-auto max-w-5xl">
           <p className="eyebrow">Estimation par comparaison</p>
           <h1 className="mt-2 font-display text-3xl leading-tight text-ink md:text-4xl">
             Combien vaut ce bien, d&apos;après les ventes réelles&nbsp;?
           </h1>
           <p className="mt-3 max-w-2xl leading-relaxed text-ink-muted">
-            Six questions. Nous cherchons ensuite les mutations enregistrées autour de l&apos;adresse,
-            écartons celles qui ne se comparent pas, et publions la méthode qui a produit le chiffre.
+            Six questions. Nous cherchons ensuite les mutations enregistrées
+            autour de l&apos;adresse, écartons celles qui ne se comparent pas,
+            et publions la méthode qui a produit le chiffre.
           </p>
 
           <div className="mt-8">
             {/* `useSearchParams` impose une frontière Suspense : sans elle, la page
                 entière basculerait en rendu dynamique. */}
-            <Suspense fallback={<LoadingState label="Préparation du parcours…" />}>
+            <Suspense
+              fallback={<LoadingState label="Préparation du parcours…" />}
+            >
               <EstimerClient />
             </Suspense>
           </div>

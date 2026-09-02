@@ -52,6 +52,35 @@ export const metadata: Metadata = pageMetadata({
   index: false,
 });
 
+/*
+ * DEUX FORMATEURS QUI NE LÈVENT JAMAIS.
+ *
+ * `Intl.DateTimeFormat.format()` ne rend pas « Invalid Date » : il LÈVE un
+ * `RangeError`. Cette page affiche QUATRE dates venues de la base — le
+ * renouvellement du quota, la date d'ouverture de chaque outil, et deux dans
+ * l'historique. Une seule illisible faisait tomber l'écran entier, alors qu'il
+ * s'agit à chaque fois d'une ligne en petits caractères.
+ *
+ * Les formateurs sont construits une fois, hors du composant : `Intl` est
+ * coûteux à instancier, et la page en créait un par outil débloqué.
+ */
+const DAY = new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" });
+const DAY_TIME = new Intl.DateTimeFormat("fr-FR", {
+  dateStyle: "long",
+  timeStyle: "short",
+});
+
+function formatDay(value: Date): string | null {
+  return Number.isNaN(value.getTime())
+    ? null
+    : `Ouvert le ${DAY.format(value)}`;
+}
+
+function formatDateTime(value: Date | null): string | null {
+  if (!value || Number.isNaN(value.getTime())) return null;
+  return DAY_TIME.format(value);
+}
+
 export default async function MonEspacePage() {
   // Pour une personne connectée, l'historique vient de la base et suit d'un
   // appareil à l'autre. Sinon il reste dans le navigateur, et la page le dit.
@@ -104,19 +133,7 @@ export default async function MonEspacePage() {
       } => entry.tool !== undefined,
     );
 
-  /*
-   * Même précaution que dans l'historique : `Intl.format()` LÈVE sur une date
-   * invalide, il ne rend pas « Invalid Date ». Un horodatage illisible venu de
-   * la base ferait tomber la page entière pour une ligne de texte.
-   */
-  const renewsAt = access.quota.renewsAt;
-  const renews =
-    renewsAt && !Number.isNaN(renewsAt.getTime())
-      ? new Intl.DateTimeFormat("fr-FR", {
-          dateStyle: "long",
-          timeStyle: "short",
-        }).format(renewsAt)
-      : null;
+  const renews = formatDateTime(access.quota.renewsAt);
 
   return (
     <div className="bg-canvas py-8 md:py-12">
@@ -237,10 +254,8 @@ export default async function MonEspacePage() {
                       {tool.title}
                     </Link>
                     <p className="tnum mt-0.5 text-sm text-ink-subtle">
-                      Ouvert le{" "}
-                      {new Intl.DateTimeFormat("fr-FR", {
-                        dateStyle: "long",
-                      }).format(new Date(grant.at * 1000))}
+                      {formatDay(new Date(grant.at * 1000)) ??
+                        "Date d'ouverture inconnue"}
                     </p>
                   </div>
                   <Button

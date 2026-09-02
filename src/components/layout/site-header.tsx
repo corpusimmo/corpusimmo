@@ -20,12 +20,7 @@ import { useCallback, useEffect, useId, useRef, useState } from "react";
 import { ChevronDown, Menu, X } from "lucide-react";
 
 import { Button } from "@/components/ui";
-import {
-  MODULE_STATUS_LABELS,
-  mainNav,
-  primaryCta,
-  secondaryNav,
-} from "@/config/navigation";
+import { MODULE_STATUS_LABELS, mainNav, primaryCta } from "@/config/navigation";
 import type { NavEntry, NavItem } from "@/config/navigation";
 import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils/cn";
@@ -101,7 +96,12 @@ export function SiteHeader() {
         Aller au contenu
       </a>
 
-      <div className="mx-auto flex h-14 max-w-[76rem] items-center justify-between gap-4 rounded-full border border-white/70 bg-surface/85 pr-2 pl-4 shadow-md backdrop-blur-xl md:h-15 md:pr-3 md:pl-6">
+      {/* TROIS COLONNES, et non `justify-between` : avec la marque à gauche et
+          deux actions à droite, la navigation se retrouvait poussée hors de
+          l'axe. Les deux colonnes latérales font `1fr` chacune, donc la
+          colonne centrale tombe au milieu de la barre quelle que soit la
+          largeur du lockup ou du nombre d'actions. */}
+      <div className="mx-auto grid h-14 max-w-[76rem] grid-cols-[auto_1fr_auto] items-center gap-4 rounded-full border border-white/70 bg-surface/85 pr-2 pl-4 shadow-md backdrop-blur-xl md:h-15 md:grid-cols-[1fr_auto_1fr] md:pr-3 md:pl-6">
         {/* `min-h-11` : le lockup dessine 38 px, et c'est la première cible de
             chaque page. Le bandeau fait 64 px, la hauteur est disponible. */}
         <Link
@@ -112,7 +112,7 @@ export function SiteHeader() {
           <BrandLockup markClassName="size-8" />
         </Link>
 
-        <div ref={navRef} className="hidden lg:block">
+        <div ref={navRef} className="hidden justify-self-center lg:block">
           <nav aria-label="Navigation principale">
             <ul className="flex items-center gap-1">
               {mainNav.map((entry) => (
@@ -150,7 +150,7 @@ export function SiteHeader() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-self-end">
           <AccountMenu className="hidden lg:inline-flex" />
           {/* `tap-target` : le CTA est dessiné en `sm` (36 px) pour ne pas
               écraser le bandeau, sa zone d'appui monte seule à 44 px. */}
@@ -306,21 +306,10 @@ function MobileMenu({
           ))}
         </ul>
 
-        {/* Ces quatre entrées sont des cibles isolées dans une liste, pas des
-            mots dans une phrase : elles prennent les 44 px, et l'écart entre
-            les lignes se resserre d'autant. */}
-        <ul className="mt-3 flex flex-wrap gap-x-5 gap-y-0.5">
-          {secondaryNav.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className="inline-flex min-h-11 items-center text-sm text-ink-muted hover:text-ink"
-              >
-                {item.label}
-              </Link>
-            </li>
-          ))}
-        </ul>
+        {/* Les entrées secondaires — à propos, mentions, confidentialité,
+            cookies — ne sont PLUS ici. Elles vivent au pied de page, où on les
+            cherche : dans un menu, elles diluaient les quatre entrées qui
+            mènent réellement au produit. */}
 
         <div className="mt-5 flex flex-col gap-3">
           <AccountMenu />

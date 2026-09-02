@@ -16,6 +16,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   ADDRESS_STEP,
+  USAGE_STEP,
   INITIAL_STATE,
   WIZARD_STEPS,
   hasProgress,
@@ -53,7 +54,13 @@ function link(addr: GeoAddress | null, usage?: string): URLSearchParams {
 }
 
 function draft(overrides: Partial<WizardState> = {}): WizardState {
-  return { ...INITIAL_STATE, usage: "residential", type: "apartment", step: 3, ...overrides };
+  return {
+    ...INITIAL_STATE,
+    usage: "residential",
+    type: "apartment",
+    step: 3,
+    ...overrides,
+  };
 }
 
 describe("resolveEntry", () => {
@@ -118,7 +125,9 @@ describe("resolveEntry", () => {
     const { state } = resolveEntry(null, link(null, "professional"));
 
     expect(state.usage).toBe("professional");
-    expect(state.step).toBe(1);
+    // Un pas APRÈS l'usage, pas « l'étape 1 » : depuis que l'adresse est
+    // passée en tête, ce numéro a changé une fois, il peut changer encore.
+    expect(state.step).toBe(USAGE_STEP + 1);
   });
 
   it("refuse un usage inventé", () => {
@@ -146,20 +155,34 @@ describe("les étapes réellement posées", () => {
     expect(steps).not.toContain(ADDRESS_STEP);
   });
 
-  it("saute l'étape d'adresse en avant comme en arrière", () => {
-    const state = { ...INITIAL_STATE, address: PAIX, addressLocked: true, step: ADDRESS_STEP - 1 };
-    const forward = nextStep(state);
+  it("ne ramène jamais à l'étape d'adresse quand elle est déjà connue", () => {
+    // L'adresse ouvre le parcours : quand elle est déjà répondue, le premier
+    // écran posé est l'usage, et « Retour » ne peut pas y revenir — il n'y a
+    // rien avant. C'est ce que l'ancien test vérifiait dans l'autre sens,
+    // quand l'adresse était en troisième position.
+    const known = {
+      ...INITIAL_STATE,
+      address: PAIX,
+      addressLocked: true,
+      step: USAGE_STEP,
+    };
 
-    expect(forward).toBe(ADDRESS_STEP + 1);
-    expect(previousStep({ ...state, step: forward })).toBe(ADDRESS_STEP - 1);
+    expect(visibleSteps(known)).not.toContain(ADDRESS_STEP);
+    expect(previousStep(known)).toBe(USAGE_STEP);
+    expect(nextStep(known)).toBe(USAGE_STEP + 1);
   });
 
   it("reconnaît la dernière étape dans les deux configurations", () => {
     const last = WIZARD_STEPS.length - 1;
     expect(isLastStep({ ...INITIAL_STATE, step: last })).toBe(true);
-    expect(isLastStep({ ...INITIAL_STATE, address: PAIX, addressLocked: true, step: last })).toBe(
-      true,
-    );
+    expect(
+      isLastStep({
+        ...INITIAL_STATE,
+        address: PAIX,
+        addressLocked: true,
+        step: last,
+      }),
+    ).toBe(true);
     expect(isLastStep({ ...INITIAL_STATE, step: last - 1 })).toBe(false);
   });
 });

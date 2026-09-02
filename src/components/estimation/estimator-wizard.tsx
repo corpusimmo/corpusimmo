@@ -45,7 +45,12 @@ import { EstimatorBackdrop } from "./estimator-backdrop";
 import { PropertyCard } from "./property-card";
 import {
   ADDRESS_STEP,
+  CONTACT_STEP,
+  FEATURES_STEP,
   INITIAL_STATE,
+  INTENT_STEP,
+  TYPE_STEP,
+  USAGE_STEP,
   WIZARD_STEPS,
   clearWizardState,
   isLastStep,
@@ -71,17 +76,18 @@ import {
  */
 const STEP_META: { title: string; subtitle: string }[] = [
   {
-    title: "Quel type de bien souhaitez-vous estimer ?",
+    title: "Quelle adresse souhaitez-vous estimer ?",
+    subtitle:
+      "C'est elle qui détermine les ventes que nous allons comparer. Rien d'autre n'est demandé sur cet écran.",
+  },
+  {
+    title: "S'agit-il d'un logement ou d'un local professionnel ?",
     subtitle:
       "Un logement et un local professionnel ne se valorisent pas de la même façon.",
   },
   {
     title: "Précisons la famille du bien",
     subtitle: "Nous n'afficherons ensuite que les questions utiles à ce type.",
-  },
-  {
-    title: "Où se situe-t-il ?",
-    subtitle: "L'adresse détermine les ventes que nous allons comparer.",
   },
   {
     title: "Décrivez le bien",
@@ -385,7 +391,7 @@ export function EstimatorWizard({ onResult }: EstimatorWizardProps) {
               event.preventDefault();
               // Sur l'étape d'adresse, la touche Entrée appartient à la combobox
               // tant qu'aucune adresse n'a été réellement choisie.
-              if (state.step === 2 && !state.address) return;
+              if (state.step === ADDRESS_STEP && !state.address) return;
               goNext();
             }}
             className="mt-6 rounded-lg border border-border bg-surface shadow-sm"
@@ -480,12 +486,24 @@ export function EstimatorWizard({ onResult }: EstimatorWizardProps) {
                 </div>
               ) : (
                 <div key={state.step} className="animate-fade-up">
-                  {state.step === 0 ? <StepUsage {...stepProps} /> : null}
-                  {state.step === 1 ? <StepType {...stepProps} /> : null}
-                  {state.step === 2 ? <StepAddress {...stepProps} /> : null}
-                  {state.step === 3 ? <StepFeatures {...stepProps} /> : null}
-                  {state.step === 4 ? <StepIntent {...stepProps} /> : null}
-                  {state.step === 5 ? <StepContact {...stepProps} /> : null}
+                  {state.step === ADDRESS_STEP ? (
+                    <StepAddress {...stepProps} />
+                  ) : null}
+                  {state.step === USAGE_STEP ? (
+                    <StepUsage {...stepProps} />
+                  ) : null}
+                  {state.step === TYPE_STEP ? (
+                    <StepType {...stepProps} />
+                  ) : null}
+                  {state.step === FEATURES_STEP ? (
+                    <StepFeatures {...stepProps} />
+                  ) : null}
+                  {state.step === INTENT_STEP ? (
+                    <StepIntent {...stepProps} />
+                  ) : null}
+                  {state.step === CONTACT_STEP ? (
+                    <StepContact {...stepProps} />
+                  ) : null}
                 </div>
               )}
             </div>

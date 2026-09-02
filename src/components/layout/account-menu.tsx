@@ -8,7 +8,18 @@ import { LogOut, UserRound } from "lucide-react";
 import { cn } from "@/lib/utils/cn";
 
 const LINK =
-  "inline-flex h-9 items-center gap-1.5 rounded-sm px-3 text-[0.9375rem] text-ink-muted transition-colors hover:text-ink";
+  "inline-flex h-9 items-center gap-1.5 rounded-full px-3 text-[0.9375rem] text-ink-muted transition-colors hover:bg-surface-3 hover:text-ink";
+
+/**
+ * « Connexion » EST UNE ACTION, pas une mention.
+ *
+ * En lien gris à côté d'un bouton bleu nuit, elle se lisait comme une note de
+ * bas de page : la seule porte vers un compte disparaissait dans le chrome.
+ * Elle prend donc la forme d'un bouton secondaire — pastille bordée, encre
+ * pleine — qui se distingue du CTA sans lui disputer la place.
+ */
+const SIGN_IN =
+  "inline-flex h-9 items-center gap-1.5 rounded-full border border-border-strong bg-surface px-4 text-[0.9375rem] font-medium text-ink transition-colors hover:border-primary hover:bg-primary-soft hover:text-primary-soft-fg";
 
 /**
  * Le coin compte de l'en-tête.
@@ -63,7 +74,7 @@ export function AccountMenu({ className }: { className?: string }) {
           <span className="lg:sr-only">Se déconnecter</span>
         </button>
       ) : (
-        <Link href="/connexion" className={LINK}>
+        <Link href="/connexion" className={SIGN_IN}>
           <UserRound aria-hidden="true" className="size-4" />
           Connexion
         </Link>

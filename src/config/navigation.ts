@@ -76,7 +76,8 @@ export const mainNav: NavEntry[] = [
         label: "Prix par commune",
         href: "/prix-immobilier",
         status: "live",
-        description: "Le prix au m² dans cent communes, sur les ventes enregistrées",
+        description:
+          "Le prix au m² dans cent communes, sur les ventes enregistrées",
       },
       {
         label: "Mes comparables",
@@ -133,7 +134,8 @@ export const unpublishedNav: NavEntry[] = [
   },
 ];
 
-/** Entrées secondaires : pied de page et menu de débordement. */
+/** Entrées secondaires. PIED DE PAGE UNIQUEMENT : dans le menu, elles
+ *  diluaient les entrées qui mènent au produit. */
 export const secondaryNav: NavItem[] = [
   { label: "À propos", href: "/a-propos" },
   { label: "Mentions légales", href: "/mentions-legales" },
@@ -142,11 +144,19 @@ export const secondaryNav: NavItem[] = [
 ];
 
 /** Le CTA persistant du header. */
-export const primaryCta = { label: "Estimer un bien", href: "/estimer" } as const;
+export const primaryCta = {
+  label: "Estimer un bien",
+  href: "/estimer",
+} as const;
 
 /** Version à plat, pour le contrôle de liens et la recherche. */
 export const mainNavFlat: NavItem[] = mainNav.flatMap((entry) => [
-  { label: entry.label, href: entry.href, status: entry.status, description: entry.description },
+  {
+    label: entry.label,
+    href: entry.href,
+    status: entry.status,
+    description: entry.description,
+  },
   ...(entry.children ?? []),
 ]);
 

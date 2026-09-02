@@ -33,9 +33,9 @@ import type { ValuationRequest } from "@/types/valuation";
  * avant de réclamer quoi que ce soit de localisant.
  */
 export const WIZARD_STEPS = [
+  "Adresse",
   "Usage",
   "Type de bien",
-  "Adresse",
   "Caractéristiques",
   "Votre projet",
   "Vos coordonnées",
@@ -67,7 +67,8 @@ export type ProfessionalPropertyType = Extract<
 >;
 
 /** Le type retenu, quelle que soit la branche. */
-export type WizardPropertyType = ResidentialPropertyType | ProfessionalPropertyType;
+export type WizardPropertyType =
+  ResidentialPropertyType | ProfessionalPropertyType;
 
 /** Occupé ou libre : un immeuble loué ne se valorise pas comme le même immeuble vide. */
 export type OccupancyAnswer = "occupied" | "vacant" | "";
@@ -170,7 +171,11 @@ export const INITIAL_STATE: WizardState = {
   intent: null,
   contact: { firstName: "", email: "", phone: "" },
   // No box is ever pre-ticked, including the one we need: consent must be an act.
-  consents: { estimationDelivery: false, professionalContact: false, marketing: false },
+  consents: {
+    estimationDelivery: false,
+    professionalContact: false,
+    marketing: false,
+  },
 };
 
 /** Props every step component receives from the wizard. */
@@ -193,7 +198,12 @@ function asString(value: unknown): string | undefined {
   return typeof value === "string" && value.length > 0 ? value : undefined;
 }
 
-const ADDRESS_KINDS: readonly string[] = ["housenumber", "street", "locality", "municipality"];
+const ADDRESS_KINDS: readonly string[] = [
+  "housenumber",
+  "street",
+  "locality",
+  "municipality",
+];
 
 /** Runtime-validates an address coming from a URL or from sessionStorage. */
 export function parseGeoAddress(value: unknown): GeoAddress | null {
@@ -235,7 +245,12 @@ export function parseGeoAddress(value: unknown): GeoAddress | null {
   };
 }
 
-const RESIDENTIAL_TYPES: readonly string[] = ["apartment", "house", "land", "other"];
+const RESIDENTIAL_TYPES: readonly string[] = [
+  "apartment",
+  "house",
+  "land",
+  "other",
+];
 
 const PROFESSIONAL_TYPES: readonly string[] = [
   "office",
@@ -245,7 +260,9 @@ const PROFESSIONAL_TYPES: readonly string[] = [
   "other",
 ];
 
-export function parseResidentialType(value: unknown): ResidentialPropertyType | null {
+export function parseResidentialType(
+  value: unknown,
+): ResidentialPropertyType | null {
   return typeof value === "string" && RESIDENTIAL_TYPES.includes(value)
     ? (value as ResidentialPropertyType)
     : null;
@@ -279,7 +296,10 @@ export function parseWizardType(value: unknown): WizardPropertyType | null {
  * l'adresse est déjà connue. Sauter par-dessus la bifurcation reviendrait à
  * choisir la méthode d'estimation à la place de la personne.
  */
-export function buildEstimatorHref(address: GeoAddress | null, usage?: PropertyUsage): string {
+export function buildEstimatorHref(
+  address: GeoAddress | null,
+  usage?: PropertyUsage,
+): string {
   const params = new URLSearchParams();
   if (address) params.set("address", JSON.stringify(address));
   if (usage) params.set("usage", usage);
@@ -288,24 +308,39 @@ export function buildEstimatorHref(address: GeoAddress | null, usage?: PropertyU
 }
 
 /**
- * L'ADRESSE, L'ÉTAPE OÙ ELLE EST DEMANDÉE, ET CE QUI ARRIVE QUAND LES DEUX
- * SE CONTREDISENT.
+ * L'ADRESSE EST LA PREMIÈRE QUESTION, et c'est un choix qui a changé.
  *
- * L'étape « Adresse » est en troisième position quand on part du formulaire :
- * deux choix fermés l'ont précédée, le parcours a montré qu'il savait de quoi
- * il parlait avant de demander quoi que ce soit de localisant.
+ * Elle était en troisième position, après l'usage et le type : deux choix
+ * fermés d'abord, pour que le parcours montre qu'il savait de quoi il parlait
+ * avant de demander quoi que ce soit de localisant. L'argument tenait, mais il
+ * en ignorait un autre, plus fort : l'adresse est la réponse qui porte le plus
+ * de valeur, pour la personne comme pour nous. C'est elle qui détermine les
+ * ventes comparées, c'est elle qu'on vient chercher, et un parcours abandonné
+ * à l'écran 2 sans elle ne laisse rien d'exploitable.
  *
- * Mais on peut aussi arriver AVEC une adresse, depuis la barre de recherche de
- * l'accueil. Elle est alors déjà répondue : la reposer au troisième écran
- * donnerait le sentiment de n'avoir pas été écouté. On la marque donc validée
- * (`addressLocked`), on l'affiche en tête, et l'étape est sautée.
+ * La conséquence à ne pas oublier : ce premier écran demande une donnée
+ * personnelle avant toute autre. Il ne réclame donc RIEN d'autre, et la page
+ * dit à quoi elle sert avant de le demander.
+ *
+ * Quand on arrive AVEC une adresse, depuis la barre de recherche de l'accueil,
+ * elle est déjà répondue : on la marque validée (`addressLocked`), on l'affiche
+ * en tête, et l'étape est sautée — le parcours commence alors à l'usage.
  */
 export const ADDRESS_STEP = WIZARD_STEPS.indexOf("Adresse");
+
+/** Les autres étapes, nommées elles aussi : un numéro en dur se périme au
+ *  premier réordonnancement, ce qui vient précisément d'arriver. */
+export const USAGE_STEP = WIZARD_STEPS.indexOf("Usage");
+export const TYPE_STEP = WIZARD_STEPS.indexOf("Type de bien");
+export const FEATURES_STEP = WIZARD_STEPS.indexOf("Caractéristiques");
+export const INTENT_STEP = WIZARD_STEPS.indexOf("Votre projet");
+export const CONTACT_STEP = WIZARD_STEPS.indexOf("Vos coordonnées");
 
 /** Les étapes réellement posées : l'adresse disparaît quand elle est déjà connue. */
 export function visibleSteps(state: WizardState): number[] {
   return WIZARD_STEPS.map((_, index) => index).filter(
-    (index) => !(index === ADDRESS_STEP && state.addressLocked && state.address),
+    (index) =>
+      !(index === ADDRESS_STEP && state.addressLocked && state.address),
   );
 }
 
@@ -339,7 +374,10 @@ export function hasProgress(state: WizardState | null): boolean {
 }
 
 /** Deux adresses désignent-elles le même bien ? L'identifiant BAN fait foi. */
-export function sameAddress(a: GeoAddress | null, b: GeoAddress | null): boolean {
+export function sameAddress(
+  a: GeoAddress | null,
+  b: GeoAddress | null,
+): boolean {
   if (!a || !b) return a === b;
   if (a.id && b.id) return a.id === b.id;
   return a.label.trim().toLowerCase() === b.label.trim().toLowerCase();
@@ -386,13 +424,17 @@ export function resolveEntry(
   const fresh: WizardState = {
     ...INITIAL_STATE,
     ...(linkedAddress ? { address: linkedAddress, addressLocked: true } : {}),
-    ...(linkedUsage ? { usage: linkedUsage, step: 1 } : {}),
+    ...(linkedUsage ? { usage: linkedUsage, step: USAGE_STEP + 1 } : {}),
   };
 
   if (!hasProgress(stored) || !stored) return { state: fresh };
 
   // Le lien apporte une AUTRE adresse que celle en cours : on demande.
-  if (linkedAddress && stored.address && !sameAddress(linkedAddress, stored.address)) {
+  if (
+    linkedAddress &&
+    stored.address &&
+    !sameAddress(linkedAddress, stored.address)
+  ) {
     return { state: stored, conflict: { draft: stored, fresh } };
   }
 
@@ -402,7 +444,11 @@ export function resolveEntry(
     merged = { ...merged, address: linkedAddress, addressLocked: true };
   }
   if (linkedUsage && !merged.usage) {
-    merged = { ...merged, usage: linkedUsage, step: Math.max(merged.step, 1) };
+    merged = {
+      ...merged,
+      usage: linkedUsage,
+      step: Math.max(merged.step, USAGE_STEP + 1),
+    };
   }
 
   // Un pas resté sur l'étape d'adresse alors qu'elle est désormais validée
@@ -446,39 +492,67 @@ export function loadWizardState(): WizardState | null {
     const consents = isRecord(parsed.consents) ? parsed.consents : {};
 
     return {
-      step: typeof parsed.step === "number" ? Math.min(Math.max(parsed.step, 0), STEP_COUNT - 1) : 0,
+      step:
+        typeof parsed.step === "number"
+          ? Math.min(Math.max(parsed.step, 0), STEP_COUNT - 1)
+          : 0,
       address: parseGeoAddress(parsed.address),
-      addressLocked: parsed.addressLocked === true && parseGeoAddress(parsed.address) !== null,
+      addressLocked:
+        parsed.addressLocked === true &&
+        parseGeoAddress(parsed.address) !== null,
       usage:
-        parsed.usage === "residential" || parsed.usage === "professional" ? parsed.usage : null,
+        parsed.usage === "residential" || parsed.usage === "professional"
+          ? parsed.usage
+          : null,
       type: parseWizardType(parsed.type),
-      otherType: typeof parsed.otherType === "string" ? (parsed.otherType as PropertyType) : null,
+      otherType:
+        typeof parsed.otherType === "string"
+          ? (parsed.otherType as PropertyType)
+          : null,
       features: {
         ...EMPTY_FEATURES,
-        livingArea: typeof features.livingArea === "string" ? features.livingArea : "",
+        livingArea:
+          typeof features.livingArea === "string" ? features.livingArea : "",
         divisible: features.divisible === true,
         occupancy:
           features.occupancy === "occupied" || features.occupancy === "vacant"
             ? features.occupancy
             : "",
-        annualRent: typeof features.annualRent === "string" ? features.annualRent : "",
-        parkingSpaces: typeof features.parkingSpaces === "string" ? features.parkingSpaces : "",
-        landArea: typeof features.landArea === "string" ? features.landArea : "",
+        annualRent:
+          typeof features.annualRent === "string" ? features.annualRent : "",
+        parkingSpaces:
+          typeof features.parkingSpaces === "string"
+            ? features.parkingSpaces
+            : "",
+        landArea:
+          typeof features.landArea === "string" ? features.landArea : "",
         rooms: typeof features.rooms === "string" ? features.rooms : "",
-        bedrooms: typeof features.bedrooms === "string" ? features.bedrooms : "",
+        bedrooms:
+          typeof features.bedrooms === "string" ? features.bedrooms : "",
         floor: typeof features.floor === "string" ? features.floor : "",
         hasElevator: features.hasElevator === true,
         hasParking: features.hasParking === true,
         hasGarage: features.hasGarage === true,
-        outdoor: typeof features.outdoor === "string" ? (features.outdoor as OutdoorFeature) : "",
+        outdoor:
+          typeof features.outdoor === "string"
+            ? (features.outdoor as OutdoorFeature)
+            : "",
         condition:
-          typeof features.condition === "string" ? (features.condition as PropertyCondition) : "",
+          typeof features.condition === "string"
+            ? (features.condition as PropertyCondition)
+            : "",
         buildable:
-          features.buildable === "yes" || features.buildable === "no" ? features.buildable : "unknown",
+          features.buildable === "yes" || features.buildable === "no"
+            ? features.buildable
+            : "unknown",
       },
-      intent: typeof parsed.intent === "string" ? (parsed.intent as ProjectIntent) : null,
+      intent:
+        typeof parsed.intent === "string"
+          ? (parsed.intent as ProjectIntent)
+          : null,
       contact: {
-        firstName: typeof contact.firstName === "string" ? contact.firstName : "",
+        firstName:
+          typeof contact.firstName === "string" ? contact.firstName : "",
         email: typeof contact.email === "string" ? contact.email : "",
         phone: typeof contact.phone === "string" ? contact.phone : "",
       },
@@ -541,7 +615,8 @@ function requireArea(
 ): void {
   const parsed = parseNumber(value);
   if (parsed === undefined) {
-    errors[field] = `Indiquez ${label}. C’est la donnée qui pèse le plus dans le calcul.`;
+    errors[field] =
+      `Indiquez ${label}. C’est la donnée qui pèse le plus dans le calcul.`;
     return;
   }
   if (parsed <= 0) {
@@ -549,30 +624,39 @@ function requireArea(
     return;
   }
   if (parsed > max) {
-    errors[field] = `Cette surface paraît hors norme. Vérifiez la valeur saisie (max ${max} m²).`;
+    errors[field] =
+      `Cette surface paraît hors norme. Vérifiez la valeur saisie (max ${max} m²).`;
   }
 }
 
 export function validateStep(step: number, state: WizardState): WizardErrors {
   const errors: WizardErrors = {};
 
-  if (step === 0 && !state.usage) {
-    errors.usage = "Indiquez s'il s'agit d'un bien résidentiel ou professionnel.";
+  if (step === USAGE_STEP && !state.usage) {
+    errors.usage =
+      "Indiquez s'il s'agit d'un bien résidentiel ou professionnel.";
   }
 
-  if (step === 1 && !state.type) {
+  if (step === TYPE_STEP && !state.type) {
     errors.type = "Sélectionnez le type de bien à estimer.";
   }
 
-  if (step === 2 && !state.address) {
-    errors.address = "Choisissez une adresse dans la liste de suggestions pour continuer.";
+  if (step === ADDRESS_STEP && !state.address) {
+    errors.address =
+      "Choisissez une adresse dans la liste de suggestions pour continuer.";
   }
 
-  if (step === 3) {
+  if (step === FEATURES_STEP) {
     const { features, type } = state;
 
     if (type === "apartment" || type === "house") {
-      requireArea(features.livingArea, "livingArea", "la surface habitable", errors, 5_000);
+      requireArea(
+        features.livingArea,
+        "livingArea",
+        "la surface habitable",
+        errors,
+        5_000,
+      );
       const rooms = parseNumber(features.rooms);
       if (rooms === undefined) {
         errors.rooms = "Indiquez le nombre de pièces principales.";
@@ -581,7 +665,8 @@ export function validateStep(step: number, state: WizardState): WizardErrors {
       }
       const bedrooms = parseNumber(features.bedrooms);
       if (bedrooms !== undefined && rooms !== undefined && bedrooms > rooms) {
-        errors.bedrooms = "Il ne peut pas y avoir plus de chambres que de pièces principales.";
+        errors.bedrooms =
+          "Il ne peut pas y avoir plus de chambres que de pièces principales.";
       }
     }
 
@@ -593,7 +678,12 @@ export function validateStep(step: number, state: WizardState): WizardErrors {
     }
 
     if (type === "land") {
-      requireArea(features.landArea, "landArea", "la surface du terrain", errors);
+      requireArea(
+        features.landArea,
+        "landArea",
+        "la surface du terrain",
+        errors,
+      );
     }
 
     /*
@@ -607,12 +697,21 @@ export function validateStep(step: number, state: WizardState): WizardErrors {
      * parcours pour de bon.
      */
     const isTertiaryBuilding =
-      state.type === "office" || state.type === "retail" || state.type === "business_premises";
+      state.type === "office" ||
+      state.type === "retail" ||
+      state.type === "business_premises";
 
     if (state.usage === "professional" && isTertiaryBuilding) {
-      requireArea(features.livingArea, "livingArea", "la surface utile", errors, 200_000);
+      requireArea(
+        features.livingArea,
+        "livingArea",
+        "la surface utile",
+        errors,
+        200_000,
+      );
       if (!features.occupancy) {
-        errors.occupancy = "Indiquez si le bien est occupé ou libre : la méthode d'estimation en dépend.";
+        errors.occupancy =
+          "Indiquez si le bien est occupé ou libre : la méthode d'estimation en dépend.";
       }
       if (features.occupancy === "occupied") {
         const loyer = parseNumber(features.annualRent);
@@ -627,25 +726,33 @@ export function validateStep(step: number, state: WizardState): WizardErrors {
       if (!state.otherType) {
         errors.otherType = "Précisez la nature du bien.";
       }
-      requireArea(features.livingArea, "livingArea", "la surface du bien", errors, 50_000);
+      requireArea(
+        features.livingArea,
+        "livingArea",
+        "la surface du bien",
+        errors,
+        50_000,
+      );
     }
   }
 
-  if (step === 4 && !state.intent) {
+  if (step === INTENT_STEP && !state.intent) {
     errors.intent = "Indiquez le motif de votre demande pour continuer.";
   }
 
-  if (step === 5) {
+  if (step === CONTACT_STEP) {
     const { contact, consents } = state;
     if (contact.firstName.trim().length < 2) {
       errors.firstName = "Indiquez votre prénom (2 caractères minimum).";
     }
     if (!EMAIL_RE.test(contact.email.trim())) {
-      errors.email = "Saisissez une adresse e-mail valide, par exemple prenom@exemple.fr";
+      errors.email =
+        "Saisissez une adresse e-mail valide, par exemple prenom@exemple.fr";
     }
     const phone = contact.phone.replace(/[\s.\-()]/g, "");
     if (phone.length > 0 && !PHONE_RE.test(phone)) {
-      errors.phone = "Numéro non reconnu. Format attendu : 06 12 34 56 78 (facultatif).";
+      errors.phone =
+        "Numéro non reconnu. Format attendu : 06 12 34 56 78 (facultatif).";
     }
     if (!consents.estimationDelivery) {
       errors.estimationDelivery =
@@ -718,7 +825,9 @@ export function toPropertyFeatures(state: WizardState): PropertyFeatures {
   return result;
 }
 
-export function toValuationRequest(state: WizardState): ValuationRequest | null {
+export function toValuationRequest(
+  state: WizardState,
+): ValuationRequest | null {
   const type = resolvePropertyType(state);
   if (!type || !state.address) return null;
 

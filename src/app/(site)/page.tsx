@@ -1,23 +1,15 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
-import {
-  ArrowRight,
-  Layers,
-  Map as MapIcon,
-  Scale,
-  Table2,
-} from "lucide-react";
+import { ArrowRight } from "lucide-react";
 
 import { MethodDiagram, RadiusEscalation } from "@/components/illustrations";
 import { CorpusStrip } from "@/components/marketing/corpus-strip";
 import { HeroAddressSearch } from "@/components/marketing/hero-address-search";
-import { HeroExhibit } from "@/components/marketing/hero-exhibit";
 import { HeroSlideshow } from "@/components/marketing/hero-slideshow";
+import { ToolsShowcase } from "@/components/marketing/tools-showcase";
 import { TypologyStrip } from "@/components/marketing/typology-strip";
 import { Button } from "@/components/ui";
 import { disclaimers, siteConfig } from "@/config/site";
-import { publishedCities } from "@/lib/cities/dataset";
 import { SITE_DESCRIPTION, SITE_TITLE, pageMetadata } from "@/lib/seo/metadata";
 
 /**
@@ -38,18 +30,6 @@ export const metadata: Metadata = pageMetadata({
 });
 
 /**
- * LA COMMUNE DE LA PIÈCE À CONVICTION.
- *
- * Nantes, parce que son marché est profond (plus de vingt mille ventes
- * d'appartements exploitables), lisible (une seule commune, pas d'arrondissement
- * à expliquer), et que sa dispersion illustre bien ce qu'une médiane cache. Le
- * jour où une autre commune conviendra mieux, c'est une constante à changer.
- * Si elle venait à sortir du jeu de données, la pièce disparaît proprement au
- * lieu d'afficher un cadre vide.
- */
-const EXHIBIT_CITY = "nantes";
-
-/**
  * L'accueil, en une seule colonne et pour tout le monde.
  *
  * Pas de porte « Particulier / Professionnel » : les deux audiences utilisent
@@ -64,30 +44,34 @@ const EXHIBIT_CITY = "nantes";
  * chiffré ici est calculé au build depuis le jeu de données versionné.
  */
 export default function HomePage() {
-  const exhibit = publishedCities().find((city) => city.slug === EXHIBIT_CITY);
-
   return (
     <>
       {/* ───────────────────────────────────────────────────────────── hero */}
-      <section className="relative isolate overflow-hidden bg-surface-inverted text-ink-inverted">
+      {/* Le héros REMONTE SOUS LA BARRE flottante : sans ça, la bande de canvas
+          qui la porte se lit comme un bandeau gris posé au-dessus de la photo,
+          c'est-à-dire exactement ce que la barre flottante venait supprimer.
+          Les valeurs compensent la hauteur du chrome (12 + 56 + 8 px, puis
+          16 + 60 + 8 px à partir de 768 px) et sont reprises en padding pour
+          que le contenu, lui, ne bouge pas. */}
+      <section className="relative isolate -mt-[76px] overflow-hidden bg-surface-inverted pt-[76px] text-ink-inverted md:-mt-[84px] md:pt-[84px]">
         <HeroSlideshow />
 
-        <div className="container-page relative grid gap-12 pt-14 pb-24 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-16 lg:pt-20 lg:pb-32 [&>*]:min-w-0">
-          <div>
-            {/* Sur le voile marine, la pastille passe en réserve : fond blanc
-                translucide, texte or clair. */}
+        <div className="container-page relative py-16 md:py-24 lg:py-28">
+          {/* UNE SEULE COLONNE, et aucun chiffre de commune. Le relevé de
+              ventes qui occupait la droite était celui de Nantes : sur un site
+              national, il faisait lire le produit comme un service nantais à
+              tous ceux qui n'y habitent pas. La mesure du corpus, elle, est
+              nationale et vit dans le bandeau juste en dessous. */}
+          <div className="max-w-3xl">
             <p className="eyebrow !bg-white/10 !text-[color:var(--accent-rule)] backdrop-blur-sm">
               {siteConfig.signature}
             </p>
             <h1 className="mt-6 font-display text-[2.75rem] leading-[1.02] font-extrabold text-ink-inverted md:text-[3.75rem] lg:text-[4.25rem]">
               Ce qui s&apos;est vraiment vendu, et à quel prix
             </h1>
-            {/* Deux lignes, pas six. L'écart annonce / acte est l'argument entier
-                du produit ; le détail (les typologies, la méthode) est repris
-                plus bas, où il a la place d'être démontré. */}
-            <p className="mt-5 max-w-md text-lg leading-relaxed text-white/80">
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">
               Des actes, pas des annonces&nbsp;: les mutations enregistrées par
-              la DGFiP, publiées en open data.
+              la DGFiP, publiées en open data. Partout en France.
             </p>
 
             <div className="mt-9 max-w-xl">
@@ -97,87 +81,15 @@ export default function HomePage() {
               </p>
             </div>
           </div>
-
-          {exhibit ? (
-            <div className="min-w-0 lg:pl-4">
-              <HeroExhibit city={exhibit} />
-            </div>
-          ) : null}
         </div>
       </section>
 
       <CorpusStrip />
 
+      {/* Ce que le site fait passe avant comment il le fait. */}
+      <ToolsShowcase />
+
       <TypologyStrip />
-
-      {/* ──────────────────────────────────────────────────────── les outils */}
-      <section
-        aria-labelledby="outils"
-        className="container-page py-16 md:py-24"
-      >
-        <div className="max-w-2xl">
-          <p className="eyebrow">Quatre entrées</p>
-          <h2
-            id="outils"
-            className="mt-3 font-display text-3xl leading-tight text-ink md:text-4xl"
-          >
-            Quatre façons d&apos;entrer dans la donnée
-          </h2>
-          <p className="mt-4 leading-relaxed text-ink-muted">
-            L&apos;estimateur, la carte et l&apos;observatoire sont ouverts sans
-            compte, parce qu&apos;un outil qu&apos;on ne peut pas essayer ne
-            prouve rien. Les dix calculateurs se consultent librement et
-            s&apos;utilisent une fois connecté.
-          </p>
-        </div>
-
-        {/* Quatre colonnes égales : une carte plus large que les autres
-            laissait un trou dans la grille à partir de 1024 px. L'entrée
-            principale se distingue par sa teinte et son filet, pas par sa
-            taille. */}
-        <ul className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {ENTRIES.map((entry, index) => (
-            <li key={entry.href}>
-              <Link
-                href={entry.href}
-                className={
-                  "group relative flex h-full flex-col gap-4 overflow-hidden rounded-lg border border-border p-7 shadow-xs transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md " +
-                  (index === 0 ? "bg-surface-3" : "bg-surface")
-                }
-              >
-                {/* Le filet bronze : permanent sur l'entrée principale, allumé
-                    au survol sur les autres. La sélection, dans le vocabulaire
-                    de la marque. */}
-                <span
-                  aria-hidden="true"
-                  className={
-                    "absolute inset-x-0 top-0 h-0.5 origin-left bg-accent-rule transition-transform duration-300 ease-out group-hover:scale-x-100 " +
-                    (index === 0 ? "scale-x-100" : "scale-x-0")
-                  }
-                />
-                <span className="grid size-11 place-items-center rounded-md bg-primary-soft text-primary">
-                  <entry.icon aria-hidden="true" className="size-5" />
-                </span>
-                <div className="flex flex-1 flex-col gap-2">
-                  <h3 className="font-display text-xl leading-snug text-ink">
-                    {entry.title}
-                  </h3>
-                  <p className="text-sm leading-relaxed text-ink-muted">
-                    {entry.body}
-                  </p>
-                </div>
-                <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
-                  {entry.cta}
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="size-4 transition-transform group-hover:translate-x-0.5"
-                  />
-                </span>
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </section>
 
       {/* ──────────────────────────────────────────────────────── la méthode */}
       <section aria-labelledby="methode" className="container-page">
@@ -368,37 +280,6 @@ export default function HomePage() {
     </>
   );
 }
-
-const ENTRIES = [
-  {
-    href: "/estimer",
-    icon: Scale,
-    title: "Estimer un bien",
-    body: "Six questions, puis une fourchette calculée sur les ventes comparables du secteur, avec le détail de ce qui a été retenu et de ce qui a été écarté.",
-    cta: "Lancer une estimation",
-  },
-  {
-    href: "/carte",
-    icon: MapIcon,
-    title: "La carte des ventes",
-    body: "Toutes les mutations enregistrées, à l'échelle de la rue. Prix, surface, date, type de bien. Plein écran, sans compte, sans limite de consultation.",
-    cta: "Ouvrir la carte",
-  },
-  {
-    href: "/observatoire",
-    icon: Table2,
-    title: "L'observatoire",
-    body: "La même donnée, augmentée : prix médian au m², volumes, dispersion, recherche tabulaire et sélection de comparables qui vous suit d'un écran à l'autre.",
-    cta: "Explorer le marché",
-  },
-  {
-    href: "/outils",
-    icon: Layers,
-    title: "Dix outils de calcul",
-    body: "Rentabilité locative, coût réel d'un prêt, arbitrage fiscal, DCF sur dix ans, charge foncière, WAULT… avec les barèmes affichés et modifiables.",
-    cta: "Voir les outils",
-  },
-] as const;
 
 const METHOD = [
   {

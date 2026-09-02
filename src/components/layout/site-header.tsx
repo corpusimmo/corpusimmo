@@ -73,21 +73,35 @@ export function SiteHeader() {
   }, [openMenu, close]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border/70 bg-surface/80 backdrop-blur-xl supports-[backdrop-filter]:bg-surface/70">
-      {/* Le filet or en tête de page : un trait de deux pixels, c'est toute
-          la part institutionnelle que le chrome se permet. */}
+    // Une barre FLOTTANTE, pas un bandeau : la page passe autour d'elle et
+    // sous elle. Le verre dépoli la garde lisible aussi bien sur le héros
+    // sombre de l'accueil que sur le canvas clair des autres pages, sans
+    // qu'aucune page n'ait à déclarer quoi que ce soit.
+    <header className="sticky top-0 z-40 px-3 pt-3 pb-2 md:px-6 md:pt-4">
+      {/* Le filet or, sur le bord même de la fenêtre : la seule pièce du
+          chrome qui touche encore les deux bords, et toute la part
+          institutionnelle que la barre se permet. */}
       <div
         aria-hidden="true"
-        className="h-0.5 w-full bg-[linear-gradient(90deg,var(--accent-rule),var(--accent)_45%,var(--accent-rule))]"
+        className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-[linear-gradient(90deg,var(--accent-rule),var(--accent)_45%,var(--accent-rule))]"
+      />
+      {/* Un voile de flou SANS teinte derrière la barre : il adoucit le
+          filet de page qui passe dans la gouttière, au-dessus et autour de
+          la pastille, et il fonctionne aussi bien sur le héros sombre que
+          sur le canvas clair, précisément parce qu'il ne colore rien. Le
+          masque le fait disparaître avant le bas du bandeau. */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10 backdrop-blur-[6px] [mask-image:linear-gradient(180deg,black_55%,transparent)]"
       />
       <a
         href="#contenu"
-        className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-3 focus:z-50 focus:rounded-sm focus:bg-primary focus:px-3 focus:py-2 focus:text-sm focus:text-primary-fg"
+        className="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-5 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:text-primary-fg"
       >
         Aller au contenu
       </a>
 
-      <div className="container-page flex h-16 items-center justify-between gap-4">
+      <div className="mx-auto flex h-14 max-w-[76rem] items-center justify-between gap-4 rounded-full border border-white/70 bg-surface/85 pr-2 pl-4 shadow-md backdrop-blur-xl md:h-15 md:pr-3 md:pl-6">
         {/* `min-h-11` : le lockup dessine 38 px, et c'est la première cible de
             chaque page. Le bandeau fait 64 px, la hauteur est disponible. */}
         <Link
@@ -256,11 +270,13 @@ function MobileMenu({
   onClose: () => void;
 }) {
   return (
+    // Le panneau flotte lui aussi, sous la barre : posé sur la page, il
+    // reprendrait un bandeau que la barre vient justement d'abandonner.
     <div
       id="menu-mobile"
-      className="animate-fade-in border-t border-border bg-surface lg:hidden"
+      className="animate-fade-in mx-auto mt-2 max-w-[76rem] rounded-2xl border border-white/70 bg-surface/95 shadow-lg backdrop-blur-xl lg:hidden"
     >
-      <div className="container-page flex items-center justify-between py-3">
+      <div className="flex items-center justify-between px-5 py-3">
         <span className="eyebrow">Navigation</span>
         <button
           type="button"
@@ -272,7 +288,7 @@ function MobileMenu({
         </button>
       </div>
 
-      <nav aria-label="Navigation principale" className="container-page pb-6">
+      <nav aria-label="Navigation principale" className="px-5 pb-6">
         <ul className="divide-y divide-border-soft">
           {mainNav.map((entry) => (
             <li key={entry.href} className="py-2">

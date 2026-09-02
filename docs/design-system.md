@@ -71,6 +71,25 @@ sections suivantes, qui ont la place de la porter.
 
 ---
 
+## L'ordre de l'accueil
+
+La page dit **ce que le site fait** avant **comment il le fait**, et ne montre
+**aucun chiffre local**.
+
+1. le héros et la recherche d'adresse, sur le diaporama ;
+2. le bandeau du corpus : quatre bornes nationales, pas une commune ;
+3. `ToolsShowcase` : les quatre entrées ouvertes, puis les dix calculateurs
+   nommés un par un, avec une capture réelle d'un classeur ;
+4. `TypologyStrip` : les typologies couvertes, en images ;
+5. la méthode, l'engagement, les limites des données, puis les professionnels.
+
+Pourquoi cet ordre : le relevé de ventes d'une commune occupait la droite du
+héros, et sur un site national il faisait lire le produit comme un service
+local à tous ceux qui n'y habitent pas. La méthode, elle, ne convainc que
+quelqu'un qui sait déjà ce qu'on lui propose de faire.
+
+---
+
 ## Le logotype
 
 **Un titre de propriété.** C'est la seule forme où les deux moitiés du nom ne

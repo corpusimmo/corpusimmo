@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { signOut, useSession } from "next-auth/react";
-import { LayoutGrid, LogOut, UserRound } from "lucide-react";
+import { LogOut, UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils/cn";
 
@@ -13,10 +13,10 @@ const LINK =
 /**
  * Le coin compte de l'en-tête.
  *
- * « Mon espace » est rendu TOUT DE SUITE, sans attendre la session : l'espace
- * ne demande pas de compte, il relit un cookie signé et le stockage du
- * navigateur. Le faire dépendre de l'authentification laisserait croire à une
- * porte fermée là où il n'y en a pas.
+ * « MON ESPACE » N'APPARAÎT QU'UNE FOIS CONNECTÉ. Le lien mène à un tableau de
+ * bord personnel : le montrer à un visiteur anonyme lui promet un espace qui
+ * n'est pas le sien, et l'envoie sur une page qui n'a rien à lui dire. Tant que
+ * la session n'a livré personne, le bandeau ne propose que « Connexion ».
  *
  * Une fois la personne connectée, sa photo prend la place du pictogramme dans
  * ce même lien : un seul chemin vers l'espace, et non deux liens côte à côte
@@ -24,7 +24,7 @@ const LINK =
  * pictogramme sur le bandeau (le libellé est lu par les lecteurs d'écran et
  * s'affiche en toutes lettres dans le menu mobile, où la place ne manque pas).
  *
- * Le reste ne rend RIEN tant que la session n'est pas résolue. Afficher
+ * Rien n'est rendu tant que la session n'est pas résolue. Afficher
  * « Connexion » puis le remplacer par une photo une demi-seconde plus tard
  * fait sauter la barre et donne l'impression d'un site mal réveillé ; sur la
  * plupart des visites la réponse est « personne », donc l'attente ne coûte
@@ -36,14 +36,19 @@ export function AccountMenu({ className }: { className?: string }) {
 
   return (
     <div className={cn("flex items-center gap-1", className)}>
-      <Link href="/mon-espace" className={LINK} title={user?.email ?? undefined}>
-        {user ? (
-          <Avatar src={user.image ?? null} name={user.name ?? user.email ?? "Compte"} />
-        ) : (
-          <LayoutGrid aria-hidden="true" className="size-4" />
-        )}
-        Mon espace
-      </Link>
+      {user ? (
+        <Link
+          href="/mon-espace"
+          className={LINK}
+          title={user.email ?? undefined}
+        >
+          <Avatar
+            src={user.image ?? null}
+            name={user.name ?? user.email ?? "Compte"}
+          />
+          Mon espace
+        </Link>
+      ) : null}
 
       {status === "loading" ? (
         <span aria-hidden="true" className="h-9 w-9" />

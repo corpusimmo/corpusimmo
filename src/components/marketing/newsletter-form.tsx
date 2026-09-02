@@ -32,7 +32,8 @@ export function NewsletterForm() {
     return (
       <p className="flex items-center gap-2 text-sm text-white/85">
         <CheckCircle2 aria-hidden="true" className="size-4 shrink-0" />
-        C&apos;est noté. Vous pouvez vous désinscrire en un clic depuis n&apos;importe quel envoi.
+        C&apos;est noté. Vous pouvez vous désinscrire en un clic depuis
+        n&apos;importe quel envoi.
       </p>
     );
   }
@@ -52,10 +53,15 @@ export function NewsletterForm() {
             body: JSON.stringify({ email: email.trim(), consent }),
           });
 
-          const payload = (await response.json().catch(() => null)) as SubscribeResponse | null;
+          const payload = (await response
+            .json()
+            .catch(() => null)) as SubscribeResponse | null;
 
           if (!response.ok) {
-            setMessage(payload?.error?.message ?? "L'inscription n'a pas abouti. Réessayez.");
+            setMessage(
+              payload?.error?.message ??
+                "L'inscription n'a pas abouti. Réessayez.",
+            );
             setStatus("error");
             return;
           }
@@ -76,7 +82,10 @@ export function NewsletterForm() {
             return;
           }
 
-          track({ name: "newsletter_subscribed", params: { source: "pied-de-page" } });
+          track({
+            name: "newsletter_subscribed",
+            params: { source: "pied-de-page" },
+          });
           setStatus("done");
         } catch {
           setMessage("Réseau indisponible. Réessayez dans un instant.");
@@ -100,7 +109,12 @@ export function NewsletterForm() {
           // largeur ne sert qu'une fois les deux éléments côte à côte.
           className="bg-white/10 text-white placeholder:text-white/40 sm:flex-1"
         />
-        <Button type="submit" variant="secondary" loading={status === "sending"} className="shrink-0">
+        <Button
+          type="submit"
+          variant="secondary"
+          loading={status === "sending"}
+          className="shrink-0"
+        >
           S&apos;inscrire
         </Button>
       </div>
@@ -110,8 +124,8 @@ export function NewsletterForm() {
         onChange={(event) => setConsent(event.target.checked)}
         label={
           <span className="text-xs leading-relaxed text-white/65">
-            J&apos;accepte de recevoir la lettre d&apos;information de CorpusImmo. Désinscription en
-            un clic dans chaque envoi.
+            J&apos;accepte de recevoir la lettre d&apos;information de
+            CorpusImmo. Désinscription en un clic dans chaque envoi.
           </span>
         }
       />

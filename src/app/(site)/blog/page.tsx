@@ -76,13 +76,14 @@ export default function BlogIndexPage() {
             ) : null}
           </div>
 
-          {/* Des îlots haussmanniens vus du ciel : le journal lit un marché
-              par-dessus les toits. Illustration générée (voir docs/images.md). */}
-          <figure>
+          {/* Une façade regardée d'en bas, dans le détail de sa modénature :
+              le journal lit un marché de près. L'aérienne, elle, est prise par
+              l'image sociale du site. Illustration générée (docs/images.md). */}
+          <figure className="reveal-late">
             <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs lg:aspect-[4/3]">
               <Image
-                src="/illustrations/ville-metropole-aerienne.webp"
-                alt="Illustration : îlots haussmanniens vus du ciel, toits de zinc et cours intérieures en fin de journée."
+                src="/illustrations/bien-appartement-ancien-2.webp"
+                alt="Illustration : façade haussmannienne en pierre de taille vue en contre-plongée, balcons en ferronnerie et toiture en zinc."
                 fill
                 priority
                 sizes="(min-width: 1024px) 480px, 100vw"

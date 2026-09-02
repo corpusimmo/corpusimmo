@@ -22,7 +22,7 @@ export default function AProposPage() {
               observe un marché, pas de quelqu'un qui vend un bien. C'est la
               posture du produit, et c'est pour ça que l'image ouvre cette page
               et aucune autre. Illustration générée (voir docs/images.md). */}
-          <figure className="mb-10">
+          <figure className="reveal mb-10">
             <div className="relative aspect-[21/9] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs">
               <Image
                 src="/illustrations/ville-rue-fenetre.webp"
@@ -34,8 +34,8 @@ export default function AProposPage() {
               />
             </div>
             <figcaption className="mt-2 text-xs text-ink-subtle">
-              Illustration. Aucune adresse réelle n&apos;est identifiable, et aucun bien du corpus
-              n&apos;est photographié.
+              Illustration. Aucune adresse réelle n&apos;est identifiable, et
+              aucun bien du corpus n&apos;est photographié.
             </figcaption>
           </figure>
 
@@ -46,47 +46,57 @@ export default function AProposPage() {
 
           <div className="mt-8 flex flex-col gap-5 leading-relaxed text-ink-muted">
             <p>
-              Un <em>corpus</em>, en science comme en droit, n&apos;est pas un tas de données. C&apos;est
-              un ensemble fini, clos et structuré de pièces authentiques, réunies pour être
-              analysées&nbsp;: rien n&apos;y entre qui n&apos;ait été constaté. Un corpus
-              linguistique ne contient que des énoncés réellement produits&nbsp;; le <em>corpus
-              juris</em> ne contient que des textes en vigueur.
+              Un <em>corpus</em>, en science comme en droit, n&apos;est pas un
+              tas de données. C&apos;est un ensemble fini, clos et structuré de
+              pièces authentiques, réunies pour être analysées&nbsp;: rien
+              n&apos;y entre qui n&apos;ait été constaté. Un corpus linguistique
+              ne contient que des énoncés réellement produits&nbsp;; le{" "}
+              <em>corpus juris</em> ne contient que des textes en vigueur.
             </p>
             <p>
-              Les Demandes de Valeurs Foncières sont exactement cela&nbsp;: l&apos;ensemble des
-              mutations à titre onéreux enregistrées par la DGFiP, publiées en open data. Pas des
-              prix demandés, mais des prix payés, portés à un acte.
+              Les Demandes de Valeurs Foncières sont exactement cela&nbsp;:
+              l&apos;ensemble des mutations à titre onéreux enregistrées par la
+              DGFiP, publiées en open data. Pas des prix demandés, mais des prix
+              payés, portés à un acte.
             </p>
             <p>
-              C&apos;est toute la différence avec un estimateur qui extrapole depuis des annonces.
-              Une annonce est une demande&nbsp;; un acte est un fait. Nous n&apos;avons jamais que
-              des faits, et c&apos;est aussi ce qui borne ce que nous pouvons dire.
+              C&apos;est toute la différence avec un estimateur qui extrapole
+              depuis des annonces. Une annonce est une demande&nbsp;; un acte
+              est un fait. Nous n&apos;avons jamais que des faits, et c&apos;est
+              aussi ce qui borne ce que nous pouvons dire.
             </p>
 
-            <h2 className="mt-6 font-display text-2xl text-ink">Ce que nous nous interdisons</h2>
+            <h2 className="mt-6 font-display text-2xl text-ink">
+              Ce que nous nous interdisons
+            </h2>
 
             <ul className="flex flex-col gap-4">
               {RULES.map((rule) => (
                 <li key={rule.title}>
-                  <strong className="font-semibold text-ink">{rule.title}</strong>
+                  <strong className="font-semibold text-ink">
+                    {rule.title}
+                  </strong>
                   <span className="mt-1 block">{rule.body}</span>
                 </li>
               ))}
             </ul>
 
-            <h2 className="mt-6 font-display text-2xl text-ink">D&apos;où viennent les données</h2>
+            <h2 className="mt-6 font-display text-2xl text-ink">
+              D&apos;où viennent les données
+            </h2>
             <p>{disclaimers.dvfSource}</p>
             <p>{disclaimers.dvfLimits}</p>
             <p>
-              Le fond cartographique vient d&apos;OpenFreeMap et d&apos;OpenStreetMap&nbsp;; le
-              géocodage d&apos;adresse, de la Géoplateforme IGN et de la base adresse nationale.
-              Aucune de ces sources n&apos;est recopiée dans une base à nous.
+              Le fond cartographique vient d&apos;OpenFreeMap et
+              d&apos;OpenStreetMap&nbsp;; le géocodage d&apos;adresse, de la
+              Géoplateforme IGN et de la base adresse nationale. Aucune de ces
+              sources n&apos;est recopiée dans une base à nous.
             </p>
 
             <h2 className="mt-6 font-display text-2xl text-ink">Nous écrire</h2>
             <p>
-              Une erreur dans un chiffre, une méthode contestable, une question sur une donnée
-              vous concernant&nbsp;:{" "}
+              Une erreur dans un chiffre, une méthode contestable, une question
+              sur une donnée vous concernant&nbsp;:{" "}
               <a
                 href={`mailto:${siteConfig.contactEmail}`}
                 className="font-semibold text-primary underline"

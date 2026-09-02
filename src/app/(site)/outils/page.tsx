@@ -48,8 +48,9 @@ export default function OutilsPage() {
             Dix outils de calcul, ouverts
           </h1>
           <p className="mt-3 leading-relaxed text-ink-muted">
-            Les mêmes calculs que les feuilles qu&apos;on se transmet entre professionnels, mais
-            avec les barèmes affichés, modifiables, et datés. Rien à télécharger, rien à créer.
+            Les mêmes calculs que les feuilles qu&apos;on se transmet entre
+            professionnels, mais avec les barèmes affichés, modifiables, et
+            datés. Rien à télécharger, rien à installer.
           </p>
         </header>
 

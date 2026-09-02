@@ -69,7 +69,7 @@ export function OfferPage({
             </div>
 
             {illustration ? (
-              <figure className="hidden lg:block">
+              <figure className="reveal-late hidden lg:block">
                 <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs">
                   <Image
                     src={illustration.src}

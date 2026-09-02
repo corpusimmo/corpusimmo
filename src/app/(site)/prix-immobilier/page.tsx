@@ -66,17 +66,17 @@ export default function PrixImmobilierPage() {
               Le prix immobilier, commune par commune
             </h1>
             <p className="mt-3 text-lg leading-relaxed text-ink-muted">
-              {cities.length} communes, {formatNumber(totalSales(cities))} ventes de logement
-              enregistrées entre {firstYear} et {lastYear}. Chaque chiffre de ces pages est
-              accompagné du nombre de ventes qui le fonde, et rien n&apos;y est extrapolé depuis
-              des annonces.
+              {cities.length} communes, {formatNumber(totalSales(cities))}{" "}
+              ventes de logement enregistrées entre {firstYear} et {lastYear}.
+              Chaque chiffre de ces pages est accompagné du nombre de ventes qui
+              le fonde, et rien n&apos;y est extrapolé depuis des annonces.
             </p>
           </div>
 
           {/* Une ville moyenne vue du ciel, calme et ordinaire : c'est le cœur du
               marché DVF, et c'est ce que ces pages documentent. Illustration
               générée, aucune commune identifiable (voir docs/images.md). */}
-          <figure>
+          <figure className="reveal-late">
             <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs lg:aspect-[4/3]">
               <Image
                 src="/illustrations/ville-moyenne-aerienne.webp"
@@ -99,25 +99,31 @@ export default function PrixImmobilierPage() {
         >
           <div className="lg:col-span-3">
             <h2 id="methode" className="font-display text-xl text-ink">
-              Ce que ces pages contiennent, et ce qu&apos;elles refusent d&apos;afficher
+              Ce que ces pages contiennent, et ce qu&apos;elles refusent
+              d&apos;afficher
             </h2>
           </div>
 
           <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-semibold text-ink">Des actes, pas des annonces</h3>
+            <h3 className="text-sm font-semibold text-ink">
+              Des actes, pas des annonces
+            </h3>
             <p className="text-sm leading-relaxed text-ink-muted">
-              Les prix viennent des Demandes de Valeurs Foncières&nbsp;: le prix inscrit à
-              l&apos;acte, chez le notaire. Un prix demandé dans une annonce n&apos;est pas un
-              prix payé, et l&apos;écart entre les deux est précisément ce qu&apos;une
-              négociation produit.
+              Les prix viennent des Demandes de Valeurs Foncières&nbsp;: le prix
+              inscrit à l&apos;acte, chez le notaire. Un prix demandé dans une
+              annonce n&apos;est pas un prix payé, et l&apos;écart entre les
+              deux est précisément ce qu&apos;une négociation produit.
             </p>
           </div>
 
           <div className="flex flex-col gap-2">
-            <h3 className="text-sm font-semibold text-ink">Un seuil, pas une page par commune</h3>
+            <h3 className="text-sm font-semibold text-ink">
+              Un seuil, pas une page par commune
+            </h3>
             <p className="text-sm leading-relaxed text-ink-muted">
-              Une commune n&apos;a de page qu&apos;au-delà de {MIN_CITY_DWELLING_SALES} ventes de
-              logement sur la période, et une médiane n&apos;est publiée qu&apos;au-delà de{" "}
+              Une commune n&apos;a de page qu&apos;au-delà de{" "}
+              {MIN_CITY_DWELLING_SALES} ventes de logement sur la période, et
+              une médiane n&apos;est publiée qu&apos;au-delà de{" "}
               {MIN_FIGURE_SAMPLE} ventes du même type. En dessous, la page dit
               l&apos;effectif et se tait sur le prix.
             </p>
@@ -126,9 +132,10 @@ export default function PrixImmobilierPage() {
           <div className="flex flex-col gap-2">
             <h3 className="text-sm font-semibold text-ink">Aucune prévision</h3>
             <p className="text-sm leading-relaxed text-ink-muted">
-              Les évolutions comparent deux millésimes complets déjà enregistrés. Quand
-              l&apos;écart mesuré reste dans la marge d&apos;incertitude des deux médianes, il
-              est affiché comme tel et nous ne concluons pas à une tendance.
+              Les évolutions comparent deux millésimes complets déjà
+              enregistrés. Quand l&apos;écart mesuré reste dans la marge
+              d&apos;incertitude des deux médianes, il est affiché comme tel et
+              nous ne concluons pas à une tendance.
             </p>
           </div>
         </section>
@@ -139,10 +146,11 @@ export default function PrixImmobilierPage() {
               Les communes couvertes
             </h2>
             <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-              Les cent communes les plus peuplées parmi celles que DVF couvre, de la plus
-              peuplée à la moins peuplée. {dvfCoverage.excludedLabel} n&apos;y figurent pas,
-              faute de publication&nbsp;: Strasbourg, Mulhouse et Metz relèvent du livre
-              foncier et sont absentes de la source, pas de notre sélection.
+              Les cent communes les plus peuplées parmi celles que DVF couvre,
+              de la plus peuplée à la moins peuplée. {dvfCoverage.excludedLabel}{" "}
+              n&apos;y figurent pas, faute de publication&nbsp;: Strasbourg,
+              Mulhouse et Metz relèvent du livre foncier et sont absentes de la
+              source, pas de notre sélection.
             </p>
           </div>
 
@@ -152,13 +160,16 @@ export default function PrixImmobilierPage() {
         <section className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-xl">
             <h2 className="flex items-center gap-2 font-display text-xl text-ink">
-              <MapPinned aria-hidden="true" className="size-5 text-ink-subtle" />
+              <MapPinned
+                aria-hidden="true"
+                className="size-5 text-ink-subtle"
+              />
               Votre commune n&apos;est pas dans la liste
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              La carte des ventes couvre toute la France, sans sélection ni seuil&nbsp;: elle
-              affiche les mutations une par une, ce qui reste honnête là où une médiane ne le
-              serait pas.
+              La carte des ventes couvre toute la France, sans sélection ni
+              seuil&nbsp;: elle affiche les mutations une par une, ce qui reste
+              honnête là où une médiane ne le serait pas.
             </p>
           </div>
           <Button asChild variant="secondary" className="shrink-0">

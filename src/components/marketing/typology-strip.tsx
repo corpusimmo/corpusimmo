@@ -3,7 +3,10 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
 import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
-import { buildEstimatorHref, type PropertyUsage } from "@/components/estimation/wizard-state";
+import {
+  buildEstimatorHref,
+  type PropertyUsage,
+} from "@/components/estimation/wizard-state";
 
 /**
  * LES TYPOLOGIES QUE LE CORPUS COUVRE, EN IMAGES.
@@ -51,7 +54,8 @@ const TYPOLOGIES: readonly Typology[] = [
   {
     icon: "apartment",
     label: "Logement neuf",
-    illustration: "immeuble résidentiel récent, balcons en loggia et dernier étage en retrait",
+    illustration:
+      "immeuble résidentiel récent, balcons en loggia et dernier étage en retrait",
     src: "/illustrations/bien-appartement-recent.webp",
     usage: "residential",
   },
@@ -65,35 +69,40 @@ const TYPOLOGIES: readonly Typology[] = [
   {
     icon: "building",
     label: "Immeuble",
-    illustration: "immeuble de rapport de faubourg, brique et enduit, rideau métallique fermé",
+    illustration:
+      "immeuble de rapport de faubourg, brique et enduit, rideau métallique fermé",
     src: "/illustrations/bien-immeuble.webp",
     usage: "professional",
   },
   {
     icon: "office",
     label: "Bureaux",
-    illustration: "immeuble de bureaux des années 2000, mur-rideau, plateaux allumés",
+    illustration:
+      "immeuble de bureaux des années 2000, mur-rideau, plateaux allumés",
     src: "/illustrations/bien-bureaux.webp",
     usage: "professional",
   },
   {
     icon: "retail",
     label: "Commerce",
-    illustration: "vitrine de pied d'immeuble sans enseigne, rue pavée de centre-ville",
+    illustration:
+      "vitrine de pied d'immeuble sans enseigne, rue pavée de centre-ville",
     src: "/illustrations/bien-commerce.webp",
     usage: "professional",
   },
   {
     icon: "business_premises",
     label: "Local d’activité",
-    illustration: "bâtiment d'activité en bardage gris, porte sectionnelle fermée",
+    illustration:
+      "bâtiment d'activité en bardage gris, porte sectionnelle fermée",
     src: "/illustrations/bien-local-activite.webp",
     usage: "professional",
   },
   {
     icon: "warehouse",
     label: "Entrepôt",
-    illustration: "entrepôt logistique, rangée de quais de chargement, cour de manœuvre",
+    illustration:
+      "entrepôt logistique, rangée de quais de chargement, cour de manœuvre",
     src: "/illustrations/bien-entrepot.webp",
     usage: "professional",
   },
@@ -108,21 +117,26 @@ const TYPOLOGIES: readonly Typology[] = [
 
 export function TypologyStrip() {
   return (
-    <section aria-labelledby="typologies" className="border-b border-border bg-canvas">
+    <section
+      aria-labelledby="typologies"
+      className="border-b border-border bg-canvas"
+    >
       <div className="container-page pt-14 md:pt-20">
-        <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
+        <div className="reveal flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <p className="eyebrow">Un seul corpus</p>
             <h2
               id="typologies"
               className="mt-3 font-display text-3xl leading-tight text-ink md:text-4xl"
             >
-              Un logement, un commerce, un plateau de bureaux&nbsp;: la même méthode
+              Un logement, un commerce, un plateau de bureaux&nbsp;: la même
+              méthode
             </h2>
             <p className="mt-4 leading-relaxed text-ink-muted">
-              DVF enregistre toutes les mutations, pas seulement les logements. Le résidentiel et
-              le professionnel vivent ici sous le même menu, et l&apos;usage est une question posée
-              dans l&apos;outil, jamais une porte à l&apos;entrée.
+              DVF enregistre toutes les mutations, pas seulement les logements.
+              Le résidentiel et le professionnel vivent ici sous le même menu,
+              et l&apos;usage est une question posée dans l&apos;outil, jamais
+              une porte à l&apos;entrée.
             </p>
           </div>
           <p className="shrink-0 text-xs text-ink-subtle md:pb-1.5">
@@ -133,10 +147,13 @@ export function TypologyStrip() {
 
       {/* La rangée déborde du conteneur à droite, et démarre alignée sur la
           marge : le bord tronqué de la dernière carte dit qu'il y a une suite. */}
-      <div className="scroll-slim mt-8 overflow-x-auto pb-14 md:pb-20">
+      <div className="scroll-slim reveal-late mt-8 overflow-x-auto pb-14 md:pb-20">
         <ul className="container-page flex w-max snap-x snap-mandatory gap-4 pr-5 md:pr-8">
           {TYPOLOGIES.map((typology) => (
-            <li key={typology.label} className="w-[15.5rem] shrink-0 snap-start md:w-[17rem]">
+            <li
+              key={typology.label}
+              className="w-[15.5rem] shrink-0 snap-start md:w-[17rem]"
+            >
               <Link
                 href={buildEstimatorHref(null, typology.usage)}
                 className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-xs transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md"

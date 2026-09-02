@@ -62,16 +62,22 @@ export default function HomePage() {
               national, il faisait lire le produit comme un service nantais à
               tous ceux qui n'y habitent pas. La mesure du corpus, elle, est
               nationale et vit dans le bandeau juste en dessous. */}
-          <div className="max-w-3xl">
+          <div className="animate-fade-up max-w-3xl">
             <p className="eyebrow !bg-white/10 !text-[color:var(--accent-rule)] backdrop-blur-sm">
               {siteConfig.signature}
             </p>
             <h1 className="mt-6 font-display text-[2.75rem] leading-[1.02] font-extrabold text-ink-inverted md:text-[3.75rem] lg:text-[4.25rem]">
               Ce qui s&apos;est vraiment vendu, et à quel prix
             </h1>
-            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">
-              Des actes, pas des annonces&nbsp;: les mutations enregistrées par
-              la DGFiP, publiées en open data. Partout en France.
+            {/* L'ACCROCHE DIT L'ÉTENDUE, PAS SEULEMENT LA THÈSE. Quelqu'un qui
+                arrive ici doit comprendre en une phrase qu'il a devant lui de
+                quoi mener un projet de bout en bout, et pas un estimateur de
+                plus. La preuve (« enregistrées par la DGFiP ») est dans la même
+                phrase : l'étendue sans la source ferait catalogue. */}
+            <p className="mt-5 max-w-2xl text-lg leading-relaxed text-white/80">
+              Estimateur, carte des ventes, observatoire et outils de calcul,
+              sur les mutations réellement enregistrées par la DGFiP. Partout en
+              France.
             </p>
 
             <div className="mt-9 max-w-xl">
@@ -93,7 +99,7 @@ export default function HomePage() {
 
       {/* ──────────────────────────────────────────────────────── la méthode */}
       <section aria-labelledby="methode" className="container-page">
-        <div className="panel px-6 py-12 md:px-12 md:py-16 lg:px-16">
+        <div className="panel reveal px-6 py-12 md:px-12 md:py-16 lg:px-16">
           <div className="grid gap-10 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:gap-16">
             <div className="lg:sticky lg:top-24 lg:self-start">
               <p className="eyebrow">La méthode</p>
@@ -135,7 +141,7 @@ export default function HomePage() {
             {/* `self-start` : la colonne de gauche est collante et la grille
                 étire ses cellules par défaut. Sans lui, le cadre du schéma
                 s'allonge jusqu'au bas de la section, vide sur les deux tiers. */}
-            <div className="rounded-xl bg-canvas p-4 md:p-6 lg:self-start">
+            <div className="reveal-late rounded-xl bg-canvas p-4 md:p-6 lg:self-start">
               <MethodDiagram />
             </div>
           </div>
@@ -147,7 +153,7 @@ export default function HomePage() {
         aria-label="Notre engagement"
         className="container-page pt-6 md:pt-8"
       >
-        <div className="relative isolate overflow-hidden rounded-2xl bg-primary text-ink-inverted shadow-lg">
+        <div className="reveal relative isolate overflow-hidden rounded-2xl bg-primary text-ink-inverted shadow-lg">
           {/* Les toits d'une ville en fin de journée, sous un voile de marine :
             l'image installe le registre de l'observatoire sans jamais
             concurrencer le texte. `priority` non : elle est sous le pli. */}
@@ -209,7 +215,7 @@ export default function HomePage() {
               {disclaimers.dvfLimits}
             </p>
 
-            <div className="mt-8 rounded-xl border border-border bg-surface p-4 shadow-sm md:p-6">
+            <div className="reveal mt-8 rounded-xl border border-border bg-surface p-4 shadow-sm md:p-6">
               <RadiusEscalation />
             </div>
           </div>
@@ -234,7 +240,7 @@ export default function HomePage() {
 
       {/* ────────────────────────────────────────────────────────── pour les pros */}
       <section aria-labelledby="pros" className="container-page">
-        <div className="grid gap-10 rounded-2xl bg-surface-3 px-6 py-12 md:px-12 md:py-16 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-16 lg:px-16">
+        <div className="reveal grid gap-10 rounded-2xl bg-surface-3 px-6 py-12 md:px-12 md:py-16 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center lg:gap-16 lg:px-16">
           <div className="max-w-2xl">
             <p className="eyebrow">Pour les professionnels</p>
             <h2
@@ -264,8 +270,8 @@ export default function HomePage() {
           <figure className="hidden lg:block">
             <div className="relative aspect-[3/2] overflow-hidden rounded-xl shadow-md">
               <Image
-                src="/illustrations/bien-bureaux.webp"
-                alt="Illustration : immeuble de bureaux des années 2000, mur-rideau et plateaux allumés en fin de journée."
+                src="/illustrations/bien-bureaux-2.webp"
+                alt="Illustration : immeuble de bureaux contemporain en verre, dans un parc d'affaires arboré."
                 fill
                 sizes="(min-width: 1024px) 420px, 0px"
                 className="object-cover"

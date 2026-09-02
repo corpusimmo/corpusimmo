@@ -29,13 +29,13 @@ emplacement. Aucune image n’est la photographie d’un lieu réel.
 | Fichier | Prompt | Ce que montre l’image | Posée |
 |---|---|---|---|
 | `bien-appartement-ancien.webp` | 3.1 | Façade haussmannienne, balcons filants, platane | accueil |
-| `bien-appartement-ancien-2.webp` | 3.1 | Même sujet, cadré en contre-plongée | réserve |
+| `bien-appartement-ancien-2.webp` | 3.1 | Même sujet, cadré en contre-plongée | `/blog` |
 | `bien-appartement-recent.webp` | 3.2 | Immeuble résidentiel des années 2010, loggias, dernier étage en retrait | accueil |
 | `bien-maison.webp` | 3.3 | Pavillon des années 1970 sur sous-sol, volets roulants, hortensia | accueil |
 | `bien-immeuble.webp` | 3.4 | Immeuble de rapport de faubourg, portrait 4:5, rideau métallique fermé | accueil |
 | `bien-terrain.webp` | 3.5 | Parcelle bornée de piquets, lisière de village | accueil |
 | `bien-bureaux.webp` | 3.6 | Immeuble de bureaux des années 2000, plateaux allumés | accueil (×2) |
-| `bien-bureaux-2.webp` | 3.6 | Immeuble de bureaux en verre, plein soleil | réserve : la lumière de midi sort de la direction artistique |
+| `bien-bureaux-2.webp` | 3.6 | Immeuble de bureaux en verre dans un parc d’affaires | accueil, section « pour les professionnels ». Sa lumière de midi sort de la direction artistique, ce qui se voit peu à la taille où elle est posée |
 | `bien-commerce.webp` | 3.7 | Vitrine de pied d’immeuble sans enseigne, rue pavée | accueil |
 | `bien-local-activite.webp` | 3.8 | Bâtiment d’activité en bardage, porte sectionnelle fermée | accueil |
 | `bien-local-activite-2.webp` | 3.8 | Hangar en bardage sombre, porte ouverte sur des rayonnages | réserve |
@@ -48,12 +48,12 @@ emplacement. Aucune image n’est la photographie d’un lieu réel.
 | `interieur-local-activite.webp` | hors catalogue | Cellule d’activité vide, mezzanine métallique | réserve |
 | `interieur-entrepot.webp` | hors catalogue | Entrepôt en exploitation, palettiers pleins | réserve |
 | `ville-moyenne-aerienne.webp` | 4.2 | Vue aérienne oblique d’une ville moyenne, cœur ancien et rivière | `/prix-immobilier` |
-| `ville-metropole-aerienne.webp` | 4.1 / 5.3 | Îlots haussmanniens vus du ciel, toits de zinc, cours intérieures | `/blog` |
+| `ville-metropole-aerienne.webp` | 4.1 / 5.3 | Îlots haussmanniens vus du ciel, toits de zinc, cours intérieures | accueil (diaporama) et **image sociale** (`src/lib/seo/og-fond.jpg`, recadrée en 1200 × 630) |
 | `ville-nantes-aerienne.webp` | 4.1 | Vue aérienne « de Nantes » avec cathédrale et rivière | réserve : une ville nommée et reconnaissable, mais générée, donc fausse dans le détail. Ne jamais la poser sur la page de la commune. |
 | `ville-rue-fenetre.webp` | 5.1 | Rue de maisons de ville vue d’une fenêtre du premier étage | `/a-propos` |
 | `ville-toits.webp` | 5.4 | Toits de zinc en fin de journée. Un dôme est visible au loin : l’image n’est posée que sous un voile de marine, où il ne se lit plus | accueil, fond |
 | `ville-quai.webp` | hors catalogue | Quai de rivière et front bâti haussmannien | réserve |
-| `ville-pont.webp` | hors catalogue | Pont de pierre au coucher du soleil | réserve : le soleil dans le cadre sort de la direction artistique |
+| `ville-pont.webp` | hors catalogue | Pont de pierre au coucher du soleil | accueil, diaporama du héros. Le soleil dans le cadre sort de la direction artistique, mais il disparaît sous le voile de marine |
 
 | `ville-quartier-affaires.webp` | hors catalogue | Esplanade d’un quartier d’affaires, passants en tenue de bureau | réserve : des personnes, ce que le catalogue interdit (cliché de banque d’images). À ne poser que si cette règle est revue. |
 | `interieur-bureaux-visite.webp` | hors catalogue | Trois personnes casquées de dos dans un plateau vide | réserve : des personnes et des visages partiels (droit à l’image). Même réserve que ci-dessus. |
@@ -64,10 +64,10 @@ emplacement. Aucune image n’est la photographie d’un lieu réel.
 |---|---|---|
 | `/` accueil, bandeau des typologies (`marketing/typology-strip.tsx`) | les dix `bien-…` | Une carte par typologie, `alt` honnête, lien vers l’estimateur avec l’usage pré-rempli |
 | `/` accueil, section « Notre engagement » | `ville-toits.webp` | Fond sous un voile de marine, `alt=""` : décorative |
-| `/` accueil, section « Pour les professionnels » | `bien-bureaux.webp` | Colonne de droite, à partir de 1024 px seulement |
+| `/` accueil, section « Pour les professionnels » | `bien-bureaux-2.webp` | Colonne de droite, à partir de 1024 px seulement |
 | `/a-propos` | `ville-rue-fenetre.webp` | Bandeau d’ouverture 21:9 |
 | `/prix-immobilier` | `ville-moyenne-aerienne.webp` | Colonne de droite de l’en-tête |
-| `/blog` | `ville-metropole-aerienne.webp` | Colonne de droite de l’en-tête |
+| `/blog` | `bien-appartement-ancien-2.webp` | Colonne de droite de l’en-tête |
 | `/solutions` | `interieur-bureaux-plateau.webp` | Colonne de droite du héros, à partir de 1024 px |
 | `/solutions/*` (`marketing/offer-page.tsx`, prop `illustration`) | un `interieur-…` par offre | Colonne de droite de l’en-tête, à partir de 1024 px |
 
@@ -75,6 +75,10 @@ emplacement. Aucune image n’est la photographie d’un lieu réel.
 
 Elles viennent du catalogue de prompts, et elles ne sont pas de forme.
 
+- **Jamais deux fois sur la même page.** Le diaporama du héros et le bandeau
+  des typologies sont sur le même écran : une vue qui apparaît dans les deux
+  fait lire la banque comme trop courte. La table ci-dessus est la seule façon
+  de le vérifier avant de poser une image.
 - **Jamais à côté d’un prix.** Une image générée n’est jamais la photographie
   d’un bien réel : elle n’a pas sa place près d’une fourchette d’estimation ni
   d’une vente DVF. Les résultats de l’estimateur, la carte et l’observatoire

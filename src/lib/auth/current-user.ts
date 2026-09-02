@@ -39,7 +39,25 @@ export { isDatabaseUserId } from "./user-id";
  */
 export async function currentUserId(): Promise<string | null> {
   if (!isAuthConfigured || !isDatabaseConfigured()) return null;
-  const session = await auth();
-  const id = session?.user?.id;
-  return isDatabaseUserId(id) ? id : null;
+
+  // `auth()` PARLE À LA BASE : l'adaptateur Drizzle relit la session, donc la
+  // table `users`. Trois pannes réelles passent par là, et toutes les trois
+  // sont des pannes de déploiement, pas des pannes de code : migrations non
+  // appliquées, chaîne de connexion fausse, base en veille. Sans ce garde-fou,
+  // chacune renvoyait un 500 et un numéro de référence à la place de l'espace.
+  //
+  // Une session illisible n'est pas une raison de fermer la page : c'est une
+  // raison de traiter la personne comme anonyme, ce que tout le reste du site
+  // sait déjà faire. L'erreur est journalisée côté serveur, où elle sert.
+  try {
+    const session = await auth();
+    const id = session?.user?.id;
+    return isDatabaseUserId(id) ? id : null;
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    console.error(
+      `[auth] session illisible, visiteur traité comme anonyme (${reason})`,
+    );
+    return null;
+  }
 }

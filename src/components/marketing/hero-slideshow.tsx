@@ -17,12 +17,16 @@ import { useEffect, useState } from "react";
  *   chargent en différé, et `next/image` les sert à la largeur de l'écran.
  * - Les images sont des illustrations générées (docs/images.md) : aucun bien
  *   ni aucune adresse réelle n'est reconnaissable.
+ * - Aucune n'est reprise ailleurs sur l'accueil. Une vue qui passe en fond du
+ *   héros PUIS en carte de typologie deux écrans plus bas se lit comme une
+ *   banque d'images trop courte, ce qui est exactement l'impression qu'on
+ *   cherche à éviter.
  */
 
 const SLIDES = [
   "/illustrations/ville-rue-fenetre.webp",
   "/illustrations/ville-metropole-aerienne.webp",
-  "/illustrations/bien-appartement-ancien.webp",
+  "/illustrations/ville-pont.webp",
   "/illustrations/ville-moyenne-aerienne.webp",
   "/illustrations/ville-quai.webp",
 ] as const;

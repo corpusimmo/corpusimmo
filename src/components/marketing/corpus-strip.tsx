@@ -37,7 +37,7 @@ export function CorpusStrip() {
     <section aria-label="L'étendue du corpus" className="container-page">
       {/* Un panneau posé à cheval sur le bas du héros : les quatre bornes du
           corpus flottent entre la promesse et le reste de la page. */}
-      <dl className="panel relative z-10 -mt-8 grid grid-cols-2 gap-y-8 px-2 py-8 md:-mt-10 md:grid-cols-4 md:gap-y-0 md:divide-x md:divide-border-soft md:px-4">
+      <dl className="panel reveal relative z-10 -mt-8 grid grid-cols-2 gap-y-8 px-2 py-8 md:-mt-10 md:grid-cols-4 md:gap-y-0 md:divide-x md:divide-border-soft md:px-4">
         {facts.map(([value, label]) => (
           <div
             key={label}

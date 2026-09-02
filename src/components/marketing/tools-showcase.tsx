@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   ArrowRight,
+  Building2,
   Layers,
   Map as MapIcon,
   Scale,
@@ -52,6 +53,13 @@ const ENTRIES = [
     cta: "Explorer le marché",
   },
   {
+    href: "/prix-immobilier",
+    icon: Building2,
+    title: "Le prix, commune par commune",
+    body: "Cent communes documentées : médianes par type de bien, volumes, évolution entre deux millésimes, et le nombre de ventes qui fonde chaque chiffre.",
+    cta: "Voir les communes",
+  },
+  {
     href: "/outils",
     icon: Layers,
     title: "Dix outils de calcul",
@@ -72,11 +80,24 @@ const ENTRIES = [
  * capture garde sa carte, avec le nom seul. Une vignette absente vaut mieux
  * qu'un cadre vide, et bien mieux qu'un build qui casse.
  */
+/**
+ * CINQ APERÇUS, PAS DIX, et une sixième case qui mène au reste.
+ *
+ * L'accueil montre assez pour qu'on voie de quoi il s'agit, et laisse à
+ * `/outils` sa raison d'être : tout déballer ici viderait la bibliothèque de
+ * son intérêt et allongerait la page d'un écran entier. Cinq et une, c'est
+ * aussi une grille de six qui tombe juste sur deux rangs de trois.
+ *
+ * Le libellé de la sixième case nomme les cinq outils restants : il dépend
+ * donc de ce nombre ET de l'ordre du catalogue. Les deux bougent ensemble.
+ */
+const HOME_PREVIEW_COUNT = 5;
+
 const LIBRARY: Array<{
   id: string;
   title: string;
   shot: ToolPreviewShot | undefined;
-}> = toolCatalogue.map((tool) => ({
+}> = toolCatalogue.slice(0, HOME_PREVIEW_COUNT).map((tool) => ({
   id: tool.id,
   title: tool.title,
   shot: getToolPreviews(tool.id)[0],
@@ -88,26 +109,31 @@ export function ToolsShowcase() {
       aria-labelledby="outils"
       className="container-page pt-16 pb-4 md:pt-20 md:pb-6"
     >
-      <div className="max-w-2xl">
+      <div className="reveal max-w-2xl">
         <p className="eyebrow">Quatre entrées, dix calculateurs</p>
         <h2
           id="outils"
           className="mt-3 font-display text-3xl leading-tight text-ink md:text-4xl"
         >
-          Tout est ouvert, et tout marche sans compte
+          Quatre outils ouverts, et dix calculateurs métier
         </h2>
+        {/* Ni « tout est ouvert », ni le détail du quota : le premier est faux,
+            le second n'a pas sa place dans une accroche. La règle d'accès se dit
+            là où elle s'applique, sur la fiche de l'outil et au moment d'ouvrir
+            un calculateur. */}
         <p className="mt-4 leading-relaxed text-ink-muted">
           L&apos;estimateur, la carte et l&apos;observatoire s&apos;utilisent
           librement, partout en France&nbsp;: un outil qu&apos;on ne peut pas
-          essayer ne prouve rien. Les dix calculateurs se consultent de la même
-          façon, et s&apos;utilisent une fois connecté.
+          essayer ne prouve rien. Les dix calculateurs reprennent les feuilles
+          que les professionnels se transmettent, avec leurs barèmes affichés,
+          modifiables et datés.
         </p>
       </div>
 
       {/* Quatre colonnes égales : une carte plus large que les autres laissait
           un trou dans la grille à partir de 1024 px. L'entrée principale se
           distingue par sa teinte et son filet, pas par sa taille. */}
-      <ul className="mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+      <ul className="reveal-late mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
         {ENTRIES.map((entry, index) => (
           <li key={entry.href}>
             <Link
@@ -150,7 +176,7 @@ export function ToolsShowcase() {
       {/* Les dix calculateurs, chacun avec l'aperçu de son classeur. Une
           grille de vignettes se vérifie ; une promesse de « nombreux outils »
           ne se vérifie pas. */}
-      <div className="panel mt-6 px-6 py-10 md:px-10 md:py-12">
+      <div className="panel reveal mt-6 px-6 py-10 md:px-10 md:py-12">
         <div className="flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
             <p className="eyebrow">La bibliothèque</p>
@@ -172,7 +198,7 @@ export function ToolsShowcase() {
           </Button>
         </div>
 
-        <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5">
+        <ul className="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3">
           {LIBRARY.map((tool) => (
             <li key={tool.id}>
               <Link
@@ -198,6 +224,28 @@ export function ToolsShowcase() {
               </Link>
             </li>
           ))}
+          {/* La dernière case de la grille mène au reste : une grille qui
+              s'arrête sans le dire laisse croire qu'il n'y a que six outils. */}
+          <li>
+            <Link
+              href="/outils"
+              className="group flex h-full min-h-[9rem] flex-col items-start justify-between gap-3 rounded-md border border-dashed border-border-strong bg-surface-2 p-4 transition-colors hover:border-accent hover:bg-accent-soft"
+            >
+              <span className="text-sm leading-snug font-semibold text-ink">
+                {toolCatalogue.length - HOME_PREVIEW_COUNT} autres calculateurs
+              </span>
+              <span className="text-xs leading-relaxed text-ink-muted">
+                Avis de valeur, net vendeur, DCF, charge foncière, WAULT.
+              </span>
+              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+                Tout voir
+                <ArrowRight
+                  aria-hidden="true"
+                  className="size-4 transition-transform group-hover:translate-x-0.5"
+                />
+              </span>
+            </Link>
+          </li>
         </ul>
 
         <p className="mt-4 text-xs leading-relaxed text-ink-subtle">

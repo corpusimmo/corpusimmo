@@ -15,7 +15,7 @@ import { siteConfig } from "@/config/site";
  * bien avant qu'une feuille de style existe. Personne ici ne peut résoudre
  * `var(--canvas)`. Ces deux valeurs doivent donc être tenues à la main si la
  * palette bouge :
- *   #f6f5f2 → `--canvas`  (l'écran d'attente au lancement)
+ *   #f4f7fb → `--canvas`  (l'écran d'attente au lancement)
  *   #1b3349 → `--primary` (la barre système ; même valeur que le `themeColor`
  *                          du `viewport` dans `layout.tsx`)
  *
@@ -46,16 +46,31 @@ export default function manifest(): MetadataRoute.Manifest {
     // de mutations se lisent en paysage.
     orientation: "any",
 
-    background_color: "#f6f5f2",
+    background_color: "#f4f7fb",
     theme_color: "#1b3349",
     categories: ["business", "finance", "utilities"],
 
     icons: [
       // `any` : le carré aux angles courts, exactement la favicon. C'est le
       // tirage que le bureau affiche tel quel.
-      { src: "/icons/icone-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-      { src: "/icons/icone-384.png", sizes: "384x384", type: "image/png", purpose: "any" },
-      { src: "/icons/icone-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
+      {
+        src: "/icons/icone-192.png",
+        sizes: "192x192",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/icone-384.png",
+        sizes: "384x384",
+        type: "image/png",
+        purpose: "any",
+      },
+      {
+        src: "/icons/icone-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any",
+      },
 
       // `maskable` : le même signe, plein bord, dessiné pour être ROGNÉ.
       // Android applique son propre masque (cercle, goutte, carré arrondi) et
@@ -83,14 +98,18 @@ export default function manifest(): MetadataRoute.Manifest {
         short_name: "Estimer",
         description: "Lancer une estimation à partir des ventes enregistrées.",
         url: "/estimer",
-        icons: [{ src: "/icons/icone-192.png", sizes: "192x192", type: "image/png" }],
+        icons: [
+          { src: "/icons/icone-192.png", sizes: "192x192", type: "image/png" },
+        ],
       },
       {
         name: "Observatoire du marché",
         short_name: "Observatoire",
         description: "Explorer les mutations DVF et les indicateurs de marché.",
         url: "/observatoire",
-        icons: [{ src: "/icons/icone-192.png", sizes: "192x192", type: "image/png" }],
+        icons: [
+          { src: "/icons/icone-192.png", sizes: "192x192", type: "image/png" },
+        ],
       },
     ],
   };

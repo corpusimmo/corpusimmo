@@ -21,7 +21,7 @@ export default function OpengraphImage() {
     // c'est là qu'elle travaille le plus — une carte de partage est vue par
     // des gens qui ne connaissent pas encore le nom.
     eyebrow: "Estimation, carte, observatoire, outils, ressources",
-    title: siteConfig.signature,
+    title: siteConfig.signatureLines.join("\n"),
     subtitle:
       "Sur les mutations enregistrées par la DGFiP et publiées en open data. Partout en France.",
   });

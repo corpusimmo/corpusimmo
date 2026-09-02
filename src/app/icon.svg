@@ -10,11 +10,11 @@
     Les couleurs sont littérales — un fichier servi hors de l'application ne
     peut pas lire les variables CSS de `globals.css`. Elles doivent donc être
     tenues à jour à la main si la palette bouge.
-      #1B3349 bleu nuit · #F6F5F2 papier · #D5CFC1 papier ombré · #C2A468 bronze
+      #1B3349 bleu nuit · #F4F7FB canvas · #D7E0EC canvas ombré · #C2A468 or
   -->
   <rect width="32" height="32" rx="6" fill="#1B3349"/>
-  <path d="M10.5 5h6.5L23 11v14.5a1 1 0 0 1-1 1H10.5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="#F6F5F2"/>
-  <path d="M17 5l6 6h-6z" fill="#D5CFC1"/>
+  <path d="M10.5 5h6.5L23 11v14.5a1 1 0 0 1-1 1H10.5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z" fill="#F4F7FB"/>
+  <path d="M17 5l6 6h-6z" fill="#D7E0EC"/>
   <g fill="none" stroke="#1B3349" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round">
     <path d="M12.5 18.5l3.75-3.5 3.75 3.5"/>
     <path d="M13.9 18.5v3.4M18.6 18.5v3.4"/>

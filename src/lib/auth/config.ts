@@ -28,7 +28,12 @@ import type { EmailConfig } from "next-auth/providers";
 import Google from "next-auth/providers/google";
 
 import { env } from "@/config/env";
-import { getDb, isDatabaseConfigured } from "@/lib/db";
+import {
+  getDb,
+  isDatabaseConfigured,
+  readContactByEmail,
+  upsertProfile,
+} from "@/lib/db";
 import { accounts, sessions, users, verificationTokens } from "@/lib/db/schema";
 import { getMailer, maskEmail, renderSignInLinkEmail } from "@/lib/email";
 
@@ -227,6 +232,41 @@ export const authConfig: NextAuthConfig = {
         session.user.id = token.sub;
       }
       return session;
+    },
+  },
+
+  events: {
+    /**
+     * LE NOM, RECOPIÉ AU MOMENT OÙ LE COMPTE NAÎT.
+     *
+     * La connexion par lien ne rapporte qu'une adresse : sans ceci, l'espace
+     * accueillerait quelqu'un qu'il ne sait pas nommer, alors que le
+     * formulaire vient précisément de demander son prénom et son nom. Ils ont
+     * été rangés dans `contacts`, indexé par adresse — le seul endroit qui
+     * survive au fait que le lien s'ouvre souvent sur un autre appareil que
+     * celui qui l'a demandé (voir `connexion/actions.ts`).
+     *
+     * L'ÉCHEC EST SILENCIEUX, et c'est délibéré : un profil non prérempli est
+     * un désagrément, une inscription qui échoue est une porte fermée. La
+     * personne pourra de toute façon corriger son nom dans son espace.
+     */
+    async createUser({ user }) {
+      if (!isDatabaseConfigured() || !user.id || !user.email) return;
+
+      try {
+        const contact = await readContactByEmail(user.email);
+        if (!contact?.firstName && !contact?.lastName) return;
+
+        await upsertProfile(user.id, {
+          firstName: contact.firstName,
+          lastName: contact.lastName,
+        });
+      } catch (error) {
+        const reason = error instanceof Error ? error.message : String(error);
+        console.error(
+          `[auth] profil non prérempli à la création du compte (${reason})`,
+        );
+      }
     },
   },
 

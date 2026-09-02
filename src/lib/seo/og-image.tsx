@@ -358,6 +358,9 @@ export function renderOgImage({
               fontSize: titleSize(title),
               color: RESERVE,
               lineHeight: 1.06,
+              // `pre-line` : un titre peut poser ses propres coupures. La
+              // signature en pose une, entre le parcours et la preuve.
+              whiteSpace: "pre-line",
               // Manrope est déjà serrée : au-delà, les jambages se touchent
               // au corps du titre.
               letterSpacing: -2,

@@ -8,6 +8,12 @@
 
 import { resolveAppUrl } from "./app-url";
 
+/** Les deux phrases de la signature, dans l'ordre. Voir `signature` plus bas. */
+const SIGNATURE_LINES = [
+  "Estimer, comparer, décider.",
+  "Sur les ventes réelles.",
+] as const;
+
 export const siteConfig = {
   name: "CorpusImmo",
   legalName: "CorpusImmo",
@@ -28,7 +34,18 @@ export const siteConfig = {
    * balisage `slogan` de schema.org et la signature des e-mails : la changer
    * ici la change partout, et c'est le seul endroit où elle est écrite.
    */
-  signature: "Estimer, comparer, décider. Sur les ventes réelles.",
+  signature: SIGNATURE_LINES.join(" "),
+
+  /**
+   * La même signature, DÉJÀ COUPÉE.
+   *
+   * Elle est faite de deux phrases : le parcours, puis la preuve. Laissée à la
+   * merci du retour à la ligne automatique, la coupure tombait au milieu de la
+   * seconde (« … décider. Sur / les ventes réelles »), ce qui casse la
+   * respiration exactement là où elle porte. Les composants qui ont la place
+   * de la poser sur deux lignes lisent donc ce tableau plutôt que la chaîne.
+   */
+  signatureLines: SIGNATURE_LINES,
 
   /** La version descriptive, celle qui travaille pour le référencement. */
   tagline:

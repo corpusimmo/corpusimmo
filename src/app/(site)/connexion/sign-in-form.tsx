@@ -8,11 +8,15 @@ import { AlertTriangle, CheckCircle2, MailCheck } from "lucide-react";
 import { Button, Field, Input, LoadingState } from "@/components/ui";
 import { track } from "@/lib/analytics/track";
 
+import { rememberIdentity } from "./actions";
+
 /** Les erreurs d'Auth.js, traduites. Le code brut ne dit rien à personne. */
 const ERRORS: Record<string, string> = {
-  OAuthSignin: "La connexion à Google n'a pas pu démarrer. Réessayez dans un instant.",
+  OAuthSignin:
+    "La connexion à Google n'a pas pu démarrer. Réessayez dans un instant.",
   OAuthCallback: "Google n'a pas répondu comme attendu. Réessayez.",
-  OAuthAccountNotLinked: "Cette adresse est déjà associée à une autre méthode de connexion.",
+  OAuthAccountNotLinked:
+    "Cette adresse est déjà associée à une autre méthode de connexion.",
   AccessDenied:
     "Google n'a pas confirmé que cette adresse vous appartient. Vérifiez votre compte Google, puis réessayez.",
   Verification: "Ce lien de connexion a expiré. Relancez la connexion.",
@@ -28,6 +32,11 @@ export function SignInForm() {
   const [emailLink, setEmailLink] = useState(false);
   const [pending, setPending] = useState(false);
   const [email, setEmail] = useState("");
+  // Le prénom et le nom ne servent PAS à l'authentification : le lien prouve
+  // l'adresse à lui seul. Ils servent à ce que le compte créé porte un nom,
+  // là où la voie Google en apporte un d'office.
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
   const [linkPending, setLinkPending] = useState(false);
   const [linkSent, setLinkSent] = useState(false);
   const [linkError, setLinkError] = useState<string | null>(null);
@@ -66,8 +75,9 @@ export function SignInForm() {
           Vous êtes connecté
         </p>
         <p className="text-sm leading-relaxed text-success-soft-fg/90">
-          {session.user.email}, votre adresse est vérifiée par Google. Les documents de la
-          bibliothèque s&apos;ouvrent désormais sans repasser par un formulaire.
+          {session.user.email}, votre adresse est vérifiée par Google. Les
+          documents de la bibliothèque s&apos;ouvrent désormais sans repasser
+          par un formulaire.
         </p>
       </div>
     );
@@ -76,14 +86,20 @@ export function SignInForm() {
   if (!available) {
     return (
       <div className="flex gap-3 rounded-lg border border-warning/25 bg-warning-soft p-6">
-        <AlertTriangle aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-warning" />
+        <AlertTriangle
+          aria-hidden="true"
+          className="mt-0.5 size-4 shrink-0 text-warning"
+        />
         <div className="text-sm leading-relaxed text-warning-soft-fg">
-          <p className="font-semibold">La connexion n&apos;est pas encore ouverte</p>
+          <p className="font-semibold">
+            La connexion n&apos;est pas encore ouverte
+          </p>
           <p className="mt-1 text-warning-soft-fg/90">
-            L&apos;identification Google n&apos;est pas configurée sur cette installation.
-            L&apos;essentiel du site n&apos;en dépend pas&nbsp;: l&apos;estimateur, la carte des
-            ventes et l&apos;observatoire fonctionnent sans compte. Seuls les dix calculateurs
-            demandent une connexion, et ils restent consultables.
+            L&apos;identification Google n&apos;est pas configurée sur cette
+            installation. L&apos;essentiel du site n&apos;en dépend pas&nbsp;:
+            l&apos;estimateur, la carte des ventes et l&apos;observatoire
+            fonctionnent sans compte. Seuls les dix calculateurs demandent une
+            connexion, et ils restent consultables.
           </p>
         </div>
       </div>
@@ -99,8 +115,9 @@ export function SignInForm() {
         </p>
         <p className="text-sm leading-relaxed text-success-soft-fg/90">
           Nous venons d&apos;envoyer un lien de connexion à{" "}
-          <strong>{email.trim()}</strong>. Il est valable quinze minutes, et une seule fois.
-          Pensez à regarder dans les indésirables si vous ne le voyez pas arriver.
+          <strong>{email.trim()}</strong>. Il est valable quinze minutes, et une
+          seule fois. Pensez à regarder dans les indésirables si vous ne le
+          voyez pas arriver.
         </p>
         <Button
           type="button"
@@ -125,7 +142,10 @@ export function SignInForm() {
           role="alert"
           className="flex gap-3 rounded-lg border border-danger bg-danger-soft px-4 py-3 text-sm text-danger-soft-fg"
         >
-          <AlertTriangle aria-hidden="true" className="mt-0.5 size-4 shrink-0 text-danger" />
+          <AlertTriangle
+            aria-hidden="true"
+            className="mt-0.5 size-4 shrink-0 text-danger"
+          />
           {ERRORS[error] ?? ERRORS.Default}
         </p>
       ) : null}
@@ -143,16 +163,18 @@ export function SignInForm() {
       </Button>
 
       <p className="text-xs leading-relaxed text-ink-subtle">
-        Nous ne demandons à Google que votre nom et votre adresse e-mail. Aucun accès à vos
-        contacts, à votre agenda ni à vos fichiers n&apos;est demandé, et rien n&apos;est publié en
-        votre nom.
+        Nous ne demandons à Google que votre nom et votre adresse e-mail. Aucun
+        accès à vos contacts, à votre agenda ni à vos fichiers n&apos;est
+        demandé, et rien n&apos;est publié en votre nom.
       </p>
 
       {emailLink ? (
         <>
           <div className="flex items-center gap-3" aria-hidden="true">
             <span className="h-px flex-1 bg-border" />
-            <span className="text-xs font-medium tracking-wide text-ink-subtle uppercase">ou</span>
+            <span className="text-xs font-medium tracking-wide text-ink-subtle uppercase">
+              ou
+            </span>
             <span className="h-px flex-1 bg-border" />
           </div>
 
@@ -166,6 +188,10 @@ export function SignInForm() {
                 setLinkError("Indiquez une adresse e-mail.");
                 return;
               }
+              if (!firstName.trim() || !lastName.trim()) {
+                setLinkError("Indiquez votre prénom et votre nom.");
+                return;
+              }
 
               setLinkPending(true);
               setLinkError(null);
@@ -174,10 +200,24 @@ export function SignInForm() {
               // `redirect: false` pour rester sur place : la page de
               // vérification d'Auth.js est en anglais et hors de notre
               // direction artistique.
-              const outcome = await signIn("email", { email: address, redirect: false });
+              // Le nom est rangé AVANT l'envoi, et l'échec n'empêche pas la
+              // connexion : un profil non prérempli est un désagrément, une
+              // porte fermée serait autre chose.
+              await rememberIdentity({
+                email: address,
+                firstName: firstName.trim(),
+                lastName: lastName.trim(),
+              }).catch(() => undefined);
+
+              const outcome = await signIn("email", {
+                email: address,
+                redirect: false,
+              });
 
               if (outcome?.error) {
-                setLinkError("L'envoi n'a pas abouti. Réessayez dans un instant.");
+                setLinkError(
+                  "L'envoi n'a pas abouti. Réessayez dans un instant.",
+                );
                 setLinkPending(false);
                 return;
               }
@@ -186,10 +226,33 @@ export function SignInForm() {
               setLinkPending(false);
             }}
           >
+            <div className="grid gap-3 sm:grid-cols-2">
+              <Field label="Prénom" htmlFor="sign-in-first-name">
+                <Input
+                  id="sign-in-first-name"
+                  required
+                  autoComplete="given-name"
+                  placeholder="Camille"
+                  value={firstName}
+                  onChange={(event) => setFirstName(event.target.value)}
+                />
+              </Field>
+              <Field label="Nom" htmlFor="sign-in-last-name">
+                <Input
+                  id="sign-in-last-name"
+                  required
+                  autoComplete="family-name"
+                  placeholder="Durand"
+                  value={lastName}
+                  onChange={(event) => setLastName(event.target.value)}
+                />
+              </Field>
+            </div>
+
             <Field
               label="Recevoir un lien de connexion"
               htmlFor="sign-in-email"
-              hint="Sans mot de passe : nous envoyons un lien valable quinze minutes."
+              hint="Sans mot de passe : nous envoyons un lien valable quinze minutes. Votre nom sert à ce que votre espace vous appelle par votre nom, rien de plus."
             >
               <Input
                 id="sign-in-email"
@@ -208,7 +271,12 @@ export function SignInForm() {
               </p>
             ) : null}
 
-            <Button type="submit" variant="secondary" loading={linkPending} className="w-fit">
+            <Button
+              type="submit"
+              variant="secondary"
+              loading={linkPending}
+              className="w-fit"
+            >
               M&apos;envoyer un lien
             </Button>
           </form>

@@ -84,7 +84,11 @@ export default function HomePage() {
                 la place d'être lue, et la phrase qui suit dit ce qu'il y a
                 derrière les trois verbes. */}
             <p className="mt-5 max-w-2xl font-display text-2xl leading-snug font-semibold text-ink-inverted md:text-[1.75rem]">
-              {siteConfig.signature}
+              {siteConfig.signatureLines.map((line) => (
+                <span key={line} className="block">
+                  {line}
+                </span>
+              ))}
             </p>
             <p className="mt-3 max-w-2xl leading-relaxed text-white/75">
               Estimateur, carte des ventes, observatoire et outils de calcul,

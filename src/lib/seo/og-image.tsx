@@ -290,7 +290,12 @@ export function renderOgImage({
                   lineHeight: 1.1,
                 }}
               >
-                {siteConfig.name}
+                {siteConfig.nameParts[0]}
+                {/* L'or clair, pas l'or plein : sur le bleu nuit, le second
+                    ne se détacherait pas. */}
+                <span style={{ color: GOLD_RULE }}>
+                  {siteConfig.nameParts[1]}
+                </span>
               </span>
               <span
                 style={{

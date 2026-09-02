@@ -76,7 +76,10 @@ export default function HomePage() {
                 thèse descend d'un cran, dans la signature, où elle est écrite
                 pour être répétée. */}
             <h1 className="mt-6 font-display text-[3.25rem] leading-[0.98] font-extrabold tracking-[-0.04em] text-ink-inverted md:text-[4.5rem] lg:text-[5.25rem]">
-              {siteConfig.name}
+              {siteConfig.nameParts[0]}
+              <span className="text-[color:var(--accent-rule)]">
+                {siteConfig.nameParts[1]}
+              </span>
             </h1>
             {/* LA SIGNATURE EST ICI, pas dans la pastille : cinquante signes
                 en capitales espacées y passeraient à la ligne, et une pastille

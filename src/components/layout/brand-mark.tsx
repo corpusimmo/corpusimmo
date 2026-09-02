@@ -69,7 +69,11 @@ export function BrandMark({
       {/* Le coin corné. Absent du tirage en réserve : à cette épaisseur de
           trait, il encombrerait la forme au lieu de la préciser. */}
       {inverted ? null : (
-        <path d="M18.5 3 26 10.5h-7.5z" fill="var(--primary-fg)" opacity="0.18" />
+        <path
+          d="M18.5 3 26 10.5h-7.5z"
+          fill="var(--primary-fg)"
+          opacity="0.18"
+        />
       )}
 
       <g
@@ -84,7 +88,12 @@ export function BrandMark({
       </g>
 
       {/* La ligne de signature. Le seul trait bronze de la marque. */}
-      <path d={SIGNATURE} stroke="var(--accent-rule)" strokeWidth="2" strokeLinecap="round" />
+      <path
+        d={SIGNATURE}
+        stroke="var(--accent-rule)"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -101,8 +110,26 @@ export function BrandLockup({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <BrandMark className={markClassName} tone={tone} />
-      <span className="font-display text-[1.125rem] font-semibold tracking-[-0.012em] text-ink">
-        {siteConfig.name}
+      {/* « Corpus » en encre, « Immo » en or. Sur fond sombre, l'or plein
+          (#8A6A2F) tomberait sous le seuil de contraste : le tirage en réserve
+          prend le filet clair, qui tient 4,5:1 sur le bleu nuit du pied de
+          page. */}
+      <span
+        className={cn(
+          "font-display text-[1.125rem] font-semibold tracking-[-0.012em]",
+          tone === "inverted" ? "text-ink-inverted" : "text-ink",
+        )}
+      >
+        {siteConfig.nameParts[0]}
+        <span
+          className={
+            tone === "inverted"
+              ? "text-[color:var(--accent-rule)]"
+              : "text-accent"
+          }
+        >
+          {siteConfig.nameParts[1]}
+        </span>
       </span>
     </span>
   );

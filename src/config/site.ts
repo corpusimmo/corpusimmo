@@ -14,8 +14,20 @@ const SIGNATURE_LINES = [
   "Sur les ventes réelles.",
 ] as const;
 
+/**
+ * Le nom, en deux morceaux.
+ *
+ * « Corpus » est l'encre, « Immo » est l'or : le second mot porte la couleur
+ * d'accent partout où le nom est écrit, du bandeau au titre d'accueil en
+ * passant par l'image sociale. Les composants lisent ce tableau ; `name`
+ * reste la chaîne entière pour tout ce qui n'est pas du dessin — un titre de
+ * page, un objet d'e-mail, une donnée structurée.
+ */
+const NAME_PARTS = ["Corpus", "Immo"] as const;
+
 export const siteConfig = {
-  name: "CorpusImmo",
+  name: NAME_PARTS.join(""),
+  nameParts: NAME_PARTS,
   legalName: "CorpusImmo",
 
   /**

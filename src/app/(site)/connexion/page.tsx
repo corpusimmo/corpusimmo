@@ -26,12 +26,14 @@ export default function ConnexionPage() {
       <div className="container-page">
         <div className="mx-auto max-w-md">
           <p className="eyebrow">Connexion</p>
-          <h1 className="mt-2 font-display text-3xl leading-tight text-ink">Se connecter</h1>
+          <h1 className="mt-2 font-display text-3xl leading-tight text-ink">
+            Se connecter
+          </h1>
+          {/* Une ligne. Ce que le compte apporte est déjà dit sous le
+              formulaire, et un paragraphe entre le titre et les boutons
+              retarde la seule chose qu'on est venu faire ici. */}
           <p className="mt-3 leading-relaxed text-ink-muted">
-            Un compte ne sert qu&apos;à une chose ici&nbsp;: prouver que votre adresse est bien la
-            vôtre, pour ouvrir les calculateurs et retrouver, d&apos;une visite à l&apos;autre,
-            vos estimations et vos comparables. Avec Google, ou par un lien envoyé à votre
-            adresse.
+            Pour ouvrir les calculateurs et retrouver vos estimations.
           </p>
 
           <div className="mt-8">
@@ -42,19 +44,31 @@ export default function ConnexionPage() {
 
           <p className="mt-8 border-t border-border pt-6 text-sm leading-relaxed text-ink-muted">
             Rien de ce que propose le site n&apos;exige un compte. L&apos;
-            <Link href="/estimer" className="font-semibold text-primary underline">
+            <Link
+              href="/estimer"
+              className="font-semibold text-primary underline"
+            >
               estimateur
             </Link>
             , la{" "}
-            <Link href="/carte" className="font-semibold text-primary underline">
+            <Link
+              href="/carte"
+              className="font-semibold text-primary underline"
+            >
               carte
             </Link>
             , l&apos;
-            <Link href="/observatoire" className="font-semibold text-primary underline">
+            <Link
+              href="/observatoire"
+              className="font-semibold text-primary underline"
+            >
               observatoire
             </Link>{" "}
             et les{" "}
-            <Link href="/outils" className="font-semibold text-primary underline">
+            <Link
+              href="/outils"
+              className="font-semibold text-primary underline"
+            >
               dix outils
             </Link>{" "}
             sont ouverts.

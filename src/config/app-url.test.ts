@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 
-import { resolveAppUrl } from "./app-url";
+import { PRODUCTION_URL, resolveAppUrl } from "./app-url";
 
 /**
  * L'origine publique décide des URL canoniques, du plan de site, des
@@ -23,6 +23,12 @@ describe("resolveAppUrl", () => {
     expect(resolveAppUrl()).toBe("https://www.corpus.immo");
   });
 
+  it("le domaine de production est l'apex, celui qui sert vraiment le site", () => {
+    // `www.corpus.immo` répond 308 vers `corpus.immo` : publier la forme
+    // redirigée coûterait une requête par visite et diluerait les signaux.
+    expect(PRODUCTION_URL).toBe("https://corpus.immo");
+  });
+
   it("retient l'alias de production de la plateforme avant l'URL du déploiement", () => {
     vi.stubEnv("NEXT_PUBLIC_APP_URL", "");
     vi.stubEnv("VERCEL_PROJECT_PRODUCTION_URL", "www.corpus.immo");
@@ -37,7 +43,7 @@ describe("resolveAppUrl", () => {
     vi.stubEnv("NEXT_PUBLIC_VERCEL_URL", "");
     vi.stubEnv("VERCEL_URL", "");
     vi.stubEnv("NODE_ENV", "production");
-    expect(resolveAppUrl()).toBe("https://www.corpus.immo");
+    expect(resolveAppUrl()).toBe("https://corpus.immo");
   });
 
   it("garde localhost en développement : une préversion ne se déclare pas canonique", () => {

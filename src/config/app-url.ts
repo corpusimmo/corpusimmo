@@ -18,11 +18,18 @@
 /**
  * Le domaine de production, écrit une fois.
  *
+ * SANS `www`, ET CE N'EST PAS UN DÉTAIL. `www.corpus.immo` répond bien, mais
+ * par une redirection 308 vers `corpus.immo` : c'est l'apex qui sert le site.
+ * Une URL canonique, une entrée de plan de site ou un lien de partage qui
+ * pointe vers la forme redirigée coûte une requête à chaque visite, dilue les
+ * signaux de référencement entre deux adresses, et fait échouer une URI de
+ * redirection OAuth déclarée sur l'autre forme.
+ *
  * `NEXT_PUBLIC_APP_URL` et les variables de la plateforme restent prioritaires :
  * une préversion doit s'annoncer sous SON adresse, jamais sous celle-ci, sinon
  * elle se déclare canonique et se met en concurrence avec le site.
  */
-export const PRODUCTION_URL = "https://www.corpus.immo";
+export const PRODUCTION_URL = "https://corpus.immo";
 
 function clean(value: string | undefined): string | undefined {
   const trimmed = value?.trim();

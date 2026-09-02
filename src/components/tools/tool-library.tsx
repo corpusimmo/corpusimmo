@@ -11,6 +11,7 @@
  */
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Bookmark, Search, SlidersHorizontal } from "lucide-react";
 
@@ -19,22 +20,33 @@ import { toolAssetTypes, toolUsages } from "@/config/navigation";
 import type { ToolAssetType, ToolUsage } from "@/config/navigation";
 import { cn } from "@/lib/utils/cn";
 import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
+import { getToolPreviews } from "@/data/tool-previews";
 import type { ToolCard } from "@/types/tool";
 
 import { FavoriteButton } from "./favorite-button";
 import { useFavorites } from "./favorites";
 
-function matches(tool: ToolCard, assetType: ToolAssetType | null, usage: ToolUsage | null, query: string) {
+function matches(
+  tool: ToolCard,
+  assetType: ToolAssetType | null,
+  usage: ToolUsage | null,
+  query: string,
+) {
   // « Tous actifs » répond à n'importe quel filtre de type d'actif : c'est ce
   // qui évite qu'un comparateur de prêts disparaisse dès qu'on clique
   // « Bureaux ».
-  if (assetType && !tool.assetTypes.includes(assetType) && !tool.assetTypes.includes("tous-actifs")) {
+  if (
+    assetType &&
+    !tool.assetTypes.includes(assetType) &&
+    !tool.assetTypes.includes("tous-actifs")
+  ) {
     return false;
   }
   if (usage && !tool.usages.includes(usage)) return false;
 
   if (query) {
-    const haystack = `${tool.title} ${tool.summary} ${tool.audience}`.toLowerCase();
+    const haystack =
+      `${tool.title} ${tool.summary} ${tool.audience}`.toLowerCase();
     if (!haystack.includes(query.toLowerCase())) return false;
   }
   return true;
@@ -64,7 +76,8 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
     setOnlyFavorites(false);
   };
 
-  const filtered = assetType !== null || usage !== null || query !== "" || onlyFavorites;
+  const filtered =
+    assetType !== null || usage !== null || query !== "" || onlyFavorites;
 
   return (
     <div className="flex flex-col gap-8">
@@ -90,7 +103,12 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
           value={assetType}
           onChange={setAssetType}
         />
-        <Facets legend="Usage" options={toolUsages} value={usage} onChange={setUsage} />
+        <Facets
+          legend="Usage"
+          options={toolUsages}
+          value={usage}
+          onChange={setUsage}
+        />
 
         {/* Le filtre n'apparaît qu'une fois qu'il a quelque chose à montrer :
             un « mes favoris (0) » proposé d'emblée n'apprend rien et occupe
@@ -126,7 +144,12 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
             </p>
             {/* `size="sm"` dessine 36 px de haut : la zone d'appui complète
                 les 8 px qui manquent, sans alourdir la barre de filtres. */}
-            <Button variant="ghost" size="sm" onClick={reset} className="tap-target">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={reset}
+              className="tap-target"
+            >
               <SlidersHorizontal aria-hidden="true" className="size-4" />
               Tout afficher
             </Button>
@@ -139,34 +162,83 @@ export function ToolLibrary({ tools }: { tools: ToolCard[] }) {
           <li key={tool.id}>
             <Link
               href={`/outils/${tool.id}`}
-              className="group flex h-full flex-col gap-3 rounded-lg border border-border bg-surface p-6 transition-shadow hover:shadow-md"
+              className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-xs transition-[box-shadow,border-color] hover:border-border-strong hover:shadow-md"
             >
-              <span className="flex items-start justify-between gap-3">
-                <span className="eyebrow-text">{tool.audience}</span>
-                {/* Les familles d'actif en silhouettes, dans la grammaire du
+              {/* L'APERÇU DU CLASSEUR, en tête de carte.
+                  Un catalogue d'outils qui ne montre aucun outil demande de
+                  croire sur parole. La capture prouve en une seconde que le
+                  fichier existe et à quoi il ressemble ; elle est cadrée par
+                  le haut, parce qu'un tableur se reconnaît à son en-tête et
+                  à ses premières lignes, jamais à son milieu. Le classeur,
+                  lui, ne se récupère que sur la fiche. */}
+              <ToolShot id={tool.id} title={tool.title} />
+
+              <span className="flex flex-1 flex-col gap-3 p-6">
+                <span className="flex items-start justify-between gap-3">
+                  <span className="eyebrow-text">{tool.audience}</span>
+                  {/* Les familles d'actif en silhouettes, dans la grammaire du
                     logotype : le classement du catalogue devient lisible d'un
                     coup d'œil, sans photo. */}
-                <span className="flex shrink-0 gap-1 text-ink-subtle" aria-hidden="true">
-                  {assetIconsFor(tool.assetTypes).map((name) => (
-                    <AssetTypeIcon key={name} name={name} className="size-5" />
-                  ))}
+                  <span
+                    className="flex shrink-0 gap-1 text-ink-subtle"
+                    aria-hidden="true"
+                  >
+                    {assetIconsFor(tool.assetTypes).map((name) => (
+                      <AssetTypeIcon
+                        key={name}
+                        name={name}
+                        className="size-5"
+                      />
+                    ))}
+                  </span>
                 </span>
-              </span>
-              <h2 className="font-display text-xl leading-snug text-ink">{tool.title}</h2>
-              <p className="flex-1 text-sm leading-relaxed text-ink-muted">{tool.summary}</p>
-              <span className="flex flex-wrap items-center gap-2 pt-1">
-                {tool.usages.map((id) => (
-                  <Badge key={id} tone="neutral" size="sm">
-                    {toolUsages.find((entry) => entry.id === id)?.label ?? id}
-                  </Badge>
-                ))}
-                <FavoriteButton slug={tool.id} title={tool.title} className="ml-auto" />
+                <h2 className="font-display text-xl leading-snug text-ink">
+                  {tool.title}
+                </h2>
+                <p className="flex-1 text-sm leading-relaxed text-ink-muted">
+                  {tool.summary}
+                </p>
+                <span className="flex flex-wrap items-center gap-2 pt-1">
+                  {tool.usages.map((id) => (
+                    <Badge key={id} tone="neutral" size="sm">
+                      {toolUsages.find((entry) => entry.id === id)?.label ?? id}
+                    </Badge>
+                  ))}
+                  <FavoriteButton
+                    slug={tool.id}
+                    title={tool.title}
+                    className="ml-auto"
+                  />
+                </span>
               </span>
             </Link>
           </li>
         ))}
       </ul>
     </div>
+  );
+}
+
+/**
+ * La vignette d'un outil : la première capture de son classeur.
+ *
+ * Rien n'est rendu quand l'outil n'a pas encore d'aperçu — un cadre vide
+ * ferait douter de tout le catalogue, l'absence ne se remarque pas.
+ */
+function ToolShot({ id, title }: { id: ToolCard["id"]; title: string }) {
+  const shot = getToolPreviews(id)[0];
+  if (!shot) return null;
+
+  return (
+    <span className="relative block aspect-[16/9] w-full overflow-hidden border-b border-border-soft bg-surface-2">
+      <Image
+        src={shot.src}
+        alt={`Aperçu du classeur : ${title}, onglet « ${shot.label} ».`}
+        fill
+        sizes="(min-width: 768px) 46vw, 92vw"
+        className="object-cover object-top"
+      />
+    </span>
   );
 }
 
@@ -231,6 +303,7 @@ const ASSET_ICONS: Record<ToolAssetType, AssetIconName[]> = {
 
 function assetIconsFor(types: readonly ToolAssetType[]): AssetIconName[] {
   const seen = new Set<AssetIconName>();
-  for (const type of types) for (const name of ASSET_ICONS[type]) seen.add(name);
+  for (const type of types)
+    for (const name of ASSET_ICONS[type]) seen.add(name);
   return [...seen].slice(0, 3);
 }

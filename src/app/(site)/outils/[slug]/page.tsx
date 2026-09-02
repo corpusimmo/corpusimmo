@@ -43,7 +43,9 @@ export function generateStaticParams() {
  * branche d'erreur, sortirait les DIX fiches de l'index. Le test
  * `src/app/sitemap.test.ts` le rattrape, mais autant ne pas l'écrire.
  */
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({
+  params,
+}: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const tool = getToolCard(slug);
   if (!tool) return { title: "Outil introuvable" };
@@ -103,15 +105,16 @@ export default async function OutilPage({ params }: PageProps) {
             <h1 className="mt-2 font-display text-3xl leading-tight text-ink md:text-4xl">
               {tool.title}
             </h1>
-            <p className="mt-3 text-lg leading-relaxed text-ink-muted">{tool.summary}</p>
+            <p className="mt-3 text-lg leading-relaxed text-ink-muted">
+              {tool.summary}
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
             <FavoriteButton
               slug={tool.id}
               title={tool.title}
-              withLabel
-              className="order-last ml-auto border border-border"
+              className="order-last ml-auto"
             />
             {tool.assetTypes.map((id) => (
               <Badge key={id} tone="neutral" size="sm">
@@ -131,11 +134,13 @@ export default async function OutilPage({ params }: PageProps) {
             que cette fiche-ci doit rester statique donc indexable. */}
         <section className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6 sm:flex-row sm:items-center sm:justify-between">
           <div className="max-w-xl">
-            <h2 className="font-display text-xl text-ink">Ouvrir le calculateur</h2>
+            <h2 className="font-display text-xl text-ink">
+              Ouvrir le calculateur
+            </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              Gratuit, dans le navigateur. Le calculateur s&apos;utilise en étant connecté, à
-              raison de deux outils par semaine glissante. Ceux que vous avez déjà ouverts le
-              restent, sans limite.
+              Gratuit, dans le navigateur. Le calculateur s&apos;utilise en
+              étant connecté, à raison de deux outils par semaine glissante.
+              Ceux que vous avez déjà ouverts le restent, sans limite.
             </p>
           </div>
           <Button asChild className="shrink-0">
@@ -149,10 +154,14 @@ export default async function OutilPage({ params }: PageProps) {
         <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_22rem]">
           <div className="flex flex-col gap-6">
             <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
-              <h2 className="font-display text-xl text-ink">Pourquoi cet outil</h2>
+              <h2 className="font-display text-xl text-ink">
+                Pourquoi cet outil
+              </h2>
               {tool.body.map((paragraph, index) => (
                 <Fragment key={paragraph}>
-                  <p className="text-sm leading-relaxed text-ink-muted">{paragraph}</p>
+                  <p className="text-sm leading-relaxed text-ink-muted">
+                    {paragraph}
+                  </p>
                   {/* Le schéma sous le PREMIER paragraphe, et seulement là où la
                       fiche annonce déjà ce qu'il montre : « le bilan se lit à
                       l'envers », « le mur d'échéances que la moyenne cache ».
@@ -172,11 +181,16 @@ export default async function OutilPage({ params }: PageProps) {
             </section>
 
             <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
-              <h2 className="font-display text-xl text-ink">Ce qu&apos;il calcule</h2>
+              <h2 className="font-display text-xl text-ink">
+                Ce qu&apos;il calcule
+              </h2>
               <ul className="flex flex-col gap-2">
                 {tool.contents.map((item) => (
                   <li key={item} className="flex gap-2.5 text-sm text-ink">
-                    <span aria-hidden="true" className="mt-2 size-1.5 shrink-0 rounded-full bg-accent-rule" />
+                    <span
+                      aria-hidden="true"
+                      className="mt-2 size-1.5 shrink-0 rounded-full bg-accent-rule"
+                    />
                     {item}
                   </li>
                 ))}
@@ -186,10 +200,13 @@ export default async function OutilPage({ params }: PageProps) {
             {previews.length > 0 ? (
               <section className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-6">
                 <div>
-                  <h2 className="font-display text-xl text-ink">Le classeur, onglet par onglet</h2>
+                  <h2 className="font-display text-xl text-ink">
+                    Le classeur, onglet par onglet
+                  </h2>
                   <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-                    L&apos;outil ci-dessus reprend ces calculs dans le navigateur. Le classeur, lui,
-                    s&apos;emporte, s&apos;annote et se transmet.
+                    L&apos;outil ci-dessus reprend ces calculs dans le
+                    navigateur. Le classeur, lui, s&apos;emporte, s&apos;annote
+                    et se transmet.
                   </p>
                 </div>
                 <PreviewGallery shots={previews} title={tool.title} />
@@ -199,26 +216,38 @@ export default async function OutilPage({ params }: PageProps) {
 
           <aside className="flex flex-col gap-5">
             <section className="flex flex-col gap-3 rounded-lg border border-warning/25 bg-warning-soft p-6">
-              <h2 className="text-sm font-semibold text-warning-soft-fg">Ce qu&apos;il ne fait pas</h2>
-              <p className="text-sm leading-relaxed text-warning-soft-fg/90">{tool.limits}</p>
-              <p className="text-sm leading-relaxed text-warning-soft-fg/90">{spec.caveat}</p>
+              <h2 className="text-sm font-semibold text-warning-soft-fg">
+                Ce qu&apos;il ne fait pas
+              </h2>
+              <p className="text-sm leading-relaxed text-warning-soft-fg/90">
+                {tool.limits}
+              </p>
+              <p className="text-sm leading-relaxed text-warning-soft-fg/90">
+                {spec.caveat}
+              </p>
             </section>
 
             {tool.matrix === "coming" ? (
               <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
                 <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
-                  <FileSpreadsheet aria-hidden="true" className="size-4 text-ink-subtle" />
+                  <FileSpreadsheet
+                    aria-hidden="true"
+                    className="size-4 text-ink-subtle"
+                  />
                   Le classeur Excel
                 </h2>
                 <p className="text-sm leading-relaxed text-ink-muted">
-                  La matrice qui double cet outil est en cours de révision. Elle n&apos;est pas
-                  encore téléchargeable : nous préférons l&apos;annoncer plutôt que de proposer un
-                  bouton qui ne donnerait rien.
+                  La matrice qui double cet outil est en cours de révision. Elle
+                  n&apos;est pas encore téléchargeable : nous préférons
+                  l&apos;annoncer plutôt que de proposer un bouton qui ne
+                  donnerait rien.
                 </p>
               </section>
             ) : null}
 
-            <p className="text-xs leading-relaxed text-ink-subtle">{disclaimers.toolResult}</p>
+            <p className="text-xs leading-relaxed text-ink-subtle">
+              {disclaimers.toolResult}
+            </p>
           </aside>
         </div>
 
@@ -229,7 +258,10 @@ export default async function OutilPage({ params }: PageProps) {
             `src/lib/seo/related-tools.ts`), pas listés à la main : trois liens,
             pas un pavé, et ils restent justes quand un outil change d'axe. */}
         {neighbours.length > 0 ? (
-          <section aria-labelledby="voisins" className="border-t border-border pt-8">
+          <section
+            aria-labelledby="voisins"
+            className="border-t border-border pt-8"
+          >
             <h2 id="voisins" className="font-display text-xl text-ink">
               Dans la suite du dossier
             </h2>
@@ -244,7 +276,9 @@ export default async function OutilPage({ params }: PageProps) {
                     href={`/outils/${neighbour.id}`}
                     className="group flex h-full flex-col gap-2 rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md"
                   >
-                    <h3 className="text-base font-semibold text-ink">{neighbour.title}</h3>
+                    <h3 className="text-base font-semibold text-ink">
+                      {neighbour.title}
+                    </h3>
                     <p className="flex-1 text-sm leading-relaxed text-ink-muted">
                       {neighbour.summary}
                     </p>

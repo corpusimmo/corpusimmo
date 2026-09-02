@@ -66,7 +66,7 @@ emplacement. Aucune image n’est la photographie d’un lieu réel.
 | `/` accueil, section « Notre engagement » | `ville-toits.webp` | Fond sous un voile de marine, `alt=""` : décorative |
 | `/` accueil, section « Pour les professionnels » | `bien-bureaux-2.webp` | Colonne de droite, à partir de 1024 px seulement |
 | `/a-propos` | `ville-rue-fenetre.webp` | Bandeau d’ouverture 21:9 |
-| `/prix-immobilier` | `ville-moyenne-aerienne.webp` | Colonne de droite de l’en-tête |
+| `/prix-immobilier` | `ville-moyenne-aerienne.webp` | Bandeau pleine largeur DERRIÈRE le titre, sous voile de marine, comme le héros de l’accueil. En vignette à côté du titre, avec bordure, ombre et légende, elle se lisait comme une illustration rapportée |
 | `/blog` | `bien-appartement-ancien-2.webp` | Colonne de droite de l’en-tête |
 | `/solutions` | `interieur-bureaux-plateau.webp` | Colonne de droite du héros, à partir de 1024 px |
 | `/solutions/*` (`marketing/offer-page.tsx`, prop `illustration`) | un `interieur-…` par offre | Colonne de droite de l’en-tête, à partir de 1024 px |

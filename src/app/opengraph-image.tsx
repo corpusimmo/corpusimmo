@@ -20,7 +20,7 @@ export default function OpengraphImage() {
     // dispose de six cents pixels de large pour la faire lire en entier, et
     // c'est là qu'elle travaille le plus — une carte de partage est vue par
     // des gens qui ne connaissent pas encore le nom.
-    eyebrow: "Estimation, carte des ventes, observatoire",
+    eyebrow: "Estimation, carte, observatoire, outils, ressources",
     title: siteConfig.signature,
     subtitle:
       "Sur les mutations enregistrées par la DGFiP et publiées en open data. Partout en France.",

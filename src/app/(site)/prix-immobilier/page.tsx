@@ -38,7 +38,7 @@ export default function PrixImmobilierPage() {
   const lastYear = dataset.years[dataset.years.length - 1];
 
   return (
-    <div className="bg-canvas py-10 md:py-14">
+    <div className="pb-10 md:pb-14">
       <div className="container-page flex flex-col gap-10">
         {/* Un sommaire est une liste : c'est ce que dit le balisage, et rien de
             plus. Aucun jeu de données déclaré, aucune FAQ absente de l'écran. */}
@@ -58,41 +58,51 @@ export default function PrixImmobilierPage() {
             ),
           ]}
         />
+      </div>
 
-        <header className="grid gap-8 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-center">
-          <div className="max-w-3xl">
-            <p className="eyebrow">Observatoire des prix</p>
-            <h1 className="mt-2 font-display text-3xl leading-tight text-ink md:text-4xl">
-              Le prix immobilier, commune par commune
-            </h1>
-            <p className="mt-3 text-lg leading-relaxed text-ink-muted">
-              {cities.length} communes, {formatNumber(totalSales(cities))}{" "}
-              ventes de logement enregistrées entre {firstYear} et {lastYear}.
-              Chaque chiffre de ces pages est accompagné du nombre de ventes qui
-              le fonde, et rien n&apos;y est extrapolé depuis des annonces.
-            </p>
-          </div>
+      {/* LE BANDEAU, ET NON UNE VIGNETTE À CÔTÉ DU TITRE.
+          L'image était une carte posée à droite du texte, avec sa bordure, son
+          ombre et sa légende : trois cadres dans un cadre, qui se lisaient
+          comme une illustration rapportée. Elle passe DERRIÈRE le titre, sous
+          le même voile de marine que le héros de l'accueil, et la page gagne
+          d'un coup la parenté visuelle qui lui manquait. La mention
+          « illustration » reste, en bas à droite du bandeau : elle est due,
+          mais elle n'a pas à occuper une ligne de composition. */}
+      <header className="relative isolate -mt-[76px] overflow-hidden bg-surface-inverted pt-[76px] text-ink-inverted md:-mt-[84px] md:pt-[84px]">
+        <Image
+          src="/illustrations/ville-moyenne-aerienne.webp"
+          alt=""
+          fill
+          priority
+          sizes="100vw"
+          className="-z-20 object-cover object-center opacity-60"
+        />
+        <div
+          aria-hidden="true"
+          className="absolute inset-0 -z-10 bg-[linear-gradient(100deg,color-mix(in_srgb,var(--surface-inverted)_95%,transparent)_0%,color-mix(in_srgb,var(--surface-inverted)_86%,transparent)_48%,color-mix(in_srgb,var(--surface-inverted)_60%,transparent)_100%)]"
+        />
 
-          {/* Une ville moyenne vue du ciel, calme et ordinaire : c'est le cœur du
-              marché DVF, et c'est ce que ces pages documentent. Illustration
-              générée, aucune commune identifiable (voir docs/images.md). */}
-          <figure className="reveal-late">
-            <div className="relative aspect-[3/2] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs lg:aspect-[4/3]">
-              <Image
-                src="/illustrations/ville-moyenne-aerienne.webp"
-                alt="Illustration : vue aérienne oblique d'une ville moyenne française, cœur ancien, clocher, rivière et quartiers pavillonnaires."
-                fill
-                priority
-                sizes="(min-width: 1024px) 480px, 100vw"
-                className="object-cover"
-              />
-            </div>
-            <figcaption className="mt-2 text-xs text-ink-subtle">
-              Illustration, pas une commune du corpus.
-            </figcaption>
-          </figure>
-        </header>
+        <div className="container-page relative py-14 md:py-20">
+          <p className="eyebrow !bg-white/10 !text-[color:var(--accent-rule)] backdrop-blur-sm">
+            Observatoire des prix
+          </p>
+          <h1 className="mt-5 max-w-3xl font-display text-3xl leading-tight text-ink-inverted md:text-[2.75rem]">
+            Le prix immobilier, commune par commune
+          </h1>
+          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/80">
+            {cities.length} communes, {formatNumber(totalSales(cities))} ventes
+            de logement enregistrées entre {firstYear} et {lastYear}. Chaque
+            chiffre de ces pages est accompagné du nombre de ventes qui le
+            fonde, et rien n&apos;y est extrapolé depuis des annonces.
+          </p>
+          <p className="mt-6 text-xs text-white/45">
+            Illustration&nbsp;: aucune commune du corpus n&apos;est
+            photographiée.
+          </p>
+        </div>
+      </header>
 
+      <div className="container-page mt-10 flex flex-col gap-10">
         <section
           aria-labelledby="methode"
           className="grid gap-6 rounded-lg border border-border bg-surface p-6 lg:grid-cols-3"

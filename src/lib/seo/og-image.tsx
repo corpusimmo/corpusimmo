@@ -30,12 +30,17 @@
  *     #FFFFFF réserve (--ink-inverted)
  *
  * ─────────────────────────────────────────────────────────────────────────────
- * LA TYPOGRAPHIE, ET SA CONTRAINTE
- *   Aucune police n'est chargée : `next/og` embarque Noto Sans en graisse
- *   normale, et elle seule. Aller chercher Manrope supposerait un appel réseau
- *   pendant le build, donc un build qui peut échouer pour une image. La
- *   hiérarchie ne repose donc sur aucun gras : elle tient par les corps,
- *   l'interlettrage, la couleur et les filets.
+ * LA TYPOGRAPHIE EST CELLE DU SITE, ET ELLE EST VERSÉE AU DÉPÔT
+ *   `next/og` n'embarque que Noto Sans : sans rien faire, la vignette de
+ *   partage s'écrivait dans une police que le site n'utilise nulle part.
+ *   Manrope titre et Inter rédige, exactement comme dans le navigateur.
+ *
+ *   Les fichiers vivent dans `fonts/`, en TrueType, lus sur le disque au
+ *   chargement du module. PAS de `fetch` vers Google Fonts : un appel réseau
+ *   pendant un build est une panne qui attend son heure, et une image sociale
+ *   ne vaut pas un déploiement échoué. Satori ne lit d'ailleurs pas le WOFF2,
+ *   donc les fichiers que `next/font` met en cache ne serviraient à rien.
+ *   340 Ko en tout, lus une fois, jamais expédiés au navigateur.
  */
 
 import { readFileSync } from "node:fs";
@@ -43,6 +48,7 @@ import { join } from "node:path";
 
 import { ImageResponse } from "next/og";
 
+import { PRODUCTION_URL } from "@/config/app-url";
 import { siteConfig } from "@/config/site";
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
@@ -66,6 +72,44 @@ const RESERVE = "#ffffff";
 const PHOTO = `data:image/jpeg;base64,${readFileSync(
   join(process.cwd(), "src/lib/seo/og-fond.jpg"),
 ).toString("base64")}`;
+
+/* -------------------------------------------------------------- typographie */
+
+function font(file: string) {
+  return readFileSync(join(process.cwd(), "src/lib/seo/fonts", file));
+}
+
+/**
+ * Les trois fontes, dans l'ordre où Satori les essaie.
+ *
+ * Le nom de famille compte : `fontFamily: "Manrope"` dans un style ne trouve
+ * la police que si elle est déclarée sous ce nom-là. Une faute de frappe ne
+ * casse rien visiblement, elle retombe sur la première famille — d'où les deux
+ * constantes, partagées avec les styles plus bas.
+ */
+const DISPLAY = "Manrope";
+const BODY = "Inter";
+
+const FONTS = [
+  {
+    name: DISPLAY,
+    data: font("manrope-800.ttf"),
+    weight: 800 as const,
+    style: "normal" as const,
+  },
+  {
+    name: DISPLAY,
+    data: font("manrope-400.ttf"),
+    weight: 400 as const,
+    style: "normal" as const,
+  },
+  {
+    name: BODY,
+    data: font("inter-400.ttf"),
+    weight: 400 as const,
+    style: "normal" as const,
+  },
+];
 
 /* --------------------------------------------------------------- le logotype */
 
@@ -121,9 +165,17 @@ export interface OgImageInput {
   subtitle?: string;
 }
 
-/** Le domaine tel qu'on l'affiche : sans protocole, sans barre finale. */
+/**
+ * Le domaine imprimé sur l'image, TOUJOURS celui de production.
+ *
+ * Et non `siteConfig.url`, qui vaut l'origine du rendu : en développement il
+ * imprimait « localhost:3000 », et sur une préversion l'adresse jetable du
+ * déploiement. Une vignette de partage circule hors de son contexte, souvent
+ * en capture d'écran ; le seul domaine qu'elle puisse porter est celui où le
+ * site vit vraiment.
+ */
 function displayHost(): string {
-  return siteConfig.url.replace(/^https?:\/\//, "").replace(/\/+$/, "");
+  return PRODUCTION_URL.replace(/^https?:\/\//, "").replace(/\/+$/, "");
 }
 
 /**
@@ -154,6 +206,7 @@ export function renderOgImage({
         width: "100%",
         height: "100%",
         backgroundColor: NIGHT,
+        fontFamily: BODY,
       }}
     >
       {/* ═════════════════════════════════════ CALQUE 1, LA PHOTOGRAPHIE */}
@@ -229,9 +282,11 @@ export function renderOgImage({
             >
               <span
                 style={{
+                  fontFamily: DISPLAY,
+                  fontWeight: 800,
                   fontSize: 36,
                   color: RESERVE,
-                  letterSpacing: -0.8,
+                  letterSpacing: -1,
                   lineHeight: 1.1,
                 }}
               >
@@ -279,12 +334,17 @@ export function renderOgImage({
               padding: "10px 22px",
             }}
           >
+            {/* `nowrap` : la pastille est une forme fermée, un surtitre qui
+                passe à la ligne la fait déborder par le bas au lieu de la faire
+                grandir. Le corps et l'interlettrage sont calés pour que la plus
+                longue énumération du site tienne sur une ligne. */}
             <span
               style={{
-                fontSize: 20,
+                fontSize: 18,
                 color: GOLD_SOFT,
-                letterSpacing: 4,
+                letterSpacing: 3,
                 textTransform: "uppercase",
+                whiteSpace: "nowrap",
               }}
             >
               {eyebrow}
@@ -293,10 +353,14 @@ export function renderOgImage({
 
           <span
             style={{
+              fontFamily: DISPLAY,
+              fontWeight: 800,
               fontSize: titleSize(title),
               color: RESERVE,
-              lineHeight: 1.1,
-              letterSpacing: -1.6,
+              lineHeight: 1.06,
+              // Manrope est déjà serrée : au-delà, les jambages se touchent
+              // au corps du titre.
+              letterSpacing: -2,
               marginTop: 24,
             }}
           >
@@ -318,7 +382,14 @@ export function renderOgImage({
         </div>
 
         <div style={{ display: "flex", alignItems: "center" }}>
-          <span style={{ fontSize: 23, color: RESERVE, letterSpacing: 0.2 }}>
+          <span
+            style={{
+              fontSize: 23,
+              color: RESERVE,
+              letterSpacing: 0.2,
+              whiteSpace: "nowrap",
+            }}
+          >
             {displayHost()}
           </span>
           <div
@@ -331,8 +402,16 @@ export function renderOgImage({
               marginRight: 22,
             }}
           />
-          <span style={{ fontSize: 23, color: "rgba(255,255,255,0.7)" }}>
-            Estimateur, carte, observatoire et outils
+          {/* `nowrap` : l'énumération est une seule respiration, la couper en
+              deux lignes la ferait lire comme deux listes. */}
+          <span
+            style={{
+              fontSize: 22,
+              color: "rgba(255,255,255,0.7)",
+              whiteSpace: "nowrap",
+            }}
+          >
+            Estimateur, carte, observatoire, outils et ressources
           </span>
         </div>
       </div>
@@ -351,6 +430,6 @@ export function renderOgImage({
         }}
       />
     </div>,
-    { ...OG_SIZE },
+    { ...OG_SIZE, fonts: FONTS },
   );
 }

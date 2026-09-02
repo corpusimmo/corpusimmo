@@ -96,6 +96,39 @@ const emailLinkProvider: EmailConfig = {
  */
 export const isAuthConfigured = Boolean(googleId && googleSecret && authSecret);
 
+/**
+ * L'ÉTAT DE LA CONNEXION, DIT AU DÉMARRAGE ET PIÈCE PAR PIÈCE.
+ *
+ * Auth.js répond `error=Configuration` — « la connexion n'est pas configurée
+ * sur ce site » — pour quatre causes très différentes : secret absent,
+ * identifiants Google absents, base injoignable, ou base joignable dont les
+ * TABLES n'existent pas encore. Le message est le même dans les quatre cas, et
+ * sans ce journal il faut deviner laquelle.
+ *
+ * La ligne ne contient aucun secret : des booléens, et le nom de ce qui
+ * manque. Elle est écrite une fois par instance, au chargement du module.
+ */
+if (!isAuthConfigured || isDatabaseConfigured()) {
+  const missing = [
+    authSecret ? null : "AUTH_SECRET",
+    googleId ? null : "AUTH_GOOGLE_ID",
+    googleSecret ? null : "AUTH_GOOGLE_SECRET",
+  ].filter(Boolean);
+
+  if (missing.length > 0) {
+    console.warn(
+      `[auth] connexion indisponible, variables manquantes : ${missing.join(", ")}. ` +
+        "Le reste du site n'en dépend pas.",
+    );
+  } else if (isDatabaseConfigured()) {
+    console.info(
+      "[auth] connexion configurée, adaptateur base ACTIF. " +
+        "Une erreur « Configuration » à ce stade vient de la base : chaîne de " +
+        "connexion invalide, ou migrations non appliquées (pnpm db:migrate).",
+    );
+  }
+}
+
 export const authConfig: NextAuthConfig = {
   /**
    * L'ADAPTATEUR EST CONDITIONNEL, et il doit le rester.

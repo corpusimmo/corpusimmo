@@ -22,7 +22,7 @@
  * une préversion doit s'annoncer sous SON adresse, jamais sous celle-ci, sinon
  * elle se déclare canonique et se met en concurrence avec le site.
  */
-const PRODUCTION_URL = "https://www.corpus.immo";
+export const PRODUCTION_URL = "https://www.corpus.immo";
 
 function clean(value: string | undefined): string | undefined {
   const trimmed = value?.trim();

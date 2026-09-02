@@ -46,7 +46,10 @@ export function Progress({
         className="h-2 w-full overflow-hidden rounded-full bg-border-soft"
       >
         <div
-          className={cn("h-full rounded-full transition-[width] duration-300 ease-out", TONES[tone])}
+          className={cn(
+            "h-full rounded-full transition-[width] duration-300 ease-out",
+            TONES[tone],
+          )}
           style={{ width: `${percent}%` }}
         />
       </div>
@@ -74,7 +77,10 @@ export function Stepper({ steps, current, className }: StepperProps) {
           <li
             key={step}
             aria-current={active ? "step" : undefined}
-            className={cn("flex min-w-0 items-center gap-2", index < steps.length - 1 && "flex-1")}
+            className={cn(
+              "flex min-w-0 items-center gap-2",
+              index < steps.length - 1 && "flex-1",
+            )}
           >
             <span
               aria-hidden="true"
@@ -85,12 +91,20 @@ export function Stepper({ steps, current, className }: StepperProps) {
                 !done && !active && "border-border bg-surface text-ink-subtle",
               )}
             >
-              {done ? <Check className="size-3.5" strokeWidth={3} /> : index + 1}
+              {done ? (
+                <Check className="size-3.5" strokeWidth={3} />
+              ) : (
+                index + 1
+              )}
             </span>
 
+            {/* `whitespace-nowrap` et non `truncate` : une étiquette coupée
+                à « Carac… » ne nomme plus l'étape, alors qu'un rail un peu
+                plus serré se lit encore. C'est le trait de liaison qui cède la
+                place, pas le mot. */}
             <span
               className={cn(
-                "truncate text-xs font-medium",
+                "whitespace-nowrap text-xs font-medium",
                 active ? "text-ink" : "text-ink-muted",
                 // Only the active label survives on small screens.
                 !active && "hidden sm:inline",
@@ -104,7 +118,7 @@ export function Stepper({ steps, current, className }: StepperProps) {
               <span
                 aria-hidden="true"
                 className={cn(
-                  "h-px min-w-4 flex-1 rounded-full transition-colors duration-150",
+                  "h-px min-w-2 flex-1 rounded-full transition-colors duration-150",
                   done ? "bg-primary" : "bg-border",
                 )}
               />

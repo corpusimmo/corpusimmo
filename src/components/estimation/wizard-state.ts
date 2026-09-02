@@ -32,13 +32,23 @@ import type { ValuationRequest } from "@/types/valuation";
  * l'ont précédée : le formulaire a déjà montré qu'il savait de quoi il parlait
  * avant de réclamer quoi que ce soit de localisant.
  */
+/**
+ * Les six étiquettes du rail de progression.
+ *
+ * COURTES, ET C'EST LEUR SEULE CONTRAINTE. Elles s'affichent côte à côte, six
+ * de front, dans une colonne qui partage l'écran avec la fiche du bien :
+ * « Caractéristiques » et « Vos coordonnées » y arrivaient tronquées en
+ * « Carac… » et « Vos … », ce qui ne nomme plus rien. Le titre de l'écran,
+ * lui, a toute la place de développer — c'est là qu'on lit « Décrivez le
+ * bien » ou « Où envoyons-nous l'estimation ? ».
+ */
 export const WIZARD_STEPS = [
   "Adresse",
   "Usage",
-  "Type de bien",
-  "Caractéristiques",
-  "Votre projet",
-  "Vos coordonnées",
+  "Type",
+  "Détails",
+  "Projet",
+  "Contact",
 ] as const;
 
 export const STEP_COUNT = WIZARD_STEPS.length;
@@ -331,10 +341,10 @@ export const ADDRESS_STEP = WIZARD_STEPS.indexOf("Adresse");
 /** Les autres étapes, nommées elles aussi : un numéro en dur se périme au
  *  premier réordonnancement, ce qui vient précisément d'arriver. */
 export const USAGE_STEP = WIZARD_STEPS.indexOf("Usage");
-export const TYPE_STEP = WIZARD_STEPS.indexOf("Type de bien");
-export const FEATURES_STEP = WIZARD_STEPS.indexOf("Caractéristiques");
-export const INTENT_STEP = WIZARD_STEPS.indexOf("Votre projet");
-export const CONTACT_STEP = WIZARD_STEPS.indexOf("Vos coordonnées");
+export const TYPE_STEP = WIZARD_STEPS.indexOf("Type");
+export const FEATURES_STEP = WIZARD_STEPS.indexOf("Détails");
+export const INTENT_STEP = WIZARD_STEPS.indexOf("Projet");
+export const CONTACT_STEP = WIZARD_STEPS.indexOf("Contact");
 
 /** Les étapes réellement posées : l'adresse disparaît quand elle est déjà connue. */
 export function visibleSteps(state: WizardState): number[] {

@@ -84,6 +84,24 @@ export interface AccessState {
   enforced: boolean;
 }
 
+/**
+ * L'état d'accès de repli, quand la lecture échoue.
+ *
+ * Aucun outil débloqué, aucun verrou annoncé : l'espace s'affiche, il ne
+ * PRÉTEND rien sur ce que la personne possède, et il ne ferme rien non plus.
+ * Mieux vaut une section vide et honnête qu'une page d'erreur pour tout.
+ */
+export const UNKNOWN_ACCESS: AccessState = {
+  unlocked: [],
+  quota: {
+    limit: WEEKLY_LIMIT,
+    used: 0,
+    remaining: WEEKLY_LIMIT,
+    renewsAt: null,
+  },
+  enforced: false,
+};
+
 let warned = false;
 
 function secret(): string | undefined {
@@ -124,7 +142,11 @@ export async function readAccess(now: Date = new Date()): Promise<AccessState> {
 
       const stored = await readStoredAccess(userId, now);
       if (stored.configured) {
-        return { unlocked: stored.unlocked, quota: stored.quota, enforced: true };
+        return {
+          unlocked: stored.unlocked,
+          quota: stored.quota,
+          enforced: true,
+        };
       }
     } catch (error) {
       // Une base injoignable ne ferme pas l'espace : le cookie porte encore
@@ -160,7 +182,10 @@ export type GrantResult =
  * À n'appeler que depuis un route handler ou une action serveur — écrire un
  * cookie depuis un Server Component lève.
  */
-export async function grantAccess(slug: string, now: Date = new Date()): Promise<GrantResult> {
+export async function grantAccess(
+  slug: string,
+  now: Date = new Date(),
+): Promise<GrantResult> {
   const key = secret();
   if (!key) return { granted: true, alreadyOwned: true, quota: OPEN_QUOTA };
 
@@ -176,10 +201,18 @@ export async function grantAccess(slug: string, now: Date = new Date()): Promise
       // perdre la base ne doit pas fermer la porte à quelqu'un qui a le droit
       // d'entrer. Une base qui LÈVE est traitée de la même façon.
       if (outcome.granted) {
-        return { granted: true, alreadyOwned: outcome.alreadyOwned, quota: outcome.quota };
+        return {
+          granted: true,
+          alreadyOwned: outcome.alreadyOwned,
+          quota: outcome.quota,
+        };
       }
       if (outcome.reason === "quota_exhausted") {
-        return { granted: false, reason: "quota_exhausted", quota: outcome.quota };
+        return {
+          granted: false,
+          reason: "quota_exhausted",
+          quota: outcome.quota,
+        };
       }
     } catch (error) {
       logDatabaseFailure("déblocage en base", error);
@@ -187,7 +220,11 @@ export async function grantAccess(slug: string, now: Date = new Date()): Promise
   }
 
   const jar = await cookies();
-  const outcome = applyGrant(decodeGrants(jar.get(ACCESS_COOKIE)?.value, key), slug, now);
+  const outcome = applyGrant(
+    decodeGrants(jar.get(ACCESS_COOKIE)?.value, key),
+    slug,
+    now,
+  );
 
   if (!outcome.granted) {
     return { granted: false, reason: outcome.reason, quota: outcome.quota };
@@ -203,5 +240,9 @@ export async function grantAccess(slug: string, now: Date = new Date()): Promise
     });
   }
 
-  return { granted: true, alreadyOwned: outcome.alreadyOwned, quota: outcome.quota };
+  return {
+    granted: true,
+    alreadyOwned: outcome.alreadyOwned,
+    quota: outcome.quota,
+  };
 }

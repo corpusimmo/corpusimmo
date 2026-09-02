@@ -1,18 +1,29 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { ArrowRight, Bookmark, Clock, History, UserRound, Unlock } from "lucide-react";
+import {
+  ArrowRight,
+  Bookmark,
+  Clock,
+  History,
+  UserRound,
+  Unlock,
+} from "lucide-react";
 
 import { EstimationHistory } from "@/components/account/estimation-history";
 import { ProfileForm } from "@/components/account/profile-form";
 import { SavedTools } from "@/components/account/saved-tools";
 import { Button, PageHeader } from "@/components/ui";
 import { getToolCard } from "@/data/tools-catalogue";
-import { readAccess } from "@/lib/access/ledger";
+import { UNKNOWN_ACCESS, readAccess } from "@/lib/access/ledger";
 import { currentUserId } from "@/lib/auth/current-user";
 import { listEstimations, readProfile } from "@/lib/db";
 import { attempt } from "@/lib/db/attempt";
 
-import { clearEstimationsAction, forgetEstimationAction, saveProfileAction } from "./actions";
+import {
+  clearEstimationsAction,
+  forgetEstimationAction,
+  saveProfileAction,
+} from "./actions";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 /**
@@ -42,7 +53,17 @@ export const metadata: Metadata = pageMetadata({
 });
 
 export default async function MonEspacePage() {
-  const access = await readAccess();
+  // `readAccess` parle à la base et au cookie signé. Elle rattrape déjà ses
+  // propres pannes, mais pas celles qui viendraient d'ailleurs — un rôle sans
+  // droits sur `tool_unlocks`, par exemple, faisait tomber la page ENTIÈRE
+  // alors que le reste de l'espace n'en dépend pas. Une lecture qui échoue se
+  // dit ; elle ne ferme pas la porte.
+  const accessRead = await attempt(
+    "accès de la semaine",
+    () => readAccess(),
+    UNKNOWN_ACCESS,
+  );
+  const access = accessRead.value;
 
   // Pour une personne connectée, l'historique vient de la base et suit d'un
   // appareil à l'autre. Sinon il reste dans le navigateur, et la page le dit.
@@ -50,24 +71,34 @@ export default async function MonEspacePage() {
   // Une lecture qui échoue ne fait pas tomber la page : elle se dit, et le
   // reste de l'espace s'affiche. Voir `lib/db/attempt.ts`.
   const storedRead = userId
-    ? await attempt("historique des estimations", () => listEstimations(userId), null)
+    ? await attempt(
+        "historique des estimations",
+        () => listEstimations(userId),
+        null,
+      )
     : { value: null, failed: false };
   const profileRead = userId
     ? await attempt("profil", () => readProfile(userId), null)
     : { value: null, failed: false };
   const stored = storedRead.value;
   const profile = profileRead.value;
-  const degraded = storedRead.failed || profileRead.failed;
+  const degraded = accessRead.failed || storedRead.failed || profileRead.failed;
   const unlocked = access.unlocked
     .map((grant) => ({ grant, tool: getToolCard(grant.slug) }))
-    .filter((entry): entry is { grant: (typeof access.unlocked)[number]; tool: NonNullable<ReturnType<typeof getToolCard>> } =>
-      entry.tool !== undefined,
+    .filter(
+      (
+        entry,
+      ): entry is {
+        grant: (typeof access.unlocked)[number];
+        tool: NonNullable<ReturnType<typeof getToolCard>>;
+      } => entry.tool !== undefined,
     );
 
   const renews = access.quota.renewsAt
-    ? new Intl.DateTimeFormat("fr-FR", { dateStyle: "long", timeStyle: "short" }).format(
-        access.quota.renewsAt,
-      )
+    ? new Intl.DateTimeFormat("fr-FR", {
+        dateStyle: "long",
+        timeStyle: "short",
+      }).format(access.quota.renewsAt)
     : null;
 
   return (
@@ -87,8 +118,9 @@ export default async function MonEspacePage() {
             role="status"
             className="rounded-lg border border-warning/25 bg-warning-soft px-4 py-3 text-sm leading-relaxed text-warning-soft-fg"
           >
-            Une partie de vos données n&apos;a pas pu être relue à l&apos;instant. Rien
-            n&apos;est perdu&nbsp;: rechargez la page dans un moment.
+            Une partie de vos données n&apos;a pas pu être relue à
+            l&apos;instant. Rien n&apos;est perdu&nbsp;: rechargez la page dans
+            un moment.
           </p>
         ) : null}
 
@@ -97,7 +129,10 @@ export default async function MonEspacePage() {
           aria-labelledby="quota"
           className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6"
         >
-          <h2 id="quota" className="flex items-center gap-2 font-display text-xl text-ink">
+          <h2
+            id="quota"
+            className="flex items-center gap-2 font-display text-xl text-ink"
+          >
             <Clock aria-hidden="true" className="size-5 text-ink-subtle" />
             Vos accès de la semaine
           </h2>
@@ -112,26 +147,30 @@ export default async function MonEspacePage() {
                 {access.quota.remaining > 0 ? (
                   <>
                     {" "}
-                    Il vous en reste <strong className="text-ink">
+                    Il vous en reste{" "}
+                    <strong className="text-ink">
                       {access.quota.remaining}
-                    </strong>.
+                    </strong>
+                    .
                   </>
                 ) : renews ? (
                   <>
                     {" "}
-                    Un crédit se libère le <strong className="text-ink">{renews}</strong>.
+                    Un crédit se libère le{" "}
+                    <strong className="text-ink">{renews}</strong>.
                   </>
                 ) : null}
               </p>
               <p className="text-sm leading-relaxed text-ink-subtle">
-                La fenêtre glisse : elle ne se remet pas à zéro un lundi matin, chaque déblocage
-                libère son crédit sept jours après lui. Rouvrir un outil déjà ouvert ne coûte rien,
-                et mettre de côté non plus.
+                La fenêtre glisse : elle ne se remet pas à zéro un lundi matin,
+                chaque déblocage libère son crédit sept jours après lui. Rouvrir
+                un outil déjà ouvert ne coûte rien, et mettre de côté non plus.
               </p>
             </>
           ) : (
             <p className="text-sm leading-relaxed text-ink-muted">
-              Le quota n&apos;est pas appliqué sur cet environnement : tous les outils sont ouverts.
+              Le quota n&apos;est pas appliqué sur cet environnement : tous les
+              outils sont ouverts.
             </p>
           )}
 
@@ -156,13 +195,15 @@ export default async function MonEspacePage() {
               Vos outils débloqués
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              Ils le restent, sans limite de temps ni de nombre d&apos;ouvertures.
+              Ils le restent, sans limite de temps ni de nombre
+              d&apos;ouvertures.
             </p>
           </div>
 
           {unlocked.length === 0 ? (
             <p className="rounded-lg border border-dashed border-border bg-surface-2 px-6 py-8 text-center text-sm text-ink-muted">
-              Vous n&apos;avez encore ouvert aucun outil. Le premier est à une adresse e-mail.
+              Vous n&apos;avez encore ouvert aucun outil. Le premier est à une
+              adresse e-mail.
             </p>
           ) : (
             <ul className="flex flex-col gap-3">
@@ -180,13 +221,20 @@ export default async function MonEspacePage() {
                     </Link>
                     <p className="tnum mt-0.5 text-sm text-ink-subtle">
                       Ouvert le{" "}
-                      {new Intl.DateTimeFormat("fr-FR", { dateStyle: "long" }).format(
-                        new Date(grant.at * 1000),
-                      )}
+                      {new Intl.DateTimeFormat("fr-FR", {
+                        dateStyle: "long",
+                      }).format(new Date(grant.at * 1000))}
                     </p>
                   </div>
-                  <Button asChild size="sm" variant="secondary" className="shrink-0">
-                    <Link href={`/outils/${tool.id}/calculer`}>Rouvrir le calculateur</Link>
+                  <Button
+                    asChild
+                    size="sm"
+                    variant="secondary"
+                    className="shrink-0"
+                  >
+                    <Link href={`/outils/${tool.id}/calculer`}>
+                      Rouvrir le calculateur
+                    </Link>
                   </Button>
                 </li>
               ))}
@@ -197,13 +245,16 @@ export default async function MonEspacePage() {
         {/* ------------------------------------- les outils mis de côté -- */}
         <section aria-labelledby="signets" className="flex flex-col gap-4">
           <div>
-            <h2 id="signets" className="flex items-center gap-2 font-display text-xl text-ink">
+            <h2
+              id="signets"
+              className="flex items-center gap-2 font-display text-xl text-ink"
+            >
               <Bookmark aria-hidden="true" className="size-5 text-ink-subtle" />
               Mis de côté pour plus tard
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              Repérer ne consomme aucun crédit. C&apos;est fait pour choisir où dépenser les deux de
-              la semaine.
+              Repérer ne consomme aucun crédit. C&apos;est fait pour choisir où
+              dépenser les deux de la semaine.
             </p>
           </div>
 
@@ -214,13 +265,19 @@ export default async function MonEspacePage() {
         {userId ? (
           <section aria-labelledby="profil" className="flex flex-col gap-4">
             <div>
-              <h2 id="profil" className="flex items-center gap-2 font-display text-xl text-ink">
-                <UserRound aria-hidden="true" className="size-5 text-ink-subtle" />
+              <h2
+                id="profil"
+                className="flex items-center gap-2 font-display text-xl text-ink"
+              >
+                <UserRound
+                  aria-hidden="true"
+                  className="size-5 text-ink-subtle"
+                />
                 Vos informations
               </h2>
               <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-                Elles ne servent qu&apos;à vous adresser correctement, et à vous rappeler si vous
-                le demandez. Le téléphone est facultatif.
+                Elles ne servent qu&apos;à vous adresser correctement, et à vous
+                rappeler si vous le demandez. Le téléphone est facultatif.
               </p>
             </div>
 
@@ -248,8 +305,8 @@ export default async function MonEspacePage() {
               Vos estimations
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              Chaque estimation terminée s&apos;ajoute ici, avec sa fourchette et le nombre de
-              ventes qui la portent.{" "}
+              Chaque estimation terminée s&apos;ajoute ici, avec sa fourchette
+              et le nombre de ventes qui la portent.{" "}
               {stored
                 ? "Elles sont rattachées à votre compte."
                 : "Elles restent dans ce navigateur tant que vous n'êtes pas connecté."}

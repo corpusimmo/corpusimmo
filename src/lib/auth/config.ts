@@ -125,13 +125,10 @@ if (!isAuthConfigured || isDatabaseConfigured()) {
       `[auth] connexion indisponible, variables manquantes : ${missing.join(", ")}. ` +
         "Le reste du site n'en dépend pas.",
     );
-  } else if (isDatabaseConfigured()) {
-    console.info(
-      "[auth] connexion configurée, adaptateur base ACTIF. " +
-        "Une erreur « Configuration » à ce stade vient de la base : chaîne de " +
-        "connexion invalide, ou migrations non appliquées (pnpm db:migrate).",
-    );
   }
+  // Rien n'est journalisé quand tout est en place : une ligne écrite à chaque
+  // démarrage à froid, sur le ton du diagnostic, se lit comme une panne dans
+  // une console qu'on ouvre justement parce qu'on en cherche une.
 }
 
 export const authConfig: NextAuthConfig = {

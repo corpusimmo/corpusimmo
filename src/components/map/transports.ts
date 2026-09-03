@@ -268,6 +268,27 @@ const AMENITY_ICONS: Record<string, string> = {
   playground: "playground_11",
 };
 
+/** L'URL du sprite, pour que la légende affiche EXACTEMENT la même image. */
+export const SPRITE_BASE = "https://tiles.openfreemap.org/sprites/ofm_f384/ofm";
+
+/**
+ * Le pictogramme représentatif d'une famille, pour la légende.
+ *
+ * Une famille couvre plusieurs valeurs (« arrêts » couvre bus et tram) : on
+ * prend la première qui a une image. La légende et la carte tirent ainsi du
+ * MÊME atlas, ce qui est la seule façon de garantir qu'un lecteur retrouve à
+ * l'écran le dessin qu'il vient de lire. Une icône « de la même famille
+ * sémantique » ne suffit pas : c'est une correspondance à faire dans la tête
+ * du lecteur, donc une correspondance qu'il ne fera pas.
+ */
+export function legendIconName(values: readonly string[]): string | null {
+  for (const value of values) {
+    const icon = STOP_ICONS[value] ?? AMENITY_ICONS[value];
+    if (icon) return icon;
+  }
+  return null;
+}
+
 /**
  * `["match", ["get", champ], "bus_stop", "bus_11", …, repli]`.
  *
@@ -297,6 +318,17 @@ function iconExpression(
  */
 const ICON_MIN_ZOOM = 15.5;
 
+/** Identifiant de la couche qui nomme les gares. */
+export const STATION_LABEL_LAYER = "transports-station-label";
+
+/**
+ * Zoom d'apparition des noms de gares.
+ *
+ * Plus haut que celui des pictogrammes : un mot prend dix fois la place d'une
+ * icône, et il n'y a rien de pire qu'un nom qui recouvre un prix.
+ */
+const STATION_LABEL_MIN_ZOOM = 16;
+
 /**
  * Tous les identifiants posés, dans l'ordre de dessin. Exporté parce que
  * l'allumage du calque doit pouvoir les parcourir sans reconstruire les
@@ -315,6 +347,7 @@ export const TRANSPORT_LAYER_IDS: readonly string[] = [
   // elle servirait à autre chose qu'à parcourir.
   ...TRANSPORT_STOPS.map((s) => `${ICON_PREFIX}${s.id}`),
   ...AMENITY_CATEGORIES.map((a) => `${ICON_PREFIX}${a.id}`),
+  STATION_LABEL_LAYER,
 ];
 
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -572,7 +605,51 @@ export function transportLayers(): LayerSpec[] {
     ),
   ];
 
-  return [...lines, ...amenities, ...stops, ...icons];
+  /**
+   * LE NOM DES GARES, ET D'ELLES SEULES.
+   *
+   * La couche `poi` porte un champ `name` : on peut donc nommer les points.
+   * Reste à décider lesquels, et la réponse n'est pas « tous ». Étiqueter
+   * chaque arrêt de bus couvrirait le centre d'une ville de dizaines de mots
+   * et entrerait en concurrence directe avec les pastilles de prix, qui sont
+   * la donnée de l'écran. Une gare, une station de métro ou un terminus de
+   * tram sont d'un autre ordre : ils structurent la lecture d'un quartier et
+   * se comptent sur les doigts d'une main dans une vue.
+   *
+   * D'où le zoom d'apparition plus élevé encore que celui des pictogrammes,
+   * et `text-optional` : si le nom ne tient pas, le pictogramme reste seul
+   * plutôt que de faire disparaître le point.
+   */
+  const names = ({
+    id: STATION_LABEL_LAYER,
+    type: "symbol",
+    source: OFM_SOURCE_ID,
+    "source-layer": "poi",
+    minzoom: STATION_LABEL_MIN_ZOOM,
+    filter: allOf(
+      matchSubclass(["station", "halt", "subway", "bus_station", "ferry_terminal"]),
+      densityFilter(),
+    ),
+    layout: {
+      visibility: "none",
+      "text-field": ["get", "name"],
+      "text-font": ["Noto Sans Regular"],
+      "text-size": 10.5,
+      "text-anchor": "top",
+      "text-offset": [0, 0.9],
+      "text-max-width": 8,
+      "text-padding": 4,
+      "text-optional": true,
+      "text-allow-overlap": false,
+    },
+    paint: {
+      "text-color": "#1e293b",
+      "text-halo-color": "rgba(255,255,255,0.9)",
+      "text-halo-width": 1.4,
+    },
+  }) as unknown as LayerSpec;
+
+  return [...lines, ...amenities, ...stops, ...icons, names];
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */

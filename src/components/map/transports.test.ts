@@ -183,17 +183,25 @@ describe("couches de transports", () => {
     expect(STATION_MIN_ZOOM).toBeLessThan(NEIGHBOURHOOD_MIN_ZOOM);
   });
 
-  it("n'écrit jamais de texte : les pastilles de prix restent la donnée principale", () => {
-    // L'invariant porte sur le TEXTE, pas sur le type de couche. Les
-    // pictogrammes d'arrêts sont des `symbol` sans `text-field` : ils
-    // n'entrent donc pas en concurrence de lecture avec les prix, et
-    // interdire le type `symbol` interdirait aussi les icônes.
-    for (const layer of transportLayers()) {
-      const s = spec(layer);
-      const layout = (s.layout ?? {}) as Record<string, unknown>;
-      expect(Object.keys(layout)).not.toContain("text-field");
-      expect(Object.keys(layout)).not.toContain("text-size");
-    }
+  it("n'écrit du texte que pour les gares, et seulement de près", () => {
+    // L'invariant protège la lisibilité des PRIX, qui sont la donnée de
+    // l'écran. Une seule couche a le droit d'écrire : le nom des gares et
+    // stations, qui structurent la lecture d'un quartier et se comptent sur
+    // les doigts d'une main dans une vue. Étiqueter chaque arrêt de bus
+    // couvrirait un centre-ville de mots.
+    const textual = transportLayers().filter((layer) => {
+      const layout = (spec(layer).layout ?? {}) as Record<string, unknown>;
+      return "text-field" in layout;
+    });
+
+    expect(textual).toHaveLength(1);
+    const only = spec(textual[0]);
+    expect(only.id).toBe("transports-station-label");
+    // Un nom prend dix fois la place d'une icône : il n'apparaît qu'au zoom
+    // où il ne recouvre plus une pastille.
+    expect(Number(only.minzoom)).toBeGreaterThanOrEqual(16);
+    // `text-optional` garde le pictogramme quand le nom ne tient pas.
+    expect((only.layout as Record<string, unknown>)["text-optional"]).toBe(true);
   });
 
   it("pose un pictogramme par arrêt et par commodité, jamais de texte", () => {

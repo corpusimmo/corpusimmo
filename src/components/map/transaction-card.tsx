@@ -36,6 +36,7 @@ import {
   formatPricePerSqm,
 } from "@/lib/utils/format";
 import { googleMapsUrl, streetViewUrl } from "@/lib/utils/maps";
+import { ActivityHint } from "./activity-hint";
 
 export const PROPERTY_TYPE_LABELS: Record<DvfPropertyType, string> = {
   apartment: "Appartement",
@@ -187,6 +188,14 @@ export function TransactionCard({
           </span>
         </span>
       </p>
+
+      {/* DVF range bureaux, boutiques, entrepôts et ateliers dans un seul
+          « local industriel, commercial ou assimilé ». Là, et seulement là, on
+          va chercher qui travaille à l'adresse pour préciser — juste sous
+          l'adresse, et sans jamais remplacer ce que DVF a écrit plus haut. */}
+      {t.propertyType === "commercial" ? (
+        <ActivityHint lat={t.coordinates.lat} lng={t.coordinates.lng} />
+      ) : null}
 
       {t.isMultiLot ? (
         <p className="rounded-sm bg-warning-soft px-2.5 py-2 text-xs leading-relaxed text-warning-soft-fg">

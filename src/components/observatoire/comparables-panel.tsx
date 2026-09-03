@@ -1,8 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import {
-  Download,
   EyeOff,
   Layers,
   Map as MapIcon,
@@ -41,7 +41,8 @@ import {
   MIN_COMPARABLES,
   useComparables,
 } from "./comparables-store";
-import { comparablesToCsv, downloadCsv } from "./csv";
+import { ExportMenu, type ExportFormat } from "./export-menu";
+import { exportCsv, exportXlsx, printSelection } from "./export-selection";
 import { dvfTypeLabel } from "./comparables-cart";
 import { RealDataNotice } from "./data-notice";
 
@@ -67,8 +68,15 @@ export function ComparablesPanel() {
    * laisser croire à une sauvegarde qui n'existe pas.
    */
   const backed = source === "account";
-  const exportSelection = () =>
-    downloadCsv(comparablesToCsv(items), "corpusimmo-comparables");
+  const [printBlocked, setPrintBlocked] = useState(false);
+
+  const exportSelection = (format: ExportFormat) => {
+    setPrintBlocked(false);
+    if (format === "csv") return exportCsv(items);
+    if (format === "xlsx") return exportXlsx(items);
+    // Une fenêtre bloquée ne doit pas passer pour un export silencieux.
+    if (!printSelection(items)) setPrintBlocked(true);
+  };
 
   if (!hydrated) {
     return (
@@ -226,11 +234,14 @@ export function ComparablesPanel() {
           <CardHeader>
             <div className="flex flex-wrap items-center justify-between gap-3">
               <CardTitle>Sélection courante · {formatNumber(count)}</CardTitle>
+              {printBlocked ? (
+                <p className="w-full text-xs text-warning-soft-fg" role="alert">
+                  Le document n’a pas pu s’ouvrir : autorisez les fenêtres
+                  surgissantes pour ce site, puis réessayez.
+                </p>
+              ) : null}
               <div className="flex flex-wrap gap-2">
-                <Button variant="outline" size="sm" onClick={exportSelection}>
-                  <Download className="size-4" aria-hidden />
-                  Exporter en CSV
-                </Button>
+                <ExportMenu onExport={exportSelection} disabled={count === 0} />
                 <Button variant="ghost" size="sm" onClick={clear}>
                   <Trash2 className="size-4" aria-hidden />
                   Vider la sélection

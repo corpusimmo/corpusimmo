@@ -82,7 +82,7 @@ export function ActivityHint({ lat, lng }: { lat: number; lng: number }) {
         Vraisemblablement <span className="font-medium text-ink">{meta.label}</span> :{" "}
         {hint.familyCount} établissement{hint.familyCount > 1 ? "s" : ""} de ce type
         {others > 0 ? ` sur ${hint.count}` : ""} à cette adresse
-        {hint.examples.length > 0 ? ` — ${hint.examples.join(", ")}` : ""}.{" "}
+        {hint.examples.length > 0 ? ` (${hint.examples.join(", ")})` : ""}.{" "}
         <span className="text-ink-subtle">
           Source SIRENE, activités déclarées : un indice sur l’usage, pas une
           qualification du bien.

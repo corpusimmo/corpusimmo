@@ -22,16 +22,21 @@ export default function AProposPage() {
           la page commençait vraiment sous la ligne de flottaison. Elle passe
           donc en fond d'un bloc qui porte le titre, la phrase d'ouverture ET
           la signature des deux auteurs : on sait dès la première seconde de
-          quoi ça parle et qui l'écrit. */}
+          quoi ça parle et qui l'écrit.
+
+          Et ce n'est PLUS la rue vue d'une fenêtre : celle-là ouvre déjà le
+          diaporama d'accueil, et la revoir ici donnait l'impression de relire
+          la même page. Le quartier d'affaires dit mieux d'où viennent deux
+          analystes d'immobilier d'entreprise. */}
       <header className="relative isolate overflow-hidden">
         <Image
-          src="/illustrations/ville-rue-fenetre.webp"
+          src="/illustrations/ville-quartier-affaires.webp"
           alt=""
           aria-hidden
           fill
           priority
           sizes="100vw"
-          className="-z-10 object-cover object-[50%_38%]"
+          className="-z-10 object-cover object-[55%_45%]"
         />
         {/* Le voile est plus dense à gauche, là où court le texte, et
             s'éclaircit à droite pour laisser vivre la photo. */}
@@ -49,9 +54,9 @@ export default function AProposPage() {
               Un corpus, et ce qu&apos;on en fait
             </h1>
             <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">
-              Nous ne partons pas d&apos;annonces. Nous partons des mutations
-              réellement enregistrées par la DGFiP — des prix payés, portés à un
-              acte.
+              Nous ne partons pas d&apos;annonces, mais des mutations
+              réellement enregistrées par la DGFiP&nbsp;: des prix payés,
+              portés à un acte.
             </p>
 
             {/* La signature dans l'en-tête, pas en bas de page : sur un
@@ -114,7 +119,7 @@ export default function AProposPage() {
             qui ne comparent rien, et défendre un chiffre devant quelqu&apos;un
             qui allait engager son argent dessus. Nous développons aujourd&apos;hui
             l&apos;un et l&apos;autre des solutions d&apos;intelligence
-            artificielle — et CorpusImmo est celle où les deux métiers se
+            artificielle. CorpusImmo est celle où les deux métiers se
             rejoignent.
           </p>
 
@@ -285,7 +290,7 @@ const TEAM = [
     photo: "/equipe/mathieu.png",
     linkedin: "https://www.linkedin.com/in/mathieu-guicheteau/",
     facts: ["6 ans chez Blot Immobilier", "1 000 lots gérés", "Fondateur de Scalenvia"],
-    bio: "Six ans d'analyse d'investissement en immobilier d'entreprise — flux actualisés, études de marché, dossiers d'acquisition — après la gestion d'un portefeuille de mille lots. Il dirige aujourd'hui Scalenvia, agence de développement de solutions d'IA. À dix-sept ans, il avait déjà écrit un simulateur d'investissement immobilier, et l'avait donné.",
+    bio: "Six ans d'analyse d'investissement en immobilier d'entreprise : flux actualisés, études de marché, dossiers d'acquisition. Auparavant, la gestion d'un portefeuille de mille lots. Il dirige aujourd'hui Scalenvia, agence de développement de solutions d'IA. À dix-sept ans, il avait déjà écrit un simulateur d'investissement immobilier, et l'avait donné.",
   },
   {
     name: "Gaël Colin",

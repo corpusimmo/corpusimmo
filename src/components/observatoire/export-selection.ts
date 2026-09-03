@@ -87,7 +87,9 @@ export function exportXlsx(items: ComparableEntry[]): void {
 /* ── Document imprimable ─────────────────────────────────────────────────── */
 
 function escapeHtml(value: unknown): string {
-  if (value === undefined || value === null || value === "") return "—";
+  // « n.c. » plutôt qu'un tiret : sur un document imprimé, le lecteur doit
+  // savoir qu'une donnée manque, pas se demander ce que le trait remplace.
+  if (value === undefined || value === null || value === "") return "n.c.";
   return String(value)
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
@@ -151,7 +153,7 @@ export function printSelection(items: ComparableEntry[]): boolean {
     .join("");
 
   win.document.write(`<!doctype html><html lang="fr"><head><meta charset="utf-8">
-<title>CorpusImmo — sélection de comparables</title><style>${PRINT_CSS}</style></head><body>
+<title>CorpusImmo · sélection de comparables</title><style>${PRINT_CSS}</style></head><body>
 <header>
   <div>
     <div class="marque">Corpus<i>Immo</i></div>

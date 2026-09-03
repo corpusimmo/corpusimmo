@@ -82,10 +82,32 @@ export const mainNav: NavEntry[] = [
     ],
   },
   {
+    /**
+     * « Outils » reste le PARENT, et `/outils` reste son adresse.
+     *
+     * Renommer l'entrée en « Matrices Excel » aurait voulu dire déplacer une
+     * URL indexée, avec ses dix fiches `/outils/[slug]` — du référencement
+     * cassé pour un gain nul côté visiteur, qui ne tape jamais l'adresse. Le
+     * libellé descend donc d'un cran, et les générateurs s'ajoutent à côté.
+     */
     label: "Outils",
     href: "/outils",
     status: "live",
-    description: "Dix calculateurs métier, gratuits, ouverts une fois connecté",
+    description: "Calculateurs métier et générateurs de documents commerciaux",
+    children: [
+      {
+        label: "Matrices Excel",
+        href: "/outils",
+        status: "live",
+        description: "Dix calculateurs métier, barèmes affichés",
+      },
+      {
+        label: "Générateurs",
+        href: "/generateurs",
+        status: "live",
+        description: "Teaser, mémorandum, avis de valeur : trames à vos couleurs",
+      },
+    ],
   },
 ];
 

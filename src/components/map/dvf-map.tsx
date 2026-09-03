@@ -186,7 +186,6 @@ export interface DvfMapProps {
    * retrouvent DERRIÈRE elle, visibles mais inatteignables. L'écran qui
    * superpose est le seul à savoir de combien, donc c'est lui qui le dit.
    */
-  chromeOffset?: string;
 }
 
 interface InstallContext {
@@ -211,7 +210,6 @@ export function DvfMap({
   // 3D is the default posture, not an opt-in: the volumes are what make the
   // observatory read as a 2026 product rather than an administrative plan.
   interactive3d = true,
-  chromeOffset,
 }: DvfMapProps) {
   const isDense = density === "dense";
   const controlled = transactions !== undefined;
@@ -1285,14 +1283,20 @@ export function DvfMap({
 
   return (
     <div
-      className={cn("relative isolate overflow-hidden bg-canvas", className)}
+      className={cn(
+        // `flex flex-col` : la carte prend la place disponible, le bandeau de
+        // commandes se pose SOUS elle dans le flux. L'appelant compense sa
+        // hauteur pour que la carte ne perde rien de la sienne.
+        "relative isolate flex flex-col overflow-hidden bg-canvas",
+        className,
+      )}
     >
       {/* `size-full`, not `absolute inset-0`: maplibre-gl.css ships unlayered,
           so its `.maplibregl-map { position: relative }` outranks Tailwind's
           `absolute` utility (layered styles always lose to unlayered ones).
           The container would then have no positioning context and collapse to
           zero height, a blank map with the tiles loading perfectly fine. */}
-      <div ref={containerRef} className="size-full" />
+      <div ref={containerRef} className="min-h-0 w-full flex-1" />
 
       {!styleReady && !basemapError ? (
         <div className="skeleton absolute inset-0 z-10" aria-hidden="true" />
@@ -1332,21 +1336,40 @@ export function DvfMap({
         </div>
       ) : null}
 
-      {/* Les commandes tiennent en UNE colonne, et pas en quatre blocs
-          positionnés chacun de son côté : c'est ce qui permet à l'écran qui
-          superpose sa propre barre (la carte plein écran, sur mobile) de tout
-          décaler d'un seul décalage, sans que rien ne passe dessous. */}
+      {/* TOUT EN BAS, COMMANDES ET LÉGENDES ENSEMBLE.
+          Un bouton et sa légende disent la même chose : les séparer aux deux
+          extrémités de la carte obligeait à faire l'aller-retour du regard
+          pour relier une couleur à ce qu'elle signifie. Et le haut d'une carte
+          est la zone qu'on balaie, alors que le bas porte déjà l'échelle et
+          l'attribution : c'est la lisière la moins chère.
+
+          Une seule rangée, alignée sur le bas, qui défile horizontalement
+          plutôt que de recouvrir la carte quand les trois calques sont
+          allumés sur un écran étroit. Les commandes restent en tête, donc
+          toujours atteignables sans faire défiler. */}
       {chrome ? (
-        <div
-          // UNE SEULE COLONNE, du haut au bas de la carte. Les légendes ont
-          // longtemps eu leur propre ancrage en bas : sur une carte courte
-          // elles remontaient dans les commandes et recouvraient « Zonage ».
-          // Deux ancrages indépendants ne peuvent pas s'éviter — il n'y en a
-          // donc plus qu'un, et `mt-auto` pousse les légendes en bas tant
-          // qu'il reste de la place.
-          className="pointer-events-none absolute left-3 z-10 flex flex-col items-start gap-2"
-          style={{ top: chromeOffset ?? "0.75rem" }}
-        >
+        <div className="flex shrink-0 flex-col gap-2 border-t border-border bg-surface px-3 py-2.5">
+          {/* La couverture ouvre le bandeau plutôt que de flotter sur la
+              carte : c'est une mise en garde sur les données affichées, elle
+              se lit avec les légendes et non par-dessus les ventes. */}
+          {result && rows.length > 0 ? (
+            <p
+              className="text-[11px] leading-tight text-ink-muted"
+              title={coverageDisclaimer(result.latestYear)}
+            >
+              <span className="tnum font-medium text-ink">
+                {formatNumber(result.count)}
+              </span>{" "}
+              vente
+              {result.count > 1 ? "s" : ""}
+              {result.truncated ? " (affichage tronqué)" : ""} ·{" "}
+              {coverageLabel(result.latestYear)}
+              {result.source === "mock" ? " · jeu de démonstration" : ""}
+            </p>
+          ) : null}
+
+          <div className="flex items-end gap-2 overflow-x-auto">
+          <div className="flex shrink-0 flex-col items-start gap-2">
           {/* PRIX — une seule commande, jamais deux.
               L'unité vivait dans un bloc qui apparaissait sous l'interrupteur :
               le décalage à chaque bascule était plus bruyant que le réglage
@@ -1455,35 +1478,21 @@ export function DvfMap({
             </button>
           ) : null}
 
-        </div>
-      ) : null}
-
-      {/* LES LÉGENDES EN BANDEAU BAS, PAS EN COLONNE.
-          Empilées à gauche, elles mangeaient une bande verticale sur toute la
-          hauteur de la carte, c'est-à-dire précisément là où l'on regarde. En
-          bandeau elles ne coûtent qu'une lisière, et les trois se lisent côte
-          à côte au lieu de se pousser.
-
-          Chaque panneau est borné en hauteur et défile pour lui-même : la
-          légende des transports compte dix entrées, elle ne doit pas fixer la
-          hauteur du bandeau pour les deux autres. Le bandeau lui-même défile
-          horizontalement plutôt que de recouvrir la carte quand les trois
-          calques sont allumés sur un écran étroit. */}
-      {chrome ? (
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-start gap-2 overflow-x-auto px-3 pb-9">
+          </div>
           {zoning ? (
-            <ZoningLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto" />
+            <ZoningLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none" />
           ) : null}
           {transports ? (
-            <TransportsLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto" />
+            <TransportsLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none" />
           ) : null}
           {showLegend && showPrices ? (
             <PriceLegend
               scale={scale}
               compact={isCompact}
-              className="max-h-[8.5rem] shrink-0 overflow-y-auto"
+              className="max-h-[8.5rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none"
             />
           ) : null}
+          </div>
         </div>
       ) : null}
 
@@ -1520,26 +1529,6 @@ export function DvfMap({
           </Banner>
         ) : null}
       </div>
-
-      {/* Coverage line. DVF is published twice a year with ~6 months of lag:
-          the most recent millésime is always partial, and we say so. */}
-      {result && rows.length > 0 ? (
-        <div className="pointer-events-none absolute bottom-2 left-2 z-10 max-w-[min(28rem,70%)] md:bottom-9">
-          <p
-            className="pointer-events-auto rounded-sm bg-surface/90 px-2 py-1 text-[11px] leading-tight text-ink-muted shadow-xs backdrop-blur-sm"
-            title={coverageDisclaimer(result.latestYear)}
-          >
-            <span className="tnum font-medium text-ink">
-              {formatNumber(result.count)}
-            </span>{" "}
-            vente
-            {result.count > 1 ? "s" : ""}
-            {result.truncated ? " (affichage tronqué)" : ""} ·{" "}
-            {coverageLabel(result.latestYear)}
-            {result.source === "mock" ? " · jeu de démonstration" : ""}
-          </p>
-        </div>
-      ) : null}
 
       {/* The map is visual; the count must still be announced. */}
       <p className="sr-only" role="status" aria-live="polite">

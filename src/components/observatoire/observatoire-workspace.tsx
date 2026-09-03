@@ -143,7 +143,10 @@ export function ObservatoireWorkspace() {
         <div className="overflow-hidden rounded-lg border border-border bg-surface">
           <LazyDvfMap
             key={`${center.lat.toFixed(5)},${center.lng.toFixed(5)}`}
-            className="h-[58vh] min-h-[420px] w-full lg:h-[calc(100vh-18rem)]"
+            // Le bandeau de commandes vit SOUS la carte, dans le flux. Sa hauteur
+            // s'ajoute donc ici, sinon il rognerait la carte d'autant : on
+            // aurait déplacé les boutons sans rien dégager.
+            className="h-[calc(58vh+7rem)] min-h-[calc(420px+7rem)] w-full lg:h-[calc(100vh-11rem)]"
             initialCenter={center}
             initialZoom={address ? 15 : 13}
             filters={filters}

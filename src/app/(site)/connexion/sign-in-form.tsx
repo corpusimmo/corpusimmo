@@ -97,9 +97,9 @@ export function SignInForm() {
           <p className="mt-1 text-warning-soft-fg/90">
             L&apos;identification Google n&apos;est pas configurée sur cette
             installation. L&apos;essentiel du site n&apos;en dépend pas&nbsp;:
-            l&apos;estimateur, la carte des ventes et l&apos;observatoire
-            fonctionnent sans compte. Seuls les dix calculateurs demandent une
-            connexion, et ils restent consultables.
+            l&apos;estimateur et l&apos;observatoire fonctionnent sans compte.
+            Seuls les dix calculateurs demandent une connexion, et ils restent
+            consultables.
           </p>
         </div>
       </div>

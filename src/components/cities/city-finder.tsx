@@ -76,10 +76,10 @@ export function CityFinder({ cities }: { cities: CityCardData[] }) {
         <EmptyState
           icon={<MapPinned aria-hidden="true" className="size-6" />}
           title="Aucune commune ne porte ce nom dans la sélection"
-          description="Le sommaire ne couvre que les cent communes les plus peuplées. La carte des ventes, elle, couvre toute la France : cherchez-y votre adresse."
+          description="Le sommaire ne couvre que les cent communes les plus peuplées. L'observatoire, lui, couvre toute la France : cherchez-y votre adresse."
           action={
             <Button variant="outline" size="sm" asChild>
-              <Link href="/carte">Ouvrir la carte des ventes</Link>
+              <Link href="/observatoire">Ouvrir l&apos;observatoire</Link>
             </Button>
           }
         />

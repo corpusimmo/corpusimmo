@@ -45,7 +45,7 @@ export function estimatorHref(): string {
 }
 
 /**
- * La carte des ventes.
+ * L'observatoire, centré sur la commune.
  *
  * Elle ne lit aujourd'hui aucun paramètre d'URL : le centrage se fait par son
  * champ de recherche d'adresse. Le lien est donc nu, et le libellé de la page
@@ -60,7 +60,9 @@ export function estimatorHref(): string {
  * vaut ça qu'un centre inventé. Sans code, le lien mène à la carte nue.
  */
 export function mapHref(insee?: string): string {
-  return insee ? `/carte?commune=${encodeURIComponent(insee)}` : "/carte";
+  return insee
+    ? `/observatoire?commune=${encodeURIComponent(insee)}`
+    : "/observatoire";
 }
 
 /** La recherche tabulaire, pour qui veut les ventes ligne à ligne. */
@@ -79,7 +81,11 @@ export function transactionsHref(): string {
  * mon bien, combien me restera-t-il, qu'est-ce que ça rapporte — et ces trois
  * outils y répondent.
  */
-const CITY_TOOL_IDS: readonly ToolId[] = ["avis-de-valeur", "net-vendeur", "rentabilite-locative"];
+const CITY_TOOL_IDS: readonly ToolId[] = [
+  "avis-de-valeur",
+  "net-vendeur",
+  "rentabilite-locative",
+];
 
 export function cityTools(): ToolCard[] {
   return CITY_TOOL_IDS.map((id) => getToolCard(id)).filter(
@@ -88,7 +94,9 @@ export function cityTools(): ToolCard[] {
 }
 
 /** Le fil d'Ariane d'une page ville, sans niveau inventé. */
-export function cityBreadcrumb(city: CityAggregate): { name: string; path: string }[] {
+export function cityBreadcrumb(
+  city: CityAggregate,
+): { name: string; path: string }[] {
   return [
     { name: "Accueil", path: "/" },
     { name: "Prix immobilier", path: CITIES_ROOT },

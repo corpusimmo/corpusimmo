@@ -86,7 +86,7 @@ export function FailedResult({ valuation }: { valuation: ValuationResult }) {
           <Link href="/estimer">Reprendre l’estimation</Link>
         </Button>
         <Button asChild variant="secondary">
-          <Link href="/carte">Voir les ventes du secteur</Link>
+          <Link href="/observatoire">Voir les ventes du secteur</Link>
         </Button>
       </div>
     </section>

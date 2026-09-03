@@ -18,7 +18,6 @@ import { describe, expect, it } from "vitest";
 
 import { metadata as home } from "@/app/(site)/page";
 import { metadata as aPropos } from "@/app/(site)/a-propos/page";
-import { metadata as carte } from "@/app/(site)/carte/page";
 import { metadata as connexion } from "@/app/(site)/connexion/page";
 import { metadata as estimer } from "@/app/(site)/estimer/page";
 import { metadata as comparables } from "@/app/(site)/observatoire/comparables/page";
@@ -33,7 +32,6 @@ import { metadata as solutions } from "@/app/(site)/solutions/page";
 const PAGES: Record<string, Metadata> = {
   "/": home,
   "/a-propos": aPropos,
-  "/carte": carte,
   "/connexion": connexion,
   "/estimer": estimer,
   "/observatoire": observatoire,
@@ -51,7 +49,8 @@ const entries = Object.entries(PAGES);
 function titleOf(meta: Metadata): string {
   const { title } = meta;
   if (typeof title === "string") return title;
-  if (title && typeof title === "object" && "absolute" in title) return String(title.absolute);
+  if (title && typeof title === "object" && "absolute" in title)
+    return String(title.absolute);
   return "";
 }
 
@@ -59,11 +58,16 @@ describe("les métadonnées de page", () => {
   it("donnent un titre unique à chaque page", () => {
     const titles = entries.map(([, meta]) => titleOf(meta));
     expect(titles.filter((title) => title.length === 0)).toEqual([]);
-    expect(new Set(titles).size, `titres en double : ${titles.join(" | ")}`).toBe(titles.length);
+    expect(
+      new Set(titles).size,
+      `titres en double : ${titles.join(" | ")}`,
+    ).toBe(titles.length);
   });
 
   it("donnent une description unique à chaque page", () => {
-    const descriptions = entries.map(([, meta]) => String(meta.description ?? ""));
+    const descriptions = entries.map(([, meta]) =>
+      String(meta.description ?? ""),
+    );
     expect(descriptions.filter((text) => text.length === 0)).toEqual([]);
     expect(new Set(descriptions).size).toBe(descriptions.length);
   });
@@ -74,13 +78,16 @@ describe("les métadonnées de page", () => {
     // qu'on interdit, c'est l'extrait vide et l'extrait tronqué.
     for (const [path, meta] of entries) {
       const length = String(meta.description ?? "").length;
-      const floor = meta.robots &&
+      const floor =
+        meta.robots &&
         typeof meta.robots === "object" &&
         "index" in meta.robots &&
         meta.robots.index === false
-        ? 100 // Une page hors index n'a pas d'extrait à remplir.
-        : 140;
-      expect(length, `${path} : ${length} signes`).toBeGreaterThanOrEqual(floor);
+          ? 100 // Une page hors index n'a pas d'extrait à remplir.
+          : 140;
+      expect(length, `${path} : ${length} signes`).toBeGreaterThanOrEqual(
+        floor,
+      );
       expect(length, `${path} : ${length} signes`).toBeLessThanOrEqual(170);
     }
   });
@@ -119,7 +126,9 @@ describe("les métadonnées de page", () => {
     ]) {
       const robots = PAGES[path]?.robots;
       expect(
-        robots && typeof robots === "object" && "index" in robots ? robots.index : undefined,
+        robots && typeof robots === "object" && "index" in robots
+          ? robots.index
+          : undefined,
         `${path} est redevenue indexable`,
       ).toBe(false);
     }

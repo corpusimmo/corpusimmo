@@ -4,14 +4,14 @@
  * Le menu trie par INTENTION — estimer, explorer, calculer, déléguer — et
  * jamais par audience. Il n'y a pas d'onglet « Particuliers » ni
  * « Professionnels », et il n'y en aura pas : la majorité du site est partagée
- * (la carte, l'observatoire, les outils), et deux menus couperaient le maillage
+ * (l'observatoire, les outils), et deux menus couperaient le maillage
  * interne en deux grappes faiblement reliées — exactement ce qu'un domaine neuf
  * ne peut pas se permettre.
  *
  * Résidentiel et professionnel existent bien, mais comme FILTRES à l'intérieur
  * des outils : une bifurcation en première étape de l'estimateur, une case à
- * cocher sur la carte, une facette dans la bibliothèque d'outils. Jamais comme
- * une branche de navigation.
+ * cocher sur la carte de l'observatoire, une facette dans la bibliothèque
+ * d'outils. Jamais comme une branche de navigation.
  *
  * `status` dit au lecteur ce qui est réel, et l'interface l'affiche :
  *   live    → réellement implémenté, sur données réelles
@@ -47,12 +47,6 @@ export const mainNav: NavEntry[] = [
     href: "/estimer",
     status: "live",
     description: "Logement ou local professionnel, à partir des ventes réelles",
-  },
-  {
-    label: "Carte des ventes",
-    href: "/carte",
-    status: "live",
-    description: "Toutes les mutations DVF, en accès libre",
   },
   {
     label: "Observatoire",

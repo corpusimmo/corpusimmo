@@ -1,7 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { Download, EyeOff, Layers, Map as MapIcon, Trash2 } from "lucide-react";
+import {
+  Download,
+  EyeOff,
+  Layers,
+  Map as MapIcon,
+  MapPin,
+  Trash2,
+} from "lucide-react";
 import {
   Badge,
   Button,
@@ -28,14 +35,29 @@ import {
   formatPricePerSqm,
 } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
-import { comparableStats, MIN_COMPARABLES, useComparables } from "./comparables-store";
+import { googleMapsUrl } from "@/lib/utils/maps";
+import {
+  comparableStats,
+  MIN_COMPARABLES,
+  useComparables,
+} from "./comparables-store";
 import { comparablesToCsv, downloadCsv } from "./csv";
 import { dvfTypeLabel } from "./comparables-cart";
 import { RealDataNotice } from "./data-notice";
 
 export function ComparablesPanel() {
-  const { items, count, activeCount, hydrated, source, syncing, failed, remove, clear, setExcluded } =
-    useComparables();
+  const {
+    items,
+    count,
+    activeCount,
+    hydrated,
+    source,
+    syncing,
+    failed,
+    remove,
+    clear,
+    setExcluded,
+  } = useComparables();
 
   /**
    * Rien n'est verrouillé : consulter, exclure, mesurer la dispersion ET
@@ -45,7 +67,8 @@ export function ComparablesPanel() {
    * laisser croire à une sauvegarde qui n'existe pas.
    */
   const backed = source === "account";
-  const exportSelection = () => downloadCsv(comparablesToCsv(items), "corpusimmo-comparables");
+  const exportSelection = () =>
+    downloadCsv(comparablesToCsv(items), "corpusimmo-comparables");
 
   if (!hydrated) {
     return (
@@ -91,7 +114,9 @@ export function ComparablesPanel() {
               </Link>
             </Button>
             <Button variant="outline" asChild>
-              <Link href="/observatoire/transactions">Rechercher des transactions</Link>
+              <Link href="/observatoire/transactions">
+                Rechercher des transactions
+              </Link>
             </Button>
           </div>
         }
@@ -111,7 +136,10 @@ export function ComparablesPanel() {
           {
             label: "Comparables retenus",
             value: `${activeCount}`,
-            hint: count > activeCount ? `${count - activeCount} exclus du calcul` : "Tous retenus",
+            hint:
+              count > activeCount
+                ? `${count - activeCount} exclus du calcul`
+                : "Tous retenus",
           },
           {
             label: "Médiane €/m²",
@@ -123,18 +151,30 @@ export function ComparablesPanel() {
           },
           {
             label: "Dispersion",
-            value: stats.dispersion !== undefined ? formatPercent(stats.dispersion, 0) : "–",
+            value:
+              stats.dispersion !== undefined
+                ? formatPercent(stats.dispersion, 0)
+                : "–",
             hint: "Écart interquartile rapporté à la médiane",
           },
           {
             label: "Période couverte",
-            value: stats.yearRange ? `${stats.yearRange[0]} → ${stats.yearRange[1]}` : "–",
+            value: stats.yearRange
+              ? `${stats.yearRange[0]} → ${stats.yearRange[1]}`
+              : "–",
             hint: `${formatArea(stats.totalArea)} de surface cumulée`,
           },
         ].map((stat) => (
-          <div key={stat.label} className="rounded-lg border border-border bg-surface p-4">
-            <p className="text-xs uppercase tracking-wide text-ink-subtle">{stat.label}</p>
-            <p className="mt-1 text-xl font-semibold text-ink tnum">{stat.value}</p>
+          <div
+            key={stat.label}
+            className="rounded-lg border border-border bg-surface p-4"
+          >
+            <p className="text-xs uppercase tracking-wide text-ink-subtle">
+              {stat.label}
+            </p>
+            <p className="mt-1 text-xl font-semibold text-ink tnum">
+              {stat.value}
+            </p>
             <p className="mt-0.5 text-xs text-ink-muted">{stat.hint}</p>
           </div>
         ))}
@@ -143,12 +183,14 @@ export function ComparablesPanel() {
       {missing > 0 && (
         <div className="rounded-md border border-warning/25 bg-warning-soft px-4 py-3 text-sm text-warning-soft-fg">
           <p className="font-semibold">
-            {missing} comparable{missing > 1 ? "s" : ""} manquant{missing > 1 ? "s" : ""}
+            {missing} comparable{missing > 1 ? "s" : ""} manquant
+            {missing > 1 ? "s" : ""}
           </p>
           <p className="mt-1">
-            Le moteur d&apos;estimation exige au minimum {MIN_COMPARABLES} comparables retenus.
-            C&apos;est une contrainte de secret statistique, pas un réglage. En dessous, aucune
-            valeur n&apos;est produite.
+            Le moteur d&apos;estimation exige au minimum {MIN_COMPARABLES}{" "}
+            comparables retenus. C&apos;est une contrainte de secret
+            statistique, pas un réglage. En dessous, aucune valeur n&apos;est
+            produite.
           </p>
         </div>
       )}
@@ -171,8 +213,8 @@ export function ComparablesPanel() {
               />
             ) : (
               <p className="text-sm text-ink-muted">
-                Aucune des mutations retenues ne porte de surface bâtie exploitable : le prix au m²
-                ne peut pas être calculé.
+                Aucune des mutations retenues ne porte de surface bâtie
+                exploitable : le prix au m² ne peut pas être calculé.
               </p>
             )}
             <RealDataNotice className="mt-3" />
@@ -213,12 +255,17 @@ export function ComparablesPanel() {
                 </TableHead>
                 <TableBody>
                   {items.map(({ transaction, excluded }) => (
-                    <TableRow key={transaction.id} className={cn(excluded && "opacity-55")}>
+                    <TableRow
+                      key={transaction.id}
+                      className={cn(excluded && "opacity-55")}
+                    >
                       <TableCell>
                         <span className="block max-w-64 truncate text-sm">
                           {transaction.addressLabel ?? "Adresse non publiée"}
                         </span>
-                        <span className="block text-xs text-ink-subtle">{transaction.city}</span>
+                        <span className="block text-xs text-ink-subtle">
+                          {transaction.city}
+                        </span>
                       </TableCell>
                       <TableCell>
                         <span className="whitespace-nowrap text-sm">
@@ -236,10 +283,14 @@ export function ComparablesPanel() {
                         </span>
                       </TableCell>
                       <TableCell className="text-right">
-                        <span className="tnum">{formatArea(transaction.builtArea)}</span>
+                        <span className="tnum">
+                          {formatArea(transaction.builtArea)}
+                        </span>
                       </TableCell>
                       <TableCell className="text-right">
-                        <span className="font-medium tnum">{formatPrice(transaction.price)}</span>
+                        <span className="font-medium tnum">
+                          {formatPrice(transaction.price)}
+                        </span>
                       </TableCell>
                       <TableCell className="text-right">
                         <span className="font-medium text-accent-soft-fg tnum">
@@ -248,6 +299,26 @@ export function ComparablesPanel() {
                       </TableCell>
                       <TableCell className="text-center">
                         <div className="flex items-center justify-center gap-1">
+                          {/* Aller voir le bien. Un `href`, donc rien ne part
+                              vers Google avant un clic, et un onglet à part
+                              pour ne pas perdre la sélection en cours. */}
+                          {googleMapsUrl(transaction) ? (
+                            <Button
+                              asChild
+                              variant="ghost"
+                              size="icon"
+                              title="Voir sur Google Maps"
+                            >
+                              <a
+                                href={googleMapsUrl(transaction) ?? undefined}
+                                target="_blank"
+                                rel="noreferrer noopener"
+                                aria-label={`Voir ${transaction.addressLabel ?? "ce bien"} sur Google Maps`}
+                              >
+                                <MapPin className="size-4" aria-hidden />
+                              </a>
+                            </Button>
+                          ) : null}
                           <Button
                             variant="ghost"
                             size="icon"
@@ -257,8 +328,12 @@ export function ComparablesPanel() {
                                 ? "Réintégrer ce comparable au calcul"
                                 : "Exclure ce comparable du calcul"
                             }
-                            title={excluded ? "Réintégrer" : "Exclure du calcul"}
-                            onClick={() => setExcluded(transaction.id, !excluded)}
+                            title={
+                              excluded ? "Réintégrer" : "Exclure du calcul"
+                            }
+                            onClick={() =>
+                              setExcluded(transaction.id, !excluded)
+                            }
                           >
                             <EyeOff className="size-4" aria-hidden />
                           </Button>
@@ -293,17 +368,34 @@ export function ComparablesPanel() {
                     {transaction.addressLabel ?? "Adresse non publiée"}
                   </p>
                   <p className="truncate text-xs text-ink-muted">
-                    {transaction.city} · {dvfTypeLabel(transaction.propertyType)} ·{" "}
+                    {transaction.city} ·{" "}
+                    {dvfTypeLabel(transaction.propertyType)} ·{" "}
                     {formatMonthYear(transaction.date)}
                   </p>
                   <p className="mt-1 flex flex-wrap gap-x-3 text-xs tnum">
-                    <span className="font-semibold text-ink">{formatPrice(transaction.price)}</span>
-                    <span className="text-ink-muted">{formatArea(transaction.builtArea)}</span>
+                    <span className="font-semibold text-ink">
+                      {formatPrice(transaction.price)}
+                    </span>
+                    <span className="text-ink-muted">
+                      {formatArea(transaction.builtArea)}
+                    </span>
                     <span className="font-medium text-accent-soft-fg">
                       {formatPricePerSqm(transaction.pricePerSqm)}
                     </span>
                   </p>
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {googleMapsUrl(transaction) ? (
+                      <Button asChild variant="secondary" size="sm">
+                        <a
+                          href={googleMapsUrl(transaction) ?? undefined}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                        >
+                          <MapPin className="size-4" aria-hidden />
+                          Maps
+                        </a>
+                      </Button>
+                    ) : null}
                     <Button
                       variant="outline"
                       size="sm"
@@ -311,7 +403,11 @@ export function ComparablesPanel() {
                     >
                       {excluded ? "Réintégrer" : "Exclure"}
                     </Button>
-                    <Button variant="ghost" size="sm" onClick={() => remove(transaction.id)}>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => remove(transaction.id)}
+                    >
                       <Trash2 className="size-4" aria-hidden />
                       Retirer
                     </Button>
@@ -350,8 +446,9 @@ function SourceNotice({
         role="status"
         className="rounded-md border border-warning/25 bg-warning-soft px-4 py-3 text-xs leading-relaxed text-warning-soft-fg"
       >
-        Votre compte n&apos;a pas pu être joint. Ce qui est affiché vient de ce navigateur, et vos
-        dernières modifications n&apos;y sont pas enregistrées.
+        Votre compte n&apos;a pas pu être joint. Ce qui est affiché vient de ce
+        navigateur, et vos dernières modifications n&apos;y sont pas
+        enregistrées.
       </p>
     );
   }
@@ -359,8 +456,8 @@ function SourceNotice({
   if (backed) {
     return (
       <p className="text-xs leading-relaxed text-ink-subtle" aria-live="polite">
-        Cette sélection est rattachée à votre compte&nbsp;: vous la retrouvez sur vos autres
-        appareils.
+        Cette sélection est rattachée à votre compte&nbsp;: vous la retrouvez
+        sur vos autres appareils.
         {syncing ? " Enregistrement en cours…" : null}
       </p>
     );
@@ -368,9 +465,9 @@ function SourceNotice({
 
   return (
     <p className="text-xs leading-relaxed text-ink-subtle">
-      Cette sélection est conservée sur cet appareil, dans ce navigateur. Elle ne quitte pas votre
-      machine et ne survivra pas à un changement d&apos;appareil&nbsp;; connectez-vous pour la
-      retrouver ailleurs.
+      Cette sélection est conservée sur cet appareil, dans ce navigateur. Elle
+      ne quitte pas votre machine et ne survivra pas à un changement
+      d&apos;appareil&nbsp;; connectez-vous pour la retrouver ailleurs.
     </p>
   );
 }

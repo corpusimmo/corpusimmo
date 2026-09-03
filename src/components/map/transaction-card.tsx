@@ -13,7 +13,18 @@
  */
 
 import * as React from "react";
-import { Check, Layers, Maximize2, MapPin, Plus, Ruler, Trees, X } from "lucide-react";
+import {
+  Check,
+  ExternalLink,
+  Layers,
+  Maximize2,
+  MapPin,
+  Plus,
+  Ruler,
+  Eye,
+  Trees,
+  X,
+} from "lucide-react";
 import type { DvfPropertyType, DvfTransaction } from "@/types/dvf";
 import { Badge, Button } from "@/components/ui";
 import { cn } from "@/lib/utils/cn";
@@ -24,6 +35,7 @@ import {
   formatPrice,
   formatPricePerSqm,
 } from "@/lib/utils/format";
+import { googleMapsUrl, streetViewUrl } from "@/lib/utils/maps";
 
 export const PROPERTY_TYPE_LABELS: Record<DvfPropertyType, string> = {
   apartment: "Appartement",
@@ -66,6 +78,14 @@ export function TransactionCard({
   className,
 }: TransactionCardProps) {
   const t = transaction;
+  const cible = {
+    coordinates: t.coordinates,
+    addressLabel: t.addressLabel,
+    postcode: t.postcode,
+    city: t.city,
+  };
+  const mapsHref = googleMapsUrl(cible);
+  const panoHref = streetViewUrl(cible);
   const isDense = density === "dense";
 
   return (
@@ -79,7 +99,10 @@ export function TransactionCard({
       <header className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 flex-col gap-1.5">
           <div className="flex flex-wrap items-center gap-1.5">
-            <Badge tone={t.propertyType === "apartment" ? "primary" : "accent"} size="sm">
+            <Badge
+              tone={t.propertyType === "apartment" ? "primary" : "accent"}
+              size="sm"
+            >
               {PROPERTY_TYPE_LABELS[t.propertyType]}
             </Badge>
             {t.source === "mock" ? (
@@ -155,7 +178,9 @@ export function TransactionCard({
           {t.addressLabel ? (
             <span className="block font-medium text-ink">{t.addressLabel}</span>
           ) : (
-            <span className="block italic">Adresse non publiée pour cette mutation</span>
+            <span className="block italic">
+              Adresse non publiée pour cette mutation
+            </span>
           )}
           <span className="block">
             {[t.postcode, t.city].filter(Boolean).join(" ") || t.cityCode}
@@ -165,9 +190,34 @@ export function TransactionCard({
 
       {t.isMultiLot ? (
         <p className="rounded-sm bg-warning-soft px-2.5 py-2 text-xs leading-relaxed text-warning-soft-fg">
-          Cette vente regroupe plusieurs lots. Le prix au m² est calculé sur la surface totale et
-          n’est pas directement comparable à une vente simple.
+          Cette vente regroupe plusieurs lots. Le prix au m² est calculé sur la
+          surface totale et n’est pas directement comparable à une vente simple.
         </p>
+      ) : null}
+
+      {/* ALLER VOIR LE BIEN.
+          DVF dit ce qui s'est vendu ; il ne dit rien de la rue ni de la
+          façade. Deux liens comblent l'écart sans que nous hébergions une
+          image ni ne chargions un script : ce sont des `href`, donc rien ne
+          part vers Google avant un clic. Ils s'ouvrent dans un onglet à part,
+          pour ne pas faire perdre la sélection de comparables en cours. */}
+      {mapsHref ? (
+        <div className="flex flex-wrap gap-2 border-t border-border-soft pt-3">
+          <Button asChild variant="secondary" size="sm" className="flex-1">
+            <a href={mapsHref} target="_blank" rel="noreferrer noopener">
+              <ExternalLink aria-hidden="true" className="size-4" />
+              Voir sur Google Maps
+            </a>
+          </Button>
+          {panoHref ? (
+            <Button asChild variant="secondary" size="sm" className="flex-1">
+              <a href={panoHref} target="_blank" rel="noreferrer noopener">
+                <Eye aria-hidden="true" className="size-4" />
+                Street View
+              </a>
+            </Button>
+          ) : null}
+        </div>
       ) : null}
 
       {onToggleComparable ? (

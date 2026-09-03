@@ -6,7 +6,6 @@ import {
   Layers,
   Map as MapIcon,
   Scale,
-  Table2,
 } from "lucide-react";
 
 import { Button } from "@/components/ui";
@@ -39,17 +38,10 @@ const ENTRIES = [
     cta: "Lancer une estimation",
   },
   {
-    href: "/carte",
-    icon: MapIcon,
-    title: "La carte des ventes",
-    body: "Toutes les mutations enregistrées, à l'échelle de la rue. Prix, surface, date, type de bien. Plein écran, sans compte, sans limite de consultation.",
-    cta: "Ouvrir la carte",
-  },
-  {
     href: "/observatoire",
-    icon: Table2,
+    icon: MapIcon,
     title: "L'observatoire",
-    body: "La même donnée, augmentée : prix médian au m², volumes, dispersion, recherche tabulaire et sélection de comparables qui vous suit d'un écran à l'autre.",
+    body: "La carte de toutes les mutations enregistrées, à l'échelle de la rue, et la même donnée augmentée : médianes au m², volumes, dispersion, table de recherche et sélection de comparables.",
     cta: "Explorer le marché",
   },
   {

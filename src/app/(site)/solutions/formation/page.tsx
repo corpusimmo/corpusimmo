@@ -70,8 +70,8 @@ export default function FormationPage() {
           body: "Des ajustements explicites et signés, parce qu'un chiffre qu'on ne peut pas défendre ne vaut rien.",
         },
         {
-          href: "/carte",
-          label: "La carte des ventes",
+          href: "/observatoire",
+          label: "L'observatoire et sa carte",
           body: "La donnée brute, sans interprétation : le meilleur terrain pour apprendre à la lire.",
         },
       ]}

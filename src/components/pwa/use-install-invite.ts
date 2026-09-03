@@ -40,7 +40,6 @@ import { isStandalone, readIosSafari } from "./platform";
  */
 const PAS_ICI = [
   "/estimer",
-  "/carte",
   "/observatoire",
   "/mon-espace",
   "/connexion",

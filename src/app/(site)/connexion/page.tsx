@@ -50,13 +50,6 @@ export default function ConnexionPage() {
             >
               estimateur
             </Link>
-            , la{" "}
-            <Link
-              href="/carte"
-              className="font-semibold text-primary underline"
-            >
-              carte
-            </Link>
             , l&apos;
             <Link
               href="/observatoire"

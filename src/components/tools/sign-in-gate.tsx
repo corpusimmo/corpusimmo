@@ -12,8 +12,8 @@
  * fermée avec une affiche. Ici, la personne sait exactement ce qu'elle vient
  * chercher avant qu'on lui demande quoi que ce soit.
  *
- * Le reste du site, lui, ne demande rien : l'estimateur, la carte des ventes et
- * l'observatoire sont ouverts, et le resteront.
+ * Le reste du site, lui, ne demande rien : l'estimateur et l'observatoire,
+ * carte comprise, sont ouverts, et le resteront.
  */
 
 import { signIn } from "next-auth/react";
@@ -45,9 +45,10 @@ export function SignInGate({
           Connectez-vous pour ouvrir «&nbsp;{title}&nbsp;»
         </h2>
         <p className="text-sm leading-relaxed text-ink-muted">
-          Les dix calculateurs se consultent librement, mais s&apos;utilisent en étant connecté.
-          C&apos;est ce qui nous permet de savoir à qui ils servent, et de tenir une limite de{" "}
-          {limit} outils par semaine qui ne dépende pas d&apos;un cookie qu&apos;on peut effacer.
+          Les dix calculateurs se consultent librement, mais s&apos;utilisent en
+          étant connecté. C&apos;est ce qui nous permet de savoir à qui ils
+          servent, et de tenir une limite de {limit} outils par semaine qui ne
+          dépende pas d&apos;un cookie qu&apos;on peut effacer.
         </p>
       </div>
 
@@ -66,13 +67,16 @@ export function SignInGate({
       </Button>
 
       <div className="flex flex-col gap-3 border-t border-border-soft pt-5">
-        <p className="text-sm font-medium text-ink">Le reste du site ne demande rien</p>
+        <p className="text-sm font-medium text-ink">
+          Le reste du site ne demande rien
+        </p>
         <ul className="flex flex-col gap-2 text-sm text-ink-muted">
           <Row icon={<Search aria-hidden="true" className="size-4" />}>
             L&apos;estimateur, de la première question au résultat.
           </Row>
           <Row icon={<Map aria-hidden="true" className="size-4" />}>
-            La carte des ventes, en plein écran et sans limite de consultation.
+            La carte de l&apos;observatoire, en plein écran et sans limite de
+            consultation.
           </Row>
           <Row icon={<Table2 aria-hidden="true" className="size-4" />}>
             L&apos;observatoire et la recherche de transactions.
@@ -83,7 +87,13 @@ export function SignInGate({
   );
 }
 
-function Row({ icon, children }: { icon: React.ReactNode; children: React.ReactNode }) {
+function Row({
+  icon,
+  children,
+}: {
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
   return (
     <li className="flex items-start gap-2.5">
       <span className="mt-0.5 shrink-0 text-ink-subtle">{icon}</span>

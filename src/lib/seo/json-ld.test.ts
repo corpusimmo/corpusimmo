@@ -108,7 +108,7 @@ describe("webApplicationNode", () => {
     const open = webApplicationNode({
       name: "Carte des ventes",
       description: "Les mutations DVF, sur une carte.",
-      path: "/carte",
+      path: "/observatoire",
       category: "BusinessApplication",
       accessibleForFree: true,
     });

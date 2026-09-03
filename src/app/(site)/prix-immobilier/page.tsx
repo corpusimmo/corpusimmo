@@ -177,14 +177,14 @@ export default function PrixImmobilierPage() {
               Votre commune n&apos;est pas dans la liste
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-muted">
-              La carte des ventes couvre toute la France, sans sélection ni
-              seuil&nbsp;: elle affiche les mutations une par une, ce qui reste
-              honnête là où une médiane ne le serait pas.
+              La carte de l&apos;observatoire couvre toute la France, sans
+              sélection ni seuil&nbsp;: elle affiche les mutations une par une,
+              ce qui reste honnête là où une médiane ne le serait pas.
             </p>
           </div>
           <Button asChild variant="secondary" className="shrink-0">
             <Link href={mapHref()}>
-              Ouvrir la carte des ventes
+              Ouvrir l&apos;observatoire
               <ArrowRight aria-hidden="true" className="size-4" />
             </Link>
           </Button>

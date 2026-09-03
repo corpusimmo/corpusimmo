@@ -44,7 +44,7 @@ describe("canonicalUrl", () => {
   it("produit une URL absolue sur l'apex", () => {
     expect(canonicalUrl("/outils")).toMatch(/^https?:\/\/[^/]+\/outils$/);
     expect(canonicalUrl("/")).toMatch(/\/$/);
-    expect(canonicalUrl("/carte")).not.toContain("www.");
+    expect(canonicalUrl("/observatoire")).not.toContain("www.");
   });
 });
 

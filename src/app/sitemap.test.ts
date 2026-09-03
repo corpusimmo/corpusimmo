@@ -75,7 +75,6 @@ describe("sitemap", () => {
     for (const path of [
       "/",
       "/estimer",
-      "/carte",
       "/observatoire",
       "/observatoire/transactions",
       "/outils",

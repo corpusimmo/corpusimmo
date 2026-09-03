@@ -42,7 +42,7 @@ export function LeadCta() {
               Fermer
             </Button>
             <Button asChild>
-              <Link href="/carte">Explorer les ventes du quartier</Link>
+              <Link href="/observatoire">Explorer les ventes du quartier</Link>
             </Button>
           </div>
         }

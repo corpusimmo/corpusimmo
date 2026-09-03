@@ -47,7 +47,7 @@ export function ObservatoireWorkspace() {
   const [state, setState] = useState<DvfMapState>("loading");
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
-  const { ids, count: basketCount } = useComparables();
+  const { ids, count: basketCount, toggle } = useComparables();
 
   const onDataChange = useCallback(
     (next: DvfResult | null, nextState: DvfMapState) => {
@@ -68,7 +68,8 @@ export function ObservatoireWorkspace() {
       .sort((a, b) => {
         if (origin) {
           return (
-            haversineMeters(origin, a.coordinates) - haversineMeters(origin, b.coordinates)
+            haversineMeters(origin, a.coordinates) -
+            haversineMeters(origin, b.coordinates)
           );
         }
         return b.date.localeCompare(a.date);
@@ -114,7 +115,11 @@ export function ObservatoireWorkspace() {
             `/connexion`. La sélection publique montre déjà les statistiques ;
             c'est depuis elle que la porte du compte se présente, expliquée.
           */}
-          <Button variant={basketCount > 0 ? "primary" : "outline"} size="sm" asChild>
+          <Button
+            variant={basketCount > 0 ? "primary" : "outline"}
+            size="sm"
+            asChild
+          >
             <Link href="/observatoire/comparables">
               <Scale className="size-4" aria-hidden />
               Analyser les comparables ({basketCount})
@@ -130,7 +135,11 @@ export function ObservatoireWorkspace() {
       />
 
       <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_400px]">
-        {/* --------------------------------------------------------- map */}
+        {/* --------------------------------------------------------- map
+            `onToggleComparable` : la fiche ouverte sur la carte peut AJOUTER,
+            et pas seulement montrer. C'est le même `toggle` que la table et
+            que le panier, donc l'état ne peut pas diverger d'un écran à
+            l'autre. */}
         <div className="overflow-hidden rounded-lg border border-border bg-surface">
           <LazyDvfMap
             key={`${center.lat.toFixed(5)},${center.lng.toFixed(5)}`}
@@ -138,17 +147,28 @@ export function ObservatoireWorkspace() {
             initialCenter={center}
             initialZoom={address ? 15 : 13}
             filters={filters}
-            subject={address ? { point: address.coordinates, label: address.label, radius: 500 } : null}
+            subject={
+              address
+                ? {
+                    point: address.coordinates,
+                    label: address.label,
+                    radius: 500,
+                  }
+                : null
+            }
             selectedId={selectedId}
             onSelect={(transaction) => setSelectedId(transaction?.id ?? null)}
             comparableIds={ids}
+            onToggleComparable={toggle}
             onDataChange={onDataChange}
             density="dense"
           />
 
           <div className="flex flex-wrap items-center gap-x-5 gap-y-2 border-t border-border px-4 py-3 text-sm">
             <span className="text-ink-muted">
-              <strong className="font-semibold text-ink tnum">{formatNumber(stats.count)}</strong>{" "}
+              <strong className="font-semibold text-ink tnum">
+                {formatNumber(stats.count)}
+              </strong>{" "}
               mutations affichées
             </span>
             {stats.medianPricePerSqm !== undefined && (
@@ -186,7 +206,9 @@ export function ObservatoireWorkspace() {
           className="flex max-h-[calc(100vh-18rem)] min-h-[420px] flex-col overflow-hidden rounded-lg border border-border bg-surface"
         >
           <div className="shrink-0 border-b border-border px-4 py-3">
-            <h2 className="text-sm font-semibold text-ink">Mutations de la vue</h2>
+            <h2 className="text-sm font-semibold text-ink">
+              Mutations de la vue
+            </h2>
             <RealDataNotice className="mt-1" />
           </div>
 
@@ -214,11 +236,15 @@ export function ObservatoireWorkspace() {
               <dl className="mt-3 grid grid-cols-3 gap-2 text-xs">
                 <div>
                   <dt className="text-ink-subtle">Prix</dt>
-                  <dd className="font-semibold text-ink tnum">{formatPrice(selected.price)}</dd>
+                  <dd className="font-semibold text-ink tnum">
+                    {formatPrice(selected.price)}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-ink-subtle">Surface</dt>
-                  <dd className="font-semibold text-ink tnum">{formatArea(selected.builtArea)}</dd>
+                  <dd className="font-semibold text-ink tnum">
+                    {formatArea(selected.builtArea)}
+                  </dd>
                 </div>
                 <div>
                   <dt className="text-ink-subtle">€/m²</dt>
@@ -234,7 +260,9 @@ export function ObservatoireWorkspace() {
           )}
 
           <div className="min-h-0 flex-1 overflow-y-auto scroll-slim">
-            {state === "loading" && <LoadingState label="Chargement des mutations…" />}
+            {state === "loading" && (
+              <LoadingState label="Chargement des mutations…" />
+            )}
 
             {state === "error" && (
               <ErrorState
@@ -268,8 +296,9 @@ export function ObservatoireWorkspace() {
 
           {state === "ready" && transactions.length > LIST_CAP && (
             <p className="shrink-0 border-t border-border px-4 py-2 text-xs text-ink-subtle">
-              {formatNumber(LIST_CAP)} mutations listées sur {formatNumber(transactions.length)}.
-              Zoomez pour affiner la sélection.
+              {formatNumber(LIST_CAP)} mutations listées sur{" "}
+              {formatNumber(transactions.length)}. Zoomez pour affiner la
+              sélection.
             </p>
           )}
         </aside>
@@ -279,9 +308,10 @@ export function ObservatoireWorkspace() {
         <Card>
           <CardContent className="p-6">
             <p className="text-sm text-ink-muted">
-              Aucune mutation ne correspond à cette vue. L&apos;observatoire interroge les
-              fichiers DVF géolocalisés commune par commune : un zoom trop large ou une commune
-              non couverte (Alsace-Moselle, Mayotte) peut expliquer l&apos;absence de résultat.
+              Aucune mutation ne correspond à cette vue. L&apos;observatoire
+              interroge les fichiers DVF géolocalisés commune par commune : un
+              zoom trop large ou une commune non couverte (Alsace-Moselle,
+              Mayotte) peut expliquer l&apos;absence de résultat.
             </p>
           </CardContent>
         </Card>
@@ -301,10 +331,17 @@ function TransactionListItem({
   active: boolean;
   onFocus: () => void;
 }) {
-  const distance = origin ? haversineMeters(origin, transaction.coordinates) : undefined;
+  const distance = origin
+    ? haversineMeters(origin, transaction.coordinates)
+    : undefined;
 
   return (
-    <li className={cn("p-3 transition-colors", active ? "bg-surface-3" : "hover:bg-surface-2")}>
+    <li
+      className={cn(
+        "p-3 transition-colors",
+        active ? "bg-surface-3" : "hover:bg-surface-2",
+      )}
+    >
       <button
         type="button"
         onClick={onFocus}
@@ -315,12 +352,17 @@ function TransactionListItem({
           {transaction.addressLabel ?? "Adresse non publiée"}
         </p>
         <p className="truncate text-xs text-ink-muted">
-          {dvfTypeLabel(transaction.propertyType)} · {formatMonthYear(transaction.date)}
+          {dvfTypeLabel(transaction.propertyType)} ·{" "}
+          {formatMonthYear(transaction.date)}
           {distance !== undefined && ` · ${formatDistance(distance)}`}
         </p>
         <p className="mt-1 flex flex-wrap items-center gap-x-3 text-xs tnum">
-          <span className="font-semibold text-ink">{formatPrice(transaction.price)}</span>
-          <span className="text-ink-muted">{formatArea(transaction.builtArea)}</span>
+          <span className="font-semibold text-ink">
+            {formatPrice(transaction.price)}
+          </span>
+          <span className="text-ink-muted">
+            {formatArea(transaction.builtArea)}
+          </span>
           <span className="font-medium text-accent-soft-fg">
             {formatPricePerSqm(transaction.pricePerSqm)}
           </span>

@@ -63,9 +63,38 @@ describe("lignes de tram et métro issues des GTFS", () => {
     expect(GTFS_LAYER_IDS[0]).toBe(GTFS_LINE_CASING_LAYER);
     expect(GTFS_LAYER_IDS[GTFS_LAYER_IDS.length - 1]).toBe(GTFS_LINE_BADGE_LAYER);
 
-    const casing = (byId(GTFS_LINE_CASING_LAYER).paint as Spec)["line-width"];
-    const ligne = (byId(GTFS_LINE_LAYER).paint as Spec)["line-width"];
-    expect(casing).toEqual(["+", ligne, 2.4]);
+    // Le liseré doit être plus épais que le trait à CHAQUE palier de zoom,
+    // sinon il cesse de déborder et le trait perd son détourage.
+    const stops = (id: string) => {
+      const expr = (byId(id).paint as Spec)["line-width"] as unknown[];
+      return expr.slice(3).filter((_, i) => i % 2 === 1) as number[];
+    };
+    const casing = stops(GTFS_LINE_CASING_LAYER);
+    const ligne = stops(GTFS_LINE_LAYER);
+    expect(casing).toHaveLength(ligne.length);
+    casing.forEach((w, i) => expect(w).toBeGreaterThan(ligne[i] as number));
+  });
+
+  it("n'enferme jamais `zoom` ailleurs qu'en entrée d'une interpolation", () => {
+    // MapLibre rejette le style ENTIER si `["zoom"]` apparaît autrement qu'en
+    // entrée directe d'un `interpolate` ou d'un `step`. TypeScript ne voit
+    // rien, la carte reste blanche, et la console ne dit pas pourquoi.
+    const verifier = (noeud: unknown, entreeAutorisee: boolean): void => {
+      if (!Array.isArray(noeud)) return;
+      if (noeud[0] === "zoom") {
+        expect(entreeAutorisee).toBe(true);
+        return;
+      }
+      const interpole = noeud[0] === "interpolate" || noeud[0] === "step";
+      noeud.forEach((enfant, i) =>
+        // L'entrée est le 3ᵉ terme d'un `interpolate`, le 2ᵉ d'un `step`.
+        verifier(enfant, interpole && i === (noeud[0] === "step" ? 1 : 2)),
+      );
+    };
+    for (const layer of specs()) {
+      verifier(layer.paint, false);
+      verifier(layer.layout, false);
+    }
   });
 
   it("naît éteint, et branché sur les deux sources attendues", () => {

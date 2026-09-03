@@ -114,17 +114,23 @@ export function gtfsLayers(): LayerSpec[] {
    * La largeur suit le zoom, pas le mode : un métro et un tram partagent
    * souvent le même axe, leur donner deux épaisseurs ferait croire à une
    * hiérarchie qui n'existe pas pour l'acheteur.
+   *
+   * Le liseré reçoit sa PROPRE interpolation, décalée, plutôt que l'épaisseur
+   * du trait augmentée d'une constante : MapLibre refuse `["zoom"]` ailleurs
+   * qu'en entrée directe d'un `interpolate` ou d'un `step`. Un `["+", …]`
+   * autour passe le compilateur TypeScript et fait échouer le style entier au
+   * chargement, sans erreur visible dans la console.
    */
-  const width: unknown[] = [
+  const width = (extra: number): unknown[] => [
     "interpolate",
     ["exponential", 1.4],
     ["zoom"],
     8,
-    1.2,
+    1.2 + extra,
     12,
-    2.4,
+    2.4 + extra,
     16,
-    5,
+    5 + extra,
   ];
 
   return [
@@ -136,7 +142,7 @@ export function gtfsLayers(): LayerSpec[] {
       layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": CASING_COLOR,
-        "line-width": ["+", width, 2.4],
+        "line-width": width(2.4),
       },
     },
     {
@@ -146,7 +152,7 @@ export function gtfsLayers(): LayerSpec[] {
       layout: { visibility: "none", "line-cap": "round", "line-join": "round" },
       paint: {
         "line-color": ["get", "couleur"],
-        "line-width": width,
+        "line-width": width(0),
         // Pas de `line-dasharray` pour distinguer le funiculaire : cette
         // propriété n'accepte AUCUNE expression liée à l'entité, seulement le
         // zoom. Il faudrait une couche de plus pour six lignes en France ; la

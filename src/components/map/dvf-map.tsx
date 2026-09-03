@@ -89,6 +89,7 @@ import {
   setTransportVisibility,
 } from "./transports";
 import { TransportsLegend } from "./transports-legend";
+import { installGtfsLayers, setGtfsVisibility } from "./transports-gtfs";
 import {
   buildTerritoryScale,
   installTerritoryLayers,
@@ -634,6 +635,14 @@ export function DvfMap({
     const rails = installTransportLayers(instance, LAYER_SUBJECT_FILL);
     setTransportsAvailable(rails);
     if (rails) setTransportVisibility(instance, transportsRef.current);
+
+    // Les lignes officielles se posent PAR-DESSUS celles des tuiles : là où un
+    // réseau publie son GTFS, on voit ses vraies couleurs et son numéro ; là
+    // où il n'en publie pas, le tracé générique reste. Un seul interrupteur
+    // pour les deux : l'utilisateur demande « les transports », pas « la
+    // couche vectorielle » ni « le référentiel d'exploitant ».
+    installGtfsLayers(instance, LAYER_SUBJECT_FILL);
+    setGtfsVisibility(instance, transportsRef.current);
     syncPriceLabels(instance, showPricesRef.current);
     hydrate();
   }, [hydrate, isDense, syncPriceLabels]);
@@ -673,6 +682,7 @@ export function DvfMap({
     const instance = mapRef.current;
     if (!instance || !transportsAvailable) return;
     setTransportVisibility(instance, transports);
+    setGtfsVisibility(instance, transports);
   }, [transports, transportsAvailable]);
 
   /* ── Format d'affichage de la fiche ────────────────────────────────────── */

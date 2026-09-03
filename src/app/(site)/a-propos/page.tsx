@@ -7,7 +7,7 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "À propos",
   description:
-    "Pourquoi CorpusImmo part d'actes et non d'annonces, d'où viennent les données DVF, et " +
+    "Deux analystes investissement immobilier, un corpus d'actes plutôt que d'annonces, et " +
     "les quatre règles que nous nous sommes fixées sur ce que nous affichons.",
   path: "/a-propos",
   socialTitle: "Un corpus, et ce qu'on en fait",
@@ -15,36 +15,167 @@ export const metadata: Metadata = pageMetadata({
 
 export default function AProposPage() {
   return (
-    <div className="bg-canvas py-12 md:py-16">
-      <div className="container-page">
-        <article className="mx-auto max-w-2xl">
-          {/* Une rue vue d'une fenêtre : le point de vue de quelqu'un qui
-              observe un marché, pas de quelqu'un qui vend un bien. C'est la
-              posture du produit, et c'est pour ça que l'image ouvre cette page
-              et aucune autre. Illustration générée (voir docs/images.md). */}
-          <figure className="reveal mb-10">
-            <div className="relative aspect-[21/9] overflow-hidden rounded-lg border border-border bg-surface-3 shadow-xs">
-              <Image
-                src="/illustrations/ville-rue-fenetre.webp"
-                alt="Illustration : une rue de maisons de ville du XIXe siècle vue d'une fenêtre du premier étage, en fin d'après-midi."
-                fill
-                priority
-                sizes="(min-width: 768px) 672px, 100vw"
-                className="object-cover object-[50%_35%]"
-              />
+    <div className="bg-canvas pb-12 md:pb-16">
+      {/* ── EN-TÊTE ─────────────────────────────────────────────────────────
+          L'image ne se donne plus à voir pour elle-même. Posée brute avec sa
+          légende, elle occupait le premier écran sans rien dire du sujet, et
+          la page commençait vraiment sous la ligne de flottaison. Elle passe
+          donc en fond d'un bloc qui porte le titre, la phrase d'ouverture ET
+          la signature des deux auteurs : on sait dès la première seconde de
+          quoi ça parle et qui l'écrit. */}
+      <header className="relative isolate overflow-hidden">
+        <Image
+          src="/illustrations/ville-rue-fenetre.webp"
+          alt=""
+          aria-hidden
+          fill
+          priority
+          sizes="100vw"
+          className="-z-10 object-cover object-[50%_38%]"
+        />
+        {/* Le voile est plus dense à gauche, là où court le texte, et
+            s'éclaircit à droite pour laisser vivre la photo. */}
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 bg-[linear-gradient(100deg,rgba(15,30,51,.96)_0%,rgba(15,30,51,.92)_42%,rgba(15,30,51,.72)_68%,rgba(15,30,51,.5)_100%)]"
+        />
+
+        <div className="container-page py-14 md:py-20">
+          <div className="max-w-2xl">
+            <p className="eyebrow-text text-[color:var(--accent-rule)]">
+              À propos
+            </p>
+            <h1 className="mt-3 font-display text-4xl leading-[1.1] tracking-tight text-white md:text-5xl">
+              Un corpus, et ce qu&apos;on en fait
+            </h1>
+            <p className="mt-5 max-w-xl text-lg leading-relaxed text-white/80">
+              Nous ne partons pas d&apos;annonces. Nous partons des mutations
+              réellement enregistrées par la DGFiP — des prix payés, portés à un
+              acte.
+            </p>
+
+            {/* La signature dans l'en-tête, pas en bas de page : sur un
+                estimateur, la première question légitime est « qui a écrit la
+                méthode ». */}
+            <div className="mt-8 flex items-center gap-3">
+              <div className="flex -space-x-3">
+                {TEAM.map((member) => (
+                  <Image
+                    key={member.name}
+                    src={member.photo}
+                    alt={`Portrait de ${member.name}`}
+                    width={44}
+                    height={44}
+                    className="size-11 rounded-full border-2 border-white/85 object-cover"
+                  />
+                ))}
+              </div>
+              <p className="text-sm leading-snug text-white/75">
+                Par{" "}
+                <span className="font-semibold text-white">
+                  Mathieu Guicheteau
+                </span>{" "}
+                et{" "}
+                <span className="font-semibold text-white">Gaël Colin</span>
+                <span className="block text-white/60">
+                  analystes investissement immobilier
+                </span>
+              </p>
             </div>
-            <figcaption className="mt-2 text-xs text-ink-subtle">
-              Illustration. Aucune adresse réelle n&apos;est identifiable, et
-              aucun bien du corpus n&apos;est photographié.
-            </figcaption>
-          </figure>
+          </div>
+        </div>
 
-          <p className="eyebrow">À propos</p>
-          <h1 className="mt-3 font-display text-4xl leading-tight text-ink">
-            Un corpus, et ce qu&apos;on en fait
-          </h1>
+        <div
+          aria-hidden
+          className="absolute inset-x-0 bottom-0 h-1 bg-[linear-gradient(90deg,var(--accent-rule),var(--accent),var(--accent-rule))]"
+        />
+      </header>
 
-          <div className="mt-8 flex flex-col gap-5 leading-relaxed text-ink-muted">
+      <div className="container-page">
+        <p className="mx-auto max-w-2xl pt-3 text-[11px] text-ink-subtle">
+          Illustration. Aucune adresse réelle n&apos;est identifiable, et aucun
+          bien du corpus n&apos;est photographié.
+        </p>
+
+        {/* ── LES DEUX PARCOURS ─────────────────────────────────────────────
+            Remontés juste sous l'en-tête. Un estimateur en ligne se juge sur
+            sa méthode, et une méthode se juge sur qui l'a signée : ces années
+            de métier valent plus que n'importe quelle promesse sur la qualité
+            des données, elles n'avaient rien à faire en bas de page. */}
+        <section className="mx-auto mt-10 max-w-4xl">
+          <h2 className="font-display text-2xl text-ink">Qui nous sommes</h2>
+          <p className="mt-3 max-w-2xl leading-relaxed text-ink-muted">
+            Nous ne venons pas de la technologie. Nous venons de l&apos;analyse
+            d&apos;investissement immobilier, où nous avons passé nos premières
+            années professionnelles à faire exactement ce que ce site
+            automatise&nbsp;: chercher des références de marché, écarter celles
+            qui ne comparent rien, et défendre un chiffre devant quelqu&apos;un
+            qui allait engager son argent dessus.
+          </p>
+
+          <ul className="mt-7 grid gap-5 sm:grid-cols-2">
+            {TEAM.map((member) => (
+              <li key={member.name} className="panel flex flex-col gap-4 p-6">
+                <div className="flex items-center gap-3.5">
+                  <Image
+                    src={member.photo}
+                    alt={`Portrait de ${member.name}`}
+                    width={60}
+                    height={60}
+                    className="size-15 shrink-0 rounded-full border border-border object-cover"
+                  />
+                  <div className="min-w-0">
+                    <p className="font-display text-lg font-semibold leading-tight text-ink">
+                      {member.name}
+                    </p>
+                    <p className="mt-0.5 text-xs leading-snug text-ink-subtle">
+                      {member.role}
+                    </p>
+                  </div>
+                </div>
+
+                {/* Les années de métier, lisibles sans lire le paragraphe. */}
+                <ul className="flex flex-wrap gap-1.5">
+                  {member.facts.map((fact) => (
+                    <li
+                      key={fact}
+                      className="rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-ink-muted"
+                    >
+                      {fact}
+                    </li>
+                  ))}
+                </ul>
+
+                <p className="text-sm leading-relaxed text-ink-muted">
+                  {member.bio}
+                </p>
+
+                <a
+                  href={member.linkedin}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="mt-auto text-xs font-semibold text-primary underline underline-offset-2"
+                >
+                  Parcours détaillé sur LinkedIn
+                </a>
+              </li>
+            ))}
+          </ul>
+
+          <p className="mt-6 max-w-2xl leading-relaxed text-ink-muted">
+            CorpusImmo est né de la lassitude de refaire ce travail à la main,
+            et de la conviction qu&apos;un estimateur honnête doit montrer ses
+            ventes plutôt que son résultat.
+          </p>
+        </section>
+
+        {/* ── LE CORPUS ─────────────────────────────────────────────────────*/}
+        <article className="mx-auto mt-14 max-w-2xl">
+          <h2 className="font-display text-2xl text-ink">
+            Pourquoi « corpus »
+          </h2>
+
+          <div className="mt-4 flex flex-col gap-5 leading-relaxed text-ink-muted">
             <p>
               Un <em>corpus</em>, en science comme en droit, n&apos;est pas un
               tas de données. C&apos;est un ensemble fini, clos et structuré de
@@ -93,61 +224,6 @@ export default function AProposPage() {
               sources n&apos;est recopiée dans une base à nous.
             </p>
 
-            <h2 className="mt-6 font-display text-2xl text-ink">
-              Qui nous sommes
-            </h2>
-            <p>
-              Nous ne venons pas de la technologie. Nous venons de
-              l&apos;analyse d&apos;investissement immobilier, où nous avons
-              passé nos premières années professionnelles à faire exactement ce
-              que ce site automatise&nbsp;: chercher des références de marché,
-              écarter celles qui ne comparent rien, et défendre un chiffre
-              devant quelqu&apos;un qui allait engager son argent dessus.
-            </p>
-            <p>
-              CorpusImmo est né de la lassitude de refaire ce travail à la main,
-              et de la conviction qu&apos;un estimateur honnête doit montrer ses
-              ventes plutôt que son résultat.
-            </p>
-
-            {/* Les deux parcours côte à côte, pas l'un sous l'autre : ils se
-                répondent — le même métier, deux maisons différentes. */}
-            <ul className="not-prose mt-2 grid gap-5 sm:grid-cols-2">
-              {TEAM.map((member) => (
-                <li
-                  key={member.name}
-                  className="panel flex flex-col gap-3 p-5"
-                >
-                  <div className="flex items-center gap-3">
-                    <Image
-                      src={member.photo}
-                      alt={`Portrait de ${member.name}`}
-                      width={56}
-                      height={56}
-                      className="size-14 shrink-0 rounded-full border border-border object-cover"
-                    />
-                    <div className="min-w-0">
-                      <p className="font-display text-base font-semibold text-ink">
-                        {member.name}
-                      </p>
-                      <p className="text-xs text-ink-subtle">{member.role}</p>
-                    </div>
-                  </div>
-                  <p className="text-sm leading-relaxed text-ink-muted">
-                    {member.bio}
-                  </p>
-                  <a
-                    href={member.linkedin}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="mt-auto text-xs font-semibold text-primary underline"
-                  >
-                    Parcours détaillé sur LinkedIn
-                  </a>
-                </li>
-              ))}
-            </ul>
-
             <h2 className="mt-6 font-display text-2xl text-ink">Nous écrire</h2>
             <p>
               Une erreur dans un chiffre, une méthode contestable, une question
@@ -171,13 +247,13 @@ export default function AProposPage() {
  * Les deux associés.
  *
  * Ce que ces notices doivent porter, et rien d'autre : des ANNÉES DE MÉTIER.
- * Un estimateur en ligne se juge sur la méthode, et la méthode se juge sur qui
- * l'a écrite. Dire « analyste investissement chez BNP Paribas Real Estate »
- * vaut mieux que n'importe quelle promesse sur la qualité des données.
+ * `facts` existe pour ça — les repères se lisent d'un coup d'œil, avant même
+ * le paragraphe, parce que c'est ce qu'un visiteur cherche à vérifier.
  *
  * Les portraits viennent des profils LinkedIn, en 100 px de côté — d'où un
- * affichage à 56 px, où cette résolution reste nette. Remplacer les deux
- * fichiers de `public/equipe/` par de la haute résolution suffit à agrandir.
+ * affichage à 60 px au plus, où cette résolution reste nette. Remplacer les
+ * deux fichiers de `public/equipe/` par de la haute résolution suffit à
+ * agrandir.
  */
 const TEAM = [
   {
@@ -185,14 +261,16 @@ const TEAM = [
     role: "Analyste investissement · produit et méthode",
     photo: "/equipe/mathieu.png",
     linkedin: "https://www.linkedin.com/in/mathieu-guicheteau/",
-    bio: "Six ans d'analyse d'investissement en immobilier d'entreprise chez Blot Immobilier — flux actualisés, études de marché, dossiers d'acquisition — après la gestion d'un portefeuille de mille lots. À dix-sept ans, il avait déjà écrit un simulateur d'investissement immobilier, donné gratuitement.",
+    facts: ["6 ans chez Blot Immobilier", "1 000 lots gérés", "DCF et études de marché"],
+    bio: "Six ans d'analyse d'investissement en immobilier d'entreprise — flux actualisés, études de marché, dossiers d'acquisition — après la gestion d'un portefeuille de mille lots. À dix-sept ans, il avait déjà écrit un simulateur d'investissement immobilier, et l'avait donné.",
   },
   {
     name: "Gaël Colin",
     role: "Analyste investissement · marché et données",
     photo: "/equipe/gael.png",
     linkedin: "https://www.linkedin.com/in/ga%C3%ABl-colin/",
-    bio: "Analyste investissement chez BNP Paribas Real Estate à Nantes, diplômé de l'ESPI. Il a instruit des opérations d'acquisition pour des investisseurs institutionnels : c'est de ce quotidien que viennent les garde-fous statistiques du moteur.",
+    facts: ["BNP Paribas Real Estate", "Nantes", "ESPI"],
+    bio: "Analyste investissement en immobilier d'entreprise, il a instruit des opérations d'acquisition pour des investisseurs institutionnels. C'est de ce quotidien que viennent les garde-fous statistiques du moteur.",
   },
 ] as const;
 

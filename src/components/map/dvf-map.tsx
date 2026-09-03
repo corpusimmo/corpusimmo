@@ -80,7 +80,12 @@ import { TransactionCard } from "./transaction-card";
 import { useDvfData } from "./use-dvf-data";
 import { PRICE_RAMP } from "./base-palette";
 import { PriceLegend } from "./price-legend";
+import { ZoningLegend } from "./zoning-legend";
 import { buildPriceScale, byPriceClass, type PriceScale } from "./price-scale";
+import {
+  installZoningLayers,
+  setZoningVisibility,
+} from "./zoning";
 
 /** Below this zoom a viewport covers whole départements: we refuse to query. */
 export const MIN_DATA_ZOOM = 13;
@@ -217,6 +222,9 @@ export function DvfMap({
   // Le €/m² d'abord : c'est la seule unité comparable d'une vente à
   // l'autre. Le prix global reste à un clic, en second.
   const [priceMode, setPriceMode] = React.useState<PriceMode>("perSqm");
+  /** Le calque d'affectation du sol est-il allumé, et peut-il l'être ? */
+  const [zoning, setZoning] = React.useState(false);
+  const [zoningAvailable, setZoningAvailable] = React.useState(false);
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
   const [internalSelectedId, setInternalSelectedId] = React.useState<
@@ -260,6 +268,8 @@ export function DvfMap({
   rowsRef.current = rows;
   const priceModeRef = React.useRef<PriceMode>(priceMode);
   priceModeRef.current = priceMode;
+  const zoningRef = React.useRef(zoning);
+  zoningRef.current = zoning;
   const scaleRef = React.useRef<PriceScale | null>(scale);
   scaleRef.current = scale;
   const subjectRef = React.useRef(subject);
@@ -516,8 +526,22 @@ export function DvfMap({
       dense: isDense,
       dark: contextRef.current.dark,
     });
+    // Sous le bâti, donc sous les routes et les pastilles : le zonage est un
+    // fond, jamais un premier plan. Il repart caché à chaque changement de
+    // fond de carte, d'où la remise en état juste après.
+    const supported = installZoningLayers(instance, "building");
+    setZoningAvailable(supported);
+    if (supported) setZoningVisibility(instance, zoningRef.current);
     hydrate();
   }, [hydrate, isDense]);
+
+  /* ── Affectation du sol ────────────────────────────────────────────────── */
+
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    if (!instance || !zoningAvailable) return;
+    setZoningVisibility(instance, zoning);
+  }, [zoning, zoningAvailable]);
 
   /* ── Format d'affichage de la fiche ────────────────────────────────────── */
 
@@ -1212,6 +1236,30 @@ export function DvfMap({
               {pitched ? "Vue à plat" : "Vue 3D"}
             </button>
           ) : null}
+
+          {/* AFFECTATION DU SOL. Un interrupteur, pas un sélecteur : une seule
+              source aujourd'hui. Le jour où la BDNB et le PLU arrivent, ce
+              bouton devient une liste — et jamais des cases à cocher, car deux
+              affectations peintes ensemble ne répondent pas à la même
+              question et se recouvriraient sans que rien ne le dise. */}
+          {zoningAvailable ? (
+            <button
+              type="button"
+              onClick={() => setZoning((on) => !on)}
+              aria-pressed={zoning}
+              className={cn(
+                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
+                zoning
+                  ? "bg-primary text-primary-fg"
+                  : "bg-surface text-ink-muted hover:text-ink",
+              )}
+            >
+              <Layers aria-hidden="true" className="size-3.5" />
+              Zonage
+            </button>
+          ) : null}
+
+          {zoning ? <ZoningLegend /> : null}
 
           {/* Sur un écran étroit la légende suit les commandes ; au large elle
               descend dans le coin, où elle ne mange pas la carte. */}

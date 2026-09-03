@@ -37,6 +37,7 @@ import {
 } from "@/lib/utils/format";
 import { googleMapsUrl, streetViewUrl } from "@/lib/utils/maps";
 import { ActivityHint } from "./activity-hint";
+import { DpeBadge } from "./dpe-badge";
 
 export const PROPERTY_TYPE_LABELS: Record<DvfPropertyType, string> = {
   apartment: "Appartement",
@@ -189,11 +190,29 @@ export function TransactionCard({
         </span>
       </p>
 
+      {/* DEUX ENRICHISSEMENTS GÉOGRAPHIQUES, ET LA MÊME PRÉCAUTION.
+          Le type déclare `coordinates` comme toujours présent, mais certaines
+          mutations n'en portent pas : DVF publie des ventes sans géocodage.
+          Sans ce test, la fiche PLANTE au lieu de se contenter de l'adresse
+          écrite. C'est un test existant qui l'a montré, pas une relecture.
+
+          L'étiquette énergie, que DVF ne publie pas. Réservée au logement :
+          un terrain, un parking ou une dépendance n'a pas de diagnostic, et
+          l'aller chercher ne ramènerait que le voisinage. */}
+      {t.coordinates &&
+      (t.propertyType === "apartment" || t.propertyType === "house") ? (
+        <DpeBadge
+          lat={t.coordinates.lat}
+          lng={t.coordinates.lng}
+          builtArea={t.builtArea}
+        />
+      ) : null}
+
       {/* DVF range bureaux, boutiques, entrepôts et ateliers dans un seul
           « local industriel, commercial ou assimilé ». Là, et seulement là, on
           va chercher qui travaille à l'adresse pour préciser — juste sous
           l'adresse, et sans jamais remplacer ce que DVF a écrit plus haut. */}
-      {t.propertyType === "commercial" ? (
+      {t.coordinates && t.propertyType === "commercial" ? (
         <ActivityHint lat={t.coordinates.lat} lng={t.coordinates.lng} />
       ) : null}
 

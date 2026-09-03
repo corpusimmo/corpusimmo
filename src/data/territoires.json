@@ -1,0 +1,1067 @@
+{
+  "generatedAt": "2026-09-03",
+  "years": [
+    2023,
+    2024,
+    2025
+  ],
+  "minSales": 50,
+  "source": "DVF géolocalisées (DGFiP / Etalab)",
+  "departements": [
+    {
+      "code": "01",
+      "nom": "Ain",
+      "region": "84",
+      "ppsm": 2414,
+      "count": 24445,
+      "house": 2308,
+      "apartment": 2625
+    },
+    {
+      "code": "02",
+      "nom": "Aisne",
+      "region": "32",
+      "ppsm": 1124,
+      "count": 17957,
+      "house": 1100,
+      "apartment": 1239
+    },
+    {
+      "code": "03",
+      "nom": "Allier",
+      "region": "84",
+      "ppsm": 1020,
+      "count": 15117,
+      "house": 968,
+      "apartment": 1170
+    },
+    {
+      "code": "04",
+      "nom": "Alpes-de-Haute-Provence",
+      "region": "93",
+      "ppsm": 2167,
+      "count": 9406,
+      "house": 2317,
+      "apartment": 2041
+    },
+    {
+      "code": "05",
+      "nom": "Hautes-Alpes",
+      "region": "93",
+      "ppsm": 2713,
+      "count": 9663,
+      "house": 2652,
+      "apartment": 2731
+    },
+    {
+      "code": "06",
+      "nom": "Alpes-Maritimes",
+      "region": "93",
+      "ppsm": 4671,
+      "count": 73291,
+      "house": 4266,
+      "apartment": 4717
+    },
+    {
+      "code": "07",
+      "nom": "Ardèche",
+      "region": "84",
+      "ppsm": 1738,
+      "count": 12775,
+      "house": 1906,
+      "apartment": 1450
+    },
+    {
+      "code": "08",
+      "nom": "Ardennes",
+      "region": "44",
+      "ppsm": 1111,
+      "count": 9406,
+      "house": 1145,
+      "apartment": 1027
+    },
+    {
+      "code": "09",
+      "nom": "Ariège",
+      "region": "76",
+      "ppsm": 1357,
+      "count": 7599,
+      "house": 1357,
+      "apartment": 1357
+    },
+    {
+      "code": "10",
+      "nom": "Aube",
+      "region": "44",
+      "ppsm": 1443,
+      "count": 11529,
+      "house": 1344,
+      "apartment": 1563
+    },
+    {
+      "code": "11",
+      "nom": "Aude",
+      "region": "76",
+      "ppsm": 1784,
+      "count": 22738,
+      "house": 1667,
+      "apartment": 2098
+    },
+    {
+      "code": "12",
+      "nom": "Aveyron",
+      "region": "76",
+      "ppsm": 1426,
+      "count": 11498,
+      "house": 1298,
+      "apartment": 1688
+    },
+    {
+      "code": "13",
+      "nom": "Bouches-du-Rhône",
+      "region": "93",
+      "ppsm": 3467,
+      "count": 77571,
+      "house": 3933,
+      "apartment": 3260
+    },
+    {
+      "code": "14",
+      "nom": "Calvados",
+      "region": "28",
+      "ppsm": 2538,
+      "count": 33699,
+      "house": 2092,
+      "apartment": 3174
+    },
+    {
+      "code": "15",
+      "nom": "Cantal",
+      "region": "84",
+      "ppsm": 1150,
+      "count": 5903,
+      "house": 1111,
+      "apartment": 1234
+    },
+    {
+      "code": "16",
+      "nom": "Charente",
+      "region": "75",
+      "ppsm": 1238,
+      "count": 14939,
+      "house": 1189,
+      "apartment": 1576
+    },
+    {
+      "code": "17",
+      "nom": "Charente-Maritime",
+      "region": "75",
+      "ppsm": 2690,
+      "count": 34677,
+      "house": 2418,
+      "apartment": 3841
+    },
+    {
+      "code": "18",
+      "nom": "Cher",
+      "region": "24",
+      "ppsm": 1033,
+      "count": 13418,
+      "house": 980,
+      "apartment": 1326
+    },
+    {
+      "code": "19",
+      "nom": "Corrèze",
+      "region": "75",
+      "ppsm": 1206,
+      "count": 10511,
+      "house": 1149,
+      "apartment": 1386
+    },
+    {
+      "code": "21",
+      "nom": "Côte-d'Or",
+      "region": "27",
+      "ppsm": 2313,
+      "count": 23481,
+      "house": 1956,
+      "apartment": 2555
+    },
+    {
+      "code": "22",
+      "nom": "Côtes-d'Armor",
+      "region": "53",
+      "ppsm": 1752,
+      "count": 28132,
+      "house": 1640,
+      "apartment": 2150
+    },
+    {
+      "code": "23",
+      "nom": "Creuse",
+      "region": "75",
+      "ppsm": 766,
+      "count": 5978,
+      "house": 767,
+      "apartment": 763
+    },
+    {
+      "code": "24",
+      "nom": "Dordogne",
+      "region": "75",
+      "ppsm": 1293,
+      "count": 19429,
+      "house": 1222,
+      "apartment": 1563
+    },
+    {
+      "code": "25",
+      "nom": "Doubs",
+      "region": "27",
+      "ppsm": 1923,
+      "count": 20926,
+      "house": 1809,
+      "apartment": 2000
+    },
+    {
+      "code": "26",
+      "nom": "Drôme",
+      "region": "84",
+      "ppsm": 2054,
+      "count": 19873,
+      "house": 2226,
+      "apartment": 1871
+    },
+    {
+      "code": "27",
+      "nom": "Eure",
+      "region": "28",
+      "ppsm": 1602,
+      "count": 22197,
+      "house": 1522,
+      "apartment": 1858
+    },
+    {
+      "code": "28",
+      "nom": "Eure-et-Loir",
+      "region": "24",
+      "ppsm": 1704,
+      "count": 16273,
+      "house": 1613,
+      "apartment": 2063
+    },
+    {
+      "code": "29",
+      "nom": "Finistère",
+      "region": "53",
+      "ppsm": 2010,
+      "count": 39357,
+      "house": 1925,
+      "apartment": 2159
+    },
+    {
+      "code": "2A",
+      "nom": "Corse-du-Sud",
+      "region": "94",
+      "ppsm": 3905,
+      "count": 5855,
+      "house": 3980,
+      "apartment": 3870
+    },
+    {
+      "code": "2B",
+      "nom": "Haute-Corse",
+      "region": "94",
+      "ppsm": 3065,
+      "count": 6316,
+      "house": 3119,
+      "apartment": 3040
+    },
+    {
+      "code": "30",
+      "nom": "Gard",
+      "region": "76",
+      "ppsm": 2302,
+      "count": 31700,
+      "house": 2393,
+      "apartment": 2130
+    },
+    {
+      "code": "31",
+      "nom": "Haute-Garonne",
+      "region": "76",
+      "ppsm": 2774,
+      "count": 56119,
+      "house": 2561,
+      "apartment": 2921
+    },
+    {
+      "code": "32",
+      "nom": "Gers",
+      "region": "76",
+      "ppsm": 1357,
+      "count": 7777,
+      "house": 1316,
+      "apartment": 1508
+    },
+    {
+      "code": "33",
+      "nom": "Gironde",
+      "region": "75",
+      "ppsm": 3341,
+      "count": 65281,
+      "house": 2941,
+      "apartment": 3698
+    },
+    {
+      "code": "34",
+      "nom": "Hérault",
+      "region": "76",
+      "ppsm": 3123,
+      "count": 62608,
+      "house": 2821,
+      "apartment": 3333
+    },
+    {
+      "code": "35",
+      "nom": "Ille-et-Vilaine",
+      "region": "53",
+      "ppsm": 2716,
+      "count": 42183,
+      "house": 2233,
+      "apartment": 3341
+    },
+    {
+      "code": "36",
+      "nom": "Indre",
+      "region": "24",
+      "ppsm": 932,
+      "count": 9629,
+      "house": 906,
+      "apartment": 1094
+    },
+    {
+      "code": "37",
+      "nom": "Indre-et-Loire",
+      "region": "24",
+      "ppsm": 2157,
+      "count": 24159,
+      "house": 1875,
+      "apartment": 2643
+    },
+    {
+      "code": "38",
+      "nom": "Isère",
+      "region": "84",
+      "ppsm": 2586,
+      "count": 47479,
+      "house": 2578,
+      "apartment": 2591
+    },
+    {
+      "code": "39",
+      "nom": "Jura",
+      "region": "27",
+      "ppsm": 1475,
+      "count": 9843,
+      "house": 1500,
+      "apartment": 1449
+    },
+    {
+      "code": "40",
+      "nom": "Landes",
+      "region": "75",
+      "ppsm": 2556,
+      "count": 19804,
+      "house": 2308,
+      "apartment": 3075
+    },
+    {
+      "code": "41",
+      "nom": "Loir-et-Cher",
+      "region": "24",
+      "ppsm": 1321,
+      "count": 13177,
+      "house": 1250,
+      "apartment": 1735
+    },
+    {
+      "code": "42",
+      "nom": "Loire",
+      "region": "84",
+      "ppsm": 1413,
+      "count": 30109,
+      "house": 1735,
+      "apartment": 1255
+    },
+    {
+      "code": "43",
+      "nom": "Haute-Loire",
+      "region": "84",
+      "ppsm": 1250,
+      "count": 8384,
+      "house": 1228,
+      "apartment": 1300
+    },
+    {
+      "code": "44",
+      "nom": "Loire-Atlantique",
+      "region": "52",
+      "ppsm": 3036,
+      "count": 59090,
+      "house": 2768,
+      "apartment": 3373
+    },
+    {
+      "code": "45",
+      "nom": "Loiret",
+      "region": "24",
+      "ppsm": 1750,
+      "count": 25753,
+      "house": 1552,
+      "apartment": 2170
+    },
+    {
+      "code": "46",
+      "nom": "Lot",
+      "region": "76",
+      "ppsm": 1301,
+      "count": 7707,
+      "house": 1280,
+      "apartment": 1397
+    },
+    {
+      "code": "47",
+      "nom": "Lot-et-Garonne",
+      "region": "75",
+      "ppsm": 1250,
+      "count": 14250,
+      "house": 1211,
+      "apartment": 1412
+    },
+    {
+      "code": "48",
+      "nom": "Lozère",
+      "region": "76",
+      "ppsm": 1370,
+      "count": 2773,
+      "house": 1378,
+      "apartment": 1327
+    },
+    {
+      "code": "49",
+      "nom": "Maine-et-Loire",
+      "region": "52",
+      "ppsm": 2059,
+      "count": 29314,
+      "house": 1845,
+      "apartment": 2717
+    },
+    {
+      "code": "50",
+      "nom": "Manche",
+      "region": "28",
+      "ppsm": 1636,
+      "count": 21339,
+      "house": 1524,
+      "apartment": 2169
+    },
+    {
+      "code": "51",
+      "nom": "Marne",
+      "region": "44",
+      "ppsm": 2039,
+      "count": 20023,
+      "house": 1817,
+      "apartment": 2349
+    },
+    {
+      "code": "52",
+      "nom": "Haute-Marne",
+      "region": "44",
+      "ppsm": 933,
+      "count": 5968,
+      "house": 898,
+      "apartment": 1071
+    },
+    {
+      "code": "53",
+      "nom": "Mayenne",
+      "region": "52",
+      "ppsm": 1400,
+      "count": 12808,
+      "house": 1322,
+      "apartment": 1778
+    },
+    {
+      "code": "54",
+      "nom": "Meurthe-et-Moselle",
+      "region": "44",
+      "ppsm": 1809,
+      "count": 28387,
+      "house": 1750,
+      "apartment": 1872
+    },
+    {
+      "code": "55",
+      "nom": "Meuse",
+      "region": "44",
+      "ppsm": 953,
+      "count": 6446,
+      "house": 949,
+      "apartment": 975
+    },
+    {
+      "code": "56",
+      "nom": "Morbihan",
+      "region": "53",
+      "ppsm": 2500,
+      "count": 33823,
+      "house": 2190,
+      "apartment": 3243
+    },
+    {
+      "code": "57",
+      "nom": "Moselle",
+      "region": "44",
+      "ppsm": null,
+      "count": 0,
+      "house": null,
+      "apartment": null
+    },
+    {
+      "code": "58",
+      "nom": "Nièvre",
+      "region": "27",
+      "ppsm": 930,
+      "count": 10189,
+      "house": 918,
+      "apartment": 963
+    },
+    {
+      "code": "59",
+      "nom": "Nord",
+      "region": "32",
+      "ppsm": 1998,
+      "count": 91408,
+      "house": 1795,
+      "apartment": 2662
+    },
+    {
+      "code": "60",
+      "nom": "Oise",
+      "region": "32",
+      "ppsm": 2103,
+      "count": 26875,
+      "house": 2049,
+      "apartment": 2273
+    },
+    {
+      "code": "61",
+      "nom": "Orne",
+      "region": "28",
+      "ppsm": 1087,
+      "count": 11363,
+      "house": 1066,
+      "apartment": 1200
+    },
+    {
+      "code": "62",
+      "nom": "Pas-de-Calais",
+      "region": "32",
+      "ppsm": 1628,
+      "count": 47950,
+      "house": 1556,
+      "apartment": 2170
+    },
+    {
+      "code": "63",
+      "nom": "Puy-de-Dôme",
+      "region": "84",
+      "ppsm": 1800,
+      "count": 26867,
+      "house": 1541,
+      "apartment": 2041
+    },
+    {
+      "code": "64",
+      "nom": "Pyrénées-Atlantiques",
+      "region": "75",
+      "ppsm": 2613,
+      "count": 29602,
+      "house": 2116,
+      "apartment": 3200
+    },
+    {
+      "code": "65",
+      "nom": "Hautes-Pyrénées",
+      "region": "76",
+      "ppsm": 1601,
+      "count": 11863,
+      "house": 1578,
+      "apartment": 1619
+    },
+    {
+      "code": "66",
+      "nom": "Pyrénées-Orientales",
+      "region": "76",
+      "ppsm": 2333,
+      "count": 31260,
+      "house": 2418,
+      "apartment": 2195
+    },
+    {
+      "code": "67",
+      "nom": "Bas-Rhin",
+      "region": "44",
+      "ppsm": null,
+      "count": 0,
+      "house": null,
+      "apartment": null
+    },
+    {
+      "code": "68",
+      "nom": "Haut-Rhin",
+      "region": "44",
+      "ppsm": null,
+      "count": 0,
+      "house": null,
+      "apartment": null
+    },
+    {
+      "code": "69",
+      "nom": "Rhône",
+      "region": "84",
+      "ppsm": 3690,
+      "count": 65899,
+      "house": 3254,
+      "apartment": 3824
+    },
+    {
+      "code": "70",
+      "nom": "Haute-Saône",
+      "region": "27",
+      "ppsm": 1000,
+      "count": 8139,
+      "house": 1015,
+      "apartment": 970
+    },
+    {
+      "code": "71",
+      "nom": "Saône-et-Loire",
+      "region": "27",
+      "ppsm": 1259,
+      "count": 21728,
+      "house": 1250,
+      "apartment": 1271
+    },
+    {
+      "code": "72",
+      "nom": "Sarthe",
+      "region": "52",
+      "ppsm": 1455,
+      "count": 22612,
+      "house": 1348,
+      "apartment": 1813
+    },
+    {
+      "code": "73",
+      "nom": "Savoie",
+      "region": "84",
+      "ppsm": 3528,
+      "count": 24952,
+      "house": 2951,
+      "apartment": 3767
+    },
+    {
+      "code": "74",
+      "nom": "Haute-Savoie",
+      "region": "84",
+      "ppsm": 4369,
+      "count": 43263,
+      "house": 4375,
+      "apartment": 4367
+    },
+    {
+      "code": "75",
+      "nom": "Paris",
+      "region": "11",
+      "ppsm": 9800,
+      "count": 87139,
+      "house": 13108,
+      "apartment": 9794
+    },
+    {
+      "code": "76",
+      "nom": "Seine-Maritime",
+      "region": "28",
+      "ppsm": 2000,
+      "count": 50163,
+      "house": 1824,
+      "apartment": 2289
+    },
+    {
+      "code": "77",
+      "nom": "Seine-et-Marne",
+      "region": "11",
+      "ppsm": 2981,
+      "count": 48505,
+      "house": 2635,
+      "apartment": 3411
+    },
+    {
+      "code": "78",
+      "nom": "Yvelines",
+      "region": "11",
+      "ppsm": 3837,
+      "count": 45208,
+      "house": 3589,
+      "apartment": 4012
+    },
+    {
+      "code": "79",
+      "nom": "Deux-Sèvres",
+      "region": "75",
+      "ppsm": 1247,
+      "count": 16194,
+      "house": 1200,
+      "apartment": 1733
+    },
+    {
+      "code": "80",
+      "nom": "Somme",
+      "region": "32",
+      "ppsm": 1667,
+      "count": 21275,
+      "house": 1489,
+      "apartment": 2500
+    },
+    {
+      "code": "81",
+      "nom": "Tarn",
+      "region": "76",
+      "ppsm": 1429,
+      "count": 13735,
+      "house": 1348,
+      "apartment": 1800
+    },
+    {
+      "code": "82",
+      "nom": "Tarn-et-Garonne",
+      "region": "76",
+      "ppsm": 1547,
+      "count": 9917,
+      "house": 1455,
+      "apartment": 1750
+    },
+    {
+      "code": "83",
+      "nom": "Var",
+      "region": "93",
+      "ppsm": 3600,
+      "count": 65496,
+      "house": 3472,
+      "apartment": 3687
+    },
+    {
+      "code": "84",
+      "nom": "Vaucluse",
+      "region": "93",
+      "ppsm": 2455,
+      "count": 22016,
+      "house": 2642,
+      "apartment": 2167
+    },
+    {
+      "code": "85",
+      "nom": "Vendée",
+      "region": "52",
+      "ppsm": 2353,
+      "count": 34230,
+      "house": 2192,
+      "apartment": 3263
+    },
+    {
+      "code": "86",
+      "nom": "Vienne",
+      "region": "75",
+      "ppsm": 1375,
+      "count": 17520,
+      "house": 1210,
+      "apartment": 2024
+    },
+    {
+      "code": "87",
+      "nom": "Haute-Vienne",
+      "region": "75",
+      "ppsm": 1281,
+      "count": 15748,
+      "house": 1123,
+      "apartment": 1500
+    },
+    {
+      "code": "88",
+      "nom": "Vosges",
+      "region": "44",
+      "ppsm": 1148,
+      "count": 13801,
+      "house": 1132,
+      "apartment": 1175
+    },
+    {
+      "code": "89",
+      "nom": "Yonne",
+      "region": "27",
+      "ppsm": 1243,
+      "count": 14155,
+      "house": 1200,
+      "apartment": 1403
+    },
+    {
+      "code": "90",
+      "nom": "Territoire de Belfort",
+      "region": "27",
+      "ppsm": 1339,
+      "count": 4999,
+      "house": 1569,
+      "apartment": 1215
+    },
+    {
+      "code": "91",
+      "nom": "Essonne",
+      "region": "11",
+      "ppsm": 3152,
+      "count": 40012,
+      "house": 3286,
+      "apartment": 3015
+    },
+    {
+      "code": "92",
+      "nom": "Hauts-de-Seine",
+      "region": "11",
+      "ppsm": 6639,
+      "count": 55271,
+      "house": 7422,
+      "apartment": 6556
+    },
+    {
+      "code": "93",
+      "nom": "Seine-Saint-Denis",
+      "region": "11",
+      "ppsm": 3977,
+      "count": 39354,
+      "house": 3897,
+      "apartment": 4015
+    },
+    {
+      "code": "94",
+      "nom": "Val-de-Marne",
+      "region": "11",
+      "ppsm": 4833,
+      "count": 41944,
+      "house": 4969,
+      "apartment": 4801
+    },
+    {
+      "code": "95",
+      "nom": "Val-d'Oise",
+      "region": "11",
+      "ppsm": 3409,
+      "count": 35776,
+      "house": 3523,
+      "apartment": 3300
+    },
+    {
+      "code": "971",
+      "nom": "Guadeloupe",
+      "region": "01",
+      "ppsm": 3036,
+      "count": 5458,
+      "house": 2832,
+      "apartment": 3228
+    },
+    {
+      "code": "972",
+      "nom": "Martinique",
+      "region": "02",
+      "ppsm": 2623,
+      "count": 5219,
+      "house": 2214,
+      "apartment": 2783
+    },
+    {
+      "code": "973",
+      "nom": "Guyane",
+      "region": "03",
+      "ppsm": 2580,
+      "count": 2484,
+      "house": 2500,
+      "apartment": 2619
+    },
+    {
+      "code": "974",
+      "nom": "La Réunion",
+      "region": "04",
+      "ppsm": 2703,
+      "count": 15542,
+      "house": 2633,
+      "apartment": 2758
+    },
+    {
+      "code": "976",
+      "nom": "Mayotte",
+      "region": "06",
+      "ppsm": null,
+      "count": 0,
+      "house": null,
+      "apartment": null
+    }
+  ],
+  "regions": [
+    {
+      "code": "01",
+      "nom": "Guadeloupe",
+      "ppsm": 3036,
+      "count": 5458,
+      "house": 2832,
+      "apartment": 3228
+    },
+    {
+      "code": "02",
+      "nom": "Martinique",
+      "ppsm": 2623,
+      "count": 5219,
+      "house": 2214,
+      "apartment": 2783
+    },
+    {
+      "code": "03",
+      "nom": "Guyane",
+      "ppsm": 2580,
+      "count": 2484,
+      "house": 2500,
+      "apartment": 2619
+    },
+    {
+      "code": "04",
+      "nom": "La Réunion",
+      "ppsm": 2703,
+      "count": 15542,
+      "house": 2633,
+      "apartment": 2758
+    },
+    {
+      "code": "06",
+      "nom": "Mayotte",
+      "ppsm": null,
+      "count": 0,
+      "house": null,
+      "apartment": null
+    },
+    {
+      "code": "11",
+      "nom": "Île-de-France",
+      "ppsm": 4642,
+      "count": 393209,
+      "house": 3469,
+      "apartment": 5545
+    },
+    {
+      "code": "24",
+      "nom": "Centre-Val de Loire",
+      "ppsm": 1540,
+      "count": 102409,
+      "house": 1373,
+      "apartment": 2095
+    },
+    {
+      "code": "27",
+      "nom": "Bourgogne-Franche-Comté",
+      "ppsm": 1470,
+      "count": 113460,
+      "house": 1332,
+      "apartment": 1735
+    },
+    {
+      "code": "28",
+      "nom": "Normandie",
+      "ppsm": 1875,
+      "count": 138761,
+      "house": 1644,
+      "apartment": 2432
+    },
+    {
+      "code": "32",
+      "nom": "Hauts-de-France",
+      "ppsm": 1778,
+      "count": 205465,
+      "house": 1640,
+      "apartment": 2412
+    },
+    {
+      "code": "44",
+      "nom": "Grand Est",
+      "ppsm": 1487,
+      "count": 95560,
+      "house": 1367,
+      "apartment": 1700
+    },
+    {
+      "code": "52",
+      "nom": "Pays de la Loire",
+      "ppsm": 2264,
+      "count": 158054,
+      "house": 1989,
+      "apartment": 3004
+    },
+    {
+      "code": "53",
+      "nom": "Bretagne",
+      "ppsm": 2237,
+      "count": 143495,
+      "house": 1983,
+      "apartment": 2810
+    },
+    {
+      "code": "75",
+      "nom": "Nouvelle-Aquitaine",
+      "ppsm": 1931,
+      "count": 263933,
+      "house": 1628,
+      "apartment": 2889
+    },
+    {
+      "code": "76",
+      "nom": "Occitanie",
+      "ppsm": 2243,
+      "count": 277294,
+      "house": 1971,
+      "apartment": 2613
+    },
+    {
+      "code": "84",
+      "nom": "Auvergne-Rhône-Alpes",
+      "ppsm": 2556,
+      "count": 325066,
+      "house": 2138,
+      "apartment": 2972
+    },
+    {
+      "code": "93",
+      "nom": "Provence-Alpes-Côte d'Azur",
+      "ppsm": 3612,
+      "count": 257443,
+      "house": 3384,
+      "apartment": 3723
+    },
+    {
+      "code": "94",
+      "nom": "Corse",
+      "ppsm": 3373,
+      "count": 12171,
+      "house": 3441,
+      "apartment": 3343
+    }
+  ]
+}

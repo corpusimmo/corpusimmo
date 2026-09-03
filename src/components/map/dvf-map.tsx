@@ -83,6 +83,11 @@ import { useDvfData } from "./use-dvf-data";
 import { PRICE_RAMP } from "./base-palette";
 import { PriceLegend } from "./price-legend";
 import { ZoningLegend } from "./zoning-legend";
+import {
+  buildTerritoryScale,
+  installTerritoryLayers,
+  type TerritoryScale,
+} from "./territories";
 import { buildPriceScale, byPriceClass, type PriceScale } from "./price-scale";
 import {
   installZoningLayers,
@@ -242,6 +247,16 @@ export function DvfMap({
    * s'empile tout seul sous la navigation et hérite de son gabarit.
    */
   const [pitchSlot, setPitchSlot] = React.useState<HTMLElement | null>(null);
+
+  /**
+   * Échelle nationale des médianes départementales.
+   *
+   * Chargée une fois, en tâche de fond : sous le zoom 13 la carte n'a rien
+   * d'autre à montrer, mais au-dessus le fichier ne sert plus à rien — il ne
+   * doit donc jamais retarder l'affichage des ventes.
+   */
+  const [territoryScale, setTerritoryScale] =
+    React.useState<TerritoryScale | null>(null);
   /** Le calque d'affectation du sol est-il allumé, et peut-il l'être ? */
   const [zoning, setZoning] = React.useState(false);
   const [zoningAvailable, setZoningAvailable] = React.useState(false);
@@ -531,6 +546,28 @@ export function DvfMap({
     syncBuildings();
   }, [applyInteractionStyles, syncBuildings]);
 
+  /* ── Échelle nationale ─────────────────────────────────────────────────── */
+
+  React.useEffect(() => {
+    let alive = true;
+    fetch("/geo/departements.geojson")
+      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+      .then((collection: { features?: { properties?: { ppsm?: number | null } }[] }) => {
+        if (!alive) return;
+        const values = (collection.features ?? [])
+          .map((f) => f.properties?.ppsm)
+          .filter((v): v is number => typeof v === "number");
+        setTerritoryScale(buildTerritoryScale(values));
+      })
+      .catch(() => {
+        // Pas d'échelle, pas de choropleth : la carte reste ce qu'elle était.
+        // Un fond national absent ne doit rien casser des ventes.
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
   /* ── Étiquettes de prix ────────────────────────────────────────────────── */
 
   const syncPriceLabels = React.useCallback(
@@ -584,6 +621,29 @@ export function DvfMap({
     syncPriceLabels(instance, showPricesRef.current);
     hydrate();
   }, [hydrate, isDense, syncPriceLabels]);
+
+  // L'échelle arrive par le réseau, souvent APRÈS la création de la carte, et
+  // `ensureDvfLayers` sort tôt dès que ses propres sources existent : lui
+  // repasser la main ne poserait rien. Le choropleth a donc son propre effet,
+  // rejoué à chaque style prêt — donc aussi après un changement de fond.
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    const container = containerRef.current;
+    if (!instance || !container || !territoryScale || !styleReady) return;
+    if (!instance.getStyle()) return;
+
+    const tokens = tokensRef.current ?? readMapTokens(container);
+    installTerritoryLayers(
+      instance,
+      territoryScale,
+      {
+        line: tokens.markerFg,
+        label: tokens.ink,
+        halo: tokens.surface,
+      },
+      "building",
+    );
+  }, [territoryScale, styleReady]);
 
   /* ── Affectation du sol ────────────────────────────────────────────────── */
 

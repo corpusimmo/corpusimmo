@@ -104,7 +104,10 @@ export function getCartoPalette(dense = false): CartoPalette {
  * Les deux extrémités restent lisibles à côté du bronze de sélection et du vert
  * des comparables, qui gardent leurs contours propres.
  */
-export const PRICE_RAMP = ["#7fae9c", "#c9c17f", "#e0a458", "#c2633c", "#872f2f"] as const;
-
-/** La chaleur des ventes : du sable au bronze, puis au bleu nuit de la marque. */
-export const HEAT_RAMP = ["#e6d7b3", "#c2a468", "#8a6a2f", "#1b3349"] as const;
+export const PRICE_RAMP = [
+  "#7fae9c",
+  "#c9c17f",
+  "#e0a458",
+  "#c2633c",
+  "#872f2f",
+] as const;

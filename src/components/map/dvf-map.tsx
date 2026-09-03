@@ -41,8 +41,6 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
   Box,
-  CircleDot,
-  Flame,
   Layers,
   Loader2,
   RotateCw,
@@ -80,8 +78,8 @@ import {
 import { TransactionPopup } from "./transaction-popup";
 import { TransactionCard } from "./transaction-card";
 import { useDvfData } from "./use-dvf-data";
-import { HEAT_RAMP, PRICE_RAMP } from "./base-palette";
-import { PriceLegend, type LayerMode } from "./price-legend";
+import { PRICE_RAMP } from "./base-palette";
+import { PriceLegend } from "./price-legend";
 import { buildPriceScale, byPriceClass, type PriceScale } from "./price-scale";
 
 /** Below this zoom a viewport covers whole départements: we refuse to query. */
@@ -128,11 +126,6 @@ const LAYER_CLUSTER_COUNT = "corpusimmo-cluster-count";
 const LAYER_DOT = "corpusimmo-dot";
 const LAYER_PRICE = "corpusimmo-price";
 const LAYER_BUILDINGS = "corpusimmo-buildings";
-/** Une seconde source, non agrégée : la chaleur se calcule sur chaque vente. */
-const SOURCE_HEAT = "corpusimmo-dvf-heat";
-const LAYER_HEAT = "corpusimmo-heat";
-/** Les calques qui disparaissent quand la chaleur prend l'écran. */
-const POINT_LAYERS = [LAYER_CLUSTER, LAYER_CLUSTER_COUNT, LAYER_DOT, LAYER_PRICE] as const;
 
 const IMG_PILL = "corpusimmo-pill";
 const IMG_PILL_SELECTED = "corpusimmo-pill-selected";
@@ -222,10 +215,11 @@ export function DvfMap({
   const [zoomTooLow, setZoomTooLow] = React.useState(false);
   const [isCompact, setIsCompact] = React.useState(false);
   const [priceMode, setPriceMode] = React.useState<PriceMode>("total");
-  const [layerMode, setLayerMode] = React.useState<LayerMode>("points");
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
-  const [internalSelectedId, setInternalSelectedId] = React.useState<string | null>(null);
+  const [internalSelectedId, setInternalSelectedId] = React.useState<
+    string | null
+  >(null);
 
   const tokensRef = React.useRef<MapTokens | null>(null);
   const subjectMarkerRef = React.useRef<Marker | null>(null);
@@ -239,7 +233,8 @@ export function DvfMap({
     [transactions, data.result],
   );
 
-  const effectiveSelectedId = selectedId !== undefined ? selectedId : internalSelectedId;
+  const effectiveSelectedId =
+    selectedId !== undefined ? selectedId : internalSelectedId;
   const selected = React.useMemo(
     () => rows.find((row) => row.id === effectiveSelectedId) ?? null,
     [rows, effectiveSelectedId],
@@ -263,8 +258,6 @@ export function DvfMap({
   rowsRef.current = rows;
   const priceModeRef = React.useRef<PriceMode>(priceMode);
   priceModeRef.current = priceMode;
-  const layerModeRef = React.useRef<LayerMode>(layerMode);
-  layerModeRef.current = layerMode;
   const scaleRef = React.useRef<PriceScale | null>(scale);
   scaleRef.current = scale;
   const subjectRef = React.useRef(subject);
@@ -310,20 +303,36 @@ export function DvfMap({
       stateExpression(sel, comp, {
         selected: tokens.selected,
         comparable: tokens.success,
-        base: scale ? byPriceClass(scale, ppsm, scale.colors, tokens.marker) : tokens.marker,
+        base: scale
+          ? byPriceClass(scale, ppsm, scale.colors, tokens.marker)
+          : tokens.marker,
       }),
     );
 
     // Les grappes prennent la couleur de leur prix au m² moyen, calculé par
     // MapLibre lui-même (`clusterProperties`). Une grappe sans surface connue
     // garde le bleu neutre plutôt qu'une classe inventée.
-    if (instance.getLayer(LAYER_CLUSTER) && instance.getLayer(LAYER_CLUSTER_COUNT)) {
-      const mean: unknown[] = ["/", ["get", "ppsmSum"], ["max", ["get", "ppsmCount"], 1]];
+    if (
+      instance.getLayer(LAYER_CLUSTER) &&
+      instance.getLayer(LAYER_CLUSTER_COUNT)
+    ) {
+      const mean: unknown[] = [
+        "/",
+        ["get", "ppsmSum"],
+        ["max", ["get", "ppsmCount"], 1],
+      ];
       const known: unknown[] = [">", ["get", "ppsmCount"], 0];
       instance.setPaintProperty(
         LAYER_CLUSTER,
         "circle-color",
-        scale ? ["case", known, byPriceClass(scale, mean, scale.colors, tokens.cluster), tokens.cluster] : tokens.cluster,
+        scale
+          ? [
+              "case",
+              known,
+              byPriceClass(scale, mean, scale.colors, tokens.cluster),
+              tokens.cluster,
+            ]
+          : tokens.cluster,
       );
       instance.setPaintProperty(
         LAYER_CLUSTER_COUNT,
@@ -362,7 +371,9 @@ export function DvfMap({
       stateExpression(sel, comp, {
         selected: IMG_PILL_SELECTED,
         comparable: IMG_PILL_COMPARABLE,
-        base: scale ? byPriceClass(scale, ppsm, scale.colors.map(pillImageId), IMG_PILL) : IMG_PILL,
+        base: scale
+          ? byPriceClass(scale, ppsm, scale.colors.map(pillImageId), IMG_PILL)
+          : IMG_PILL,
       }),
     );
     instance.setPaintProperty(
@@ -396,7 +407,8 @@ export function DvfMap({
     if (!instance) return;
 
     if (!interactive3dRef.current) {
-      if (instance.getLayer(LAYER_BUILDINGS)) instance.removeLayer(LAYER_BUILDINGS);
+      if (instance.getLayer(LAYER_BUILDINGS))
+        instance.removeLayer(LAYER_BUILDINGS);
       setHas3d(false);
       return;
     }
@@ -427,7 +439,11 @@ export function DvfMap({
             // No height in the tiles → one low, uniform volume. Inventing
             // storeys would be a lie dressed up as a feature.
             "fill-extrusion-height": capability.heightProperty
-              ? ["coalesce", ["to-number", ["get", capability.heightProperty]], 6]
+              ? [
+                  "coalesce",
+                  ["to-number", ["get", capability.heightProperty]],
+                  6,
+                ]
               : 6,
             "fill-extrusion-base": capability.baseProperty
               ? ["coalesce", ["to-number", ["get", capability.baseProperty]], 0]
@@ -446,7 +462,11 @@ export function DvfMap({
         // instance vidée et lève, ce qui masque les vraies erreurs de style.
         if (!instance.getStyle || !instance.getLayer(LAYER_BUILDINGS)) return;
         if (instance.getLayer(LAYER_BUILDINGS)) {
-          instance.setPaintProperty(LAYER_BUILDINGS, "fill-extrusion-opacity", 0.9);
+          instance.setPaintProperty(
+            LAYER_BUILDINGS,
+            "fill-extrusion-opacity",
+            0.9,
+          );
         }
       });
     }
@@ -460,10 +480,11 @@ export function DvfMap({
     const instance = mapRef.current;
     if (!instance) return;
 
-    const collection = toFeatureCollection(rowsRef.current, priceModeRef.current);
+    const collection = toFeatureCollection(
+      rowsRef.current,
+      priceModeRef.current,
+    );
     geojsonSource(instance, SOURCE_POINTS)?.setData(collection);
-    geojsonSource(instance, SOURCE_HEAT)?.setData(collection);
-    applyLayerMode(instance, layerModeRef.current);
 
     const current = subjectRef.current;
     geojsonSource(instance, SOURCE_SUBJECT)?.setData(
@@ -488,7 +509,11 @@ export function DvfMap({
 
     const tokens = readMapTokens(container);
     tokensRef.current = tokens;
-    installDvfLayers(instance, { tokens, dense: isDense, dark: contextRef.current.dark });
+    installDvfLayers(instance, {
+      tokens,
+      dense: isDense,
+      dark: contextRef.current.dark,
+    });
     hydrate();
   }, [hydrate, isDense]);
 
@@ -505,14 +530,16 @@ export function DvfMap({
 
     // A map filling the viewport IS the page; anything shorter is embedded in a
     // scrolling document, where swallowing one-finger pans would trap the user.
-    const embedded = container.getBoundingClientRect().height < window.innerHeight * 0.8;
+    const embedded =
+      container.getBoundingClientRect().height < window.innerHeight * 0.8;
 
     const instance = new MapLibreMap({
       container,
-      style:
-        STYLE_OVERRIDE ??
-        buildMapStyle({ dense: isDenseRef.current }),
-      center: [(initialCenter ?? DEFAULT_CENTER).lng, (initialCenter ?? DEFAULT_CENTER).lat],
+      style: STYLE_OVERRIDE ?? buildMapStyle({ dense: isDenseRef.current }),
+      center: [
+        (initialCenter ?? DEFAULT_CENTER).lng,
+        (initialCenter ?? DEFAULT_CENTER).lat,
+      ],
       zoom: initialZoom,
       pitch: 0,
       bearing: 0,
@@ -524,8 +551,10 @@ export function DvfMap({
       locale: {
         "CooperativeGesturesHandler.WindowsHelpText":
           "Utilisez Ctrl + molette pour zoomer sur la carte",
-        "CooperativeGesturesHandler.MacHelpText": "Utilisez ⌘ + molette pour zoomer sur la carte",
-        "CooperativeGesturesHandler.MobileHelpText": "Utilisez deux doigts pour déplacer la carte",
+        "CooperativeGesturesHandler.MacHelpText":
+          "Utilisez ⌘ + molette pour zoomer sur la carte",
+        "CooperativeGesturesHandler.MobileHelpText":
+          "Utilisez deux doigts pour déplacer la carte",
       },
     });
 
@@ -536,19 +565,30 @@ export function DvfMap({
     // mesure (temps par image sur un déplacement programmé) et le débogage.
     // Jamais en production, où rien ne doit toucher la carte de l'extérieur.
     if (process.env.NODE_ENV !== "production") {
-      (window as unknown as { __corpusMap?: MapLibreMap }).__corpusMap = instance;
+      (window as unknown as { __corpusMap?: MapLibreMap }).__corpusMap =
+        instance;
     }
 
     instance.addControl(
-      new NavigationControl({ showCompass: true, showZoom: !compact, visualizePitch: true }),
+      new NavigationControl({
+        showCompass: true,
+        showZoom: !compact,
+        visualizePitch: true,
+      }),
       "top-right",
     );
     instance.addControl(
-      new AttributionControl({ compact: true, customAttribution: DVF_ATTRIBUTION }),
+      new AttributionControl({
+        compact: true,
+        customAttribution: DVF_ATTRIBUTION,
+      }),
       "bottom-right",
     );
     if (!compact) {
-      instance.addControl(new ScaleControl({ maxWidth: 110, unit: "metric" }), "bottom-left");
+      instance.addControl(
+        new ScaleControl({ maxWidth: 110, unit: "metric" }),
+        "bottom-left",
+      );
     }
 
     /**
@@ -609,16 +649,23 @@ export function DvfMap({
 
       // Les couches DVF sont du GeoJSON que nous produisons : leurs incidents
       // relèvent du bandeau de données, pas du fond de carte.
-      const estFondDeCarte = !event.sourceId || event.sourceId === SOURCE_BASEMAP;
+      const estFondDeCarte =
+        !event.sourceId || event.sourceId === SOURCE_BASEMAP;
 
       if (!estFondDeCarte) {
-        console.error(`[carte] incident sur la source « ${source} » :`, message);
+        console.error(
+          `[carte] incident sur la source « ${source} » :`,
+          message,
+        );
         return;
       }
 
       erreursFondRef.current += 1;
       if (erreursFondRef.current === 1) {
-        console.error(`[carte] le fond de carte a échoué (source « ${source} ») :`, message);
+        console.error(
+          `[carte] le fond de carte a échoué (source « ${source} ») :`,
+          message,
+        );
         setBasemapError(message);
       }
     };
@@ -674,9 +721,11 @@ export function DvfMap({
       console.info("[carte] style demandé :", source);
       instance.once("styledata", () => {
         const spec = instance.getStyle();
-          console.info(
+        console.info(
           "[carte] style reçu :",
-          spec ? `${spec.layers?.length ?? 0} couches, sources : ${Object.keys(spec.sources ?? {}).join(", ") || "aucune"}` : "aucun",
+          spec
+            ? `${spec.layers?.length ?? 0} couches, sources : ${Object.keys(spec.sources ?? {}).join(", ") || "aucune"}`
+            : "aucun",
         );
       });
     }
@@ -814,19 +863,20 @@ export function DvfMap({
     const source = geojsonSource(instance, SOURCE_POINTS);
     if (!source) return;
 
-    const collection = zoomTooLow && !controlled ? EMPTY_POINTS : toFeatureCollection(rows, priceMode);
+    const collection =
+      zoomTooLow && !controlled
+        ? EMPTY_POINTS
+        : toFeatureCollection(rows, priceMode);
     source.setData(collection);
-    geojsonSource(instance, SOURCE_HEAT)?.setData(collection);
     applyInteractionStyles();
-  }, [rows, priceMode, styleReady, zoomTooLow, controlled, applyInteractionStyles]);
-
-  /* ── Points ou chaleur ─────────────────────────────────────────────────── */
-
-  React.useEffect(() => {
-    const instance = mapRef.current;
-    if (!instance || !styleReady) return;
-    applyLayerMode(instance, layerMode);
-  }, [layerMode, styleReady]);
+  }, [
+    rows,
+    priceMode,
+    styleReady,
+    zoomTooLow,
+    controlled,
+    applyInteractionStyles,
+  ]);
 
   React.useEffect(() => {
     applyInteractionStyles();
@@ -875,7 +925,9 @@ export function DvfMap({
     const instance = mapRef.current;
     if (!instance || !styleReady) return;
 
-    const onEnter = (event: MapMouseEvent & { features?: MapGeoJSONFeature[] }): void => {
+    const onEnter = (
+      event: MapMouseEvent & { features?: MapGeoJSONFeature[] },
+    ): void => {
       instance.getCanvas().style.cursor = "pointer";
       const id = event.features?.[0]?.properties?.id;
       hoveredIdRef.current = typeof id === "string" ? id : null;
@@ -888,9 +940,14 @@ export function DvfMap({
       applyInteractionStyles();
     };
 
-    const onPointClick = (event: MapMouseEvent & { features?: MapGeoJSONFeature[] }): void => {
+    const onPointClick = (
+      event: MapMouseEvent & { features?: MapGeoJSONFeature[] },
+    ): void => {
       const id = event.features?.[0]?.properties?.id;
-      const row = typeof id === "string" ? rowsRef.current.find((r) => r.id === id) : undefined;
+      const row =
+        typeof id === "string"
+          ? rowsRef.current.find((r) => r.id === id)
+          : undefined;
       if (!row) return;
       select(row);
       // Gentle fly so the card never opens on top of its own marker.
@@ -902,7 +959,9 @@ export function DvfMap({
       });
     };
 
-    const onClusterClick = (event: MapMouseEvent & { features?: MapGeoJSONFeature[] }): void => {
+    const onClusterClick = (
+      event: MapMouseEvent & { features?: MapGeoJSONFeature[] },
+    ): void => {
       const feature = event.features?.[0];
       const clusterId = feature?.properties?.cluster_id;
       const source = geojsonSource(instance, SOURCE_POINTS);
@@ -924,9 +983,12 @@ export function DvfMap({
     };
 
     const onBackgroundClick = (event: MapMouseEvent): void => {
-      const layers = [LAYER_DOT, LAYER_PRICE, LAYER_CLUSTER].filter((id) => instance.getLayer(id));
+      const layers = [LAYER_DOT, LAYER_PRICE, LAYER_CLUSTER].filter((id) =>
+        instance.getLayer(id),
+      );
       if (layers.length === 0) return;
-      if (instance.queryRenderedFeatures(event.point, { layers }).length === 0) select(null);
+      if (instance.queryRenderedFeatures(event.point, { layers }).length === 0)
+        select(null);
     };
 
     const pointLayers = [LAYER_DOT, LAYER_PRICE];
@@ -966,7 +1028,10 @@ export function DvfMap({
     if (interactive3d) {
       // Tilt only if the volumes are actually on screen. Forcing a zoom here
       // would yank a user who opened the observatory on a country-wide view.
-      if (instance.getZoom() >= BUILDING_3D_MIN_ZOOM && instance.getPitch() < 20) {
+      if (
+        instance.getZoom() >= BUILDING_3D_MIN_ZOOM &&
+        instance.getPitch() < 20
+      ) {
         instance.easeTo({ pitch: PITCH_3D, duration: 800 });
         setPitched(true);
       }
@@ -980,7 +1045,11 @@ export function DvfMap({
     const instance = mapRef.current;
     if (!instance) return;
     const next = instance.getPitch() > 10 ? 0 : 50;
-    instance.easeTo({ pitch: next, bearing: next === 0 ? 0 : instance.getBearing(), duration: 600 });
+    instance.easeTo({
+      pitch: next,
+      bearing: next === 0 ? 0 : instance.getBearing(),
+      duration: 600,
+    });
     setPitched(next > 0);
   }, []);
 
@@ -995,7 +1064,11 @@ export function DvfMap({
     // été lancée parce que l'emprise est trop large, ou la carte démarre. La
     // première n'est PAS un chargement — la confondre laissait le panneau sur
     // un squelette éternel pendant que la carte affichait déjà « Zoomez ».
-    const state = zoomTooLow ? "zoom" : data.status === "idle" ? "loading" : data.status;
+    const state = zoomTooLow
+      ? "zoom"
+      : data.status === "idle"
+        ? "loading"
+        : data.status;
     onDataChangeRef.current?.(data.result, state);
   }, [controlled, data.result, data.status, zoomTooLow]);
 
@@ -1016,7 +1089,9 @@ export function DvfMap({
     subject ? haversineMeters(subject.point, row.coordinates) : undefined;
 
   return (
-    <div className={cn("relative isolate overflow-hidden bg-canvas", className)}>
+    <div
+      className={cn("relative isolate overflow-hidden bg-canvas", className)}
+    >
       {/* `size-full`, not `absolute inset-0`: maplibre-gl.css ships unlayered,
           so its `.maplibregl-map { position: relative }` outranks Tailwind's
           `absolute` utility (layered styles always lose to unlayered ones).
@@ -1044,8 +1119,8 @@ export function DvfMap({
               Le fond de carte n&apos;a pas pu être chargé.
             </p>
             <p className="text-xs text-ink-muted">
-              Les ventes ne peuvent pas être situées sans lui. Vérifiez votre connexion, puis
-              réessayez.
+              Les ventes ne peuvent pas être situées sans lui. Vérifiez votre
+              connexion, puis réessayez.
             </p>
             <button
               type="button"
@@ -1055,7 +1130,9 @@ export function DvfMap({
               <RotateCw aria-hidden="true" className="size-3.5" />
               Réessayer
             </button>
-            <p className="text-[11px] text-ink-subtle">Détail technique : {basemapError}</p>
+            <p className="text-[11px] text-ink-subtle">
+              Détail technique : {basemapError}
+            </p>
           </div>
         </div>
       ) : null}
@@ -1097,35 +1174,6 @@ export function DvfMap({
             ))}
           </div>
 
-          <div
-            className="pointer-events-auto flex rounded-md border border-border bg-surface p-0.5 shadow-md"
-            role="group"
-            aria-label="Représentation des ventes"
-          >
-            {(
-              [
-                { id: "points", label: "Points", icon: CircleDot },
-                { id: "heat", label: "Chaleur", icon: Flame },
-              ] as const
-            ).map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                aria-pressed={layerMode === option.id}
-                onClick={() => setLayerMode(option.id)}
-                className={cn(
-                  "inline-flex min-h-9 items-center gap-1.5 rounded-sm px-2.5 text-xs font-medium transition-colors",
-                  layerMode === option.id
-                    ? "bg-primary text-primary-fg shadow-xs"
-                    : "text-ink-muted hover:bg-surface-2 hover:text-ink",
-                )}
-              >
-                <option.icon aria-hidden="true" className="size-3.5" />
-                {option.label}
-              </button>
-            ))}
-          </div>
-
           {has3d ? (
             <button
               type="button"
@@ -1133,7 +1181,9 @@ export function DvfMap({
               aria-pressed={pitched}
               className={cn(
                 "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
-                pitched ? "bg-primary text-primary-fg" : "bg-surface text-ink-muted hover:text-ink",
+                pitched
+                  ? "bg-primary text-primary-fg"
+                  : "bg-surface text-ink-muted hover:text-ink",
               )}
             >
               {pitched ? (
@@ -1147,14 +1197,15 @@ export function DvfMap({
 
           {/* Sur un écran étroit la légende suit les commandes ; au large elle
               descend dans le coin, où elle ne mange pas la carte. */}
-          {isCompact && showLegend ? <PriceLegend scale={scale} mode={layerMode} compact /> : null}
+          {isCompact && showLegend ? (
+            <PriceLegend scale={scale} compact />
+          ) : null}
         </div>
       ) : null}
 
       {chrome && !isCompact && showLegend ? (
         <PriceLegend
           scale={scale}
-          mode={layerMode}
           className="absolute bottom-[4.4rem] left-2 z-10 max-w-[16rem]"
         />
       ) : null}
@@ -1166,7 +1217,10 @@ export function DvfMap({
             Zoomez pour afficher les ventes enregistrées
           </Banner>
         ) : loading ? (
-          <Banner icon={<Loader2 className="size-4 animate-spin" />} tone="neutral">
+          <Banner
+            icon={<Loader2 className="size-4 animate-spin" />}
+            tone="neutral"
+          >
             Chargement des ventes…
           </Banner>
         ) : failed ? (
@@ -1198,9 +1252,13 @@ export function DvfMap({
             className="pointer-events-auto rounded-sm bg-surface/90 px-2 py-1 text-[11px] leading-tight text-ink-muted shadow-xs backdrop-blur-sm"
             title={coverageDisclaimer(result.latestYear)}
           >
-            <span className="tnum font-medium text-ink">{formatNumber(result.count)}</span> vente
+            <span className="tnum font-medium text-ink">
+              {formatNumber(result.count)}
+            </span>{" "}
+            vente
             {result.count > 1 ? "s" : ""}
-            {result.truncated ? " (affichage tronqué)" : ""} · {coverageLabel(result.latestYear)}
+            {result.truncated ? " (affichage tronqué)" : ""} ·{" "}
+            {coverageLabel(result.latestYear)}
             {result.source === "mock" ? " · jeu de démonstration" : ""}
           </p>
         </div>
@@ -1210,7 +1268,12 @@ export function DvfMap({
       <p className="sr-only" role="status" aria-live="polite">
         {basemapError
           ? "Le fond de carte n'a pas pu être chargé."
-          : liveMessage(zoomTooLow && !controlled, loading, failed, rows.length)}
+          : liveMessage(
+              zoomTooLow && !controlled,
+              loading,
+              failed,
+              rows.length,
+            )}
       </p>
 
       {selected && map && !isCompact ? (
@@ -1231,7 +1294,10 @@ export function DvfMap({
           role="dialog"
           aria-label="Détail de la vente"
         >
-          <div aria-hidden="true" className="mx-auto mt-2 h-1 w-10 rounded-full bg-border-strong" />
+          <div
+            aria-hidden="true"
+            className="mx-auto mt-2 h-1 w-10 rounded-full bg-border-strong"
+          />
           <TransactionCard
             transaction={selected}
             distanceMeters={distanceToSubject(selected)}
@@ -1280,7 +1346,6 @@ function installDvfLayers(map: MapLibreMap, ctx: InstallContext): void {
       ppsmCount: ["+", ["case", [">", ["get", "ppsm"], 0], 1, 0]],
     },
   });
-  map.addSource(SOURCE_HEAT, { type: "geojson", data: EMPTY_POINTS });
 
   map.addLayer({
     id: LAYER_SUBJECT_FILL,
@@ -1297,36 +1362,6 @@ function installDvfLayers(map: MapLibreMap, ctx: InstallContext): void {
       "line-width": 1.5,
       "line-opacity": 0.6,
       "line-dasharray": [3, 3],
-    },
-  });
-
-  // La chaleur est une DENSITÉ de ventes, pas un prix : deux quantités sur la
-  // même teinte se liraient l'une pour l'autre. Le prix, lui, colore les points.
-  map.addLayer({
-    id: LAYER_HEAT,
-    type: "heatmap",
-    source: SOURCE_HEAT,
-    layout: { visibility: "none" },
-    paint: {
-      "heatmap-weight": 1,
-      "heatmap-intensity": ["interpolate", ["linear"], ["zoom"], MIN_DATA_ZOOM, 0.9, 17, 2.2],
-      "heatmap-radius": ["interpolate", ["linear"], ["zoom"], MIN_DATA_ZOOM, 16, 16, 30, 19, 46],
-      "heatmap-opacity": 0.78,
-      "heatmap-color": [
-        "interpolate",
-        ["linear"],
-        ["heatmap-density"],
-        0,
-        withAlpha(HEAT_RAMP[0], 0),
-        0.15,
-        HEAT_RAMP[0],
-        0.45,
-        HEAT_RAMP[1],
-        0.75,
-        HEAT_RAMP[2],
-        1,
-        HEAT_RAMP[3],
-      ],
     },
   });
 
@@ -1384,8 +1419,24 @@ function installDvfLayers(map: MapLibreMap, ctx: InstallContext): void {
       "circle-stroke-color": chrome.dotStroke,
       "circle-radius": 5,
       // Dots hand over to labelled pills, fading rather than popping.
-      "circle-opacity": ["interpolate", ["linear"], ["zoom"], fade - 0.4, 1, fade + 0.4, 0],
-      "circle-stroke-opacity": ["interpolate", ["linear"], ["zoom"], fade - 0.4, 1, fade + 0.4, 0],
+      "circle-opacity": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        fade - 0.4,
+        1,
+        fade + 0.4,
+        0,
+      ],
+      "circle-stroke-opacity": [
+        "interpolate",
+        ["linear"],
+        ["zoom"],
+        fade - 0.4,
+        1,
+        fade + 0.4,
+        0,
+      ],
     },
   });
 
@@ -1414,13 +1465,21 @@ function installDvfLayers(map: MapLibreMap, ctx: InstallContext): void {
   });
 }
 
-function addPillImages(map: MapLibreMap, tokens: MapTokens, dark: boolean): void {
+function addPillImages(
+  map: MapLibreMap,
+  tokens: MapTokens,
+  dark: boolean,
+): void {
   const chrome = markerChrome(tokens, dark);
   const variants: [string, string, string][] = [
     [IMG_PILL, chrome.pillFill, chrome.pillStroke],
     [IMG_PILL_SELECTED, tokens.selected, tokens.selected],
     [IMG_PILL_COMPARABLE, tokens.success, tokens.success],
-    ...PRICE_RAMP.map((color): [string, string, string] => [pillImageId(color), color, color]),
+    ...PRICE_RAMP.map((color): [string, string, string] => [
+      pillImageId(color),
+      color,
+      color,
+    ]),
   ];
   for (const [id, fill, stroke] of variants) {
     const image = createPillImage(fill, stroke);
@@ -1431,7 +1490,11 @@ function addPillImages(map: MapLibreMap, tokens: MapTokens, dark: boolean): void
 }
 
 /** Re-applies overlay colours after a token change, without touching data. */
-function repaintOverlay(map: MapLibreMap, tokens: MapTokens, dark: boolean): void {
+function repaintOverlay(
+  map: MapLibreMap,
+  tokens: MapTokens,
+  dark: boolean,
+): void {
   const chrome = markerChrome(tokens, dark);
   const set = (layer: string, prop: string, value: string | number): void => {
     if (map.getLayer(layer)) map.setPaintProperty(layer, prop, value);
@@ -1443,25 +1506,6 @@ function repaintOverlay(map: MapLibreMap, tokens: MapTokens, dark: boolean): voi
   set(LAYER_CLUSTER_COUNT, "text-color", tokens.markerFg);
   set(LAYER_DOT, "circle-stroke-color", chrome.dotStroke);
   addPillImages(map, tokens, dark);
-}
-
-/** Montre les points ou la chaleur, jamais les deux : ils se cacheraient. */
-function applyLayerMode(map: MapLibreMap, mode: LayerMode): void {
-  for (const layer of POINT_LAYERS) {
-    if (map.getLayer(layer)) {
-      map.setLayoutProperty(layer, "visibility", mode === "points" ? "visible" : "none");
-    }
-  }
-  if (map.getLayer(LAYER_HEAT)) {
-    map.setLayoutProperty(LAYER_HEAT, "visibility", mode === "heat" ? "visible" : "none");
-  }
-}
-
-/** La même teinte, à l'opacité voulue : le début transparent du dégradé de chaleur. */
-function withAlpha(color: string, alpha: number): string {
-  const rgb = parseColor(color);
-  if (!rgb) return color;
-  return `rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, ${alpha})`;
 }
 
 /** Zoom at which individual price pills replace the dots. */
@@ -1482,7 +1526,12 @@ function geojsonSource(map: MapLibreMap, id: string): GeoJSONSource | null {
 
 function toBBox(map: MapLibreMap): BBox {
   const bounds = map.getBounds();
-  return [bounds.getWest(), bounds.getSouth(), bounds.getEast(), bounds.getNorth()];
+  return [
+    bounds.getWest(),
+    bounds.getSouth(),
+    bounds.getEast(),
+    bounds.getNorth(),
+  ];
 }
 
 /**
@@ -1511,14 +1560,23 @@ function parseColor(value: string): [number, number, number] | null {
   }
   if (/^#[0-9a-f]{3}$/i.test(hex)) {
     const [r, g, b] = [hex[1], hex[2], hex[3]];
-    return [parseInt(`${r}${r}`, 16), parseInt(`${g}${g}`, 16), parseInt(`${b}${b}`, 16)];
+    return [
+      parseInt(`${r}${r}`, 16),
+      parseInt(`${g}${g}`, 16),
+      parseInt(`${b}${b}`, 16),
+    ];
   }
   const match = /rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i.exec(hex);
   if (!match) return null;
   return [Number(match[1]), Number(match[2]), Number(match[3])];
 }
 
-function liveMessage(zoomTooLow: boolean, loading: boolean, failed: boolean, count: number): string {
+function liveMessage(
+  zoomTooLow: boolean,
+  loading: boolean,
+  failed: boolean,
+  count: number,
+): string {
   if (zoomTooLow) return "Zoomez pour afficher les ventes enregistrées.";
   if (loading) return "Chargement des ventes en cours.";
   if (failed) return "Les données de ventes n'ont pas pu être chargées.";

@@ -28,6 +28,7 @@
  */
 
 import * as React from "react";
+import { createPortal } from "react-dom";
 import {
   AttributionControl,
   GeoJSONSource,
@@ -231,6 +232,16 @@ export function DvfMap({
    * les pastilles retirées — d'où l'interrupteur.
    */
   const [showPrices, setShowPrices] = React.useState(true);
+
+  /**
+   * Le groupe de boutons où va se ranger la bascule 3D.
+   *
+   * Le relief est une commande de CAMÉRA, pas un calque : sa place est avec le
+   * zoom et la boussole, pas dans la colonne qui décide de ce que la carte
+   * affiche. On le pose donc dans la pile de commandes de MapLibre, où il
+   * s'empile tout seul sous la navigation et hérite de son gabarit.
+   */
+  const [pitchSlot, setPitchSlot] = React.useState<HTMLElement | null>(null);
   /** Le calque d'affectation du sol est-il allumé, et peut-il l'être ? */
   const [zoning, setZoning] = React.useState(false);
   const [zoningAvailable, setZoningAvailable] = React.useState(false);
@@ -671,6 +682,16 @@ export function DvfMap({
         "bottom-left",
       );
     }
+
+    // Un groupe vide sous la navigation ; React y projette le bouton. Même
+    // pattern que la fiche de vente, qui se projette dans le popup MapLibre :
+    // la carte possède la position, React possède le contenu.
+    const pitchGroup = document.createElement("div");
+    pitchGroup.className = "maplibregl-ctrl maplibregl-ctrl-group";
+    container
+      .querySelector(".maplibregl-ctrl-top-right")
+      ?.appendChild(pitchGroup);
+    setPitchSlot(pitchGroup);
 
     /**
      * `getStyle()` ne renvoie un document QUE lorsque MapLibre l'a réellement
@@ -1275,27 +1296,6 @@ export function DvfMap({
             ))}
           </div>
 
-          {has3d ? (
-            <button
-              type="button"
-              onClick={togglePitch}
-              aria-pressed={pitched}
-              className={cn(
-                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
-                pitched
-                  ? "bg-primary text-primary-fg"
-                  : "bg-surface text-ink-muted hover:text-ink",
-              )}
-            >
-              {pitched ? (
-                <Square aria-hidden="true" className="size-3.5" />
-              ) : (
-                <Box aria-hidden="true" className="size-3.5" />
-              )}
-              {pitched ? "Vue à plat" : "Vue 3D"}
-            </button>
-          ) : null}
-
           {/* AFFECTATION DU SOL. Un interrupteur, pas un sélecteur : une seule
               source aujourd'hui. Le jour où la BDNB et le PLU arrivent, ce
               bouton devient une liste — et jamais des cases à cocher, car deux
@@ -1400,6 +1400,36 @@ export function DvfMap({
               rows.length,
             )}
       </p>
+
+      {/* La bascule de relief, rangée avec le zoom et la boussole. Le libellé
+          vit dans le titre et le lecteur d'écran : dans une pile de 34 px, un
+          mot ne tient pas, et « 3D » seul en dirait moins que l'icône. */}
+      {has3d && pitchSlot
+        ? createPortal(
+            <button
+              type="button"
+              onClick={togglePitch}
+              aria-pressed={pitched}
+              title={pitched ? "Revenir à la vue à plat" : "Afficher le relief"}
+              className={cn(
+                "grid place-items-center transition-colors",
+                pitched
+                  ? "bg-primary text-primary-fg"
+                  : "text-ink-muted hover:text-ink",
+              )}
+            >
+              {pitched ? (
+                <Square aria-hidden="true" className="size-4" />
+              ) : (
+                <Box aria-hidden="true" className="size-4" />
+              )}
+              <span className="sr-only">
+                {pitched ? "Revenir à la vue à plat" : "Afficher le relief"}
+              </span>
+            </button>,
+            pitchSlot,
+          )
+        : null}
 
       {selected && map && !isCompact ? (
         <TransactionPopup

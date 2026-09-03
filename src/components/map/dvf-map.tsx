@@ -1261,9 +1261,11 @@ export function DvfMap({
               L'unité vivait dans un bloc qui apparaissait sous l'interrupteur :
               le décalage à chaque bascule était plus bruyant que le réglage
               lui-même. Tout tient maintenant dans une pastille : l'état à
-              gauche, l'unité à droite, séparés d'un trait. Éteinte, l'unité
-              s'estompe et se désactive au lieu de disparaître — la commande
-              garde sa taille, et on voit quelle unité reviendra. */}
+              gauche, l'unité à droite, séparés d'un trait. Prix décoché,
+              l'unité disparaît — il n'y a plus rien à cadrer, et comme elle
+              vit DANS la pastille, sa disparition la rétrécit sans déplacer
+              quoi que ce soit en dessous. C'était le décalage vertical du
+              bloc précédent qui gênait, pas le fait de masquer. */}
           <div className="pointer-events-auto flex items-stretch overflow-hidden rounded-md border border-border bg-surface shadow-md">
             <button
               type="button"
@@ -1280,18 +1282,18 @@ export function DvfMap({
               Prix
             </button>
 
-            <div
-              aria-hidden="true"
-              className="w-px shrink-0 self-stretch bg-border"
-            />
+            {showPrices ? (
+              <div
+                aria-hidden="true"
+                className="w-px shrink-0 self-stretch bg-border"
+              />
+            ) : null}
 
             <div
               role="group"
               aria-label="Unité affichée sur les marqueurs"
-              className={cn(
-                "flex items-stretch transition-opacity",
-                showPrices ? "" : "opacity-45",
-              )}
+              hidden={!showPrices}
+              className="flex items-stretch"
             >
               {(
                 [
@@ -1306,10 +1308,16 @@ export function DvfMap({
                   aria-pressed={priceMode === option.id}
                   onClick={() => setPriceMode(option.id)}
                   className={cn(
-                    "min-h-9 px-2.5 text-xs font-medium transition-colors",
+                    "min-h-9 px-2.5 text-xs transition-colors",
+                    // L'unité retenue prend l'or, pas le bleu : le bleu est déjà
+                    // pris par l'interrupteur, à sa gauche, et deux segments
+                    // bleus côte à côte ne diraient plus lequel est quoi. Un
+                    // simple fond gris ne suffisait pas — à côté du blanc de la
+                    // pastille, il ne se voyait pas, et on ne savait plus quelle
+                    // unité était affichée.
                     priceMode === option.id
-                      ? "bg-surface-2 text-ink"
-                      : "text-ink-subtle enabled:hover:bg-surface-2 enabled:hover:text-ink",
+                      ? "bg-accent font-semibold text-accent-fg"
+                      : "font-medium text-ink-muted enabled:hover:bg-surface-2 enabled:hover:text-ink",
                   )}
                 >
                   {option.label}
@@ -1340,21 +1348,31 @@ export function DvfMap({
             </button>
           ) : null}
 
-          {zoning ? <ZoningLegend /> : null}
-
-          {/* Sur un écran étroit la légende suit les commandes ; au large elle
-              descend dans le coin, où elle ne mange pas la carte. */}
-          {isCompact && showLegend && showPrices ? (
-            <PriceLegend scale={scale} compact />
+          {/* Sur un écran étroit les légendes suivent les commandes : elles
+              sont dans la MÊME colonne, donc elles s'empilent au lieu de se
+              croiser. */}
+          {isCompact ? (
+            <>
+              {zoning ? <ZoningLegend /> : null}
+              {showLegend && showPrices ? (
+                <PriceLegend scale={scale} compact />
+              ) : null}
+            </>
           ) : null}
         </div>
       ) : null}
 
-      {chrome && !isCompact && showLegend && showPrices ? (
-        <PriceLegend
-          scale={scale}
-          className="absolute bottom-[4.4rem] left-2 z-10 max-w-[16rem]"
-        />
+      {/* UNE SEULE PILE DE LÉGENDES, jamais deux ancrages concurrents.
+          Le zonage vivait en haut sous les commandes et les prix en bas dans
+          le coin : sur une carte courte, les deux blocs se recouvraient. Ils
+          partagent maintenant un seul conteneur ancré en bas à gauche, empilés
+          par `gap`, et la pile se limite à la hauteur de la carte pour ne
+          jamais déborder sous l'échelle. */}
+      {chrome && !isCompact ? (
+        <div className="pointer-events-none absolute bottom-[4.4rem] left-2 z-10 flex max-h-[calc(100%-6rem)] max-w-[16rem] flex-col gap-2 overflow-y-auto">
+          {zoning ? <ZoningLegend /> : null}
+          {showLegend && showPrices ? <PriceLegend scale={scale} /> : null}
+        </div>
       ) : null}
 
       {/* Status band: never more than one message at a time. */}

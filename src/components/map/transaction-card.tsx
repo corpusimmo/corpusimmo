@@ -38,6 +38,7 @@ import {
 import { googleMapsUrl, streetViewUrl } from "@/lib/utils/maps";
 import { ActivityHint } from "./activity-hint";
 import { DpeBadge } from "./dpe-badge";
+import { RisquesBadge } from "./risques-badge";
 
 export const PROPERTY_TYPE_LABELS: Record<DvfPropertyType, string> = {
   apartment: "Appartement",
@@ -214,6 +215,13 @@ export function TransactionCard({
           l'adresse, et sans jamais remplacer ce que DVF a écrit plus haut. */}
       {t.coordinates && t.propertyType === "commercial" ? (
         <ActivityHint lat={t.coordinates.lat} lng={t.coordinates.lng} />
+      ) : null}
+
+      {/* Les risques valent pour TOUS les types, y compris un terrain : une
+          zone d'aléa argile ou une ancienne activité industrielle pèsent
+          autant sur un terrain nu que sur un logement. */}
+      {t.coordinates ? (
+        <RisquesBadge lat={t.coordinates.lat} lng={t.coordinates.lng} />
       ) : null}
 
       {t.isMultiLot ? (

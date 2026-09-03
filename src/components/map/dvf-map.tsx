@@ -43,6 +43,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import {
   Box,
   Tag,
+  TrainFront,
   Layers,
   Loader2,
   RotateCw,
@@ -83,6 +84,11 @@ import { useDvfData } from "./use-dvf-data";
 import { PRICE_RAMP } from "./base-palette";
 import { PriceLegend } from "./price-legend";
 import { ZoningLegend } from "./zoning-legend";
+import {
+  installTransportLayers,
+  setTransportVisibility,
+} from "./transports";
+import { TransportsLegend } from "./transports-legend";
 import {
   buildTerritoryScale,
   installTerritoryLayers,
@@ -260,6 +266,9 @@ export function DvfMap({
   /** Le calque d'affectation du sol est-il allumé, et peut-il l'être ? */
   const [zoning, setZoning] = React.useState(false);
   const [zoningAvailable, setZoningAvailable] = React.useState(false);
+  /** Le calque transports et commodités est-il allumé, et disponible ? */
+  const [transports, setTransports] = React.useState(false);
+  const [transportsAvailable, setTransportsAvailable] = React.useState(false);
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
   const [internalSelectedId, setInternalSelectedId] = React.useState<
@@ -305,6 +314,8 @@ export function DvfMap({
   priceModeRef.current = priceMode;
   const zoningRef = React.useRef(zoning);
   zoningRef.current = zoning;
+  const transportsRef = React.useRef(transports);
+  transportsRef.current = transports;
   const showPricesRef = React.useRef(showPrices);
   showPricesRef.current = showPrices;
   const scaleRef = React.useRef<PriceScale | null>(scale);
@@ -618,6 +629,13 @@ export function DvfMap({
     const supported = installZoningLayers(instance, "building");
     setZoningAvailable(supported);
     if (supported) setZoningVisibility(instance, zoningRef.current);
+
+    // Les transports passent AU-DESSUS du zonage et du bâti, mais SOUS
+    // l'overlay des ventes : un tram ne doit jamais masquer une pastille de
+    // prix, qui reste la donnée principale de l'écran.
+    const rails = installTransportLayers(instance, LAYER_SUBJECT_FILL);
+    setTransportsAvailable(rails);
+    if (rails) setTransportVisibility(instance, transportsRef.current);
     syncPriceLabels(instance, showPricesRef.current);
     hydrate();
   }, [hydrate, isDense, syncPriceLabels]);
@@ -652,6 +670,12 @@ export function DvfMap({
     if (!instance || !zoningAvailable) return;
     setZoningVisibility(instance, zoning);
   }, [zoning, zoningAvailable]);
+
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    if (!instance || !transportsAvailable) return;
+    setTransportVisibility(instance, transports);
+  }, [transports, transportsAvailable]);
 
   /* ── Format d'affichage de la fiche ────────────────────────────────────── */
 
@@ -1414,6 +1438,23 @@ export function DvfMap({
             </button>
           ) : null}
 
+          {transportsAvailable ? (
+            <button
+              type="button"
+              onClick={() => setTransports((on) => !on)}
+              aria-pressed={transports}
+              className={cn(
+                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
+                transports
+                  ? "bg-primary text-primary-fg"
+                  : "bg-surface text-ink-muted hover:text-ink",
+              )}
+            >
+              <TrainFront aria-hidden="true" className="size-3.5" />
+              Transports
+            </button>
+          ) : null}
+
           {/* `mt-auto` colle les légendes au bas de la colonne quand la carte
               est haute, et les laisse simplement suivre les commandes quand
               elle est courte. `min-h-0` est ce qui autorise le rétrécissement :
@@ -1422,6 +1463,7 @@ export function DvfMap({
               barre d'échelle occupe le coin, d'où la marge du bas. */}
           <div className="mt-auto flex min-h-0 w-full max-w-[16rem] flex-col gap-2 overflow-y-auto pb-14">
             {zoning ? <ZoningLegend /> : null}
+            {transports ? <TransportsLegend /> : null}
             {showLegend && showPrices ? (
               <PriceLegend scale={scale} compact={isCompact} />
             ) : null}

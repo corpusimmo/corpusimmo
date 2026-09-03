@@ -38,7 +38,7 @@ export function TransactionPopup({
 }: TransactionPopupProps) {
   const [container] = React.useState(() => {
     const node = document.createElement("div");
-    node.className = "w-[19rem] max-w-[80vw]";
+    node.className = "w-[21rem] max-w-[80vw]";
     return node;
   });
   const popupRef = React.useRef<Popup | null>(null);

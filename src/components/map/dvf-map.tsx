@@ -214,7 +214,9 @@ export function DvfMap({
   const [basemapPainted, setBasemapPainted] = React.useState(false);
   const [zoomTooLow, setZoomTooLow] = React.useState(false);
   const [isCompact, setIsCompact] = React.useState(false);
-  const [priceMode, setPriceMode] = React.useState<PriceMode>("total");
+  // Le €/m² d'abord : c'est la seule unité comparable d'une vente à
+  // l'autre. Le prix global reste à un clic, en second.
+  const [priceMode, setPriceMode] = React.useState<PriceMode>("perSqm");
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
   const [internalSelectedId, setInternalSelectedId] = React.useState<
@@ -517,6 +519,21 @@ export function DvfMap({
     hydrate();
   }, [hydrate, isDense]);
 
+  /* ── Format d'affichage de la fiche ────────────────────────────────────── */
+
+  // La largeur se SUIT, elle ne se photographie pas. Mesurée une seule fois à
+  // la création de la carte, elle restait figée sur la valeur du premier rendu :
+  // une carte montée en étroit gardait sa feuille du bas par-dessus la moitié
+  // de la carte une fois la fenêtre élargie, et une carte montée en large
+  // écrasait un encart de 19 rem sur un écran de téléphone.
+  React.useEffect(() => {
+    const query = window.matchMedia("(max-width: 767px)");
+    const sync = () => setIsCompact(query.matches);
+    sync();
+    query.addEventListener("change", sync);
+    return () => query.removeEventListener("change", sync);
+  }, []);
+
   /* ── Map creation ──────────────────────────────────────────────────────── */
 
   React.useEffect(() => {
@@ -525,8 +542,9 @@ export function DvfMap({
 
     tokensRef.current = readMapTokens(container);
 
+    // Les options de construction de MapLibre, elles, se figent bel et bien
+    // à la création : gestes coopératifs, boutons de zoom, attribution.
     const compact = window.matchMedia("(max-width: 767px)").matches;
-    setIsCompact(compact);
 
     // A map filling the viewport IS the page; anything shorter is embedded in a
     // scrolling document, where swallowing one-finger pans would trap the user.
@@ -1153,8 +1171,8 @@ export function DvfMap({
           >
             {(
               [
-                { id: "total", label: "Prix" },
                 { id: "perSqm", label: "€/m²" },
+                { id: "total", label: "Prix" },
               ] as const
             ).map((option) => (
               <button

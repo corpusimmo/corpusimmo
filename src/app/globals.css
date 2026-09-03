@@ -336,6 +336,45 @@
 }
 
 /* ============================================================================
+   PROSE JUSTIFIÉE
+   Le fer à droite est une demande d'esthétique, mais il ne se pose pas seul :
+   justifié SANS césure, un texte français étire ses espaces jusqu'à creuser des
+   « rivières » de blanc, et le défaut devient criant dès que la colonne se
+   resserre. `hyphens: auto` s'appuie sur le dictionnaire du navigateur, que
+   `lang="fr"` sur `<html>` sélectionne déjà.
+
+   Deux garde-fous. En dessous de 30em, la colonne est trop étroite pour qu'une
+   ligne justifiée tienne : on revient au fer à gauche plutôt que d'imposer des
+   mots hachés à chaque ligne. Et l'utilitaire ne s'applique qu'à des blocs de
+   prose choisis : justifier un tableau, un libellé ou une légende de deux mots
+   ne produit rien de bon.
+   ========================================================================== */
+
+@utility prose-justifiee {
+  &,
+  & p,
+  & li {
+    hyphens: auto;
+    -webkit-hyphens: auto;
+    /* Une césure isolée en bout de colonne est plus laide que la ligne
+       qu'elle rattrape : deux au maximum, jamais à la dernière ligne. */
+    hyphenate-limit-chars: 6 3 3;
+    -webkit-hyphenate-limit-before: 3;
+    -webkit-hyphenate-limit-after: 3;
+  }
+
+  @media (min-width: 30em) {
+    &,
+    & p,
+    & li {
+      text-align: justify;
+      /* `pretty` chasse les orphelines ; `justify` gère le reste. */
+      text-wrap: pretty;
+    }
+  }
+}
+
+/* ============================================================================
    UTILITAIRES
    ========================================================================== */
 

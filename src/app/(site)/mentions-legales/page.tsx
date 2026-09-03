@@ -13,7 +13,7 @@ export default function MentionsLegalesPage() {
   return (
     <div className="bg-canvas py-12 md:py-16">
       <div className="container-page">
-        <article className="mx-auto flex max-w-2xl flex-col gap-6">
+        <article className="prose-justifiee mx-auto flex max-w-2xl flex-col gap-6">
           <div>
             <p className="eyebrow">Informations légales</p>
             <h1 className="mt-3 font-display text-4xl leading-tight text-ink">Mentions légales</h1>

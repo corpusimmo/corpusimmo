@@ -112,7 +112,7 @@ export default function CookiesPage() {
   return (
     <div className="bg-canvas py-12 md:py-16">
       <div className="container-page">
-        <article className="mx-auto flex max-w-3xl flex-col gap-8">
+        <article className="prose-justifiee mx-auto flex max-w-3xl flex-col gap-8">
           <div>
             <p className="eyebrow">Traceurs</p>
             <h1 className="mt-3 font-display text-4xl leading-tight text-ink">

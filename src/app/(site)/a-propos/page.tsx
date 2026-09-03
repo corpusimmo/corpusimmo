@@ -108,7 +108,7 @@ export default function AProposPage() {
             sa méthode, et une méthode se juge sur qui l'a signée : ces années
             de métier valent plus que n'importe quelle promesse sur la qualité
             des données, elles n'avaient rien à faire en bas de page. */}
-        <section className="mx-auto mt-10 max-w-4xl">
+        <section className="prose-justifiee mx-auto mt-10 max-w-4xl">
           <h2 className="font-display text-2xl text-ink">Qui nous sommes</h2>
           <p className="mt-3 max-w-2xl leading-relaxed text-ink-muted">
             Nous ne sommes pas venus à l&apos;immobilier par la technologie,
@@ -149,7 +149,9 @@ export default function AProposPage() {
                   {member.facts.map((fact) => (
                     <li
                       key={fact}
-                      className="rounded-full bg-surface-2 px-2.5 py-1 text-[11px] font-medium text-ink-muted"
+                      // Une étiquette n'est pas de la prose : ni justifiée,
+                      // ni coupée en deux.
+                      className="rounded-full bg-surface-2 px-2.5 py-1 text-left text-[11px] font-medium text-ink-muted hyphens-none"
                     >
                       {fact}
                     </li>
@@ -203,7 +205,7 @@ export default function AProposPage() {
             Pourquoi « corpus »
           </h2>
 
-          <div className="mt-4 flex flex-col gap-5 leading-relaxed text-ink-muted">
+          <div className="prose-justifiee mt-4 flex flex-col gap-5 leading-relaxed text-ink-muted">
             <p>
               Un <em>corpus</em>, en science comme en droit, n&apos;est pas un
               tas de données. C&apos;est un ensemble fini, clos et structuré de

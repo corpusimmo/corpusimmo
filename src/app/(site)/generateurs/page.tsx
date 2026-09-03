@@ -161,7 +161,7 @@ export default function GenerateursPage() {
 
                 {/* Le piège plutôt qu'une définition : c'est la phrase qui
                     évite réellement la confusion. */}
-                <p className="rounded-sm bg-surface-2 px-3 py-2.5 text-sm leading-relaxed text-ink-muted">
+                <p className="prose-justifiee rounded-sm bg-surface-2 px-3 py-2.5 text-sm leading-relaxed text-ink-muted">
                   {kind.pitfall}
                 </p>
 

@@ -1254,7 +1254,13 @@ export function DvfMap({
           décaler d'un seul décalage, sans que rien ne passe dessous. */}
       {chrome ? (
         <div
-          className="pointer-events-none absolute left-3 z-10 flex flex-col items-start gap-2"
+          // UNE SEULE COLONNE, du haut au bas de la carte. Les légendes ont
+          // longtemps eu leur propre ancrage en bas : sur une carte courte
+          // elles remontaient dans les commandes et recouvraient « Zonage ».
+          // Deux ancrages indépendants ne peuvent pas s'éviter — il n'y en a
+          // donc plus qu'un, et `mt-auto` pousse les légendes en bas tant
+          // qu'il reste de la place.
+          className="pointer-events-none absolute bottom-3 left-3 z-10 flex flex-col items-start gap-2"
           style={{ top: chromeOffset ?? "0.75rem" }}
         >
           {/* PRIX — une seule commande, jamais deux.
@@ -1348,30 +1354,18 @@ export function DvfMap({
             </button>
           ) : null}
 
-          {/* Sur un écran étroit les légendes suivent les commandes : elles
-              sont dans la MÊME colonne, donc elles s'empilent au lieu de se
-              croiser. */}
-          {isCompact ? (
-            <>
-              {zoning ? <ZoningLegend /> : null}
-              {showLegend && showPrices ? (
-                <PriceLegend scale={scale} compact />
-              ) : null}
-            </>
-          ) : null}
-        </div>
-      ) : null}
-
-      {/* UNE SEULE PILE DE LÉGENDES, jamais deux ancrages concurrents.
-          Le zonage vivait en haut sous les commandes et les prix en bas dans
-          le coin : sur une carte courte, les deux blocs se recouvraient. Ils
-          partagent maintenant un seul conteneur ancré en bas à gauche, empilés
-          par `gap`, et la pile se limite à la hauteur de la carte pour ne
-          jamais déborder sous l'échelle. */}
-      {chrome && !isCompact ? (
-        <div className="pointer-events-none absolute bottom-[4.4rem] left-2 z-10 flex max-h-[calc(100%-6rem)] max-w-[16rem] flex-col gap-2 overflow-y-auto">
-          {zoning ? <ZoningLegend /> : null}
-          {showLegend && showPrices ? <PriceLegend scale={scale} /> : null}
+          {/* `mt-auto` colle les légendes au bas de la colonne quand la carte
+              est haute, et les laisse simplement suivre les commandes quand
+              elle est courte. `min-h-0` est ce qui autorise le rétrécissement :
+              sans lui, une pile flex refuse de passer sous sa taille de
+              contenu et déborderait à nouveau par le haut. Sur mobile la
+              barre d'échelle occupe le coin, d'où la marge du bas. */}
+          <div className="mt-auto flex min-h-0 w-full max-w-[16rem] flex-col gap-2 overflow-y-auto pb-14">
+            {zoning ? <ZoningLegend /> : null}
+            {showLegend && showPrices ? (
+              <PriceLegend scale={scale} compact={isCompact} />
+            ) : null}
+          </div>
         </div>
       ) : null}
 

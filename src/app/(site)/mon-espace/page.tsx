@@ -41,7 +41,25 @@ import { pageMetadata } from "@/lib/seo/metadata";
  * lié à CE navigateur. Le jour où une base existe, la connexion Google devient
  * le porte-clés et la même page se remplit à l'identique.
  */
-export const dynamic = "force-dynamic";
+/*
+ * PAS DE `force-dynamic`, ET C'EST UNE CORRECTION.
+ *
+ * La page lit un cookie signé et la session : Next la rend donc dynamique de
+ * lui-même, sans qu'on ait à le déclarer. La directive était redondante — et
+ * elle avait un effet de bord coûteux : elle faisait aussi RÉSOUDRE LES
+ * MÉTADONNÉES à chaque requête, ce qu'aucune autre page du site ne fait.
+ *
+ * C'est précisément là que la production échouait. Le corps de la page
+ * s'affichait parfaitement (une requête `curl` recevait le HTML complet), mais
+ * la promesse des métadonnées revenait rejetée :
+ *
+ *     /outils      "metadata":[["$","title", … ]        résolu
+ *     /mon-espace  "metadata":"$undefined","error":"$Z"  rejeté
+ *
+ * et le navigateur, qui l'attend, basculait sur la frontière d'erreur et
+ * remplaçait toute la page par « Quelque chose s'est mal passé ». Le compte
+ * n'y était pour rien : l'écran tombait aussi pour un visiteur anonyme.
+ */
 
 export const metadata: Metadata = pageMetadata({
   title: "Mon espace",

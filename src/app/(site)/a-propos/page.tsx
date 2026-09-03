@@ -93,6 +93,61 @@ export default function AProposPage() {
               sources n&apos;est recopiée dans une base à nous.
             </p>
 
+            <h2 className="mt-6 font-display text-2xl text-ink">
+              Qui nous sommes
+            </h2>
+            <p>
+              Nous ne venons pas de la technologie. Nous venons de
+              l&apos;analyse d&apos;investissement immobilier, où nous avons
+              passé nos premières années professionnelles à faire exactement ce
+              que ce site automatise&nbsp;: chercher des références de marché,
+              écarter celles qui ne comparent rien, et défendre un chiffre
+              devant quelqu&apos;un qui allait engager son argent dessus.
+            </p>
+            <p>
+              CorpusImmo est né de la lassitude de refaire ce travail à la main,
+              et de la conviction qu&apos;un estimateur honnête doit montrer ses
+              ventes plutôt que son résultat.
+            </p>
+
+            {/* Les deux parcours côte à côte, pas l'un sous l'autre : ils se
+                répondent — le même métier, deux maisons différentes. */}
+            <ul className="not-prose mt-2 grid gap-5 sm:grid-cols-2">
+              {TEAM.map((member) => (
+                <li
+                  key={member.name}
+                  className="panel flex flex-col gap-3 p-5"
+                >
+                  <div className="flex items-center gap-3">
+                    <Image
+                      src={member.photo}
+                      alt={`Portrait de ${member.name}`}
+                      width={56}
+                      height={56}
+                      className="size-14 shrink-0 rounded-full border border-border object-cover"
+                    />
+                    <div className="min-w-0">
+                      <p className="font-display text-base font-semibold text-ink">
+                        {member.name}
+                      </p>
+                      <p className="text-xs text-ink-subtle">{member.role}</p>
+                    </div>
+                  </div>
+                  <p className="text-sm leading-relaxed text-ink-muted">
+                    {member.bio}
+                  </p>
+                  <a
+                    href={member.linkedin}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="mt-auto text-xs font-semibold text-primary underline"
+                  >
+                    Parcours détaillé sur LinkedIn
+                  </a>
+                </li>
+              ))}
+            </ul>
+
             <h2 className="mt-6 font-display text-2xl text-ink">Nous écrire</h2>
             <p>
               Une erreur dans un chiffre, une méthode contestable, une question
@@ -111,6 +166,35 @@ export default function AProposPage() {
     </div>
   );
 }
+
+/**
+ * Les deux associés.
+ *
+ * Ce que ces notices doivent porter, et rien d'autre : des ANNÉES DE MÉTIER.
+ * Un estimateur en ligne se juge sur la méthode, et la méthode se juge sur qui
+ * l'a écrite. Dire « analyste investissement chez BNP Paribas Real Estate »
+ * vaut mieux que n'importe quelle promesse sur la qualité des données.
+ *
+ * Les portraits viennent des profils LinkedIn, en 100 px de côté — d'où un
+ * affichage à 56 px, où cette résolution reste nette. Remplacer les deux
+ * fichiers de `public/equipe/` par de la haute résolution suffit à agrandir.
+ */
+const TEAM = [
+  {
+    name: "Mathieu Guicheteau",
+    role: "Analyste investissement · produit et méthode",
+    photo: "/equipe/mathieu.png",
+    linkedin: "https://www.linkedin.com/in/mathieu-guicheteau/",
+    bio: "Six ans d'analyse d'investissement en immobilier d'entreprise chez Blot Immobilier — flux actualisés, études de marché, dossiers d'acquisition — après la gestion d'un portefeuille de mille lots. À dix-sept ans, il avait déjà écrit un simulateur d'investissement immobilier, donné gratuitement.",
+  },
+  {
+    name: "Gaël Colin",
+    role: "Analyste investissement · marché et données",
+    photo: "/equipe/gael.png",
+    linkedin: "https://www.linkedin.com/in/ga%C3%ABl-colin/",
+    bio: "Analyste investissement chez BNP Paribas Real Estate à Nantes, diplômé de l'ESPI. Il a instruit des opérations d'acquisition pour des investisseurs institutionnels : c'est de ce quotidien que viennent les garde-fous statistiques du moteur.",
+  },
+] as const;
 
 const RULES = [
   {

@@ -1032,12 +1032,21 @@ export function DvfMap({
     ): void => {
       instance.getCanvas().style.cursor = "pointer";
       const id = event.features?.[0]?.properties?.id;
-      hoveredIdRef.current = typeof id === "string" ? id : null;
+      const next = typeof id === "string" ? id : null;
+      // `mousemove` tire à CHAQUE pixel parcouru, pas à l'entrée dans la
+      // pastille. Sans ce garde-fou, `applyInteractionStyles()` réécrivait
+      // `icon-image` — une propriété de LAYOUT — des dizaines de fois par
+      // seconde, et MapLibre reprenait la mise en page de tous les symboles à
+      // chaque passe : les pastilles disparaissaient et revenaient sous le
+      // curseur. Rien à repeindre tant que la vente survolée ne change pas.
+      if (next === hoveredIdRef.current) return;
+      hoveredIdRef.current = next;
       applyInteractionStyles();
     };
 
     const onLeave = (): void => {
       instance.getCanvas().style.cursor = "";
+      if (hoveredIdRef.current === null) return;
       hoveredIdRef.current = null;
       applyInteractionStyles();
     };
@@ -1248,52 +1257,65 @@ export function DvfMap({
           className="pointer-events-none absolute left-3 z-10 flex flex-col items-start gap-2"
           style={{ top: chromeOffset ?? "0.75rem" }}
         >
-          {/* PRIX. Interrupteur d'abord, unité ensuite : on choisit d'abord si
-              on veut des étiquettes, et seulement après en quelle unité. Poser
-              les deux à plat laisserait croire que « €/m² » et « Prix total »
-              sont trois états avec « éteint ». */}
-          <button
-            type="button"
-            onClick={() => setShowPrices((on) => !on)}
-            aria-pressed={showPrices}
-            className={cn(
-              "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
-              showPrices
-                ? "bg-primary text-primary-fg"
-                : "bg-surface text-ink-muted hover:text-ink",
-            )}
-          >
-            <Tag aria-hidden="true" className="size-3.5" />
-            Prix
-          </button>
+          {/* PRIX — une seule commande, jamais deux.
+              L'unité vivait dans un bloc qui apparaissait sous l'interrupteur :
+              le décalage à chaque bascule était plus bruyant que le réglage
+              lui-même. Tout tient maintenant dans une pastille : l'état à
+              gauche, l'unité à droite, séparés d'un trait. Éteinte, l'unité
+              s'estompe et se désactive au lieu de disparaître — la commande
+              garde sa taille, et on voit quelle unité reviendra. */}
+          <div className="pointer-events-auto flex items-stretch overflow-hidden rounded-md border border-border bg-surface shadow-md">
+            <button
+              type="button"
+              onClick={() => setShowPrices((on) => !on)}
+              aria-pressed={showPrices}
+              className={cn(
+                "flex min-h-9 items-center gap-1.5 px-2.5 text-xs font-medium transition-colors",
+                showPrices
+                  ? "bg-primary text-primary-fg"
+                  : "text-ink-muted hover:bg-surface-2 hover:text-ink",
+              )}
+            >
+              <Tag aria-hidden="true" className="size-3.5" />
+              Prix
+            </button>
 
-          <div
-            hidden={!showPrices}
-            className="pointer-events-auto flex rounded-md border border-border bg-surface p-0.5 shadow-md"
-            role="group"
-            aria-label="Unité affichée sur les marqueurs"
-          >
-            {(
-              [
-                { id: "perSqm", label: "€/m²" },
-                { id: "total", label: "Prix total" },
-              ] as const
-            ).map((option) => (
-              <button
-                key={option.id}
-                type="button"
-                aria-pressed={priceMode === option.id}
-                onClick={() => setPriceMode(option.id)}
-                className={cn(
-                  "min-h-9 rounded-sm px-3 text-xs font-medium transition-colors",
-                  priceMode === option.id
-                    ? "bg-primary text-primary-fg shadow-xs"
-                    : "text-ink-muted hover:bg-surface-2 hover:text-ink",
-                )}
-              >
-                {option.label}
-              </button>
-            ))}
+            <div
+              aria-hidden="true"
+              className="w-px shrink-0 self-stretch bg-border"
+            />
+
+            <div
+              role="group"
+              aria-label="Unité affichée sur les marqueurs"
+              className={cn(
+                "flex items-stretch transition-opacity",
+                showPrices ? "" : "opacity-45",
+              )}
+            >
+              {(
+                [
+                  { id: "perSqm", label: "€/m²" },
+                  { id: "total", label: "Total" },
+                ] as const
+              ).map((option) => (
+                <button
+                  key={option.id}
+                  type="button"
+                  disabled={!showPrices}
+                  aria-pressed={priceMode === option.id}
+                  onClick={() => setPriceMode(option.id)}
+                  className={cn(
+                    "min-h-9 px-2.5 text-xs font-medium transition-colors",
+                    priceMode === option.id
+                      ? "bg-surface-2 text-ink"
+                      : "text-ink-subtle enabled:hover:bg-surface-2 enabled:hover:text-ink",
+                  )}
+                >
+                  {option.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* AFFECTATION DU SOL. Un interrupteur, pas un sélecteur : une seule

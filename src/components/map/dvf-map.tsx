@@ -1344,7 +1344,7 @@ export function DvfMap({
           // Deux ancrages indépendants ne peuvent pas s'éviter — il n'y en a
           // donc plus qu'un, et `mt-auto` pousse les légendes en bas tant
           // qu'il reste de la place.
-          className="pointer-events-none absolute bottom-3 left-3 z-10 flex flex-col items-start gap-2"
+          className="pointer-events-none absolute left-3 z-10 flex flex-col items-start gap-2"
           style={{ top: chromeOffset ?? "0.75rem" }}
         >
           {/* PRIX — une seule commande, jamais deux.
@@ -1455,19 +1455,35 @@ export function DvfMap({
             </button>
           ) : null}
 
-          {/* `mt-auto` colle les légendes au bas de la colonne quand la carte
-              est haute, et les laisse simplement suivre les commandes quand
-              elle est courte. `min-h-0` est ce qui autorise le rétrécissement :
-              sans lui, une pile flex refuse de passer sous sa taille de
-              contenu et déborderait à nouveau par le haut. Sur mobile la
-              barre d'échelle occupe le coin, d'où la marge du bas. */}
-          <div className="mt-auto flex min-h-0 w-full max-w-[16rem] flex-col gap-2 overflow-y-auto pb-14">
-            {zoning ? <ZoningLegend /> : null}
-            {transports ? <TransportsLegend /> : null}
-            {showLegend && showPrices ? (
-              <PriceLegend scale={scale} compact={isCompact} />
-            ) : null}
-          </div>
+        </div>
+      ) : null}
+
+      {/* LES LÉGENDES EN BANDEAU BAS, PAS EN COLONNE.
+          Empilées à gauche, elles mangeaient une bande verticale sur toute la
+          hauteur de la carte, c'est-à-dire précisément là où l'on regarde. En
+          bandeau elles ne coûtent qu'une lisière, et les trois se lisent côte
+          à côte au lieu de se pousser.
+
+          Chaque panneau est borné en hauteur et défile pour lui-même : la
+          légende des transports compte dix entrées, elle ne doit pas fixer la
+          hauteur du bandeau pour les deux autres. Le bandeau lui-même défile
+          horizontalement plutôt que de recouvrir la carte quand les trois
+          calques sont allumés sur un écran étroit. */}
+      {chrome ? (
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 flex justify-start gap-2 overflow-x-auto px-3 pb-9">
+          {zoning ? (
+            <ZoningLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto" />
+          ) : null}
+          {transports ? (
+            <TransportsLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto" />
+          ) : null}
+          {showLegend && showPrices ? (
+            <PriceLegend
+              scale={scale}
+              compact={isCompact}
+              className="max-h-[8.5rem] shrink-0 overflow-y-auto"
+            />
+          ) : null}
         </div>
       ) : null}
 

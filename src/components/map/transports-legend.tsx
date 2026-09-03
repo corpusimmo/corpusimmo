@@ -1,5 +1,15 @@
 "use client";
 
+import {
+  Bus,
+  Cross,
+  GraduationCap,
+  ShoppingBasket,
+  TrainFront,
+  Trees,
+  type LucideIcon,
+} from "lucide-react";
+
 import { cn } from "@/lib/utils/cn";
 
 import {
@@ -29,6 +39,41 @@ import {
  * Les trois blocs suivent l'ordre de lecture attendu : d'abord le réseau qui
  * structure, puis les points d'accès, puis le quotidien.
  */
+/**
+ * Le pictogramme de chaque famille, dans la légende.
+ *
+ * Ce ne sont PAS les images du sprite de la carte : celles-ci vivent dans un
+ * atlas PNG dont il faudrait lire les coordonnées à l'exécution pour les
+ * recadrer en CSS. Des icônes de la même famille sémantique suffisent à faire
+ * le lien, et évitent une dépendance au découpage d'un fichier distant qui
+ * peut changer sans prévenir.
+ *
+ * La couleur reste celle de la carte : c'est elle qui fait la correspondance,
+ * le dessin ne fait que la nommer.
+ */
+const LEGEND_ICONS: Record<string, LucideIcon> = {
+  arret: Bus,
+  gare: TrainFront,
+  ecole: GraduationCap,
+  alimentation: ShoppingBasket,
+  sante: Cross,
+  parc: Trees,
+};
+
+function LegendIcon({ id, color }: { id: string; color: string }) {
+  const Icon = LEGEND_ICONS[id];
+  if (!Icon) {
+    return (
+      <span
+        aria-hidden="true"
+        className="size-3 shrink-0 rounded-full border border-border-strong/40"
+        style={{ backgroundColor: color }}
+      />
+    );
+  }
+  return <Icon aria-hidden="true" className="size-3.5 shrink-0" style={{ color }} />;
+}
+
 export function TransportsLegend({ className }: { className?: string }) {
   return (
     <div
@@ -64,11 +109,7 @@ export function TransportsLegend({ className }: { className?: string }) {
             key={group.id}
             className="flex items-center gap-2 text-[11px] text-ink-muted"
           >
-            <span
-              aria-hidden="true"
-              className="size-3 shrink-0 rounded-full border border-border-strong/40"
-              style={{ backgroundColor: group.color }}
-            />
+            <LegendIcon id={group.id} color={group.color} />
             {group.label}
           </li>
         ))}
@@ -83,11 +124,7 @@ export function TransportsLegend({ className }: { className?: string }) {
             key={category.id}
             className="flex items-center gap-2 text-[11px] text-ink-muted"
           >
-            <span
-              aria-hidden="true"
-              className="size-3 shrink-0 rounded-full border border-border-strong/40"
-              style={{ backgroundColor: category.color }}
-            />
+            <LegendIcon id={category.id} color={category.color} />
             {category.label}
           </li>
         ))}

@@ -184,10 +184,33 @@ describe("couches de transports", () => {
   });
 
   it("n'écrit jamais de texte : les pastilles de prix restent la donnée principale", () => {
+    // L'invariant porte sur le TEXTE, pas sur le type de couche. Les
+    // pictogrammes d'arrêts sont des `symbol` sans `text-field` : ils
+    // n'entrent donc pas en concurrence de lecture avec les prix, et
+    // interdire le type `symbol` interdirait aussi les icônes.
     for (const layer of transportLayers()) {
       const s = spec(layer);
-      expect(s.type).not.toBe("symbol");
-      expect(Object.keys(s.layout as object)).not.toContain("text-field");
+      const layout = (s.layout ?? {}) as Record<string, unknown>;
+      expect(Object.keys(layout)).not.toContain("text-field");
+      expect(Object.keys(layout)).not.toContain("text-size");
+    }
+  });
+
+  it("pose un pictogramme par arrêt et par commodité, jamais de texte", () => {
+    const icons = transportLayers().filter((layer) =>
+      String(spec(layer).id).startsWith("transports-icon-"),
+    );
+
+    expect(icons.length).toBe(
+      TRANSPORT_STOPS.length + AMENITY_CATEGORIES.length,
+    );
+    for (const icon of icons) {
+      const layout = spec(icon).layout as Record<string, unknown>;
+      expect(layout.visibility).toBe("none");
+      expect(layout["icon-image"]).toBeDefined();
+      // Un pictogramme illisible ne vaut pas mieux que rien : il n'apparaît
+      // qu'au zoom où la place existe.
+      expect(Number(spec(icon).minzoom)).toBeGreaterThanOrEqual(15.5);
     }
   });
 

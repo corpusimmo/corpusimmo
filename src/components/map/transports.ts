@@ -227,6 +227,75 @@ const LINE_PREFIX = "transports-line-";
 const CASING_SUFFIX = "-casing";
 const STOP_PREFIX = "transports-stop-";
 const AMENITY_PREFIX = "transports-amenity-";
+const ICON_PREFIX = "transports-icon-";
+
+/**
+ * LES PICTOGRAMMES, PRIS DANS LE SPRITE DÉJÀ CHARGÉ.
+ *
+ * Le style maison déclare le sprite d'OpenFreeMap pour ses propres besoins :
+ * ces icônes sont donc déjà sur le réseau, et les afficher ne coûte pas un
+ * octet de plus. Aucun fichier à produire, aucune image à générer à
+ * l'exécution comme le fait `addPillImages` pour les pastilles de prix.
+ *
+ * Les noms sont ceux du sprite `ofm_f384`, vérifiés un par un contre son
+ * index : un `icon-image` inexistant ne lève RIEN chez MapLibre, il dessine
+ * simplement le vide, et le défaut passerait inaperçu jusqu'en production.
+ *
+ * Le suffixe `_11` est la variante compacte (15 px). La grande, à 19 px,
+ * écraserait les pastilles de prix qui restent la donnée principale.
+ */
+const STOP_ICONS: Record<string, string> = {
+  bus_stop: "bus_11",
+  bus_station: "bus_11",
+  tram_stop: "railway_light_11",
+  station: "railway_11",
+  halt: "railway_11",
+  subway: "railway_metro_11",
+  ferry_terminal: "ferry_11",
+};
+
+const AMENITY_ICONS: Record<string, string> = {
+  school: "school_11",
+  college: "college_11",
+  grocery: "grocery_11",
+  bakery: "bakery_11",
+  butcher: "grocery_11",
+  hospital: "hospital_11",
+  pharmacy: "pharmacy_11",
+  doctors: "doctors_11",
+  dentist: "dentist_11",
+  park: "park_11",
+  playground: "playground_11",
+};
+
+/**
+ * `["match", ["get", champ], "bus_stop", "bus_11", …, repli]`.
+ *
+ * Une seule couche par groupe plutôt qu'une par valeur : c'est l'expression
+ * qui choisit le pictogramme, donc MapLibre ne gère qu'un jeu de symboles à
+ * dédoublonner et les arrêts ne se recouvrent pas entre couches sœurs.
+ */
+function iconExpression(
+  field: string,
+  values: readonly string[],
+  table: Record<string, string>,
+  fallback: string,
+): unknown[] {
+  const pairs = values.flatMap((value) =>
+    table[value] ? [value, table[value]] : [],
+  );
+  if (pairs.length === 0) return [fallback];
+  return ["match", ["get", field], ...pairs, fallback];
+}
+
+/**
+ * Zoom à partir duquel le pictogramme remplace la pastille.
+ *
+ * Un point de 5 px accepte une couleur, pas un dessin. En dessous de ce zoom
+ * les cercles restent seuls : mieux vaut un point lisible qu'une icône
+ * illisible.
+ */
+const ICON_MIN_ZOOM = 15.5;
 
 /**
  * Tous les identifiants posés, dans l'ordre de dessin. Exporté parce que
@@ -240,6 +309,12 @@ export const TRANSPORT_LAYER_IDS: readonly string[] = [
   ]),
   ...AMENITY_CATEGORIES.map((a) => `${AMENITY_PREFIX}${a.id}`),
   ...TRANSPORT_STOPS.map((s) => `${STOP_PREFIX}${s.id}`),
+  // L'ordre suit celui du dessin : les pictogrammes d'arrêts avant ceux des
+  // commodités, comme dans `transportLayers()`. Une liste qui divergerait de
+  // l'ordre réel casserait `setTransportVisibility` en silence le jour où
+  // elle servirait à autre chose qu'à parcourir.
+  ...TRANSPORT_STOPS.map((s) => `${ICON_PREFIX}${s.id}`),
+  ...AMENITY_CATEGORIES.map((a) => `${ICON_PREFIX}${a.id}`),
 ];
 
 /* ────────────────────────────────────────────────────────────────────────── */
@@ -433,7 +508,71 @@ export function transportLayers(): LayerSpec[] {
       }) as LayerSpec,
   );
 
-  return [...lines, ...amenities, ...stops];
+  /**
+   * Les pictogrammes, posés PAR-DESSUS les pastilles et non à leur place.
+   *
+   * La pastille garde le codage par couleur et reste lisible à tous les
+   * zooms ; l'icône vient s'y superposer quand la place existe. Deux
+   * conséquences voulues : rien ne disparaît au passage du seuil, et un
+   * pictogramme absent du sprite laisse au moins un point coloré.
+   *
+   * `icon-allow-overlap: false` laisse MapLibre écarter les icônes qui se
+   * chevauchent. Sans dédoublonnage possible des quais (`agg_stop` est vide
+   * dans les tuiles servies), c'est ce qui évite une grappe illisible sur une
+   * station à six quais.
+   */
+  const icons = [
+    ...TRANSPORT_STOPS.map(
+      (group) =>
+        ({
+          id: `${ICON_PREFIX}${group.id}`,
+          type: "symbol",
+          source: OFM_SOURCE_ID,
+          "source-layer": "poi",
+          minzoom: Math.max(group.minzoom, ICON_MIN_ZOOM),
+          filter: allOf(matchSubclass(group.subclasses), densityFilter()),
+          layout: {
+            visibility: "none",
+            "icon-image": iconExpression(
+              "subclass",
+              group.subclasses,
+              STOP_ICONS,
+              "bus_11",
+            ),
+            "icon-size": 0.9,
+            "icon-allow-overlap": false,
+            "icon-padding": 3,
+          },
+          paint: { "icon-opacity": 0.95 },
+        }) as LayerSpec,
+    ),
+    ...AMENITY_CATEGORIES.map(
+      (category) =>
+        ({
+          id: `${ICON_PREFIX}${category.id}`,
+          type: "symbol",
+          source: OFM_SOURCE_ID,
+          "source-layer": "poi",
+          minzoom: ICON_MIN_ZOOM,
+          filter: allOf(matchClass(category.classes), densityFilter()),
+          layout: {
+            visibility: "none",
+            "icon-image": iconExpression(
+              "class",
+              category.classes,
+              AMENITY_ICONS,
+              "commercial_11",
+            ),
+            "icon-size": 0.85,
+            "icon-allow-overlap": false,
+            "icon-padding": 3,
+          },
+          paint: { "icon-opacity": 0.9 },
+        }) as LayerSpec,
+    ),
+  ];
+
+  return [...lines, ...amenities, ...stops, ...icons];
 }
 
 /* ────────────────────────────────────────────────────────────────────────── */

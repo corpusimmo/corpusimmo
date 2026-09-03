@@ -30,6 +30,9 @@ const VENTE: DvfTransaction = {
   cityCode: "44109",
   coordinates: { lat: 47.2184, lng: -1.5536 },
   isMultiLot: false,
+  year: 2025,
+  departmentCode: "44",
+  source: "geodvf",
 };
 
 describe("TransactionCard", () => {

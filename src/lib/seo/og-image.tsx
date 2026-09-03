@@ -90,26 +90,29 @@ function font(file: string) {
 const DISPLAY = "Manrope";
 const BODY = "Inter";
 
-const FONTS = [
-  {
-    name: DISPLAY,
-    data: font("manrope-800.ttf"),
-    weight: 800 as const,
-    style: "normal" as const,
-  },
-  {
-    name: DISPLAY,
-    data: font("manrope-400.ttf"),
-    weight: 400 as const,
-    style: "normal" as const,
-  },
-  {
-    name: BODY,
-    data: font("inter-400.ttf"),
-    weight: 400 as const,
-    style: "normal" as const,
-  },
-];
+type Fonte = { name: string; data: Buffer; weight: 400 | 800; style: "normal" };
+
+let fontes: Fonte[] | undefined;
+
+/** Mêmes lectures paresseuses que la photographie, pour la même raison. */
+function fonts(): Fonte[] {
+  fontes ??= [
+    {
+      name: DISPLAY,
+      data: font("manrope-800.ttf"),
+      weight: 800,
+      style: "normal",
+    },
+    {
+      name: DISPLAY,
+      data: font("manrope-400.ttf"),
+      weight: 400,
+      style: "normal",
+    },
+    { name: BODY, data: font("inter-400.ttf"), weight: 400, style: "normal" },
+  ];
+  return fontes;
+}
 
 /* --------------------------------------------------------------- le logotype */
 
@@ -438,6 +441,6 @@ export function renderOgImage({
         }}
       />
     </div>,
-    { ...OG_SIZE, fonts: FONTS },
+    { ...OG_SIZE, fonts: fonts() },
   );
 }

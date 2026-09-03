@@ -41,6 +41,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
   Box,
+  Tag,
   Layers,
   Loader2,
   RotateCw,
@@ -222,6 +223,14 @@ export function DvfMap({
   // Le €/m² d'abord : c'est la seule unité comparable d'une vente à
   // l'autre. Le prix global reste à un clic, en second.
   const [priceMode, setPriceMode] = React.useState<PriceMode>("perSqm");
+  /**
+   * Les étiquettes de prix sont-elles affichées ?
+   *
+   * Allumées d'entrée : c'est ce que les gens viennent lire. Mais elles
+   * couvrent la carte, et le zonage sous-jacent ne devient lisible qu'une fois
+   * les pastilles retirées — d'où l'interrupteur.
+   */
+  const [showPrices, setShowPrices] = React.useState(true);
   /** Le calque d'affectation du sol est-il allumé, et peut-il l'être ? */
   const [zoning, setZoning] = React.useState(false);
   const [zoningAvailable, setZoningAvailable] = React.useState(false);
@@ -270,6 +279,8 @@ export function DvfMap({
   priceModeRef.current = priceMode;
   const zoningRef = React.useRef(zoning);
   zoningRef.current = zoning;
+  const showPricesRef = React.useRef(showPrices);
+  showPricesRef.current = showPrices;
   const scaleRef = React.useRef<PriceScale | null>(scale);
   scaleRef.current = scale;
   const subjectRef = React.useRef(subject);
@@ -509,6 +520,33 @@ export function DvfMap({
     syncBuildings();
   }, [applyInteractionStyles, syncBuildings]);
 
+  /* ── Étiquettes de prix ────────────────────────────────────────────────── */
+
+  const syncPriceLabels = React.useCallback(
+    (instance: MapLibreMap, visible: boolean) => {
+      if (!instance.getLayer(LAYER_PRICE) || !instance.getLayer(LAYER_DOT)) {
+        return;
+      }
+      instance.setLayoutProperty(
+        LAYER_PRICE,
+        "visibility",
+        visible ? "visible" : "none",
+      );
+      // Les points reprennent le service : sans ce retour à l'opacité pleine,
+      // masquer les pastilles viderait la carte au-delà du zoom de bascule.
+      const opacity = visible ? dotFade(isDense) : 1;
+      instance.setPaintProperty(LAYER_DOT, "circle-opacity", opacity);
+      instance.setPaintProperty(LAYER_DOT, "circle-stroke-opacity", opacity);
+    },
+    [isDense],
+  );
+
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    if (!instance) return;
+    syncPriceLabels(instance, showPrices);
+  }, [showPrices, syncPriceLabels]);
+
   /**
    * Idempotent: called on `load` AND on every `styledata`, because switching
    * basemap wipes our sources, layers and images along with the old style.
@@ -532,8 +570,9 @@ export function DvfMap({
     const supported = installZoningLayers(instance, "building");
     setZoningAvailable(supported);
     if (supported) setZoningVisibility(instance, zoningRef.current);
+    syncPriceLabels(instance, showPricesRef.current);
     hydrate();
-  }, [hydrate, isDense]);
+  }, [hydrate, isDense, syncPriceLabels]);
 
   /* ── Affectation du sol ────────────────────────────────────────────────── */
 
@@ -1188,7 +1227,27 @@ export function DvfMap({
           className="pointer-events-none absolute left-3 z-10 flex flex-col items-start gap-2"
           style={{ top: chromeOffset ?? "0.75rem" }}
         >
+          {/* PRIX. Interrupteur d'abord, unité ensuite : on choisit d'abord si
+              on veut des étiquettes, et seulement après en quelle unité. Poser
+              les deux à plat laisserait croire que « €/m² » et « Prix total »
+              sont trois états avec « éteint ». */}
+          <button
+            type="button"
+            onClick={() => setShowPrices((on) => !on)}
+            aria-pressed={showPrices}
+            className={cn(
+              "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
+              showPrices
+                ? "bg-primary text-primary-fg"
+                : "bg-surface text-ink-muted hover:text-ink",
+            )}
+          >
+            <Tag aria-hidden="true" className="size-3.5" />
+            Prix
+          </button>
+
           <div
+            hidden={!showPrices}
             className="pointer-events-auto flex rounded-md border border-border bg-surface p-0.5 shadow-md"
             role="group"
             aria-label="Unité affichée sur les marqueurs"
@@ -1196,7 +1255,7 @@ export function DvfMap({
             {(
               [
                 { id: "perSqm", label: "€/m²" },
-                { id: "total", label: "Prix" },
+                { id: "total", label: "Prix total" },
               ] as const
             ).map((option) => (
               <button
@@ -1263,13 +1322,13 @@ export function DvfMap({
 
           {/* Sur un écran étroit la légende suit les commandes ; au large elle
               descend dans le coin, où elle ne mange pas la carte. */}
-          {isCompact && showLegend ? (
+          {isCompact && showLegend && showPrices ? (
             <PriceLegend scale={scale} compact />
           ) : null}
         </div>
       ) : null}
 
-      {chrome && !isCompact && showLegend ? (
+      {chrome && !isCompact && showLegend && showPrices ? (
         <PriceLegend
           scale={scale}
           className="absolute bottom-[4.4rem] left-2 z-10 max-w-[16rem]"
@@ -1485,24 +1544,8 @@ function installDvfLayers(map: MapLibreMap, ctx: InstallContext): void {
       "circle-stroke-color": chrome.dotStroke,
       "circle-radius": 5,
       // Dots hand over to labelled pills, fading rather than popping.
-      "circle-opacity": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        fade - 0.4,
-        1,
-        fade + 0.4,
-        0,
-      ],
-      "circle-stroke-opacity": [
-        "interpolate",
-        ["linear"],
-        ["zoom"],
-        fade - 0.4,
-        1,
-        fade + 0.4,
-        0,
-      ],
+      "circle-opacity": dotFade(dense),
+      "circle-stroke-opacity": dotFade(dense),
     },
   });
 
@@ -1577,6 +1620,27 @@ function repaintOverlay(
 /** Zoom at which individual price pills replace the dots. */
 function pillZoom(dense: boolean): number {
   return dense ? 14.6 : 15.2;
+}
+
+/**
+ * L'opacité des points, qui s'effacent quand les pastilles prennent le relais.
+ *
+ * Extrait parce que l'interrupteur « Prix » doit pouvoir l'ANNULER : sans
+ * pastilles, ce fondu laisserait la carte vide au-delà du zoom de bascule.
+ */
+type FadeExpression = [
+  "interpolate",
+  ["linear"],
+  ["zoom"],
+  number,
+  number,
+  number,
+  number,
+];
+
+function dotFade(dense: boolean): FadeExpression {
+  const fade = pillZoom(dense);
+  return ["interpolate", ["linear"], ["zoom"], fade - 0.4, 1, fade + 0.4, 0];
 }
 
 /**

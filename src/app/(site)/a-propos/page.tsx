@@ -7,8 +7,8 @@ import { pageMetadata } from "@/lib/seo/metadata";
 export const metadata: Metadata = pageMetadata({
   title: "À propos",
   description:
-    "Deux analystes investissement immobilier, un corpus d'actes plutôt que d'annonces, et " +
-    "les quatre règles que nous nous sommes fixées sur ce que nous affichons.",
+    "Deux anciens analystes investissement passés à l'IA, un corpus d'actes plutôt que " +
+    "d'annonces, et les quatre règles que nous nous fixons sur ce que nous affichons.",
   path: "/a-propos",
   socialTitle: "Un corpus, et ce qu'on en fait",
 });
@@ -78,7 +78,8 @@ export default function AProposPage() {
                 et{" "}
                 <span className="font-semibold text-white">Gaël Colin</span>
                 <span className="block text-white/60">
-                  analystes investissement immobilier
+                  ex-analystes investissement, aujourd&apos;hui sur les
+                  solutions d&apos;IA appliquées à l&apos;immobilier
                 </span>
               </p>
             </div>
@@ -105,12 +106,16 @@ export default function AProposPage() {
         <section className="mx-auto mt-10 max-w-4xl">
           <h2 className="font-display text-2xl text-ink">Qui nous sommes</h2>
           <p className="mt-3 max-w-2xl leading-relaxed text-ink-muted">
-            Nous ne venons pas de la technologie. Nous venons de l&apos;analyse
-            d&apos;investissement immobilier, où nous avons passé nos premières
-            années professionnelles à faire exactement ce que ce site
+            Nous ne sommes pas venus à l&apos;immobilier par la technologie,
+            mais l&apos;inverse. Tous deux issus de l&apos;ESPI, nous avons
+            passé nos premières années professionnelles comme analystes
+            investissement, à faire exactement ce que ce site
             automatise&nbsp;: chercher des références de marché, écarter celles
             qui ne comparent rien, et défendre un chiffre devant quelqu&apos;un
-            qui allait engager son argent dessus.
+            qui allait engager son argent dessus. Nous développons aujourd&apos;hui
+            l&apos;un et l&apos;autre des solutions d&apos;intelligence
+            artificielle — et CorpusImmo est celle où les deux métiers se
+            rejoignent.
           </p>
 
           <ul className="mt-7 grid gap-5 sm:grid-cols-2">
@@ -161,6 +166,24 @@ export default function AProposPage() {
               </li>
             ))}
           </ul>
+
+          {/* La formation commune, une fois pour deux. Répéter le logo dans
+              chaque fiche l'aurait transformé en décor ; posé ici, il dit ce
+              qu'il doit dire : d'où vient la formation, pas qui la cautionne. */}
+          <p className="mt-6 flex items-center gap-3 text-sm text-ink-muted">
+            <Image
+              src="/equipe/espi.png"
+              alt="Logo du Groupe ESPI"
+              width={40}
+              height={40}
+              className="size-10 shrink-0 rounded-md border border-border bg-surface object-contain"
+            />
+            <span>
+              Nous sommes tous deux issus du{" "}
+              <strong className="font-semibold text-ink">Groupe ESPI</strong>,
+              école spécialisée dans les métiers de l&apos;immobilier.
+            </span>
+          </p>
 
           <p className="mt-6 max-w-2xl leading-relaxed text-ink-muted">
             CorpusImmo est né de la lassitude de refaire ce travail à la main,
@@ -258,19 +281,19 @@ export default function AProposPage() {
 const TEAM = [
   {
     name: "Mathieu Guicheteau",
-    role: "Analyste investissement · produit et méthode",
+    role: "Ex-analyste investissement · produit et méthode",
     photo: "/equipe/mathieu.png",
     linkedin: "https://www.linkedin.com/in/mathieu-guicheteau/",
-    facts: ["6 ans chez Blot Immobilier", "1 000 lots gérés", "DCF et études de marché"],
-    bio: "Six ans d'analyse d'investissement en immobilier d'entreprise — flux actualisés, études de marché, dossiers d'acquisition — après la gestion d'un portefeuille de mille lots. À dix-sept ans, il avait déjà écrit un simulateur d'investissement immobilier, et l'avait donné.",
+    facts: ["6 ans chez Blot Immobilier", "1 000 lots gérés", "Fondateur de Scalenvia"],
+    bio: "Six ans d'analyse d'investissement en immobilier d'entreprise — flux actualisés, études de marché, dossiers d'acquisition — après la gestion d'un portefeuille de mille lots. Il dirige aujourd'hui Scalenvia, agence de développement de solutions d'IA. À dix-sept ans, il avait déjà écrit un simulateur d'investissement immobilier, et l'avait donné.",
   },
   {
     name: "Gaël Colin",
-    role: "Analyste investissement · marché et données",
+    role: "Ex-analyste investissement · marché et données",
     photo: "/equipe/gael.png",
     linkedin: "https://www.linkedin.com/in/ga%C3%ABl-colin/",
-    facts: ["BNP Paribas Real Estate", "Nantes", "ESPI"],
-    bio: "Analyste investissement en immobilier d'entreprise, il a instruit des opérations d'acquisition pour des investisseurs institutionnels. C'est de ce quotidien que viennent les garde-fous statistiques du moteur.",
+    facts: ["BNP Paribas Real Estate", "Nantes", "IA pour l'immobilier"],
+    bio: "Analyste investissement en immobilier d'entreprise, il a instruit des opérations d'acquisition pour des investisseurs institutionnels. Il conçoit aujourd'hui des solutions d'IA dédiées à l'immobilier. C'est de ce quotidien d'analyste que viennent les garde-fous statistiques du moteur.",
   },
 ] as const;
 

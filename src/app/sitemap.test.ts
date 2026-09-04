@@ -92,11 +92,13 @@ describe("sitemap", () => {
    * L'assertion est une INCLUSION et non une égalité : une page hors index
    * ajoutée demain par ailleurs (un écran de repli, une page de service) est
    * légitime et ne doit pas faire échouer ce test. Ce qui doit échouer, c'est
-   * qu'une de ces six-là revienne dans l'index.
+   * qu'une de ces huit-là revienne dans l'index.
    */
   it("tient hors index les écrans qui n'ont rien à y faire", () => {
     const patterns = noindexPatterns();
     for (const pattern of [
+      "/connexion",
+      "/mon-espace",
       "/observatoire/comparables",
       "/outils/[slug]/calculer",
       "/solutions",

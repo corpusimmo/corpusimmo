@@ -10,6 +10,7 @@ import {
   useRef,
   type ReactNode,
 } from "react";
+import { useSession } from "next-auth/react";
 
 import {
   addComparableAction,
@@ -26,7 +27,6 @@ import {
   parseComparableEntries,
   type ComparableEntry,
 } from "@/app/(site)/observatoire/comparables/wire";
-import { useSessionStatus } from "./session-status";
 import type { DvfTransaction } from "@/types/dvf";
 
 import { attachSubjectAccount, detachSubjectAccount } from "./subject-store";
@@ -64,9 +64,12 @@ import { attachSubjectAccount, detachSubjectAccount } from "./subject-store";
  * l'utilisateur. Laisser croire à une sauvegarde qui n'existe pas est la seule
  * chose qu'on ne peut pas se permettre ici.
  *
- * LA SESSION EST RETIRÉE POUR L'INSTANT, et tout le monde est donc anonyme.
- * La bascule vers le registre d'un compte reste écrite et testée ici : voir
- * `session-status.ts`, seul fichier à rouvrir quand les comptes reviendront.
+ * LA SESSION EST RÉSOLUE DANS LE NAVIGATEUR, par `useSession()`. Lire `auth()`
+ * dans une page basculerait les trois écrans de l'observatoire en rendu
+ * dynamique, alors que deux d'entre eux sont indexés ; c'est déjà la raison
+ * pour laquelle `src/components/layout/session-provider.tsx` existe. Le client
+ * ne fait toutefois que PROPOSER : l'action serveur revérifie la session
+ * elle-même et c'est sa réponse, jamais `useSession()`, qui décide du registre.
  *
  * LA REPRISE. Quelqu'un qui a constitué un panier sans compte, puis se
  * connecte, doit le RETROUVER. Le contenu local est donc versé dans le compte
@@ -291,7 +294,6 @@ export interface ComparablesApi {
 
 const ComparablesContext = createContext<ComparablesApi | null>(null);
 
-
 export function ComparablesProvider({ children }: { children: ReactNode }) {
   const [state, dispatch] = useReducer(reducer, {
     items: [],
@@ -301,7 +303,7 @@ export function ComparablesProvider({ children }: { children: ReactNode }) {
     failed: false,
   });
 
-  const status = useSessionStatus();
+  const { status } = useSession();
   const localRead = useRef(false);
   /** Le registre pour lequel la bascule a déjà été jouée. */
   const settledFor = useRef<"anonymous" | "account" | null>(null);

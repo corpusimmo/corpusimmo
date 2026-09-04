@@ -15,7 +15,7 @@ import { canonicalUrl } from "@/lib/seo/metadata";
  *    routes `/api/*` servent la même donnée en JSON et ne rendent rien de
  *    lisible ; elles portent déjà `X-Robots-Tag`, ceci est la seconde ceinture.
  *
- * 2. RIEN À INDEXER. Certains écrans sont de purs outils de service :
+ * 2. RIEN À INDEXER. `/mon-espace` et `/connexion` sont des écrans de service :
  *    un robot n'y voit qu'un état vide ou un bouton de connexion.
  *
  * 3. PAS DE CONTENU PROPRE. La route `/outils/[slug]/calculer` est le
@@ -44,6 +44,8 @@ export default function robots(): MetadataRoute.Robots {
         allow: "/",
         disallow: [
           "/api/",
+          "/connexion",
+          "/mon-espace",
           "/observatoire/comparables",
           // Le joker médian est compris par Google et Bing ; les fiches
           // `/outils/<slug>` restent explorables, seul le calculateur est fermé.

@@ -8,9 +8,9 @@
  *
  * Il importe les modules de page eux-mêmes plutôt que de reconstituer leurs
  * métadonnées : ce qui est vérifié est donc exactement ce qui sera servi.
- * `/outils/[slug]/calculer` en est absent, parce qu'il lit des cookies par
- * `next/headers` et ne s'importe pas hors du rendu d'une requête ; ses
- * métadonnées passent par la même fabrique.
+ * `/mon-espace` et `/outils/[slug]/calculer` en sont absents, parce qu'ils
+ * lisent des cookies par `next/headers` et ne s'importent pas hors du rendu
+ * d'une requête ; leurs métadonnées passent par la même fabrique.
  */
 
 import type { Metadata } from "next";
@@ -18,6 +18,7 @@ import { describe, expect, it } from "vitest";
 
 import { metadata as home } from "@/app/(site)/page";
 import { metadata as aPropos } from "@/app/(site)/a-propos/page";
+import { metadata as connexion } from "@/app/(site)/connexion/page";
 import { metadata as estimer } from "@/app/(site)/estimer/page";
 import { metadata as comparables } from "@/app/(site)/observatoire/comparables/page";
 import { metadata as observatoire } from "@/app/(site)/observatoire/page";
@@ -31,6 +32,7 @@ import { metadata as solutions } from "@/app/(site)/solutions/page";
 const PAGES: Record<string, Metadata> = {
   "/": home,
   "/a-propos": aPropos,
+  "/connexion": connexion,
   "/estimer": estimer,
   "/observatoire": observatoire,
   "/observatoire/comparables": comparables,
@@ -115,6 +117,7 @@ describe("les métadonnées de page", () => {
 
   it("gardent hors index les pages qui doivent l'être", () => {
     for (const path of [
+      "/connexion",
       "/observatoire/comparables",
       "/solutions",
       "/solutions/automatisation",

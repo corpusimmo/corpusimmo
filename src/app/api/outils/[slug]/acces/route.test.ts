@@ -80,11 +80,10 @@ describe("POST /api/outils/[slug]/acces", () => {
       purpose: "marketing",
       granted: false,
       source: `outil:${SLUG}`,
-      // PLUS DE SESSION, DONC PLUS D'ADRESSE. Le corps de la requête ne porte
-      // que le consentement : le refus est enregistré sans identité, rattaché
-      // au seul compte de navigateur. L'adresse reviendra quand la connexion
-      // sera refaite.
-      email: null,
+      // L'adresse part telle que la session la donne : la mise en minuscules
+      // est faite une seule fois, par `normaliseEmail`, juste avant l'écriture
+      // (voir `src/lib/db/scopes.ts`).
+      email: "Mathieu@Example.FR",
       userId: "44444444-4444-4444-8444-444444444444",
     });
 

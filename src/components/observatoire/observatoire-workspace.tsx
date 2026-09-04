@@ -109,9 +109,11 @@ export function ObservatoireWorkspace() {
             </Button>
           )}
           {/*
-            Vers `/observatoire/comparables` : la sélection est publique et
-            montre déjà les statistiques. C'est de là que partira la porte du
-            compte quand la connexion sera refaite.
+            Vers `/observatoire/comparables`, PAS vers la valorisation du
+            workspace : l'observatoire est public, et envoyer un visiteur sans
+            session sur un écran protégé produirait une redirection sèche vers
+            `/connexion`. La sélection publique montre déjà les statistiques ;
+            c'est depuis elle que la porte du compte se présente, expliquée.
           */}
           <Button
             variant={basketCount > 0 ? "primary" : "outline"}

@@ -5,7 +5,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 import type { Charte } from "@/lib/brand/charte";
 import { CHARTE_CORPUSIMMO } from "@/lib/brand/charte";
 import { DOCUMENT_KINDS, documentKind, sectionsFor } from "@/lib/generators/documents";
-import { buildPptx } from "./pptx";
+import { buildPptx, piedTexte } from "./pptx";
 
 /* ── Relire ce qu'on a écrit ─────────────────────────────────────────────── */
 
@@ -180,7 +180,7 @@ describe("l'archive produite", () => {
     );
 
     const ids = [...presentation.getElementsByTagName("p:sldId")];
-    expect(ids.length).toBe(1 + sectionsFor(AVIS).length);
+    expect(ids.length).toBe(sectionsFor(AVIS).length + 3);
     for (const id of ids) {
       // 256 est le premier identifiant admis : en dessous, le fichier est refusé.
       expect(Number(id.getAttribute("id"))).toBeGreaterThanOrEqual(256);
@@ -201,20 +201,40 @@ describe("l'archive produite", () => {
 
 describe("les diapositives suivent la taxonomie", () => {
   it.each(DOCUMENT_KINDS.map((kind) => [kind.id, kind] as const))(
-    "%s : une diapositive de titre puis une par section",
+    "%s : couverture, sommaire, les sections, puis le contact",
     async (_id, kind) => {
       const parties = lireZip(await octets(buildPptx(kind, CHARTE_CLIENT)));
       const sections = sectionsFor(kind);
 
       const diapos = [...parties.keys()].filter((n) => /^ppt\/slides\/slide\d+\.xml$/.test(n));
-      expect(diapos.length).toBe(1 + sections.length);
+      // Deux pages de cadre en tête, une de contact en queue.
+      expect(diapos.length).toBe(sections.length + 3);
 
+      // Le sommaire annonce TOUTES les sections, et dans l'ordre : un sommaire
+      // qui en oublie une est pire qu'aucun sommaire.
+      const sommaire = parties.get("ppt/slides/slide2.xml")!;
+      for (const section of sections) {
+        expect(sommaire, `sommaire, ${section.id}`).toContain(section.label);
+      }
+
+      // Les sections commencent à la troisième diapositive.
       for (const [index, section] of sections.entries()) {
-        const contenu = parties.get(`ppt/slides/slide${index + 2}.xml`)!;
+        const contenu = parties.get(`ppt/slides/slide${index + 3}.xml`)!;
         expect(contenu, `section ${section.id}`).toContain(`<a:t>${section.label}</a:t>`);
       }
     },
   );
+
+  it("numérote chaque page sur le même total", async () => {
+    const parties = lireZip(await octets(buildPptx(AVIS, CHARTE_CLIENT)));
+    const total = sectionsFor(AVIS).length + 3;
+
+    for (let rang = 2; rang <= total; rang += 1) {
+      const contenu = parties.get(`ppt/slides/slide${rang}.xml`)!;
+      const attendu = `${String(rang).padStart(2, "0")} / ${String(total).padStart(2, "0")}`;
+      expect(contenu, `page ${rang}`).toContain(attendu);
+    }
+  });
 
   it("un teaser ne reçoit pas les sections que ses champs interdits vident", async () => {
     // Le libellé n'est pas recopié ici : la taxonomie peut le réécrire, et un
@@ -314,18 +334,100 @@ describe("le pied de page", () => {
 /* ── Aucun contenu rédigé ────────────────────────────────────────────────── */
 
 describe("les zones restent vides", () => {
+  /**
+   * LA PROMESSE : aucune phrase que le professionnel n'a pas écrite.
+   *
+   * Le test comptait autrefois les textes, deux par diapositive, ce qui ne
+   * tenait plus dès qu'une section reçut des en-têtes de tableau ou des
+   * libellés d'indicateurs. Compter n'était de toute façon qu'un approximatif
+   * de ce qui compte vraiment : que tout texte présent vienne du VOCABULAIRE
+   * de la taxonomie, jamais d'une rédaction.
+   *
+   * On vérifie donc l'appartenance, pas le nombre. Un « Lorem ipsum », un
+   * exemple de rent roll ou une valeur inventée échouerait, quel que soit le
+   * nombre de zones de la diapositive.
+   */
   it("ne pose ni texte d'exemple ni faux contenu", async () => {
     const parties = lireZip(await octets(buildPptx(AVIS, CHARTE_CLIENT)));
-    const sections = new Set(sectionsFor(AVIS).map((s) => s.label));
+    const sections = sectionsFor(AVIS);
+    const total = sections.length + 3;
+
+    const admis = new Set<string>([piedTexte(CHARTE_CLIENT)]);
+    for (const [index, section] of sections.entries()) {
+      admis.add(section.label);
+      // Le sommaire préfixe le libellé du rang de sa page.
+      admis.add(`${String(index + 3).padStart(2, "0")}   ${section.label}`);
+      for (const v of section.volets ?? []) admis.add(v);
+      for (const c of section.colonnes ?? []) admis.add(c);
+      for (const i of section.indicateurs ?? []) admis.add(i);
+    }
+    admis.add("Sommaire");
+    for (let rang = 1; rang <= total; rang += 1) {
+      admis.add(`${String(rang).padStart(2, "0")} / ${String(total).padStart(2, "0")}`);
+    }
 
     for (const [nom, contenu] of parties) {
-      if (!/^ppt\/slides\/slide[2-9]\d*\.xml$/.test(nom)) continue;
-      const textes = [...xml(contenu, nom).getElementsByTagName("a:t")].map(
-        (t) => t.textContent ?? "",
-      );
-      // Deux textes seulement par diapositive de section : son titre, et le pied.
-      expect(textes.length, nom).toBe(2);
-      expect(sections.has(textes[0]!), `${nom} : ${textes[0]}`).toBe(true);
+      // La couverture porte le nom du document et celui du cabinet, la
+      // dernière page le contact : elles ont leur propre vocabulaire.
+      if (!/^ppt\/slides\/slide\d+\.xml$/.test(nom)) continue;
+      const rang = Number(nom.match(/slide(\d+)\.xml/)![1]);
+      if (rang === 1 || rang === total) continue;
+
+      for (const noeud of xml(contenu, nom).getElementsByTagName("a:t")) {
+        const texte = (noeud.textContent ?? "").trim();
+        if (!texte) continue;
+        expect(admis.has(texte), `${nom} : « ${texte} » n'est pas du vocabulaire`).toBe(true);
+      }
     }
+  });
+});
+
+/* ── Les notes ───────────────────────────────────────────────────────────── */
+
+describe("les pages de notes", () => {
+  it("accompagnent chaque diapositive, une pour une", async () => {
+    const parties = lireZip(await octets(buildPptx(AVIS, CHARTE_CLIENT)));
+    const total = sectionsFor(AVIS).length + 3;
+
+    for (let rang = 1; rang <= total; rang += 1) {
+      expect(parties.has(`ppt/notesSlides/notesSlide${rang}.xml`), `notes ${rang}`).toBe(true);
+      const rels = parties.get(`ppt/slides/_rels/slide${rang}.xml.rels`)!;
+      expect(rels, `renvoi de la diapositive ${rang}`).toContain(
+        `notesSlides/notesSlide${rang}.xml`,
+      );
+    }
+  });
+
+  it("portent le mode d'emploi de la section", async () => {
+    const parties = lireZip(await octets(buildPptx(AVIS, CHARTE_CLIENT)));
+
+    for (const [index, section] of sectionsFor(AVIS).entries()) {
+      if (!section.attendu) continue;
+      const notes = parties.get(`ppt/notesSlides/notesSlide${index + 3}.xml`)!;
+      const doc = xml(notes, `notesSlide${index + 3}`);
+      const textes = [...doc.getElementsByTagName("a:t")].map((t) => t.textContent);
+      expect(textes, `notes de ${section.id}`).toContain(section.attendu);
+    }
+  });
+
+  /**
+   * LA CONSIGNE NE DOIT JAMAIS ATTERRIR SUR LA PAGE.
+   *
+   * C'est tout l'intérêt de la mettre en notes : un texte d'aide posé sur la
+   * diapositive est un texte d'aide qu'on oublie d'effacer, et qui part chez
+   * le client sous la signature du professionnel.
+   */
+  it("ne laissent aucune consigne sur les diapositives", async () => {
+    const parties = lireZip(await octets(buildPptx(AVIS, CHARTE_CLIENT)));
+    const diapos = [...parties.entries()]
+      .filter(([nom]) => /^ppt\/slides\/slide\d+\.xml$/.test(nom))
+      .map(([, contenu]) => contenu)
+      .join("");
+
+    for (const section of sectionsFor(AVIS)) {
+      if (!section.attendu) continue;
+      expect(diapos, `consigne de ${section.id}`).not.toContain(section.attendu);
+    }
+    expect(diapos).not.toContain(AVIS.pitfall);
   });
 });

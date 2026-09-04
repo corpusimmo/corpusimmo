@@ -91,10 +91,18 @@ export default async function GenerateursPage() {
               </Badge>
             </div>
             <p className="text-sm leading-relaxed text-ink-muted">
-              Un document structuré, à vos couleurs et à votre logo, avec les
-              sections que vous cochez et les chiffres déjà calculés. Vous
-              gardez la main sur la rédaction, ce que préfèrent la plupart des
-              professionnels expérimentés.
+              Un dossier complet à vos couleurs&nbsp;: couverture, sommaire,
+              une page par section dans l&apos;ordre de la pratique française,
+              et le contact pour finir. Chaque page arrive avec la forme que son
+              contenu demande, tableau pour un rent roll, deux volets pour des
+              forces et des faiblesses, pavés d&apos;indicateurs pour une
+              synthèse de marché.
+            </p>
+            <p className="text-sm leading-relaxed text-ink-muted">
+              Et chaque page porte ses notes&nbsp;: ce qu&apos;on y attend, dans
+              quel ordre, et le piège du document. Les zones, elles, restent
+              vides. Vous gardez la main sur la rédaction, ce que préfèrent la
+              plupart des professionnels expérimentés.
             </p>
           </article>
 

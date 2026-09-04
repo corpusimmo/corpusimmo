@@ -165,19 +165,97 @@ export interface DocumentKind {
  */
 const S = {
   /* Cadre et responsabilité */
-  avertissement: { id: "avertissement", label: "Avertissement et confidentialité", defaultOn: true },
-  mission: { id: "mission", label: "Objet et contexte de la mission", defaultOn: true },
-  bases: { id: "bases", label: "Bases et limites de l'avis", defaultOn: true },
-  perimetre: { id: "perimetre", label: "Objet et périmètre de l'étude", defaultOn: true },
-  methodologie: { id: "methodologie", label: "Méthodologie et sources", defaultOn: true },
+  avertissement: {
+    id: "avertissement",
+    label: "Avertissement et confidentialité",
+    defaultOn: true,
+    gabarit: "legal",
+    attendu:
+      "La clause de confidentialité et la limitation de responsabilité, dans les termes de votre cabinet. Dites que le document ne vaut ni offre ni engagement, et à qui il ne doit pas être transmis.",
+  },
+  mission: {
+    id: "mission",
+    label: "Objet et contexte de la mission",
+    defaultOn: true,
+    attendu:
+      "Qui commande, pour quel usage, à quelle date de valeur, et sur quel périmètre. L'usage compte : une valeur pour un partage ne se rédige pas comme une valeur pour une mise en vente.",
+  },
+  bases: {
+    id: "bases",
+    label: "Bases et limites de l'avis",
+    defaultOn: true,
+    gabarit: "legal",
+    attendu:
+      "Les hypothèses retenues, les pièces reçues, ce que vous n'avez PAS vérifié, et les limites qui en découlent. C'est cette section qui borne votre responsabilité : elle se rédige avant les autres, pas après.",
+  },
+  perimetre: {
+    id: "perimetre",
+    label: "Objet et périmètre de l'étude",
+    defaultOn: true,
+    attendu:
+      "Le territoire couvert, les segments retenus, la période observée, et ce qui est explicitement hors champ.",
+  },
+  methodologie: {
+    id: "methodologie",
+    label: "Méthodologie et sources",
+    defaultOn: true,
+    volets: ["Méthodes employées", "Sources et millésimes"],
+    gabarit: "colonnes",
+    attendu:
+      "Les méthodes et les sources, DVF comprise, avec leur millésime. Une source sans date se retourne contre celui qui la cite.",
+  },
 
   /* L'actif */
-  synthese: { id: "synthese", label: "Synthèse de l'opportunité", defaultOn: true },
-  designation: { id: "designation", label: "Désignation du bien", defaultOn: true },
-  bien: { id: "bien", label: "Description de l'actif", defaultOn: true },
-  prestations: { id: "prestations", label: "Prestations et équipements", defaultOn: false },
-  photos: { id: "photos", label: "Photographies et plans", defaultOn: true },
-  localisation: { id: "localisation", label: "Situation géographique et accessibilité", defaultOn: true },
+  synthese: {
+    id: "synthese",
+    label: "Synthèse de l'opportunité",
+    defaultOn: true,
+    gabarit: "chiffres",
+    indicateurs: ["Typologie", "Surface", "Secteur", "Disponibilité"],
+    attendu:
+      "Les quatre repères qu'un investisseur lit en premier, puis trois lignes qui disent pourquoi ce dossier mérite la suite. Rien qui identifie l'actif si le document est anonyme.",
+  },
+  designation: {
+    id: "designation",
+    label: "Désignation du bien",
+    defaultOn: true,
+    attendu:
+      "L'identification cadastrale et juridique : références de parcelle, lots, tantièmes, nature. C'est la section que reprendra le notaire.",
+  },
+  bien: {
+    id: "bien",
+    label: "Description de l'actif",
+    defaultOn: true,
+    gabarit: "colonnes",
+    volets: ["Descriptif", "Points forts"],
+    attendu:
+      "À gauche ce qui est vérifiable et se mesure, à droite ce qui se plaide. Ne mélangez pas les deux : un comité d'engagement fait le tri lui-même, et il le fait à votre défaveur.",
+  },
+  prestations: {
+    id: "prestations",
+    label: "Prestations et équipements",
+    defaultOn: false,
+    gabarit: "colonnes",
+    volets: ["Équipements", "État et entretien"],
+    attendu:
+      "Chauffage, ascenseur, sécurité, réseaux, stationnement, et leur état réel avec l'année de la dernière intervention.",
+  },
+  photos: {
+    id: "photos",
+    label: "Photographies et plans",
+    defaultOn: true,
+    gabarit: "image",
+    attendu:
+      "Une vue par page, légendée. Sur un document anonyme, écartez toute prise de vue où une plaque de rue, une enseigne ou un numéro reste lisible.",
+  },
+  localisation: {
+    id: "localisation",
+    label: "Situation géographique et accessibilité",
+    defaultOn: true,
+    gabarit: "image",
+    attendu:
+      "Un plan de situation et une vue du quartier. Sur un teaser, restez à l'échelle du secteur : un plan trop zoomé désigne l'immeuble.",
+  },
 
   /* Ce que nos moteurs alimentent */
   environnement: {
@@ -185,47 +263,299 @@ const S = {
     label: "Environnement, transports et commodités",
     defaultOn: true,
     computed: true,
+    gabarit: "colonnes",
+    volets: ["Transports et accès", "Commodités et services"],
+    attendu:
+      "Alimenté par nos moteurs : arrêts, lignes et temps d'accès d'un côté, équipements et services de l'autre. À contrôler, pas à rédiger.",
   },
-  urbanisme: { id: "urbanisme", label: "Situation urbanistique et zonage", defaultOn: false, computed: true },
-  risques: { id: "risques", label: "Risques et contraintes du site", defaultOn: false, computed: true },
-  marche: { id: "marche", label: "Analyse du marché local", defaultOn: true, computed: true },
-  comparables: { id: "comparables", label: "Références de comparaison (DVF)", defaultOn: true, computed: true },
-  offreDemande: { id: "offre-demande", label: "Offre, demande et absorption", defaultOn: true, computed: true },
-  valeurs: { id: "valeurs", label: "Prix, loyers et rendements", defaultOn: true, computed: true },
+  urbanisme: {
+    id: "urbanisme",
+    label: "Situation urbanistique et zonage",
+    defaultOn: false,
+    computed: true,
+    attendu:
+      "Zonage applicable, servitudes repérées, droits à construire résiduels. Calculé, puis confirmé par une lecture du règlement de la commune.",
+  },
+  risques: {
+    id: "risques",
+    label: "Risques et contraintes du site",
+    defaultOn: false,
+    computed: true,
+    gabarit: "tableau",
+    colonnes: ["Aléa", "Niveau", "Source", "Conséquence pour l'actif"],
+    attendu:
+      "Repris de Géorisques. La colonne de droite est la vôtre : un aléa sans conséquence énoncée n'informe personne et inquiète tout le monde.",
+  },
+  marche: {
+    id: "marche",
+    label: "Analyse du marché local",
+    defaultOn: true,
+    computed: true,
+    gabarit: "chiffres",
+    indicateurs: [
+      "Médiane au m²",
+      "Ventes sur 12 mois",
+      "Évolution annuelle",
+      "Dispersion",
+    ],
+    attendu:
+      "Calculé sur les mutations enregistrées. Dites toujours sur combien de ventes porte la médiane : une médiane sur onze ventes n'a pas le poids d'une médiane sur six cents.",
+  },
+  comparables: {
+    id: "comparables",
+    label: "Références de comparaison (DVF)",
+    defaultOn: true,
+    computed: true,
+    gabarit: "tableau",
+    colonnes: ["Date", "Adresse", "Type", "Surface", "Prix", "€/m²"],
+    attendu:
+      "Les ventes retenues, telles qu'enregistrées. Ajoutez sous le tableau ce que vous avez ÉCARTÉ et pourquoi : c'est ce qui rend l'avis contrôlable.",
+  },
+  offreDemande: {
+    id: "offre-demande",
+    label: "Offre, demande et absorption",
+    defaultOn: true,
+    computed: true,
+    gabarit: "chiffres",
+    indicateurs: [
+      "Offre disponible",
+      "Ventes sur 12 mois",
+      "Délai d'absorption",
+      "Tension",
+    ],
+    attendu:
+      "Le rapport entre ce qui est à vendre et ce qui se vend. C'est cette section qui justifie un délai de commercialisation annoncé.",
+  },
+  valeurs: {
+    id: "valeurs",
+    label: "Prix, loyers et rendements",
+    defaultOn: true,
+    computed: true,
+    gabarit: "tableau",
+    colonnes: ["Segment", "Prix au m²", "Loyer au m²/an", "Rendement"],
+    attendu:
+      "Une ligne par segment observé. Précisez si les loyers sont hors droit de bail et hors charges : sans cela le rendement n'est pas comparable.",
+  },
 
   /* Exploitation et finance */
-  locative: { id: "locative", label: "Situation locative et occupation", defaultOn: true },
-  baux: { id: "baux", label: "Baux, rent roll et échéancier", defaultOn: true },
-  financier: { id: "financier", label: "Analyse financière et flux", defaultOn: true },
-  charges: { id: "charges", label: "Charges et travaux à venir", defaultOn: false },
-  fiscal: { id: "fiscal", label: "Régime fiscal", defaultOn: false },
+  locative: {
+    id: "locative",
+    label: "Situation locative et occupation",
+    defaultOn: true,
+    attendu:
+      "Occupé ou libre, taux d'occupation, vacance et son ancienneté. Un immeuble loué et le même immeuble vide ne se valorisent pas de la même façon.",
+  },
+  baux: {
+    id: "baux",
+    label: "Baux, rent roll et échéancier",
+    defaultOn: true,
+    gabarit: "tableau",
+    colonnes: [
+      "Locataire",
+      "Surface",
+      "Loyer annuel",
+      "Échéance",
+      "Indexation",
+    ],
+    attendu:
+      "Le rent roll, ligne par ligne, plus les échéances triennales. C'est la pièce la plus lue d'un mémorandum, et la plus vérifiée.",
+  },
+  financier: {
+    id: "financier",
+    label: "Analyse financière et flux",
+    defaultOn: true,
+    gabarit: "tableau",
+    colonnes: ["Poste", "N-1", "N", "N+1"],
+    attendu:
+      "Revenus, charges, résultat d'exploitation, et les flux projetés avec leurs hypothèses écrites en dessous. Une projection sans hypothèses affichées ne vaut rien.",
+  },
+  charges: {
+    id: "charges",
+    label: "Charges et travaux à venir",
+    defaultOn: false,
+    gabarit: "tableau",
+    colonnes: ["Poste", "Montant annuel", "Récupérable", "Échéance"],
+    attendu:
+      "Charges d'exploitation et travaux votés ou prévisibles. Distinguez le récupérable du non récupérable : c'est ce qui sépare le loyer facial du revenu net.",
+  },
+  fiscal: {
+    id: "fiscal",
+    label: "Régime fiscal",
+    defaultOn: false,
+    attendu:
+      "Régime applicable, TVA, droits d'enregistrement, dispositifs en cours. Renvoyez au conseil du client : on expose, on ne conseille pas.",
+  },
 
   /* Diligences */
-  technique: { id: "technique", label: "État technique et diagnostics", defaultOn: false },
-  juridique: { id: "juridique", label: "Situation juridique et administrative", defaultOn: false },
+  technique: {
+    id: "technique",
+    label: "État technique et diagnostics",
+    defaultOn: false,
+    gabarit: "tableau",
+    colonnes: ["Diagnostic", "Date", "Résultat", "Validité"],
+    attendu:
+      "Les diagnostics au dossier, avec leur date et leur validité. Un diagnostic périmé se signale comme périmé, il ne se tait pas.",
+  },
+  juridique: {
+    id: "juridique",
+    label: "Situation juridique et administrative",
+    defaultOn: false,
+    attendu:
+      "Propriété, servitudes, copropriété, procédures en cours, autorisations. Ce qui est en litige se dit ici, pas en annexe.",
+  },
 
   /* Conclusion */
-  methode: { id: "methode", label: "Méthodes d'évaluation retenues", defaultOn: true },
-  valeur: { id: "valeur", label: "Valeur retenue et fourchette", defaultOn: true },
-  conclusion: { id: "conclusion", label: "Conclusion et signature", defaultOn: true },
-  syntheseMarche: { id: "synthese-marche", label: "Synthèse, forces et faiblesses", defaultOn: true },
+  methode: {
+    id: "methode",
+    label: "Méthodes d'évaluation retenues",
+    defaultOn: true,
+    gabarit: "colonnes",
+    volets: ["Méthode retenue", "Pourquoi elle s'applique ici"],
+    attendu:
+      "Comparaison, capitalisation, bilan promoteur : dites laquelle vous retenez ET pourquoi les autres ont été écartées sur ce bien précis.",
+  },
+  valeur: {
+    id: "valeur",
+    label: "Valeur retenue et fourchette",
+    defaultOn: true,
+    gabarit: "chiffres",
+    indicateurs: [
+      "Valeur retenue",
+      "Fourchette basse",
+      "Fourchette haute",
+      "Au m² retenu",
+    ],
+    attendu:
+      "La valeur, sa fourchette, et la date de valeur. Une fourchette large est honnête quand le marché est mince : c'est le texte qui l'explique, pas la fourchette qui se resserre.",
+  },
+  conclusion: {
+    id: "conclusion",
+    label: "Conclusion et signature",
+    defaultOn: true,
+    attendu:
+      "Le rappel de la valeur, la date, le nom, la qualité et la signature de celui qui engage sa responsabilité. Sans qualité affichée, l'avis ne vaut rien.",
+  },
+  syntheseMarche: {
+    id: "synthese-marche",
+    label: "Synthèse, forces et faiblesses",
+    defaultOn: true,
+    gabarit: "colonnes",
+    volets: ["Forces", "Faiblesses"],
+    attendu:
+      "Deux colonnes honnêtes. Un dossier sans faiblesse énoncée se lit comme un dossier mal instruit.",
+  },
 
   /* Commercialisation */
-  besoin: { id: "besoin", label: "Compréhension du besoin", defaultOn: true },
-  agence: { id: "agence", label: "Présentation du cabinet et de l'équipe", defaultOn: true },
-  references: { id: "references", label: "Références et transactions récentes", defaultOn: true },
-  positionnement: { id: "positionnement", label: "Positionnement prix conseillé", defaultOn: true },
-  plan: { id: "plan", label: "Stratégie et plan de commercialisation", defaultOn: true },
-  moyens: { id: "moyens", label: "Moyens de diffusion et marketing", defaultOn: true },
-  reporting: { id: "reporting", label: "Reporting et suivi du mandat", defaultOn: false },
-  honoraires: { id: "honoraires", label: "Honoraires et conditions", defaultOn: false },
-  calendrier: { id: "calendrier", label: "Calendrier", defaultOn: false },
+  besoin: {
+    id: "besoin",
+    label: "Compréhension du besoin",
+    defaultOn: true,
+    attendu:
+      "Ce que le client vous a dit, reformulé dans ses mots. C'est la page qui décide de la suite : elle prouve que vous avez écouté avant de proposer.",
+  },
+  agence: {
+    id: "agence",
+    label: "Présentation du cabinet et de l'équipe",
+    defaultOn: true,
+    gabarit: "colonnes",
+    volets: ["Le cabinet", "L'équipe dédiée"],
+    attendu:
+      "Qui vous êtes, et surtout QUI travaillera sur ce mandat, avec son rôle. Une plaquette d'agence sans visage se lit comme une plaquette d'agence.",
+  },
+  references: {
+    id: "references",
+    label: "Références et transactions récentes",
+    defaultOn: true,
+    gabarit: "tableau",
+    colonnes: ["Bien", "Secteur", "Surface", "Délai de vente", "Année"],
+    attendu:
+      "Vos ventes comparables à celle-ci. Le délai est la colonne qui convainc : un prix obtenu sans le temps qu'il a fallu ne prouve rien.",
+  },
+  positionnement: {
+    id: "positionnement",
+    label: "Positionnement prix conseillé",
+    defaultOn: true,
+    gabarit: "chiffres",
+    indicateurs: [
+      "Prix conseillé",
+      "Fourchette",
+      "Au m²",
+      "Délai visé",
+    ],
+    attendu:
+      "Le prix que vous conseillez, appuyé sur la section des comparables. Si le client vise plus haut, écrivez-le ici avec la conséquence sur le délai.",
+  },
+  plan: {
+    id: "plan",
+    label: "Stratégie et plan de commercialisation",
+    defaultOn: true,
+    attendu:
+      "La cible d'acquéreurs, l'ordre d'approche, et le déroulé prévu semaine par semaine.",
+  },
+  moyens: {
+    id: "moyens",
+    label: "Moyens de diffusion et marketing",
+    defaultOn: true,
+    gabarit: "colonnes",
+    volets: ["Diffusion", "Supports et marketing"],
+    attendu:
+      "Où l'annonce paraît, sous quelle forme, et ce que vous produisez vous-même. Chiffrez ce qui est chiffrable.",
+  },
+  reporting: {
+    id: "reporting",
+    label: "Reporting et suivi du mandat",
+    defaultOn: false,
+    attendu:
+      "À quelle fréquence, sous quelle forme, et ce que le compte rendu contient. Un engagement de reporting est ce qui distingue un mandat d'une promesse.",
+  },
+  honoraires: {
+    id: "honoraires",
+    label: "Honoraires et conditions",
+    defaultOn: false,
+    gabarit: "tableau",
+    colonnes: ["Prestation", "Assiette", "Taux", "Montant"],
+    attendu:
+      "Ce qui est dû, sur quelle assiette, à quel moment, et qui le paie. Toute ambiguïté ici se paie plus tard.",
+  },
+  calendrier: {
+    id: "calendrier",
+    label: "Calendrier",
+    defaultOn: false,
+    gabarit: "tableau",
+    colonnes: ["Étape", "Responsable", "Échéance"],
+    attendu:
+      "Les jalons jusqu'à la signature, avec un responsable nommé pour chacun. Une étape sans responsable ne se tient pas.",
+  },
 
   /* Sortie */
-  conditions: { id: "conditions", label: "Conditions financières", defaultOn: true },
-  offre: { id: "offre", label: "Modalités de la consultation", defaultOn: true },
-  contact: { id: "contact", label: "Contact", defaultOn: true },
-  annexes: { id: "annexes", label: "Annexes", defaultOn: false },
+  conditions: {
+    id: "conditions",
+    label: "Conditions financières",
+    defaultOn: true,
+    attendu:
+      "Prix ou fourchette attendue, modalités, conditions particulières, et ce qui reste à négocier.",
+  },
+  offre: {
+    id: "offre",
+    label: "Modalités de la consultation",
+    defaultOn: true,
+    attendu:
+      "Comment remettre une offre, sous quel format, à quelle date limite, et ce qu'elle doit contenir pour être examinée.",
+  },
+  contact: {
+    id: "contact",
+    label: "Contact",
+    defaultOn: true,
+    attendu:
+      "Un interlocuteur nommé, sa ligne directe et son adresse. Un contact générique fait perdre les deux jours qui comptent.",
+  },
+  annexes: {
+    id: "annexes",
+    label: "Annexes",
+    defaultOn: false,
+    attendu:
+      "La liste des pièces jointes, numérotées, avec leur date. L'annexe qu'on ne peut pas nommer n'est pas jointe.",
+  },
 } as const satisfies Record<string, DocumentSection>;
 
 /* ── Le catalogue ────────────────────────────────────────────────────────── */

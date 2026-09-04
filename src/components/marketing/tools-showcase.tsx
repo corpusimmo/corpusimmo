@@ -33,6 +33,7 @@ const ENTRIES = [
   {
     href: "/estimer",
     icon: Scale,
+    kicker: "Estimation",
     title: "Estimer un bien",
     body: "Six questions, puis une fourchette calculée sur les ventes comparables du secteur, avec le détail de ce qui a été retenu et de ce qui a été écarté.",
     cta: "Lancer une estimation",
@@ -40,6 +41,7 @@ const ENTRIES = [
   {
     href: "/observatoire",
     icon: MapIcon,
+    kicker: "Cartographie",
     title: "L'observatoire",
     body: "La carte de toutes les mutations enregistrées, à l'échelle de la rue, et la même donnée augmentée : médianes au m², volumes, dispersion, table de recherche et sélection de comparables.",
     cta: "Explorer le marché",
@@ -47,6 +49,7 @@ const ENTRIES = [
   {
     href: "/prix-immobilier",
     icon: Building2,
+    kicker: "Références",
     title: "Le prix, commune par commune",
     body: "Cent communes documentées : médianes par type de bien, volumes, évolution entre deux millésimes, et le nombre de ventes qui fonde chaque chiffre.",
     cta: "Voir les communes",
@@ -54,6 +57,7 @@ const ENTRIES = [
   {
     href: "/outils",
     icon: Layers,
+    kicker: "Calculs",
     title: "Dix outils de calcul",
     body: "Rentabilité locative, coût réel d'un prêt, arbitrage fiscal, DCF sur dix ans, charge foncière, WAULT… avec les barèmes affichés et modifiables.",
     cta: "Voir les outils",
@@ -122,42 +126,66 @@ export function ToolsShowcase() {
         </p>
       </div>
 
-      {/* Quatre colonnes égales : une carte plus large que les autres laissait
-          un trou dans la grille à partir de 1024 px. L'entrée principale se
-          distingue par sa teinte et son filet, pas par sa taille. */}
-      <ul className="reveal-late mt-10 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {/*
+        PAS DE CARTES. C'est un choix, et le seul point de cette grille.
+
+        Quatre boîtes arrondies, ombrées, chacune ouverte par une icône dans
+        une pastille ronde et fermée par un lien fléché : c'est la composition
+        que tout générateur produit, et elle se reconnaît au premier coup
+        d'œil. Elle avait en plus un défaut mesurable ici, quatre éléments dans
+        une grille de trois colonnes laissant une case vide au dernier rang.
+
+        Ce qui la remplace est un SOMMAIRE, en deux colonnes qui tombent
+        juste. Chaque entrée s'ouvre sur un filet et son surtitre, qui dit sa
+        nature plutôt que de la décorer, et l'icône se retire à l'extrémité de
+        ce filet. Le filet est la seule chose qui bouge au survol : il passe à
+        l'accent et s'épaissit. Aucune ombre, aucun cadre, aucun fond.
+      */}
+      <ul className="reveal-late mt-12 grid gap-x-12 gap-y-12 md:grid-cols-2 md:gap-x-16">
         {ENTRIES.map((entry, index) => (
           <li key={entry.href}>
             <Link
               href={entry.href}
               className={
-                "group relative flex h-full flex-col gap-4 overflow-hidden rounded-lg border border-border p-7 shadow-sm transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md " +
-                (index === 0 ? "bg-surface-3" : "bg-surface")
+                // L'estimation est le chemin principal du site. Elle se
+                // distingue par son filet déjà à l'accent, pas par un fond ni
+                // une taille : les quatre entrées gardent le même poids.
+                "group flex h-full flex-col gap-3 border-t-2 pt-5 transition-colors duration-200 hover:border-accent-rule " +
+                (index === 0 ? "border-accent-rule" : "border-border")
               }
             >
-              <span
-                aria-hidden="true"
-                className={
-                  "absolute inset-x-0 top-0 h-0.5 origin-left bg-accent-rule transition-transform duration-300 ease-out group-hover:scale-x-100 " +
-                  (index === 0 ? "scale-x-100" : "scale-x-0")
-                }
-              />
-              <span className="grid size-11 place-items-center rounded-full bg-primary-soft text-primary">
-                <entry.icon aria-hidden="true" className="size-5" />
+              {/* Le surtitre, un filet de liaison, puis l'icône : la ligne dit
+                  la nature de l'entrée avant d'en dire le nom. */}
+              <span className="flex items-center gap-3">
+                <span
+                  className={
+                    "eyebrow-text transition-colors duration-200 group-hover:text-accent " +
+                    (index === 0 ? "text-accent" : "text-ink-subtle")
+                  }
+                >
+                  {entry.kicker}
+                </span>
+                <span
+                  aria-hidden="true"
+                  className="h-px flex-1 bg-border-strong/40"
+                />
+                <entry.icon
+                  aria-hidden="true"
+                  className="size-4 shrink-0 text-ink-subtle transition-colors duration-200 group-hover:text-accent"
+                />
               </span>
-              <div className="flex flex-1 flex-col gap-2">
-                <h3 className="font-display text-xl leading-snug text-ink">
-                  {entry.title}
-                </h3>
-                <p className="text-sm leading-relaxed text-ink-muted">
-                  {entry.body}
-                </p>
-              </div>
-              <span className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary">
+
+              <h3 className="font-display text-2xl leading-tight tracking-tight text-ink">
+                {entry.title}
+              </h3>
+              <p className="max-w-prose flex-1 text-sm leading-relaxed text-ink-muted">
+                {entry.body}
+              </p>
+              <span className="inline-flex items-center gap-1.5 pt-1 text-sm font-semibold text-primary">
                 {entry.cta}
                 <ArrowRight
                   aria-hidden="true"
-                  className="size-4 transition-transform group-hover:translate-x-0.5"
+                  className="size-4 transition-transform duration-200 group-hover:translate-x-1"
                 />
               </span>
             </Link>

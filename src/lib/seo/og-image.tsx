@@ -62,16 +62,35 @@ const GOLD_SOFT = "#f6efdf";
 const RESERVE = "#ffffff";
 
 /**
- * LA PHOTOGRAPHIE DE FOND, lue sur le disque au build et encodée en base64.
+ * LA PHOTOGRAPHIE DE FOND, encodée en base64, LUE PARESSEUSEMENT.
  *
  * Satori ne suit pas de chemin relatif : il lui faut une URL. Une URL absolue
  * vers le site rendrait le build dépendant du déploiement précédent, et une
  * requête réseau pendant un build est une panne qui attend son heure. Le
- * fichier pèse 142 Ko ; il est lu UNE fois, au chargement du module.
+ * fichier pèse 142 Ko et n'est lu qu'une fois, à la première image produite.
+ *
+ * POURQUOI PARESSEUSE, ET PAS À L'IMPORT. C'est la cause d'une panne qui a
+ * tenu longtemps. Ce module est importé bien au-delà des routes d'image :
+ * pour résoudre les métadonnées d'une page, Next charge le module
+ * `opengraph-image` voisin afin d'en lire la taille et le type. Sur une page
+ * PRÉ-RENDUE, cela se passe à la construction, où tout le dépôt est là. Sur
+ * une page rendue À LA DEMANDE, cela se passe dans la fonction déployée, où
+ * seuls les fichiers tracés existent, et `og-fond.jpg` n'est tracé que pour
+ * les routes d'image. La lecture au chargement du module levait alors ENOENT,
+ * le rendu des métadonnées échouait en silence, la page partait sans
+ * `<title>` et l'écran d'erreur prenait la main à l'hydratation.
+ *
+ * Différée, la lecture n'a plus lieu que là où le fichier est effectivement
+ * présent : dans la route qui produit l'image.
  */
-const PHOTO = `data:image/jpeg;base64,${readFileSync(
-  join(process.cwd(), "src/lib/seo/og-fond.jpg"),
-).toString("base64")}`;
+let photo: string | undefined;
+
+function photographie(): string {
+  photo ??= `data:image/jpeg;base64,${readFileSync(
+    join(process.cwd(), "src/lib/seo/og-fond.jpg"),
+  ).toString("base64")}`;
+  return photo;
+}
 
 /* -------------------------------------------------------------- typographie */
 
@@ -216,7 +235,7 @@ export function renderOgImage({
       {/* eslint-disable-next-line @next/next/no-img-element -- Satori compose
             hors navigateur : `next/image` n'a aucun sens ici. */}
       <img
-        src={PHOTO}
+        src={photographie()}
         width={width}
         height={height}
         alt=""

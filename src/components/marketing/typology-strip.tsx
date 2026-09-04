@@ -1,8 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
 
 import { AssetTypeIcon, type AssetIconName } from "@/components/illustrations";
+import { Button } from "@/components/ui";
 import {
   buildEstimatorHref,
   type PropertyUsage,
@@ -13,7 +13,17 @@ import {
  *
  * Le site refuse la porte « Particuliers / Professionnels » : ce bandeau est
  * ce qui la remplace. Neuf typologies, du studio à l'entrepôt, dans une seule
- * rangée, parce que c'est un seul corpus et une seule méthode.
+ * rangée, parce que c'est un seul corpus.
+ *
+ * CE NE SONT PAS DES BOUTONS, ET C'EST LE POINT. Chaque vignette a longtemps
+ * été un lien, avec sa flèche et sa pastille de couleur, ce qui promettait dix
+ * destinations. Il n'y en a jamais eu que deux : l'estimateur en résidentiel,
+ * l'estimateur en professionnel. Cliquer « Entrepôt » ouvrait exactement le
+ * même écran que cliquer « Bureaux ». Une flèche qui ne mène pas où elle a
+ * l'air de mener use la confiance pour rien.
+ *
+ * Les vignettes redeviennent donc ce qu'elles sont, des images légendées, et
+ * les deux vraies portes sont posées dessous, nommées.
  *
  * LES IMAGES SONT DES ILLUSTRATIONS, PAS DES BIENS. Elles sont générées d'après
  * les prompts de `docs/images.md`, sans adresse identifiable, sans texte, sans
@@ -124,19 +134,21 @@ export function TypologyStrip() {
       <div className="container-page pt-14 md:pt-20">
         <div className="reveal flex flex-col gap-5 md:flex-row md:items-end md:justify-between">
           <div className="max-w-2xl">
-            <p className="eyebrow">Un seul corpus</p>
+            <p className="eyebrow">Toutes les typologies</p>
             <h2
               id="typologies"
               className="mt-3 font-display text-3xl leading-tight text-ink md:text-4xl"
             >
-              Un logement, un commerce, un plateau de bureaux&nbsp;: la même
-              méthode
+              Un logement, un commerce, un plateau de bureaux&nbsp;: le même
+              corpus
             </h2>
             <p className="mt-4 leading-relaxed text-ink-muted">
-              DVF enregistre toutes les mutations, pas seulement les logements.
-              Le résidentiel et le professionnel vivent ici sous le même menu,
-              et l&apos;usage est une question posée dans l&apos;outil, jamais
-              une porte à l&apos;entrée.
+              DVF enregistre toutes les mutations, pas seulement les logements&nbsp;:
+              bureaux, commerces, entrepôts et terrains y figurent au même titre
+              qu&apos;un appartement. L&apos;usage se choisit au début de
+              l&apos;estimation, et la méthode suit&nbsp;: comparaison au mètre
+              carré pour un logement, approche par le revenu pour un actif
+              tertiaire, dont les ventes sont trop rares pour un prix au m².
             </p>
           </div>
           <p className="shrink-0 text-xs text-ink-subtle md:pb-1.5">
@@ -147,42 +159,51 @@ export function TypologyStrip() {
 
       {/* La rangée déborde du conteneur à droite, et démarre alignée sur la
           marge : le bord tronqué de la dernière carte dit qu'il y a une suite. */}
-      <div className="scroll-slim reveal-late mt-8 overflow-x-auto pb-14 md:pb-20">
+      <div className="scroll-slim reveal-late mt-8 overflow-x-auto pb-8">
         <ul className="container-page flex w-max snap-x snap-mandatory gap-4 pr-5 md:pr-8">
           {TYPOLOGIES.map((typology) => (
             <li
               key={typology.label}
               className="w-[15.5rem] shrink-0 snap-start md:w-[17rem]"
             >
-              <Link
-                href={buildEstimatorHref(null, typology.usage)}
-                className="group flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-xs transition-[transform,box-shadow,border-color] duration-200 ease-out hover:-translate-y-0.5 hover:border-border-strong hover:shadow-md"
-              >
+              <figure className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-xs">
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3">
                   <Image
                     src={typology.src}
                     alt={`Illustration : ${typology.illustration}.`}
                     fill
                     sizes="(min-width: 768px) 272px, 248px"
-                    className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.03]"
+                    className="object-cover"
                   />
                 </div>
-                <div className="flex items-center gap-3 px-4 py-3.5">
-                  <span className="grid size-9 shrink-0 place-items-center rounded-md bg-primary-soft text-primary">
-                    <AssetTypeIcon name={typology.icon} className="size-5" />
-                  </span>
-                  <span className="flex-1 font-display text-lg leading-tight text-ink">
+                <figcaption className="flex items-center gap-2.5 px-4 py-3.5">
+                  <AssetTypeIcon
+                    name={typology.icon}
+                    className="size-4 shrink-0 text-ink-subtle"
+                  />
+                  <span className="font-display text-lg leading-tight text-ink">
                     {typology.label}
                   </span>
-                  <ArrowRight
-                    aria-hidden="true"
-                    className="size-4 text-ink-subtle transition-transform group-hover:translate-x-0.5 group-hover:text-primary"
-                  />
-                </div>
-              </Link>
+                </figcaption>
+              </figure>
             </li>
           ))}
         </ul>
+      </div>
+
+      {/* Deux portes, parce qu'il y en a exactement deux : les deux branches
+          de l'estimateur, qui ne partagent pas la même méthode. */}
+      <div className="container-page flex flex-wrap gap-3 pb-14 md:pb-20">
+        <Button asChild>
+          <Link href={buildEstimatorHref(null, "residential")}>
+            Estimer un logement
+          </Link>
+        </Button>
+        <Button asChild variant="secondary">
+          <Link href={buildEstimatorHref(null, "professional")}>
+            Estimer un local professionnel
+          </Link>
+        </Button>
       </div>
     </section>
   );

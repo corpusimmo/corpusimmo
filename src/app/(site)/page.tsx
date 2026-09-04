@@ -130,13 +130,13 @@ export default function HomePage() {
                 id="methode"
                 className="mt-3 font-display text-3xl leading-tight text-ink md:text-4xl"
               >
-                Une estimation qu&apos;un professionnel peut contester ligne à
-                ligne
+                Une estimation dont vous pouvez montrer le calcul
               </h2>
               <p className="mt-4 leading-relaxed text-ink-muted">
-                Le moteur ne cherche pas la précision maximale&nbsp;: il cherche
-                à être défendable. À chaque étape, il préfère la méthode dont on
-                peut expliquer le comportement, et il l&apos;affiche.
+                Le moteur ne vise pas le chiffre le plus fin, mais celui qui
+                se justifie. À chaque étape, il retient la méthode dont on peut
+                expliquer le résultat, et il montre les ventes qu&apos;il a
+                gardées comme celles qu&apos;il a écartées.
               </p>
 
               <ol className="mt-8 flex flex-col divide-y divide-border-soft">

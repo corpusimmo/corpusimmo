@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter, Manrope, Source_Serif_4 } from "next/font/google";
+import { Inter, Outfit, Source_Serif_4 } from "next/font/google";
 
 import { Analytics } from "@/components/analytics/analytics";
 import { ConsentBanner } from "@/components/consent/consent-banner";
@@ -29,10 +29,18 @@ const inter = Inter({
   display: "swap",
 });
 
-const manrope = Manrope({
+/**
+ * OUTFIT porte les titres et la marque, à la place de Manrope.
+ *
+ * Un grotesque GÉOMÉTRIQUE : ses `o`, `e` et `p` sont bâtis sur le cercle,
+ * ce qui donne le mot-symbole net et contemporain visé pour la direction
+ * artistique. Manrope, plus humaniste et plus étroite, tirait la marque vers
+ * l'éditorial ; ce n'est plus ce qu'on cherche.
+ */
+const outfit = Outfit({
   subsets: ["latin"],
-  weight: ["600", "700", "800"],
-  variable: "--font-manrope",
+  weight: ["500", "600", "700", "800"],
+  variable: "--font-outfit",
   display: "swap",
 });
 
@@ -145,7 +153,7 @@ export default function RootLayout({
   return (
     <html
       lang="fr"
-      className={`${inter.variable} ${manrope.variable} ${sourceSerif.variable}`}
+      className={`${inter.variable} ${outfit.variable} ${sourceSerif.variable}`}
     >
       <body>
         {/* Les données structurées de SITE, posées une fois pour toutes les

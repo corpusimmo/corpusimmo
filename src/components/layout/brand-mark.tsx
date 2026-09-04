@@ -110,13 +110,16 @@ export function BrandLockup({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <BrandMark className={markClassName} tone={tone} />
-      {/* « Corpus » en encre, « Immo » en or. Sur fond sombre, l'or plein
-          (#8A6A2F) tomberait sous le seuil de contraste : le tirage en réserve
-          prend le filet clair, qui tient 4,5:1 sur le bleu nuit du pied de
-          page. */}
+      {/* « Corpus » en encre, « Immo » en bleu de marque.
+          PAS le bleu vif : à 18 px demi-gras, le mot-symbole n'est pas du
+          « grand texte » au sens des règles de contraste, et `--brand-500`
+          (#0082c3) plafonne à 4,22:1 sur blanc. On prend donc `--brand-600`
+          (5,92:1), qui reste franchement azur sans passer sous le seuil.
+          Sur fond sombre, c'est l'inverse : il faut monter dans la rampe,
+          d'où `--brand-300`. */}
       <span
         className={cn(
-          "font-display text-[1.125rem] font-semibold tracking-[-0.012em]",
+          "font-display text-[1.125rem] font-semibold tracking-[-0.02em]",
           tone === "inverted" ? "text-ink-inverted" : "text-ink",
         )}
       >
@@ -124,8 +127,8 @@ export function BrandLockup({
         <span
           className={
             tone === "inverted"
-              ? "text-[color:var(--accent-rule)]"
-              : "text-accent"
+              ? "text-[color:var(--brand-300)]"
+              : "text-[color:var(--brand-600)]"
           }
         >
           {siteConfig.nameParts[1]}

@@ -41,6 +41,10 @@ const EMU_PAR_POUCE = 914_400;
 const LARGEUR = 12_192_000;
 const HAUTEUR = 6_858_000;
 
+/** La page de notes reste au A4 portrait des modèles Office : 7,5 x 10 pouces. */
+const NOTES_L = Math.round(7.5 * EMU_PAR_POUCE);
+const NOTES_H = Math.round(10 * EMU_PAR_POUCE);
+
 /** Trois quarts de pouce : la marge des modèles PowerPoint natifs. */
 const MARGE = Math.round(0.75 * EMU_PAR_POUCE);
 
@@ -53,6 +57,9 @@ const FILET = Math.round(0.05 * EMU_PAR_POUCE);
 /** Le pied tient sur une demi-ligne, posée à un demi-pouce du bord bas. */
 const PIED_HAUTEUR = Math.round(0.3 * EMU_PAR_POUCE);
 const PIED_Y = HAUTEUR - Math.round(0.5 * EMU_PAR_POUCE);
+
+/** Le retrait du texte dans sa forme : 0,15 pouce, comme les modèles Office. */
+const RETRAIT_TEXTE = Math.round(0.15 * EMU_PAR_POUCE);
 
 /**
  * Le gris du pied de page.
@@ -148,8 +155,14 @@ function rect(options: {
   trait?: Hex;
   textes?: Texte[];
   ancre?: "t" | "ctr";
+  /**
+   * Retrait interne à gauche et à droite, en EMU. Sert au bandeau, qui va
+   * d'un bord à l'autre de la diapositive mais dont le titre doit s'aligner
+   * sur la marge du reste de la page.
+   */
+  retrait?: number;
 }): string {
-  const { id, nom, zone, fond, trait, textes = [], ancre = "ctr" } = options;
+  const { id, nom, zone, fond, trait, textes = [], ancre = "ctr", retrait = RETRAIT_TEXTE } = options;
 
   const remplissage = fond
     ? `<a:solidFill><a:srgbClr val="${srgb(fond)}"/></a:solidFill>`
@@ -173,7 +186,7 @@ function rect(options: {
     bordure +
     "</p:spPr>" +
     "<p:txBody>" +
-    `<a:bodyPr wrap="square" lIns="137160" tIns="91440" rIns="137160" bIns="91440" anchor="${ancre}">` +
+    `<a:bodyPr wrap="square" lIns="${retrait}" tIns="91440" rIns="${retrait}" bIns="91440" anchor="${ancre}">` +
     "<a:normAutofit/></a:bodyPr><a:lstStyle/>" +
     corps +
     "</p:txBody>" +
@@ -386,6 +399,7 @@ function diapoSection(titre: string, charte: Charte): string {
         },
       ],
       ancre: "ctr",
+      retrait: MARGE,
     }) +
       rect({
         id: 3,
@@ -470,7 +484,7 @@ export function buildPptx(kind: DocumentKind, charte: Charte): Blob {
       .join("") +
     "</p:sldIdLst>" +
     `<p:sldSz cx="${LARGEUR}" cy="${HAUTEUR}"/>` +
-    `<p:notesSz cx="${HAUTEUR}" cy="${LARGEUR}"/>` +
+    `<p:notesSz cx="${NOTES_L}" cy="${NOTES_H}"/>` +
     "</p:presentation>";
 
   const presentationRels =

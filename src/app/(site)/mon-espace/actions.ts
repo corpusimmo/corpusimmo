@@ -19,7 +19,13 @@
 import { revalidatePath } from "next/cache";
 
 import { currentUserId } from "@/lib/auth/current-user";
-import { clearEstimations, forgetEstimation, upsertProfile } from "@/lib/db";
+import type { BrandInput } from "@/lib/db";
+import {
+  clearEstimations,
+  forgetEstimation,
+  upsertCharte,
+  upsertProfile,
+} from "@/lib/db";
 
 /** Borne de sûreté : un identifiant de ligne, rien d'autre. */
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -73,4 +79,37 @@ export async function saveProfileAction(values: {
     phone: trim(values.phone),
   });
   revalidatePath("/mon-espace");
+}
+
+/**
+ * Enregistre la charte graphique du compte.
+ *
+ * Elle passe par une action et non par une route d'API pour la même raison que
+ * le profil : le formulaire est rendu par le serveur, et une action revérifie
+ * la session sans exposer une URL de plus.
+ *
+ * Le champ vide vaut EFFACEMENT ici, contrairement à `undefined` côté base.
+ * C'est le comportement attendu d'un formulaire : on efface une couleur en
+ * vidant son champ. La distinction « ne pas toucher » sert aux appels
+ * partiels, pas à un écran qui renvoie toujours tous ses champs.
+ */
+export async function saveCharteAction(
+  input: BrandInput,
+): Promise<{ ok: boolean; message?: string }> {
+  const userId = await currentUserId();
+  if (!userId) return { ok: false, message: "Session expirée." };
+
+  const outcome = await upsertCharte(userId, input);
+  if (!outcome.stored) {
+    return {
+      ok: false,
+      message:
+        outcome.reason === "not_configured"
+          ? "L'enregistrement est indisponible pour le moment."
+          : "La charte n'a pas pu être enregistrée. Vérifiez les couleurs saisies.",
+    };
+  }
+
+  revalidatePath("/mon-espace");
+  return { ok: true };
 }

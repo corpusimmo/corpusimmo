@@ -84,6 +84,13 @@ export {
   type StoredProfile,
 } from "./profiles";
 
+export {
+  readBrandRow,
+  readCharte,
+  upsertCharte,
+  type BrandInput,
+} from "./brand";
+
 export { eraseUser, forgetEmail, purgeExpired } from "./erasure";
 
 export type { SavedComparable } from "../mappers";

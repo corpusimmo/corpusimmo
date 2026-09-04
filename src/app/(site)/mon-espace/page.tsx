@@ -217,6 +217,12 @@ export default async function MonEspacePage() {
 
           <div className="flex flex-wrap gap-3 pt-1">
             <Button asChild variant="secondary" size="sm">
+              <Link href="/mon-espace/charte">
+                Ma charte graphique
+                <ArrowRight aria-hidden="true" className="size-4" />
+              </Link>
+            </Button>
+            <Button asChild variant="secondary" size="sm">
               <Link href="/outils">
                 Parcourir la bibliothèque
                 <ArrowRight aria-hidden="true" className="size-4" />

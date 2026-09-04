@@ -20,6 +20,9 @@ export type { AccountRow, SessionRow, UserRow } from "./auth";
 export { userProfiles } from "./profiles";
 export type { UserProfileInsert, UserProfileRow } from "./profiles";
 
+export { brandProfiles } from "./brand";
+export type { BrandProfileInsert, BrandProfileRow } from "./brand";
+
 export { toolUnlocks } from "./unlocks";
 export type { ToolUnlockInsert, ToolUnlockRow } from "./unlocks";
 

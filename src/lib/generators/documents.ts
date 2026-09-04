@@ -101,39 +101,86 @@ export interface DocumentKind {
 
 /* ── Sections réutilisées ────────────────────────────────────────────────── */
 
+/**
+ * LE VOCABULAIRE ET L'ORDRE SONT CEUX DE LA PRATIQUE FRANÇAISE.
+ *
+ * Ce ne sont pas des rubriques inventées : ce sont celles qu'attend un
+ * investisseur, un notaire ou un comité d'engagement, dans l'ordre où ils les
+ * lisent. Deux conséquences pratiques.
+ *
+ * L'ORDRE EST UNE INFORMATION. Un mémorandum s'ouvre sur son avertissement de
+ * confidentialité et non sur l'actif ; un avis de valeur pose les BASES ET
+ * LIMITES de la mission avant de décrire quoi que ce soit, parce que c'est ce
+ * qui borne la responsabilité de celui qui signe. Déplacer ces sections en
+ * annexe transformerait un document professionnel en plaquette.
+ *
+ * `computed` MARQUE CE QUE NOS MOTEURS ALIMENTENT. C'est la frontière du
+ * produit : ces sections arrivent remplies de valeurs vérifiées, les autres
+ * viennent du formulaire et des pièces jointes. Une section calculée ne se
+ * rédige pas, elle se contrôle.
+ */
 const S = {
-  synthese: { id: "synthese", label: "Synthèse", defaultOn: true },
-  bien: { id: "bien", label: "Description du bien", defaultOn: true },
-  localisation: { id: "localisation", label: "Localisation et accès", defaultOn: true },
-  marche: {
-    id: "marche",
-    label: "Contexte de marché",
-    defaultOn: true,
-    computed: true,
-  },
-  comparables: {
-    id: "comparables",
-    label: "Ventes comparables (DVF)",
-    defaultOn: true,
-    computed: true,
-  },
+  /* Cadre et responsabilité */
+  avertissement: { id: "avertissement", label: "Avertissement et confidentialité", defaultOn: true },
+  mission: { id: "mission", label: "Objet et contexte de la mission", defaultOn: true },
+  bases: { id: "bases", label: "Bases et limites de l'avis", defaultOn: true },
+  perimetre: { id: "perimetre", label: "Objet et périmètre de l'étude", defaultOn: true },
+  methodologie: { id: "methodologie", label: "Méthodologie et sources", defaultOn: true },
+
+  /* L'actif */
+  synthese: { id: "synthese", label: "Synthèse de l'opportunité", defaultOn: true },
+  designation: { id: "designation", label: "Désignation du bien", defaultOn: true },
+  bien: { id: "bien", label: "Description de l'actif", defaultOn: true },
+  prestations: { id: "prestations", label: "Prestations et équipements", defaultOn: false },
+  photos: { id: "photos", label: "Photographies et plans", defaultOn: true },
+  localisation: { id: "localisation", label: "Situation géographique et accessibilité", defaultOn: true },
+
+  /* Ce que nos moteurs alimentent */
   environnement: {
     id: "environnement",
-    label: "Environnement et zonage",
-    defaultOn: false,
+    label: "Environnement, transports et commodités",
+    defaultOn: true,
     computed: true,
   },
-  valeur: { id: "valeur", label: "Fourchette de valeur", defaultOn: true },
-  methode: { id: "methode", label: "Méthode retenue", defaultOn: true },
-  baux: { id: "baux", label: "Baux et revenus", defaultOn: true },
-  technique: { id: "technique", label: "État technique", defaultOn: false },
-  juridique: { id: "juridique", label: "Situation juridique", defaultOn: false },
+  urbanisme: { id: "urbanisme", label: "Situation urbanistique et zonage", defaultOn: false, computed: true },
+  risques: { id: "risques", label: "Risques et contraintes du site", defaultOn: false, computed: true },
+  marche: { id: "marche", label: "Analyse du marché local", defaultOn: true, computed: true },
+  comparables: { id: "comparables", label: "Références de comparaison (DVF)", defaultOn: true, computed: true },
+  offreDemande: { id: "offre-demande", label: "Offre, demande et absorption", defaultOn: true, computed: true },
+  valeurs: { id: "valeurs", label: "Prix, loyers et rendements", defaultOn: true, computed: true },
+
+  /* Exploitation et finance */
+  locative: { id: "locative", label: "Situation locative et occupation", defaultOn: true },
+  baux: { id: "baux", label: "Baux, rent roll et échéancier", defaultOn: true },
+  financier: { id: "financier", label: "Analyse financière et flux", defaultOn: true },
+  charges: { id: "charges", label: "Charges et travaux à venir", defaultOn: false },
   fiscal: { id: "fiscal", label: "Régime fiscal", defaultOn: false },
-  agence: { id: "agence", label: "Présentation de l'agence", defaultOn: true },
-  references: { id: "references", label: "Références et mandats", defaultOn: true },
-  plan: { id: "plan", label: "Plan de commercialisation", defaultOn: true },
-  honoraires: { id: "honoraires", label: "Honoraires", defaultOn: false },
-  offre: { id: "offre", label: "Modalités de l'offre", defaultOn: true },
+
+  /* Diligences */
+  technique: { id: "technique", label: "État technique et diagnostics", defaultOn: false },
+  juridique: { id: "juridique", label: "Situation juridique et administrative", defaultOn: false },
+
+  /* Conclusion */
+  methode: { id: "methode", label: "Méthodes d'évaluation retenues", defaultOn: true },
+  valeur: { id: "valeur", label: "Valeur retenue et fourchette", defaultOn: true },
+  conclusion: { id: "conclusion", label: "Conclusion et signature", defaultOn: true },
+  syntheseMarche: { id: "synthese-marche", label: "Synthèse, forces et faiblesses", defaultOn: true },
+
+  /* Commercialisation */
+  besoin: { id: "besoin", label: "Compréhension du besoin", defaultOn: true },
+  agence: { id: "agence", label: "Présentation du cabinet et de l'équipe", defaultOn: true },
+  references: { id: "references", label: "Références et transactions récentes", defaultOn: true },
+  positionnement: { id: "positionnement", label: "Positionnement prix conseillé", defaultOn: true },
+  plan: { id: "plan", label: "Stratégie et plan de commercialisation", defaultOn: true },
+  moyens: { id: "moyens", label: "Moyens de diffusion et marketing", defaultOn: true },
+  reporting: { id: "reporting", label: "Reporting et suivi du mandat", defaultOn: false },
+  honoraires: { id: "honoraires", label: "Honoraires et conditions", defaultOn: false },
+  calendrier: { id: "calendrier", label: "Calendrier", defaultOn: false },
+
+  /* Sortie */
+  conditions: { id: "conditions", label: "Conditions financières", defaultOn: true },
+  offre: { id: "offre", label: "Modalités de la consultation", defaultOn: true },
+  contact: { id: "contact", label: "Contact", defaultOn: true },
   annexes: { id: "annexes", label: "Annexes", defaultOn: false },
 } as const satisfies Record<string, DocumentSection>;
 
@@ -152,7 +199,15 @@ export const DOCUMENT_KINDS: readonly DocumentKind[] = [
     notToConfuse:
       "Ce n'est pas une plaquette raccourcie : c'est un document anonyme par construction.",
     forbiddenFields: ["adresse", "proprietaire", "locataires", "diagnostics"],
-    sections: [S.synthese, S.bien, S.localisation, S.marche, S.offre],
+    sections: [
+      S.synthese,
+      S.bien,
+      S.localisation,
+      S.marche,
+      S.valeurs,
+      S.offre,
+      S.contact,
+    ],
     availability: "trame",
   },
   {
@@ -168,16 +223,24 @@ export const DOCUMENT_KINDS: readonly DocumentKind[] = [
       "Ce n'est pas un dossier de présentation étoffé : le niveau de détail engage la responsabilité de celui qui le transmet.",
     forbiddenFields: [],
     sections: [
+      S.avertissement,
       S.synthese,
+      S.designation,
       S.bien,
+      S.photos,
       S.localisation,
+      S.environnement,
       S.marche,
       S.comparables,
+      S.locative,
       S.baux,
+      S.financier,
+      S.charges,
       S.technique,
       S.juridique,
+      S.urbanisme,
+      S.risques,
       S.fiscal,
-      S.environnement,
       S.offre,
       S.annexes,
     ],
@@ -196,14 +259,19 @@ export const DOCUMENT_KINDS: readonly DocumentKind[] = [
       "L'expertise en évaluation immobilière obéit à une charte et à des qualifications propres. Le mot compte.",
     forbiddenFields: [],
     sections: [
-      S.synthese,
-      S.bien,
+      S.mission,
+      S.bases,
+      S.designation,
       S.localisation,
+      S.bien,
+      S.locative,
+      S.urbanisme,
+      S.risques,
       S.marche,
       S.comparables,
-      S.environnement,
       S.methode,
       S.valeur,
+      S.conclusion,
       S.annexes,
     ],
     availability: "trame",
@@ -220,13 +288,16 @@ export const DOCUMENT_KINDS: readonly DocumentKind[] = [
     forbiddenFields: ["proprietaire"],
     sections: [
       S.synthese,
-      S.bien,
       S.localisation,
+      S.bien,
+      S.photos,
+      S.prestations,
+      S.environnement,
+      S.locative,
       S.marche,
       S.comparables,
-      S.environnement,
-      S.baux,
-      S.offre,
+      S.conditions,
+      S.contact,
       S.annexes,
     ],
     availability: "trame",
@@ -242,11 +313,16 @@ export const DOCUMENT_KINDS: readonly DocumentKind[] = [
       "Ce document parle de VOUS, pas du bien : méthode, références, plan de commercialisation. L'erreur courante est d'y recopier la plaquette du bien.",
     forbiddenFields: ["baux", "locataires", "diagnostics"],
     sections: [
+      S.besoin,
       S.agence,
       S.references,
       S.marche,
       S.comparables,
+      S.positionnement,
       S.plan,
+      S.moyens,
+      S.reporting,
+      S.calendrier,
       S.honoraires,
     ],
     availability: "trame",
@@ -262,10 +338,16 @@ export const DOCUMENT_KINDS: readonly DocumentKind[] = [
       "Une étude de marché ne vaut que par ses sources. Chaque chiffre doit porter son origine et sa date : sans cela, c'est une opinion mise en pages.",
     forbiddenFields: ["proprietaire", "locataires"],
     sections: [
-      S.synthese,
+      S.perimetre,
+      S.methodologie,
+      S.localisation,
+      S.environnement,
+      S.offreDemande,
+      S.valeurs,
       S.marche,
       S.comparables,
-      S.environnement,
+      S.urbanisme,
+      S.syntheseMarche,
       S.annexes,
     ],
     availability: "trame",
@@ -305,9 +387,18 @@ export const CONFIDENTIALITY_LABELS: Record<
 export function sectionsFor(kind: DocumentKind): readonly DocumentSection[] {
   const blocked = new Set(kind.forbiddenFields);
   return kind.sections.filter((section) => {
-    if (section.id === "baux" && (blocked.has("baux") || blocked.has("locataires"))) {
+    if (
+      (section.id === "baux" || section.id === "locative") &&
+      (blocked.has("baux") || blocked.has("locataires"))
+    ) {
       return false;
     }
+    if (section.id === "photos" && blocked.has("adresse")) {
+      // Une façade photographiée identifie l'actif aussi sûrement qu'une
+      // adresse : sur un document anonyme, la section n'a pas lieu d'être.
+      return false;
+    }
+    if (section.id === "technique" && blocked.has("diagnostics")) return false;
     return true;
   });
 }

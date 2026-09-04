@@ -8,6 +8,13 @@
       "when": 1788283395080,
       "tag": "0000_socle_persistance",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1788503085058,
+      "tag": "0001_charte_graphique",
+      "breakpoints": true
     }
   ]
 }

@@ -3,6 +3,10 @@ import Link from "next/link";
 import { FileStack, Lock, Shield, Sparkles, Table2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { TelechargerTrame } from "@/components/generateurs/telecharger-trame";
+import { currentUserId } from "@/lib/auth/current-user";
+import { CHARTE_CORPUSIMMO } from "@/lib/brand/charte";
+import { readCharte } from "@/lib/db";
 import { pageMetadata } from "@/lib/seo/metadata";
 import {
   CONFIDENTIALITY_LABELS,
@@ -36,7 +40,20 @@ export const metadata: Metadata = pageMetadata({
  *    outil d'un habillage de modèle de langage, et ça doit se voir avant de
  *    cliquer.
  */
-export default function GenerateursPage() {
+/**
+ * La page lit la session pour connaître la charte à appliquer.
+ *
+ * `force-dynamic` en conséquence : mise en cache, elle servirait la charte
+ * d'un compte à un autre visiteur. Sans session, c'est celle de CorpusImmo,
+ * et le bouton produit quand même une trame : le générateur de trames ne
+ * demande pas de compte, seule la personnalisation en demande un.
+ */
+export const dynamic = "force-dynamic";
+
+export default async function GenerateursPage() {
+  const userId = await currentUserId();
+  const charte = userId ? await readCharte(userId) : CHARTE_CORPUSIMMO;
+
   return (
     <div className="bg-canvas pb-14">
       <header className="relative isolate overflow-hidden bg-primary">
@@ -69,8 +86,8 @@ export default function GenerateursPage() {
               <h2 className="font-display text-lg font-semibold text-ink">
                 Trames et modèles
               </h2>
-              <Badge tone="primary" size="sm">
-                Bientôt
+              <Badge tone="success" size="sm">
+                Disponible
               </Badge>
             </div>
             <p className="text-sm leading-relaxed text-ink-muted">
@@ -206,6 +223,15 @@ export default function GenerateursPage() {
                       </li>
                     ))}
                   </ul>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2 border-t border-border-soft pt-4">
+                  <TelechargerTrame kind={kind} charte={charte} />
+                  <span className="text-xs text-ink-subtle">
+                    {charte.parDefaut
+                      ? "Aux couleurs de CorpusImmo. Renseignez votre charte pour la vôtre."
+                      : `Aux couleurs de ${charte.entreprise}.`}
+                  </span>
                 </div>
               </li>
             );

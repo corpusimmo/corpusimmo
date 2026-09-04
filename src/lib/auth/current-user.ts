@@ -1,63 +1,42 @@
 import "server-only";
 
 /**
- * QUI EST CONNECTÉ, ET PEUT-ON S'EN SERVIR COMME CLÉ ÉTRANGÈRE ?
+ * L'AUTHENTIFICATION EST RETIRÉE, ET TOUT LE MONDE EST ANONYME.
  *
- * Ces deux questions n'ont pas la même réponse, et les confondre casse la
- * production.
+ * Ce module ne parle plus à aucun fournisseur : il rend `null`, toujours.
+ * Ce n'est pas un bouchon posé à la hâte, c'est le contrat que le reste du
+ * site respectait déjà.
  *
- * LE PIÈGE, RENCONTRÉ EN BRANCHANT LA BASE. La session est un jeton signé.
- * Avant que l'adaptateur n'existe, `sub` portait l'identifiant du compte
- * GOOGLE, une longue suite de chiffres. Depuis, il porte l'identifiant de la
- * ligne `users`, un UUID. Or les jetons déjà émis, eux, n'ont pas changé : ils
- * continuent de circuler avec l'ancienne valeur jusqu'à expiration.
+ * POURQUOI CE FICHIER SURVIT À LA SUPPRESSION. Une dizaine d'écrans et de
+ * routes demandent « qui est connecté ? » avant de décider s'ils lisent la
+ * base ou le navigateur : l'estimateur, les comparables, le quota des
+ * calculateurs, les ressources, les leads. Tous savent déjà répondre à `null`,
+ * puisque le site a toujours dû fonctionner sans compte. Garder la fonction et
+ * lui faire dire « personne » retire l'authentification en UN endroit, là où
+ * supprimer l'appel dans chaque fichier aurait été dix occasions de casser un
+ * chemin anonyme qui marchait.
  *
- * Passer cet ancien `sub` à une requête reviendrait à comparer une colonne
- * `uuid` à « 104857293847562930485 » : Postgres refuse, la page tombe en 500,
- * et elle ne tombe QUE pour les personnes déjà connectées avant la mise en
- * ligne. C'est-à-dire, précisément, les plus fidèles.
- *
- * D'où le garde-fou : un identifiant qui n'a pas la forme d'un UUID n'est pas
- * un identifiant de base, et la personne est traitée comme anonyme le temps que
- * son jeton se renouvelle. Elle retrouve tout à sa prochaine connexion, et rien
- * ne casse entre-temps.
+ * C'est aussi le point de rebranchement : le jour où la connexion revient, ce
+ * fichier redevient le seul à toucher, et tout le reste suit sans être
+ * modifié.
  */
-
-import { isDatabaseConfigured } from "@/lib/db";
-
-import { auth, isAuthConfigured } from "./index";
-import { isDatabaseUserId } from "./user-id";
 
 export { isDatabaseUserId } from "./user-id";
 
 /**
- * L'identifiant de la ligne `users` de la personne connectée, ou `null`.
+ * Personne n'est connecté, par construction.
  *
- * `null` couvre quatre situations qui appellent la même conduite, à savoir se
- * rabattre sur le navigateur : pas d'authentification configurée, pas de base,
- * personne connectée, ou un jeton antérieur à l'arrivée de la base.
+ * `Promise` conservée : les appelants l'attendent, et changer la signature
+ * obligerait à toucher chaque site d'appel pour un gain nul.
  */
-export async function currentUserId(): Promise<string | null> {
-  if (!isAuthConfigured || !isDatabaseConfigured()) return null;
-
-  // `auth()` PARLE À LA BASE : l'adaptateur Drizzle relit la session, donc la
-  // table `users`. Trois pannes réelles passent par là, et toutes les trois
-  // sont des pannes de déploiement, pas des pannes de code : migrations non
-  // appliquées, chaîne de connexion fausse, base en veille. Sans ce garde-fou,
-  // chacune renvoyait un 500 et un numéro de référence à la place de l'espace.
-  //
-  // Une session illisible n'est pas une raison de fermer la page : c'est une
-  // raison de traiter la personne comme anonyme, ce que tout le reste du site
-  // sait déjà faire. L'erreur est journalisée côté serveur, où elle sert.
-  try {
-    const session = await auth();
-    const id = session?.user?.id;
-    return isDatabaseUserId(id) ? id : null;
-  } catch (error) {
-    const reason = error instanceof Error ? error.message : String(error);
-    console.error(
-      `[auth] session illisible, visiteur traité comme anonyme (${reason})`,
-    );
-    return null;
-  }
+export function currentUserId(): Promise<string | null> {
+  return Promise.resolve(null);
 }
+
+/**
+ * Faux, tant qu'aucune voie de connexion n'existe.
+ *
+ * L'en-tête et les écrans qui proposaient de se connecter le lisent : un
+ * bouton qui mène à une page supprimée est pire que pas de bouton.
+ */
+export const isAuthConfigured = false;

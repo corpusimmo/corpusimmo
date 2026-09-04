@@ -42,9 +42,6 @@ export function QuotaExhausted({ renewsAt, limit }: { renewsAt: Date | null; lim
 
       <div className="flex flex-wrap gap-3">
         <Button asChild variant="secondary">
-          <Link href="/mon-espace">Voir ce que j&apos;ai déjà ouvert</Link>
-        </Button>
-        <Button asChild variant="ghost">
           <Link href="/outils">Repérer et mettre de côté</Link>
         </Button>
       </div>

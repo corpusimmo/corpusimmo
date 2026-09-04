@@ -19,8 +19,8 @@ import type { ValuationResult } from "@/types/valuation";
  * champ par champ.
  *
  * Le résumé est en revanche déposé dans l'historique du navigateur au passage :
- * l'estimation reste retrouvable depuis `/mon-espace` après la fermeture de
- * l'onglet, sans compte et sans base. Voir `src/lib/history/estimations.ts`
+ * l'estimation survit à la fermeture de l'onglet, sans compte et sans base.
+ * L'écran qui la relisait est retiré le temps que les comptes soient refaits. Voir `src/lib/history/estimations.ts`
  * pour ce qui est gardé, et ce qui ne l'est pas.
  */
 export function EstimerClient() {

@@ -4,14 +4,14 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Check } from "lucide-react";
 
 import { QuotaExhausted } from "@/components/tools/quota-exhausted";
-import { SignInGate } from "@/components/tools/sign-in-gate";
 import { ToolRunner } from "@/components/tools/tool-runner";
 import { UnlockForm } from "@/components/tools/unlock-form";
 import { disclaimers } from "@/config/site";
 import { getToolCard } from "@/data/tools-catalogue";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { readAccess } from "@/lib/access/ledger";
-import { auth, isAuthConfigured } from "@/lib/auth";
+// L'authentification est retirée : plus de session à consulter, et donc
+// plus de porte à franchir. Le quota, lui, reste tenu par navigateur.
 import { getToolSpec } from "@/lib/tools/definitions";
 
 interface PageProps {
@@ -67,7 +67,6 @@ export default async function CalculerPage({ params }: PageProps) {
   if (!tool) notFound();
 
   const spec = getToolSpec(tool.id);
-  const session = isAuthConfigured ? await auth() : null;
   const access = await readAccess();
   // Sans secret de signature configuré, il n'y a pas de verrou : tout est
   // ouvert. Voir l'en-tête de `src/lib/access/ledger.ts`.
@@ -95,9 +94,7 @@ export default async function CalculerPage({ params }: PageProps) {
           </div>
         </header>
 
-        {isAuthConfigured && !session?.user ? (
-          <SignInGate slug={tool.id} title={tool.title} limit={access.quota.limit} />
-        ) : owned ? (
+        {owned ? (
           <>
             {access.enforced && grant ? (
               <p className="flex flex-wrap items-center gap-2 text-sm text-ink-muted">
@@ -119,7 +116,7 @@ export default async function CalculerPage({ params }: PageProps) {
           <UnlockForm
             slug={tool.id}
             title={tool.title}
-            email={session?.user?.email ?? ""}
+            email=""
             remaining={access.quota.remaining}
             limit={access.quota.limit}
           />

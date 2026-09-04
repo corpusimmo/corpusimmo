@@ -18,8 +18,7 @@
  *
  * POURQUOI LIRE LE FICHIER PLUTÔT QU'IMPORTER LA PAGE
  *   Importer `page.tsx` pour lire son `metadata.robots` serait plus direct, et
- *   inutilisable : `/mon-espace` et `/outils/[slug]/calculer` lisent des
- *   cookies via `next/headers`, ce qui casse hors du rendu d'une requête, et
+ *   inutilisable : `/outils/[slug]/calculer` lit des cookies via `next/headers`, ce qui casse hors du rendu d'une requête, et
  *   entraînerait tout l'arbre React dans le module du sitemap. On lit donc le
  *   TEXTE du fichier, ce qui suffit à répondre à la seule question posée : la
  *   page se déclare-t-elle hors index ?
@@ -220,8 +219,8 @@ function patternFromFile(file: string): string {
  * passer inaperçu.
  *
  * L'analyse fine du module serait plus sûre et n'est pas envisageable :
- * `/mon-espace` et `/outils/[slug]/calculer` lisent des cookies par
- * `next/headers`, donc ne s'importent pas hors du rendu d'une requête.
+ * `/outils/[slug]/calculer` lit des cookies par `next/headers`, donc ne
+ * s'importe pas hors du rendu d'une requête.
  */
 const NOINDEX_PATTERN = /\bindex\s*:\s*false\b/;
 

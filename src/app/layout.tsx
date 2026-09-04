@@ -3,7 +3,6 @@ import { Inter, Outfit, Source_Serif_4 } from "next/font/google";
 
 import { Analytics } from "@/components/analytics/analytics";
 import { ConsentBanner } from "@/components/consent/consent-banner";
-import { AuthSessionProvider } from "@/components/layout/session-provider";
 import { PwaRuntime } from "@/components/pwa";
 import { ToastProvider } from "@/components/ui/toast";
 import { safeUrl } from "@/config/app-url";
@@ -162,9 +161,7 @@ export default function RootLayout({
             Aucune `SearchAction` : il n'existe pas de recherche à l'échelle du
             site, et en déclarer une qui n'existe pas ne rapporte rien. */}
         <JsonLd nodes={[organizationNode(), webSiteNode()]} />
-        <AuthSessionProvider>
           <ToastProvider>{children}</ToastProvider>
-        </AuthSessionProvider>
 
         {/* Le bandeau de consentement, puis la mesure d'audience qu'il commande.
             L'ORDRE N'EST PAS DÉCORATIF : `Analytics` ne rend rien tant que la

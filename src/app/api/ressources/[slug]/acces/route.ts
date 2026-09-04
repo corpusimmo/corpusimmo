@@ -15,7 +15,6 @@ import { NextResponse } from "next/server";
 import { z } from "zod";
 
 import { env } from "@/config/env";
-import { auth } from "@/lib/auth";
 import { getMailer, maskEmail } from "@/lib/email";
 import { leadsListId, syncContact } from "@/lib/email/contacts";
 import { renderMagnetReadyEmail } from "@/lib/email/templates/magnet-ready";
@@ -128,8 +127,9 @@ export async function POST(
    * le lien directement — mais uniquement pour l'adresse de la session, jamais
    * pour celle tapée dans le champ.
    */
-  const session = await auth().catch(() => null);
-  const sessionEmail = session?.user?.verifiedEmail ? session.user.email?.toLowerCase() : undefined;
+  /* Plus de session, donc plus de raccourci pour une adresse déjà prouvée par
+     un tiers : tout le monde passe par la vérification ordinaire. */
+  const sessionEmail: string | undefined = undefined;
 
   if (sessionEmail && sessionEmail === email) {
     const shortcut = await syncContact(

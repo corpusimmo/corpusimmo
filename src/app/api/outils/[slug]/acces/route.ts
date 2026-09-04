@@ -27,10 +27,9 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
-import { maskEmail } from "@/lib/email";
 import { leadsListId, syncContact } from "@/lib/email/contacts";
 import { grantAccess } from "@/lib/access/ledger";
-import { auth, isAuthConfigured } from "@/lib/auth";
+// Plus de session : l'accès se décide sur le seul quota du navigateur.
 import { accountId, saveConsents } from "@/lib/leads/persistence";
 import { checkRateLimit, clientKey } from "@/lib/leads/rate-limit";
 import { getToolCard } from "@/data/tools-catalogue";
@@ -55,8 +54,11 @@ export async function POST(
     );
   }
 
-  const session = isAuthConfigured ? await auth() : null;
-  if (isAuthConfigured && !session?.user?.email) {
+  /* L'AUTHENTIFICATION EST RETIRÉE. Le débit d'un crédit ne se refuse donc
+     plus faute de session : il ne dépend que du quota du navigateur. L'adresse
+     saisie dans le formulaire reste la seule source, comme elle l'était déjà
+     pour un visiteur anonyme. */
+  if (false) {
     return NextResponse.json(
       {
         error: {
@@ -108,7 +110,11 @@ export async function POST(
   }
 
   const input = parsed.data;
-  const email = session?.user?.email ?? null;
+  /* Sans session, cette route n'a AUCUNE adresse à sa disposition : le corps
+     de la requête ne porte que le consentement à la lettre d'information.
+     `null` est donc la réponse honnête, et la synchronisation de contact plus
+     bas se contente de ne rien faire. */
+  const email: string | null = null;
   const outcome = await grantAccess(slug);
 
   if (!outcome.granted) {
@@ -153,7 +159,6 @@ export async function POST(
       ? await syncContact(
           {
             email,
-            ...(session?.user?.name ? { firstName: session.user.name } : {}),
             source: `outil:${slug}`,
             consents: {
               marketing: true,
@@ -172,7 +177,7 @@ export async function POST(
 
   console.info(
     `[api/outils] « ${slug} » ${outcome.alreadyOwned ? "déjà ouvert" : "débloqué"} pour ` +
-      `${email ? maskEmail(email.toLowerCase()) : "visiteur anonyme"}, ` +
+      `visiteur anonyme, ` +
       `${outcome.quota.remaining} crédit(s) restant(s), ` +
       `lettre d'information ${input.newsletter ? "acceptée" : "refusée"} ` +
       `(${consentWrite.recorded ? "consentement enregistré" : `non enregistré : ${consentWrite.reason}`})`,

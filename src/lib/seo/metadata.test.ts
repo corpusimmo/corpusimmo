@@ -92,9 +92,9 @@ describe("pageMetadata", () => {
 
   it("sait sortir une page de l'index sans couper le suivi des liens", () => {
     const hidden = pageMetadata({
-      title: "Mon espace",
+      title: "Comparables retenus",
       description: "Un écran de service.",
-      path: "/mon-espace",
+      path: "/observatoire/comparables",
       index: false,
     });
     expect(hidden.robots).toEqual({ index: false, follow: true });

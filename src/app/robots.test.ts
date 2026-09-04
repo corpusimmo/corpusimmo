@@ -31,8 +31,6 @@ describe("robots", () => {
   it("ferme les routes de service et les données détaillées", () => {
     for (const path of [
       "/api/",
-      "/connexion",
-      "/mon-espace",
       "/observatoire/comparables",
       "/outils/*/calculer",
     ]) {

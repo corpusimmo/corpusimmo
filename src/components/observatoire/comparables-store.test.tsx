@@ -15,6 +15,8 @@ import type { DvfTransaction } from "@/types/dvf";
 
 const useSession = vi.fn<() => { status: "loading" | "authenticated" | "unauthenticated" }>();
 
+vi.mock("./session-status", () => ({ useSessionStatus: () => useSession().status }));
+
 const syncComparablesAction = vi.fn();
 const addComparableAction = vi.fn();
 const removeComparableAction = vi.fn();
@@ -22,7 +24,6 @@ const updateComparableAction = vi.fn();
 const clearComparablesAction = vi.fn();
 const setComparableSubjectAction = vi.fn();
 
-vi.mock("next-auth/react", () => ({ useSession: () => useSession() }));
 
 vi.mock("@/app/(site)/observatoire/comparables/actions", () => ({
   syncComparablesAction: (...args: unknown[]) => syncComparablesAction(...args),

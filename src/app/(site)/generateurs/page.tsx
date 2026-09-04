@@ -4,9 +4,7 @@ import { FileStack, Lock, Shield, Sparkles, Table2 } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
 import { TelechargerTrame } from "@/components/generateurs/telecharger-trame";
-import { currentUserId } from "@/lib/auth/current-user";
 import { CHARTE_CORPUSIMMO } from "@/lib/brand/charte";
-import { readCharte } from "@/lib/db";
 import { pageMetadata } from "@/lib/seo/metadata";
 import {
   CONFIDENTIALITY_LABELS,
@@ -41,18 +39,20 @@ export const metadata: Metadata = pageMetadata({
  *    cliquer.
  */
 /**
- * La page lit la session pour connaître la charte à appliquer.
+ * LA PAGE EST STATIQUE, ET DOIT LE RESTER TANT QU'IL N'Y A PAS DE COMPTE.
  *
- * `force-dynamic` en conséquence : mise en cache, elle servirait la charte
- * d'un compte à un autre visiteur. Sans session, c'est celle de CorpusImmo,
- * et le bouton produit quand même une trame : le générateur de trames ne
- * demande pas de compte, seule la personnalisation en demande un.
+ * Elle a longtemps porté `force-dynamic`, pour lire la charte de la session et
+ * ne jamais servir celle d'un compte à un autre visiteur. Il n'y a plus de
+ * session : tout le monde voit la charte de CorpusImmo, donc plus rien à
+ * isoler, et le rendu dynamique ne coûtait qu'une fonction par visite.
+ *
+ * Le jour où les comptes reviennent, ce n'est PAS `force-dynamic` qu'il faudra
+ * remettre en tête de page : la personnalisation devra vivre dans un morceau
+ * client ou dans un segment à part, pour que la page reste servie depuis le
+ * cache et que ses métadonnées continuent d'être calculées à la construction.
  */
-export const dynamic = "force-dynamic";
-
 export default async function GenerateursPage() {
-  const userId = await currentUserId();
-  const charte = userId ? await readCharte(userId) : CHARTE_CORPUSIMMO;
+  const charte = CHARTE_CORPUSIMMO;
 
   return (
     <div className="bg-canvas pb-14">

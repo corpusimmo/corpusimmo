@@ -75,15 +75,28 @@ try {
     console.log(`  ${present.has(table) ? "✓" : "✗"} ${table}`);
   }
 
-  if (present.has("__drizzle_migrations")) {
+  /* LE REGISTRE VIT DANS LE SCHÉMA `drizzle`, PAS DANS `public`.
+   *
+   * Vérifié dans le code de l'ORM : `migrationsSchema` vaut « drizzle » par
+   * défaut. Le chercher dans `public`, comme le faisait la première version de
+   * ce script, revenait à annoncer « la migration n'a jamais tourné » même
+   * après un succès complet. Un outil de diagnostic qui ment est pire qu'une
+   * absence d'outil : il envoie chercher une panne qui n'existe pas. */
+  const [registre] = await sql`
+    select count(*)::int as n
+    from information_schema.tables
+    where table_schema = 'drizzle' and table_name = '__drizzle_migrations'
+  `;
+
+  if (registre.n > 0) {
     const [applied] =
-      await sql`select count(*)::int as n from public.__drizzle_migrations`;
+      await sql`select count(*)::int as n from drizzle.__drizzle_migrations`;
     console.log(
-      `\n  ✓ __drizzle_migrations : ${applied.n} migration(s) appliquée(s)`,
+      `\n  ✓ drizzle.__drizzle_migrations : ${applied.n} migration(s) appliquée(s)`,
     );
   } else {
     console.log(
-      "\n  ✗ __drizzle_migrations : la migration n'a JAMAIS tourné sur cette base.",
+      "\n  ✗ drizzle.__drizzle_migrations : la migration n'a JAMAIS tourné ici.",
     );
   }
 

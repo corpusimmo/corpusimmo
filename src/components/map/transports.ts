@@ -685,6 +685,30 @@ export function installTransportLayers(
   return true;
 }
 
+/**
+ * Éteint le tracé de tram et de métro des TUILES, en gardant celui du train.
+ *
+ * Sert quand un tracé coloré et nommé prend le relais : les deux dessinent la
+ * même voie, l'un gris l'autre aux couleurs de l'exploitant, et les allumer
+ * ensemble donnerait deux traits parallèles sur la même rue. C'est exactement
+ * le défaut qui avait fait éteindre le tracé GTFS.
+ *
+ * Le train reste, lui : aucune autre source ne le couvre ici, le jeu OSM ne
+ * portant que le tram, le métro et le funiculaire.
+ */
+export function setTileTransitLinesVisibility(
+  map: MapLibreMap,
+  visible: boolean,
+): void {
+  for (const id of [
+    `${LINE_PREFIX}transit`,
+    `${LINE_PREFIX}transit${CASING_SUFFIX}`,
+  ]) {
+    if (!map.getLayer(id)) continue;
+    map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+  }
+}
+
 export function setTransportVisibility(
   map: MapLibreMap,
   visible: boolean,

@@ -86,8 +86,13 @@ import { PriceLegend } from "./price-legend";
 import { ZoningLegend } from "./zoning-legend";
 import {
   installTransportLayers,
+  setTileTransitLinesVisibility,
   setTransportVisibility,
 } from "./transports";
+import {
+  installOsmLineLayers,
+  setOsmLineVisibility,
+} from "./transports-osm-lines";
 import { TransportsLegend } from "./transports-legend";
 import { installGtfsLayers, setGtfsVisibility } from "./transports-gtfs";
 import {
@@ -643,6 +648,16 @@ export function DvfMap({
     // couche vectorielle » ni « le référentiel d'exploitant ».
     installGtfsLayers(instance, LAYER_SUBJECT_FILL);
     setGtfsVisibility(instance, transportsRef.current);
+
+    // Les tracés colorés d'OpenStreetMap : précis à 2 m, aux couleurs de
+    // l'exploitant. Quand ils sont là, le tracé gris des tuiles s'efface pour
+    // le tram et le métro, sans quoi la même voie serait dessinée deux fois.
+    // Le train, lui, reste : aucune autre source ne le couvre.
+    const lignes = installOsmLineLayers(instance, LAYER_SUBJECT_FILL);
+    if (lignes) {
+      setOsmLineVisibility(instance, transportsRef.current);
+      setTileTransitLinesVisibility(instance, false);
+    }
     syncPriceLabels(instance, showPricesRef.current);
     hydrate();
   }, [hydrate, isDense, syncPriceLabels]);
@@ -683,6 +698,11 @@ export function DvfMap({
     if (!instance || !transportsAvailable) return;
     setTransportVisibility(instance, transports);
     setGtfsVisibility(instance, transports);
+    setOsmLineVisibility(instance, transports);
+    // `setTransportVisibility` vient de rallumer TOUTES ses lignes : on
+    // réaffirme donc l'extinction du tram et du métro des tuiles, sinon le
+    // doublon revient à chaque bascule.
+    setTileTransitLinesVisibility(instance, false);
   }, [transports, transportsAvailable]);
 
   /* ── Format d'affichage de la fiche ────────────────────────────────────── */

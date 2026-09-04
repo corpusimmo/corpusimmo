@@ -203,7 +203,15 @@ describe("fichier des tracés", () => {
   ) as {
     licence?: string;
     attribution?: string;
-    features: { properties: Record<string, string>; geometry: { type: string } }[];
+    features: {
+      properties: {
+        reseau: string;
+        ref: string;
+        mode: string;
+        couleur: string;
+        couleurTexte: string;
+      };
+    }[];
   };
 
   it("porte sa licence et son attribution en tête", () => {

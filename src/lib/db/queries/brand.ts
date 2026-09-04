@@ -27,6 +27,7 @@ import {
   resoudreCharte,
   type Charte,
 } from "@/lib/brand/charte";
+import { attempt } from "../attempt";
 import { getDb, isDatabaseConfigured } from "../client";
 import { NOT_CONFIGURED, writeFailed, type WriteOutcome } from "../outcome";
 import { brandProfiles, type BrandProfileRow } from "../schema/brand";
@@ -102,13 +103,24 @@ function toCharte(row: BrandProfileRow | undefined): Charte {
 export async function readCharte(userId: string): Promise<Charte> {
   if (!isDatabaseConfigured()) return toCharte(undefined);
 
-  const rows = await getDb()
-    .select()
-    .from(brandProfiles)
-    .where(eq(brandProfiles.userId, userId))
-    .limit(1);
+  // UNE CHARTE ABSENTE NE DOIT PAS ABATTRE UN ÉCRAN. La page des générateurs
+  // est publique et fonctionne sans compte : si la lecture échoue, table pas
+  // encore migrée ou base indisponible, les documents sortent aux couleurs de
+  // CorpusImmo et la panne est journalisée. Ce n'est pas un repli silencieux
+  // au sens que le produit s'interdit : on ne substitue aucune donnée de
+  // marché, on rend notre propre identité, qui est le repli documenté.
+  const { value } = await attempt(
+    "lecture de la charte",
+    async () =>
+      getDb()
+        .select()
+        .from(brandProfiles)
+        .where(eq(brandProfiles.userId, userId))
+        .limit(1),
+    [] as BrandProfileRow[],
+  );
 
-  return toCharte(rows[0]);
+  return toCharte(value[0]);
 }
 
 /** Ce que le compte a saisi, tel quel, pour réafficher le formulaire. */
@@ -117,13 +129,18 @@ export async function readBrandRow(
 ): Promise<BrandProfileRow | null> {
   if (!isDatabaseConfigured()) return null;
 
-  const rows = await getDb()
-    .select()
-    .from(brandProfiles)
-    .where(eq(brandProfiles.userId, userId))
-    .limit(1);
+  const { value } = await attempt(
+    "lecture de la charte enregistrée",
+    async () =>
+      getDb()
+        .select()
+        .from(brandProfiles)
+        .where(eq(brandProfiles.userId, userId))
+        .limit(1),
+    [] as BrandProfileRow[],
+  );
 
-  return rows[0] ?? null;
+  return value[0] ?? null;
 }
 
 /**

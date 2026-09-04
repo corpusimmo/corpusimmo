@@ -172,11 +172,21 @@ describe("installation", () => {
     expect(f.added).toHaveLength(apres);
   });
 
-  it("bascule la visibilité des seules couches réellement posées", () => {
+  it("bascule les arrêts et les pastilles, jamais le tracé schématique", () => {
     const f = fakeMap();
     installGtfsLayers(f.map);
     setGtfsVisibility(f.map, true);
-    for (const id of GTFS_LAYER_IDS) expect(f.visibility[id]).toBe("visible");
+
+    // Ce que le GTFS apporte et que les tuiles n'ont pas : les arrêts, les
+    // numéros et les couleurs officielles.
+    expect(f.visibility["transports-gtfs-arret"]).toBe("visible");
+    expect(f.visibility["transports-gtfs-pastille"]).toBe("visible");
+
+    // Le tracé, lui, reste éteint MÊME quand le calque est demandé : les
+    // `shapes.txt` français vont d'arrêt à arrêt (médiane 344 m entre deux
+    // points) et doubleraient le tracé des tuiles, qui suit la voie.
+    expect(f.visibility["transports-gtfs-ligne"]).toBe("none");
+    expect(f.visibility["transports-gtfs-liseré"]).toBe("none");
 
     setGtfsVisibility(f.map, false);
     for (const id of GTFS_LAYER_IDS) expect(f.visibility[id]).toBe("none");

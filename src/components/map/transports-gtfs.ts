@@ -88,11 +88,42 @@ export const GTFS_LINE_BADGE_LAYER = "transports-gtfs-pastille";
  * Le liseré passe SOUS le trait coloré, les arrêts par-dessus les deux, et la
  * pastille en dernier pour n'être jamais recouverte par un arrêt.
  */
+/**
+ * LE TRACÉ GTFS NE SE DESSINE PAS, ET C'EST MESURÉ.
+ *
+ * Les `shapes.txt` français sont schématiques : 112 des 123 lignes produites
+ * ont plus de 200 mètres entre deux points consécutifs, médiane 344 m, et la
+ * forme la plus détaillée de tout le GTFS nantais compte 47 points pour un
+ * réseau de trois lignes. Ce ne sont pas des tracés de voie, ce sont des
+ * polylignes d'arrêt à arrêt.
+ *
+ * Superposé au tracé des tuiles vectorielles, qui suit la voie réelle, ça
+ * donnait DEUX lignes pour un même tram : l'une juste mais grise, l'autre
+ * colorée mais fausse de trois cents mètres. Le tracé précis reste donc seul,
+ * et le GTFS n'apporte que ce que les tuiles n'ont pas : les arrêts, les
+ * numéros de ligne et les couleurs officielles de l'exploitant.
+ *
+ * Les deux couches de tracé restent construites : elles reviendront le jour où
+ * la géométrie viendra d'une source fidèle. Elles ne sont simplement pas
+ * allumées.
+ */
 export const GTFS_LAYER_IDS: readonly string[] = [
   GTFS_LINE_CASING_LAYER,
   GTFS_LINE_LAYER,
   GTFS_STOP_LAYER,
   GTFS_LINE_BADGE_LAYER,
+];
+
+/**
+ * Les deux couches de tracé, posées mais JAMAIS allumées.
+ *
+ * Elles restent construites pour revenir le jour où la géométrie viendra
+ * d'une source fidèle : les retirer obligerait à les réécrire, et à réécrire
+ * leurs tests avec.
+ */
+const COARSE_LINE_LAYERS: readonly string[] = [
+  GTFS_LINE_CASING_LAYER,
+  GTFS_LINE_LAYER,
 ];
 
 /**
@@ -256,6 +287,9 @@ export function installGtfsLayers(map: MapLibreMap, beforeId?: string): boolean 
 export function setGtfsVisibility(map: MapLibreMap, visible: boolean): void {
   for (const id of GTFS_LAYER_IDS) {
     if (!map.getLayer(id)) continue;
-    map.setLayoutProperty(id, "visibility", visible ? "visible" : "none");
+    // Le tracé schématique ne s'allume jamais, même quand le calque est
+    // demandé : il doublerait celui des tuiles, qui suit la voie réelle.
+    const shown = visible && !COARSE_LINE_LAYERS.includes(id);
+    map.setLayoutProperty(id, "visibility", shown ? "visible" : "none");
   }
 }

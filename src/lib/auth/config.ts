@@ -268,31 +268,26 @@ export const authConfig: NextAuthConfig = {
   },
 
   /**
-   * Le cookie de session ne sert à rien à un script tiers, et un site externe
-   * n'a aucune raison de déclencher une action authentifiée chez nous.
+   * AUCUNE PERSONNALISATION DES COOKIES, ET C'EST LE CORRECTIF.
    *
-   * `secure` SUIT L'ENVIRONNEMENT, et ce n'est pas un relâchement. Codé en dur
-   * à `true`, le navigateur REFUSE de poser le cookie sur `http://localhost` :
-   * la connexion aboutit côté serveur, la redirection se fait, et la personne
-   * revient déconnectée sans le moindre message. Autrement dit, la voie de
-   * connexion devenait intestable en local, précisément là où l'on diagnostique
-   * les pannes de production.
+   * Ce bloc imposait le nom `corpusimmo.session` au cookie de session. La
+   * connexion Google aboutissait alors parfaitement — compte créé en base,
+   * callback en 302, aucune erreur dans les journaux — mais la personne
+   * revenait déconnectée : `/api/auth/session` répondait `null`, donc le
+   * jeton n'était jamais relu.
    *
-   * En production `NODE_ENV` vaut « production » et le cookie reste `Secure`,
-   * comme il doit l'être : la seule chose qui change est la possibilité de
-   * reproduire une panne avant de la livrer.
+   * Le nom personnalisé était le SEUL élément non standard de toute la
+   * configuration. Auth.js nomme ses cookies avec les préfixes de sécurité du
+   * navigateur, `__Secure-` et `__Host-`, et les autres cookies du site les
+   * portaient bien : seul celui de session en était privé, puisqu'il était
+   * nommé à la main. Les valeurs qu'on imposait par ailleurs — `httpOnly`,
+   * `sameSite: lax`, `path: /`, `secure` en HTTPS — sont exactement les
+   * réglages par défaut d'Auth.js. Ce bloc ne protégeait donc rien de plus,
+   * il ne faisait que retirer les préfixes.
+   *
+   * Le nom de cookie n'était pas une exigence, c'était une coquetterie. On la
+   * retire, et la valeur par défaut s'applique.
    */
-  cookies: {
-    sessionToken: {
-      name: "corpusimmo.session",
-      options: {
-        httpOnly: true,
-        sameSite: "lax",
-        path: "/",
-        secure: process.env.NODE_ENV === "production",
-      },
-    },
-  },
 
   trustHost: true,
 };

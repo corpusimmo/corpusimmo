@@ -267,12 +267,30 @@ export const authConfig: NextAuthConfig = {
     },
   },
 
-  // Le cookie de session ne sert à rien à un script tiers, et un site externe
-  // n'a aucune raison de déclencher une action authentifiée chez nous.
+  /**
+   * Le cookie de session ne sert à rien à un script tiers, et un site externe
+   * n'a aucune raison de déclencher une action authentifiée chez nous.
+   *
+   * `secure` SUIT L'ENVIRONNEMENT, et ce n'est pas un relâchement. Codé en dur
+   * à `true`, le navigateur REFUSE de poser le cookie sur `http://localhost` :
+   * la connexion aboutit côté serveur, la redirection se fait, et la personne
+   * revient déconnectée sans le moindre message. Autrement dit, la voie de
+   * connexion devenait intestable en local, précisément là où l'on diagnostique
+   * les pannes de production.
+   *
+   * En production `NODE_ENV` vaut « production » et le cookie reste `Secure`,
+   * comme il doit l'être : la seule chose qui change est la possibilité de
+   * reproduire une panne avant de la livrer.
+   */
   cookies: {
     sessionToken: {
       name: "corpusimmo.session",
-      options: { httpOnly: true, sameSite: "lax", path: "/", secure: true },
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: process.env.NODE_ENV === "production",
+      },
     },
   },
 

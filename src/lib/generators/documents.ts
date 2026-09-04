@@ -61,11 +61,55 @@ export const SENSITIVE_FIELD_LABELS: Record<SensitiveField, string> = {
   diagnostics: "Diagnostics et audits",
 };
 
+/**
+ * LA FORME QUE PREND LE CONTENU D'UNE SECTION.
+ *
+ * Ce n'est pas de la décoration, c'est de l'information sur la section : un
+ * rent roll est un tableau et le sera toujours, une clause de confidentialité
+ * est un bloc de texte dense, des photographies veulent une pleine page. La
+ * trame livrait jusqu'ici la MÊME diapositive quarante fois, seul le titre du
+ * bandeau changeant, ce qui laissait au professionnel exactement le travail
+ * qu'on prétendait lui épargner.
+ *
+ * Le gabarit vit ici, avec la section, et non dans le module qui fabrique le
+ * `.pptx` : c'est une propriété du métier, pas du format. Le jour où l'on
+ * produira du `.docx` ou du PDF, il servira sans être réécrit.
+ */
+export type Gabarit =
+  /** Un intertitre et une zone de rédaction. Le cas par défaut. */
+  | "texte"
+  /** Deux volets côte à côte, chacun avec son sous-titre. */
+  | "colonnes"
+  /** Un vrai tableau, avec sa ligne d'en-tête nommée. */
+  | "tableau"
+  /** Trois ou quatre indicateurs en pavés. */
+  | "chiffres"
+  /** Une grande réserve d'image et sa légende. */
+  | "image"
+  /** Un bloc dense en petit corps : clauses, limites, avertissements. */
+  | "legal";
+
 export interface DocumentSection {
   id: string;
   label: string;
   /** Vrai quand la section est cochée à l'ouverture du formulaire. */
   defaultOn: boolean;
+  /** La forme du contenu. `texte` quand ce n'est pas précisé. */
+  gabarit?: Gabarit;
+  /** Gabarit `tableau` : l'en-tête réel des colonnes, dans l'ordre. */
+  colonnes?: readonly string[];
+  /** Gabarit `chiffres` : les indicateurs à poser, dans l'ordre. */
+  indicateurs?: readonly string[];
+  /** Gabarit `colonnes` : les deux sous-titres. */
+  volets?: readonly [string, string];
+  /**
+   * CE QU'ON ATTEND DANS CETTE SECTION, en une phrase.
+   *
+   * Va sur la PAGE DE NOTES de la diapositive, jamais sur la diapositive
+   * elle-même. Un texte d'aide posé sur la page est un texte d'aide qu'on
+   * oublie d'effacer, et qui part chez le client.
+   */
+  attendu?: string;
   /**
    * Vrai quand la section est alimentée par NOS données plutôt que par la
    * saisie ou la rédaction. C'est ce qui sépare ce produit d'un habillage de

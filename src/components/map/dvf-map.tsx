@@ -31,7 +31,9 @@ import * as React from "react";
 import { createPortal } from "react-dom";
 import {
   AttributionControl,
+  FullscreenControl,
   GeoJSONSource,
+  GeolocateControl,
   Map as MapLibreMap,
   Marker,
   NavigationControl,
@@ -221,6 +223,17 @@ export function DvfMap({
   const controlled = transactions !== undefined;
 
   const containerRef = React.useRef<HTMLDivElement>(null);
+  /**
+   * La racine du composant, et non le conteneur de la carte.
+   *
+   * C'est ce qui distingue notre plein écran de celui qu'on obtient en
+   * passant `container` par défaut à MapLibre : les légendes, les
+   * interrupteurs de couches et le bandeau d'état vivent dans la racine, à
+   * côté de la carte et non dedans. Basculer la seule carte les laisserait
+   * derrière, et on se retrouverait en grand devant des bulles de couleur
+   * dont plus rien ne dit ce qu'elles valent.
+   */
+  const racineRef = React.useRef<HTMLDivElement>(null);
   const mapRef = React.useRef<MapLibreMap | null>(null);
   const [map, setMap] = React.useState<MapLibreMap | null>(null);
   const [styleReady, setStyleReady] = React.useState(false);
@@ -759,6 +772,26 @@ export function DvfMap({
           "Utilisez ⌘ + molette pour zoomer sur la carte",
         "CooperativeGesturesHandler.MobileHelpText":
           "Utilisez deux doigts pour déplacer la carte",
+
+        /* Les commandes natives, en français. Elles arrivaient en anglais au
+           milieu d'un écran entièrement français : « Zoom in », « Enter
+           fullscreen », « Location not available ». Ces libellés sont le titre
+           au survol ET le nom lu par les lecteurs d'écran, donc ce n'est pas
+           qu'une question de cohérence visuelle. */
+        "NavigationControl.ZoomIn": "Zoomer",
+        "NavigationControl.ZoomOut": "Dézoomer",
+        "NavigationControl.ResetBearing":
+          "Faire pivoter la carte, cliquer pour remettre le nord en haut",
+        "FullscreenControl.Enter": "Passer en plein écran",
+        "FullscreenControl.Exit": "Quitter le plein écran",
+        "GeolocateControl.FindMyLocation": "Afficher ma position",
+        "GeolocateControl.LocationNotAvailable": "Position indisponible",
+        "ScaleControl.Meters": "m",
+        "ScaleControl.Kilometers": "km",
+        "AttributionControl.ToggleAttribution": "Afficher les sources",
+        "AttributionControl.MapFeedback": "Signaler une erreur de fond de carte",
+        "Popup.Close": "Fermer",
+        "Marker.Title": "Carte",
       },
     });
 
@@ -781,6 +814,45 @@ export function DvfMap({
       }),
       "top-right",
     );
+    /**
+     * LE PLEIN ÉCRAN PORTE LA RACINE, pas le conteneur de la carte.
+     *
+     * `racineRef` couvre la carte ET ce qui l'explique : légendes, bascules de
+     * couches, bandeau d'état. Voir la référence pour le détail.
+     *
+     * Il n'apparaît pas en format réduit : sur un téléphone la page occupe
+     * déjà tout l'écran, et le bouton ne ferait qu'y prendre de la place.
+     */
+    if (!compact && racineRef.current) {
+      instance.addControl(
+        new FullscreenControl({ container: racineRef.current }),
+        "top-right",
+      );
+    }
+
+    /**
+     * LA GÉOLOCALISATION, en suivi.
+     *
+     * `trackUserLocation` garde le point à jour et affiche le cercle de
+     * précision : sur une carte de ventes, savoir où l'on est vaut surtout
+     * quand on est SUR PLACE, en visite, et que l'on veut les mutations de la
+     * rue où l'on se tient. Un point posé une fois puis figé raterait
+     * exactement cet usage.
+     *
+     * L'en-tête `Permissions-Policy` du site autorise déjà `geolocation=(self)`
+     * (voir `next.config.ts`) : sans elle, le navigateur refuserait la demande
+     * sans rien afficher.
+     */
+    instance.addControl(
+      new GeolocateControl({
+        positionOptions: { enableHighAccuracy: true },
+        trackUserLocation: true,
+        showUserLocation: true,
+        showAccuracyCircle: true,
+      }),
+      "top-right",
+    );
+
     instance.addControl(
       new AttributionControl({
         compact: true,
@@ -1313,6 +1385,7 @@ export function DvfMap({
 
   return (
     <div
+      ref={racineRef}
       className={cn(
         // `flex flex-col` : la carte prend la place disponible, le bandeau de
         // commandes se pose SOUS elle dans le flux. L'appelant compense sa
@@ -1582,12 +1655,31 @@ export function DvfMap({
               onClick={togglePitch}
               aria-pressed={pitched}
               title={pitched ? "Revenir à la vue à plat" : "Afficher le relief"}
-              className={cn(
-                "grid place-items-center transition-colors",
+              className="grid place-items-center transition-colors"
+              /**
+               * LES COULEURS SONT EN STYLE D'ÉLÉMENT, ET C'EST OBLIGATOIRE.
+               *
+               * `maplibre-gl.css` n'est pas dans une couche, et une règle hors
+               * couche l'emporte TOUJOURS sur un utilitaire Tailwind, quelle
+               * que soit la spécificité. Ce bouton est projeté à l'intérieur
+               * d'un `.maplibregl-ctrl-group`, donc `bg-primary` et
+               * `text-primary-fg` étaient purement et simplement ignorés :
+               * l'état actif rendait un fond transparent et une encre claire
+               * sur le blanc du groupe, c'est à dire un bouton invisible. Le
+               * même piège est déjà documenté deux cents lignes plus bas, pour
+               * le positionnement du conteneur.
+               *
+               * Un style d'élément passe devant toutes les feuilles. C'est la
+               * seule façon fiable de peindre dans le territoire de MapLibre.
+               */
+              style={
                 pitched
-                  ? "bg-primary text-primary-fg"
-                  : "text-ink-muted hover:text-ink",
-              )}
+                  ? {
+                      backgroundColor: "var(--primary)",
+                      color: "var(--primary-fg)",
+                    }
+                  : { backgroundColor: "transparent", color: "var(--ink-muted)" }
+              }
             >
               {pitched ? (
                 <Square aria-hidden="true" className="size-4" />

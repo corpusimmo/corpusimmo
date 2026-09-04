@@ -38,7 +38,9 @@ export function TransactionPopup({
 }: TransactionPopupProps) {
   const [container] = React.useState(() => {
     const node = document.createElement("div");
-    node.className = "w-[21rem] max-w-[80vw]";
+    // `overflow-y-auto` : voir la hauteur plafonnée plus bas. Sans lui, le
+    // plafond couperait la fiche au lieu de la faire défiler.
+    node.className = "w-[21rem] max-w-[80vw] overflow-y-auto overscroll-contain";
     return node;
   });
   const popupRef = React.useRef<Popup | null>(null);
@@ -62,7 +64,37 @@ export function TransactionPopup({
     popup.on("close", () => onCloseRef.current());
     popupRef.current = popup;
 
+    /**
+     * LA FICHE NE DOIT JAMAIS DÉPASSER LA CARTE.
+     *
+     * Une vente en multi-lots, avec ses diagnostics et son avertissement,
+     * dépasse facilement six cents pixels. La racine de la carte porte
+     * `overflow-hidden`, indispensable pour que les coins arrondis tiennent :
+     * la fiche était donc COUPÉE en bas, sans barre de défilement et sans rien
+     * qui signale qu'il manquait du texte. C'est le pire des deux mondes,
+     * puisque l'avertissement sur le prix au m² d'une vente groupée est
+     * précisément ce qu'il ne faut pas manquer.
+     *
+     * On plafonne donc la fiche à la hauteur visible de la carte, moins la
+     * place du bec et des marges, et on la fait défiler à l'intérieur.
+     * MapLibre garde par ailleurs sa logique de bascule au-dessus ou en
+     * dessous du point ; les deux se complètent, l'une choisit le côté,
+     * l'autre garantit que ça rentre.
+     */
+    const RESERVE = 96;
+    const PLANCHER = 220;
+
+    const ajusterHauteur = (): void => {
+      const disponible = map.getContainer().clientHeight - RESERVE;
+      container.style.maxHeight = `${Math.max(PLANCHER, disponible)}px`;
+    };
+
+    ajusterHauteur();
+    const observateur = new ResizeObserver(ajusterHauteur);
+    observateur.observe(map.getContainer());
+
     return () => {
+      observateur.disconnect();
       popupRef.current = null;
       popup.remove();
     };

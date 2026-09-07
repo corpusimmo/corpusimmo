@@ -310,6 +310,35 @@
    des trois arrêts parce qu'elle doit rester plus lumineuse que le plus clair
    d'entre eux, sinon le passage ne se voit pas.
    -------------------------------------------------------------------------- */
+/* ----------------------------------------------------------------------------
+   LE MOT DE LA MARQUE
+   ----------------------------------------------------------------------------
+   « Immo » ne prend PAS le métal du thème, il prend sa propre couleur, et
+   c'est la seule exception du système.
+
+   Le thème mixte met le violet sur ce qui se clique et l'argent sur tout le
+   reste. Le nom du produit n'est ni l'un ni l'autre : c'est l'identité, et
+   elle doit dire de quel thème on parle. En argent pur, « CorpusImmo » y
+   perdait sa couleur et le mixte ne se distinguait plus de l'argent au premier
+   coup d'œil.
+
+   Dans les deux thèmes purs, ces tokens repointent vers le métal : le mot y
+   suit la matière du thème, comme avant. */
+:root {
+  --mot-a: #b9a6f2;
+  --mot-eclat: #f0eaff;
+  --mot-grave: var(--primary);
+  --mot-grave-ombre: var(--primary-active);
+}
+
+:root[data-theme="argent"],
+:root[data-theme="violet"] {
+  --mot-a: var(--metal-b);
+  --mot-eclat: var(--metal-eclat);
+  --mot-grave: var(--accent);
+  --mot-grave-ombre: var(--accent-active);
+}
+
 :root,
 :root[data-theme="argent"] {
   --metal-a: #78818f;
@@ -966,11 +995,11 @@
   margin-inline-end: -0.06em;
   background-image: linear-gradient(
     100deg,
-    var(--metal-b) 0%,
-    var(--metal-eclat) 34%,
-    var(--metal-b) 48%,
-    var(--metal-eclat) 62%,
-    var(--metal-b) 100%
+    var(--mot-a) 0%,
+    var(--mot-eclat) 34%,
+    var(--mot-a) 48%,
+    var(--mot-eclat) 62%,
+    var(--mot-a) 100%
   );
   background-size: 280% 100%;
   -webkit-background-clip: text;
@@ -988,13 +1017,13 @@
  * à n'importe quelle taille.
  */
 @utility grave-metal {
-  color: var(--accent);
+  color: var(--mot-grave);
   /* Une lumière au-dessus, une ombre en dessous : c'est le relief d'une
      gravure. L'ombre est prise dans la teinte du métal et non dans du noir,
      sans quoi la lettre paraît sale plutôt que creusée. */
   text-shadow:
     0 -1px 0 rgb(255 255 255 / 0.65),
-    0 1px 0 color-mix(in srgb, var(--accent-active) 45%, transparent);
+    0 1px 0 color-mix(in srgb, var(--mot-grave-ombre) 45%, transparent);
 }
 
 /* ----------------------------------------------------------------------------
@@ -1160,50 +1189,23 @@
 /* LE SIGNE SUIT LE THÈME, SANS JAVASCRIPT. Les deux fichiers sont dans le
    balisage, et l'attribut de thème décide lequel se voit. Un choix fait en
    JavaScript rendrait le signe absent jusqu'à l'hydratation, donc en retard
-   sur tout le reste de l'en-tête. */
-/* ── LA FAMILLE DE SIGNE, ET LE MÉTAL, SONT DEUX CHOIX SÉPARÉS ────────────
-   `data-signe` dit la famille, `data-theme` dit le métal. Les croiser en CSS
-   plutôt qu'en JavaScript garde le composant de marque côté serveur : le signe
-   est peint avec la première image, et non après l'hydratation.
+   sur tout le reste de l'en-tête, et garde le composant de marque côté
+   serveur. */
+/* ── LE SIGNE SUIT LE THÈME ───────────────────────────────────────────────
+   Deux fichiers, et le thème décide lequel se voit. Le signe porte
+   l'identité, pas la température de l'écran : il est VIOLET par défaut comme
+   en thème violet, et seul le thème argent, qui ne colore rien, le prend en
+   argent.
 
-   Deux familles, en tours et en pile, chacune fournie dans les trois métaux.
-   Par défaut, les tours. */
-/* ── LE MÉTAL, PUIS LA FAMILLE ────────────────────────────────────────────
-   L'ORDRE DE CES DEUX GROUPES EST LA RÈGLE, ET IL N'EST PAS ARBITRAIRE.
-   Le métal choisit un fichier dans une famille ; la famille décide ensuite
-   quelle famille se tait. Écrites dans l'autre sens, les deux règles avaient
-   la même force et c'est le métal qui gagnait : en pile et en violet, le
-   signe en tours réapparaissait par-dessus. Les sélecteurs de famille
-   répètent donc leur classe, pour passer devant à coup sûr.
-
-   DEUX FICHIERS PAR FAMILLE, ET NON TROIS. Le thème par défaut mêle le violet
-   à l'argent : son signe est celui d'argent, puisque c'est l'argent qui y
-   tient tout ce qui n'est pas une action. Seul le thème violet plein change
-   de signe. */
-:root[data-theme="violet"] .signe-tours.marque-argent {
+   LA FAMILLE EN PILE A ÉTÉ ABANDONNÉE, et avec elle le second réglage du
+   sélecteur. Deux signes valaient deux identités : à choisir, autant en tenir
+   une. */
+:root[data-theme="argent"] .marque-violet {
   display: none;
 }
 
-:root[data-theme="violet"] .signe-tours.marque-violet {
+:root[data-theme="argent"] .marque-argent {
   display: block;
-}
-
-/* La famille en pile : mêmes métaux, en plaques gravées. */
-:root[data-signe="stack"] .signe-stack.marque-argent {
-  display: block;
-}
-
-:root[data-signe="stack"][data-theme="violet"] .signe-stack.marque-argent {
-  display: none;
-}
-
-:root[data-signe="stack"][data-theme="violet"] .signe-stack.marque-violet {
-  display: block;
-}
-
-/* Ce que la famille choisie fait taire. */
-:root[data-signe="stack"] .signe-tours.signe-tours {
-  display: none;
 }
 
 @utility tap-target {

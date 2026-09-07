@@ -4,12 +4,12 @@ import { cn } from "@/lib/utils/cn";
 /**
  * LA MARQUE, EN DEUX FAMILLES DE SIGNE ET TROIS MÉTAUX.
  *
- * Les quatre fichiers sont TOUS dans le balisage, et c'est le CSS qui n'en montre
- * qu'un, selon `data-signe` et `data-theme` posés sur la racine. Choisir en
+ * Les deux fichiers sont TOUS DEUX dans le balisage, et c'est le CSS qui n'en
+ * montre qu'un, selon `data-theme` posé sur la racine. Choisir en
  * JavaScript obligerait ce composant à passer client, et le signe
  * n'apparaîtrait qu'après l'hydratation, donc en retard sur le reste de
- * l'en-tête. Quatre requêtes d'image contre un signe qui clignote : le choix
- * est vite fait, d'autant que les fichiers pèsent sept kilo-octets chacun.
+ * l'en-tête. Deux requêtes d'image contre un signe qui clignote : le choix est
+ * vite fait, d'autant que les fichiers pèsent sept kilo-octets chacun.
  */
 
 export type BrandMarkTone = "default" | "inverted";
@@ -48,11 +48,11 @@ export function BrandMark({
   /**
    * SUR FOND SOMBRE, LE MÊME SIGNE, POSÉ SUR UNE PLAQUE CLAIRE.
    *
-   * Les quatre fichiers sont des aplats sombres. Sur le fond du pied de page,
+   * Les deux fichiers sont des aplats sombres. Sur le fond du pied de page,
    * la moitié des plaques disparaît et il ne reste qu'un liseré doré ou
    * violet : la marque n'est plus reconnaissable. La plaque claire lui rend
    * le fond pour lequel elle a été dessinée, et le pied de page montre alors
-   * exactement le signe choisi dans le sélecteur, famille et couleur comprises.
+   * exactement le signe du thème choisi dans le sélecteur.
    *
    * Le tracé qui tenait ce rôle a été retiré : il montrait un signe que
    * personne n'avait choisi, et l'en-tête et le pied de page ne parlaient
@@ -73,7 +73,7 @@ export function BrandMark({
 }
 
 /**
- * LES QUATRE FICHIERS, ÉCRITS UNE FOIS.
+ * LES DEUX FICHIERS, ÉCRITS UNE FOIS.
  *
  * Les deux tirages montrent le même jeu : les répéter dans chaque branche
  * garantissait qu'un ajout de métal n'atterrisse que dans l'une des deux.
@@ -89,9 +89,8 @@ function Signes() {
           alt=""
           aria-hidden="true"
           className={cn(
-            signe.famille,
             signe.metal,
-            /* L'argent en tours est le seul montré par défaut : c'est le
+            /* Le violet en tours est le seul montré par défaut : c'est le
                signe du thème écrit dans `:root`, celui que le serveur rend. */
             signe.defaut ? "block" : "hidden",
           )}
@@ -102,10 +101,8 @@ function Signes() {
 }
 
 const SIGNES = [
-  { fichier: "/marque-argent.webp", famille: "signe-tours", metal: "marque-argent", defaut: true },
-  { fichier: "/marque-violet.webp", famille: "signe-tours", metal: "marque-violet", defaut: false },
-  { fichier: "/marque-stack-argent.webp", famille: "signe-stack", metal: "marque-argent", defaut: false },
-  { fichier: "/marque-stack-violet.webp", famille: "signe-stack", metal: "marque-violet", defaut: false },
+  { fichier: "/marque-violet.webp", metal: "marque-violet", defaut: true },
+  { fichier: "/marque-argent.webp", metal: "marque-argent", defaut: false },
 ] as const;
 
 export function BrandLockup({

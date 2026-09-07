@@ -10,7 +10,7 @@ import { siteConfig } from "@/config/site";
  * Il n'y a RIEN à ajouter dans `layout.tsx` pour ce fichier.
  *
  * LA SEULE EXCEPTION À LA RÈGLE DES TOKENS — `background_color` et
- * `theme_color` sont écrits en dur, comme les couleurs de `src/app/icon.svg`,
+ * `theme_color` sont écrits en dur, comme celles des icônes,
  * et pour la même raison : un manifeste est lu par le système d'exploitation
  * bien avant qu'une feuille de style existe. Personne ici ne peut résoudre
  * `var(--canvas)`. Ces deux valeurs doivent donc être tenues à la main si la

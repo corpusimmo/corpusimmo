@@ -21,7 +21,7 @@
  *
  * ─────────────────────────────────────────────────────────────────────────────
  * LES COULEURS SONT LITTÉRALES, ET C'EST UNE EXCEPTION ASSUMÉE
- *   Exactement comme dans `src/app/icon.svg`. Ce rendu ne se fait pas dans un
+ *   Ce rendu ne se fait pas dans un
  *   navigateur : Satori compose l'image hors de toute feuille de style, et
  *   `var(--primary)` n'y vaut rien. Ces valeurs DOIVENT donc être tenues à jour
  *   à la main si la palette de `globals.css` bouge.

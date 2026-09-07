@@ -102,7 +102,7 @@ export function organizationNode(): JsonLdNode {
     // Le logotype est servi par la convention de fichier de Next, à cette URL
     // exacte. C'est un SVG : certains agrégateurs préfèrent un bitmap, aucun ne
     // le refuse.
-    logo: canonicalUrl("/icon.svg"),
+    logo: canonicalUrl("/icons/icone-512.png"),
     slogan: siteConfig.signature,
     description: siteConfig.description,
   };

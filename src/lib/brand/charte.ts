@@ -59,7 +59,7 @@ export interface Charte {
 export const CHARTE_CORPUSIMMO: Charte = {
   entreprise: "CorpusImmo",
   site: "corpus.immo",
-  logo: "/icon.svg",
+  logo: "/icons/icone-512.png",
   principale: "#14293c",
   secondaire: "#8a6a2f",
   parDefaut: true,

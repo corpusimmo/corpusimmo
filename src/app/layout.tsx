@@ -113,19 +113,26 @@ export const metadata: Metadata = {
   /**
    * LES ICÔNES, TOUTES DÉCLARÉES ICI — ET C'EST OBLIGATOIRE.
    *
-   * `src/app/icon.svg` est une convention de fichier : Next pose tout seul le
-   * `<link rel="icon">` correspondant… tant que `metadata.icons` n'existe pas.
-   * Dès qu'on déclare ce champ, il REMPLACE ce que la convention aurait
-   * produit — il ne s'y ajoute pas. En ne nommant que l'icône Apple, on
-   * supprimait donc la favicon du site : `/icon.svg` répondait bien, mais
-   * aucune balise ne la désignait, et l'onglet restait vide.
+   * Ce champ REMPLACE ce que la convention de fichier `src/app/icon.*` aurait
+   * produit, il ne s'y ajoute pas. En n'y nommant que l'icône Apple, on avait
+   * supprimé la favicon du site : le fichier répondait bien, mais aucune
+   * balise ne le désignait, et l'onglet restait vide. Toute icône doit donc
+   * être listée ici.
+   *
+   * Les fichiers sortent de `scripts/icones.mjs`, qui tire le signe en pile
+   * sur un carré marine. Le signe en bleu et argent est le seul des trois
+   * métaux qui convienne : une icône ne suit pas le thème choisi par le
+   * visiteur, elle est posée une fois pour toutes.
    *
    * L'icône Apple, elle, doit rester déclarée : depuis iOS 16.4 Safari lit les
    * icônes du manifeste, mais les versions antérieures ne connaissent que
    * celle-ci, et une vignette pixelisée sur un écran d'accueil se remarque.
    */
   icons: {
-    icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+    icon: [
+      { url: "/icons/icone-32.png", type: "image/png", sizes: "32x32" },
+      { url: "/icons/icone-192.png", type: "image/png", sizes: "192x192" },
+    ],
     shortcut: [
       { url: "/icons/icone-192.png", type: "image/png", sizes: "192x192" },
     ],

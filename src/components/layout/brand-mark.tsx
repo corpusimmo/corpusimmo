@@ -129,20 +129,54 @@ export function BrandMark({
   }
 
   /**
-   * SUR FOND SOMBRE, LE SIGNE EST TOUJOURS LE TRACÉ, quelle que soit la
-   * famille choisie ailleurs.
+   * SUR FOND SOMBRE, LE PIED DE PAGE SUIT LA MÊME FAMILLE QUE L'EN-TÊTE.
    *
-   * Les deux familles fournies sont des bitmaps en marine : posées sur le
-   * marine du pied de page, elles disparaissent. Le tracé, lui, prend les
-   * couleurs qu'on lui donne et se tire en réserve. Tant qu'il n'existe pas
-   * de fichier en réserve, c'est lui qui tient le pied de page.
+   * Les plaques du signe en pile sont séparées par des liserés blancs et
+   * gravées de pistes dorées : ce sont eux qui portent la forme, et ils
+   * tiennent sur le marine du pied de page sans retouche. Le fichier y va
+   * donc tel quel, plutôt que de laisser un second signe que personne n'a
+   * choisi.
+   *
+   * Les tours, elles, restent le TRACÉ et non le fichier : leur plaque de
+   * gauche est marine pleine, et sur le marine du pied de page elle
+   * disparaîtrait. Le tracé prend les couleurs qu'on lui donne, donc il se
+   * tire en réserve.
    */
   return (
-    <svg
+    <span
+      className={cn(
+        "relative inline-flex h-9 shrink-0 items-center",
+        "[&>img]:h-full [&>img]:w-auto [&>svg]:h-full [&>svg]:w-auto",
+        className,
+        "!w-auto",
+      )}
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/marque-stack-or.webp"
+        alt=""
+        aria-hidden="true"
+        className="signe-stack marque-or hidden"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/marque-stack-argent.webp"
+        alt=""
+        aria-hidden="true"
+        className="signe-stack marque-argent hidden"
+      />
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img
+        src="/marque-stack-violet.webp"
+        alt=""
+        aria-hidden="true"
+        className="signe-stack marque-violet hidden"
+      />
+      <svg
       viewBox="0 0 32 32"
       aria-hidden="true"
       focusable="false"
-      className={cn("signe-tours size-9 shrink-0", className)}
+      className="signe-tours size-9 shrink-0"
     >
       <path
         d={PAGE}
@@ -180,7 +214,8 @@ export function BrandMark({
         strokeWidth="2"
         strokeLinecap="round"
       />
-    </svg>
+      </svg>
+    </span>
   );
 }
 

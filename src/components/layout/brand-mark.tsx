@@ -67,30 +67,78 @@ export function BrandMark({
     return (
       <span
         className={cn(
-          "relative inline-block h-9 w-auto shrink-0 [&>img]:h-full [&>img]:w-auto",
+          "relative inline-block h-9 w-auto shrink-0 [&>img]:h-full [&>img]:w-auto [&>svg]:h-full [&>svg]:w-auto",
           className,
         )}
       >
+        {/* ── LE SIGNE EN STRATES, DESSINÉ ─────────────────────────────────
+            Trois plaques empilées, la plus haute gravée de pistes. C'est le
+            signe déposé, redessiné en vectoriel plutôt qu'importé : il prend
+            les couleurs du thème, reste net à toutes les tailles, pèse un
+            kilo-octet, et n'a pas de fond blanc à détourer.
+
+            LA GÉOMÉTRIE EST UNE DIMÉTRIE 2:1, la même que le cube : les
+            sommets tombent sur des demi-pixels et les arêtes restent franches
+            même à seize pixels. Les trois plaques sont décalées de six unités,
+            ce qui laisse voir l'épaisseur de chacune sans que la pile ne
+            penche. */}
+        <svg
+          viewBox="0 0 32 32"
+          className="signe-strates hidden"
+          aria-hidden="true"
+          focusable="false"
+        >
+          <path
+            d="M16 19.5 4.8 24a1.3 1.3 0 0 0 0 2.4l10.3 4.1a2.4 2.4 0 0 0 1.8 0l10.3-4.1a1.3 1.3 0 0 0 0-2.4z"
+            fill="var(--primary-active)"
+          />
+          <path
+            d="M16 12.2 4.8 16.7a1.3 1.3 0 0 0 0 2.4l10.3 4.1a2.4 2.4 0 0 0 1.8 0l10.3-4.1a1.3 1.3 0 0 0 0-2.4z"
+            fill="var(--primary-hover)"
+          />
+          <path
+            d="M16.9 1.4a2.4 2.4 0 0 0-1.8 0L4.8 5.5a1.3 1.3 0 0 0 0 2.4l10.3 4.1a2.4 2.4 0 0 0 1.8 0l10.3-4.1a1.3 1.3 0 0 0 0-2.4z"
+            fill="var(--primary)"
+          />
+          {/* Les pistes, dans le plan de la plaque du dessus. Elles vivent
+              entre 4,5 et 9,5 en ordonnée, c'est à dire dans le tiers visible
+              de la face : plus haut elles sortiraient du losange, plus bas
+              elles passeraient sous l'arête. */}
+          <g
+            fill="none"
+            stroke="var(--accent-rule)"
+            strokeWidth="0.9"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M9.6 7.1 12.4 5.9l2.2 1" />
+            <path d="M17.6 5.2l2.6 1.1-1.9 0.9" />
+            <path d="M12.2 8.7l2.4-1.1" />
+            <circle cx="16" cy="7" r="0.9" />
+            <circle cx="20.3" cy="6.3" r="0.7" />
+          </g>
+        </svg>
+
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/marque-or.webp"
           alt=""
           aria-hidden="true"
-          className="marque-or block"
+          className="signe-tours marque-or block"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/marque-argent.webp"
           alt=""
           aria-hidden="true"
-          className="marque-argent hidden"
+          className="signe-tours marque-argent hidden"
         />
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           src="/marque-violet.webp"
           alt=""
           aria-hidden="true"
-          className="marque-violet hidden"
+          className="signe-tours marque-violet hidden"
         />
       </span>
     );

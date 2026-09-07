@@ -179,8 +179,11 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{var m=localStorage.getItem("corpusimmo.metal");' +
-              'if(m==="argent"||m==="violet")document.documentElement.dataset.theme=m;}catch(e){}',
+              'try{var d=document.documentElement;' +
+              'var m=localStorage.getItem("corpusimmo.metal");' +
+              'if(m==="argent"||m==="violet")d.dataset.theme=m;' +
+              'var s=localStorage.getItem("corpusimmo.signe");' +
+              'if(s==="strates")d.dataset.signe=s;}catch(e){}',
           }}
         />
       </head>

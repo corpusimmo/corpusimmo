@@ -37,7 +37,16 @@ export function CorpusStrip() {
     <section aria-label="L'étendue du corpus" className="container-page">
       {/* Un panneau posé à cheval sur le bas du héros : les quatre bornes du
           corpus flottent entre la promesse et le reste de la page. */}
-      <dl className="panel reveal relative z-10 -mt-8 grid grid-cols-2 gap-y-8 px-2 py-8 md:-mt-10 md:grid-cols-4 md:gap-y-0 md:divide-x md:divide-border-soft md:px-4">
+      {/* L'OMBRE EST DESCENDANTE, ET C'EST UN CORRECTIF. Le panneau remonte
+          de deux crans sur le héros, et l'ombre douce de `panel` déborde alors
+          VERS LE HAUT sur la photographie sombre : elle y forme un halo gris
+          aux coins arrondis, qu'on lit comme un voile translucide posé devant
+          le héros. Sur le fond clair du reste de la page la même ombre ne se
+          voit pas, ce qui explique qu'elle n'ait gêné qu'ici.
+
+          Un décalage positif et aucun étalement vers le haut : l'ombre ne peut
+          plus remonter, et le panneau redevient une plaque franche. */}
+      <dl className="panel reveal relative z-10 -mt-8 grid grid-cols-2 gap-y-8 px-2 py-8 shadow-[0_14px_30px_-16px_rgb(11_16_23/0.4)] md:-mt-10 md:grid-cols-4 md:gap-y-0 md:divide-x md:divide-border-soft md:px-4">
         {facts.map(([value, label]) => (
           <div
             key={label}

@@ -1172,6 +1172,22 @@
    balisage, et l'attribut de thème décide lequel se voit. Un choix fait en
    JavaScript rendrait le signe absent jusqu'à l'hydratation, donc en retard
    sur tout le reste de l'en-tête. */
+/* ── LA FAMILLE DE SIGNE, ET LE MÉTAL, SONT DEUX CHOIX SÉPARÉS ────────────
+   `data-signe` dit la famille, `data-theme` dit le métal. Les croiser en CSS
+   plutôt qu'en JavaScript garde le composant de marque côté serveur : le signe
+   est peint avec la première image, et non après l'hydratation.
+
+   Par défaut, les tours. Les strates sont dessinées et prennent les couleurs
+   du thème toutes seules, donc une seule règle suffit pour les trois métaux,
+   là où les tours en demandent une par fichier. */
+:root[data-signe="strates"] .signe-tours {
+  display: none;
+}
+
+:root[data-signe="strates"] .signe-strates {
+  display: block;
+}
+
 :root[data-theme="argent"] .marque-or,
 :root[data-theme="violet"] .marque-or {
   display: none;

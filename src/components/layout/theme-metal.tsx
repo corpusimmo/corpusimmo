@@ -25,8 +25,17 @@ import { cn } from "@/lib/utils/cn";
 
 export type Metal = "or" | "argent" | "violet";
 
-/** La clé est partagée avec le script en ligne du gabarit racine. */
+/** Les clés sont partagées avec le script en ligne du gabarit racine. */
 export const CLE_METAL = "corpusimmo.metal";
+export const CLE_SIGNE = "corpusimmo.signe";
+
+/** La famille de signe. Le métal est un choix distinct : voir `globals.css`. */
+export type Signe = "tours" | "strates";
+
+const SIGNES: ReadonlyArray<{ id: Signe; nom: string; titre: string }> = [
+  { id: "tours", nom: "Tours", titre: "Signe en tours" },
+  { id: "strates", nom: "Strates", titre: "Signe en strates" },
+];
 
 const METAUX: ReadonlyArray<{ id: Metal; nom: string; titre: string }> = [
   { id: "or", nom: "Or", titre: "Thème marine et or" },
@@ -51,6 +60,16 @@ function lireServeur(): Metal {
   return "or";
 }
 
+function lireSigne(): Signe {
+  return document.documentElement.dataset.signe === "strates"
+    ? "strates"
+    : "tours";
+}
+
+function signeServeur(): Signe {
+  return "tours";
+}
+
 function abonner(reagir: () => void): () => void {
   window.addEventListener(EVENEMENT, reagir);
   return () => window.removeEventListener(EVENEMENT, reagir);
@@ -72,6 +91,22 @@ export function ThemeMetal({ className }: { className?: string }) {
    * que de se relire l'une l'autre.
    */
   const metal = React.useSyncExternalStore(abonner, lireClient, lireServeur);
+  const signe = React.useSyncExternalStore(abonner, lireSigne, signeServeur);
+
+  const retenir = (cle: string, valeur: string): void => {
+    window.dispatchEvent(new Event(EVENEMENT));
+    try {
+      window.localStorage.setItem(cle, valeur);
+    } catch {
+      // Mode privé, quota plein : le choix vaut pour cette visite seulement.
+      // C'est un désagrément, pas une panne, et rien d'autre n'en dépend.
+    }
+  };
+
+  const choisirSigne = (suivant: Signe): void => {
+    document.documentElement.dataset.signe = suivant;
+    retenir(CLE_SIGNE, suivant);
+  };
 
   const choisir = (suivant: Metal): void => {
     document.documentElement.dataset.theme = suivant;
@@ -139,6 +174,32 @@ export function ThemeMetal({ className }: { className?: string }) {
               )}
             />
             {m.nom}
+          </button>
+        );
+      })}
+
+      {/* LE SIGNE EST UN SECOND CHOIX, séparé du métal par un filet. Deux
+          réglages dans un même groupe se confondent ; le filet dit qu'ils ne
+          font pas la même chose. */}
+      <span aria-hidden="true" className="mx-1 h-4 w-px bg-border" />
+
+      {SIGNES.map((sg) => {
+        const actif = signe === sg.id;
+        return (
+          <button
+            key={sg.id}
+            type="button"
+            onClick={() => choisirSigne(sg.id)}
+            aria-pressed={actif}
+            title={sg.titre}
+            className={cn(
+              "inline-flex min-h-8 items-center rounded-full px-2.5 text-xs font-semibold transition-colors",
+              actif
+                ? "bg-primary text-primary-fg"
+                : "text-ink-muted hover:text-ink",
+            )}
+          >
+            {sg.nom}
           </button>
         );
       })}

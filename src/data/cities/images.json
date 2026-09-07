@@ -1,0 +1,892 @@
+{
+  "aix-en-provence": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f5/Fontaine_de_la_Rotonde_-_Aix-en-Provence.JPG",
+    "largeur": 1984,
+    "hauteur": 1488,
+    "auteur": "Rainbow0413",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Fontaine_de_la_Rotonde_-_Aix-en-Provence.JPG",
+    "article": "https://fr.wikipedia.org/wiki/Aix-en-Provence"
+  },
+  "ajaccio": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/84/Aiacciu.jpg",
+    "largeur": 5616,
+    "hauteur": 3744,
+    "auteur": "dmytrok",
+    "licence": "CC BY-SA 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Aiacciu.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Ajaccio"
+  },
+  "amiens": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/86/Amiens_France_Quai-Belu-03.jpg",
+    "largeur": 5760,
+    "hauteur": 2834,
+    "auteur": "CEphoto, Uwe Aranas",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Amiens_France_Quai-Belu-03.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Amiens"
+  },
+  "angers": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7f/Ch%C3%A2teau_d%27Angers%2C_South_view_20170611_1.jpg",
+    "largeur": 6469,
+    "hauteur": 4558,
+    "auteur": "DXR",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%A2teau_d%27Angers,_South_view_20170611_1.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Angers"
+  },
+  "annecy": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Annecy%2C_France_%2837635411615%29.jpg",
+    "largeur": 5761,
+    "hauteur": 3893,
+    "auteur": "Roman Boed from The Netherlands",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Annecy,_France_(37635411615).jpg",
+    "article": "https://fr.wikipedia.org/wiki/Annecy"
+  },
+  "antibes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/af/Antibes_in_winter_%2816352944512%29.jpg",
+    "largeur": 5209,
+    "hauteur": 3473,
+    "auteur": "Franck Michel from Antibes, France",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Antibes_in_winter_(16352944512).jpg",
+    "article": "https://fr.wikipedia.org/wiki/Antibes"
+  },
+  "antony": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3e/Commune_antony_fontaine.jpg",
+    "largeur": 800,
+    "hauteur": 600,
+    "auteur": "User:Wikialine",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Commune_antony_fontaine.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Antony"
+  },
+  "asnieres-sur-seine": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/78/Mairie_Asni%C3%A8res.jpg",
+    "largeur": 4032,
+    "hauteur": 3024,
+    "auteur": "Brumathechec",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Mairie_Asni%C3%A8res.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Asni%C3%A8res-sur-Seine"
+  },
+  "aubervilliers": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1a/Place_H%C3%B4tel_Ville_Aubervilliers_1.jpg",
+    "largeur": 4780,
+    "hauteur": 2376,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Place_H%C3%B4tel_Ville_Aubervilliers_1.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Aubervilliers"
+  },
+  "aulnay-sous-bois": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f1/Photo_de_l%27h%C3%B4tel_de_ville_de_la_ville_d%27Aulnay-Sous-Bois.jpg",
+    "largeur": 718,
+    "hauteur": 600,
+    "auteur": "Rio0601",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Photo_de_l%27h%C3%B4tel_de_ville_de_la_ville_d%27Aulnay-Sous-Bois.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Aulnay-sous-Bois"
+  },
+  "avignon": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e2/Vue_a%C3%A9rienne_2_JP_Campomar.jpg",
+    "largeur": 3008,
+    "hauteur": 1960,
+    "auteur": "OT Avignon",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Vue_a%C3%A9rienne_2_JP_Campomar.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Avignon"
+  },
+  "besancon": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/99/Besan%C3%A7on%2C_la_rue_de_la_Convention.jpg",
+    "largeur": 5908,
+    "hauteur": 3928,
+    "auteur": "Wikipedro",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Besan%C3%A7on,_la_rue_de_la_Convention.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Besan%C3%A7on"
+  },
+  "beziers": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9b/B%C3%A9ziers_-_54704365001.jpg",
+    "largeur": 5822,
+    "hauteur": 3275,
+    "auteur": "Jorge Franganillo",
+    "licence": "CC BY 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:B%C3%A9ziers_-_54704365001.jpg",
+    "article": "https://fr.wikipedia.org/wiki/B%C3%A9ziers"
+  },
+  "bordeaux": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e1/Bordeaux_Place_de_la_Bourse_de_nuit.jpg",
+    "largeur": 2560,
+    "hauteur": 1920,
+    "auteur": "Mariette",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Bordeaux_Place_de_la_Bourse_de_nuit.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Bordeaux"
+  },
+  "bourges": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Bourges_-_Cath%C3%A9drale_Saint-%C3%89tienne_-_Ext%C3%A9rieur_-_05.jpg",
+    "largeur": 6490,
+    "hauteur": 4330,
+    "auteur": "Benjamin Smith",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Bourges_-_Cath%C3%A9drale_Saint-%C3%89tienne_-_Ext%C3%A9rieur_-_05.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Bourges"
+  },
+  "brest": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/aa/Ch%C3%A2teau_et_Tour_Tanguy.jpg",
+    "largeur": 5184,
+    "hauteur": 3456,
+    "auteur": "Aodhanbzh",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%A2teau_et_Tour_Tanguy.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Brest"
+  },
+  "caen": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bf/Eglise_St_Pierre_190.JPG",
+    "largeur": 3216,
+    "hauteur": 2136,
+    "auteur": "Viault",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Eglise_St_Pierre_190.JPG",
+    "article": "https://fr.wikipedia.org/wiki/Caen"
+  },
+  "calais": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/Calais_hotel_de_ville_face.jpg",
+    "largeur": 2259,
+    "hauteur": 2200,
+    "auteur": "Velvet",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Calais_hotel_de_ville_face.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Calais"
+  },
+  "cannes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3f/Cannes_-_port_et_croisette.jpg",
+    "largeur": 2592,
+    "hauteur": 1944,
+    "auteur": "Christophe.Finot",
+    "licence": "CC BY-SA 2.5",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cannes_-_port_et_croisette.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Cannes"
+  },
+  "cayenne": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c2/Cayenne_av_G%C3%A9n%C3%A9ral-de-Gaulle.jpg",
+    "largeur": 6856,
+    "hauteur": 3387,
+    "auteur": "Cayambe",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cayenne_av_G%C3%A9n%C3%A9ral-de-Gaulle.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Cayenne"
+  },
+  "cergy": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/38/Cergy_Grand_Centre_Parc_Fran%C3%A7ois_Mitterrand%C2%A9L_Pages.jpg",
+    "largeur": 3840,
+    "hauteur": 2926,
+    "auteur": "L. Pages - Ville de Cergy",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cergy_Grand_Centre_Parc_Fran%C3%A7ois_Mitterrand%C2%A9L_Pages.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Cergy"
+  },
+  "chambery": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/98/Chamb%C3%A9ry_depuis_les_Monts.JPG",
+    "largeur": 2981,
+    "hauteur": 2204,
+    "auteur": "Florian Pépellin",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Chamb%C3%A9ry_depuis_les_Monts.JPG",
+    "article": "https://fr.wikipedia.org/wiki/Chamb%C3%A9ry"
+  },
+  "champigny-sur-marne": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/b2/H%C3%B4tel_ville_Champigny_Marne_8.jpg",
+    "largeur": 6603,
+    "hauteur": 2638,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_ville_Champigny_Marne_8.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Champigny-sur-Marne"
+  },
+  "cherbourg-en-cotentin": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a7/Cherbourg.jpg",
+    "largeur": 2128,
+    "hauteur": 2832,
+    "auteur": "fr:Utilisateur:Steff",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cherbourg.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Cherbourg-en-Cotentin"
+  },
+  "clermont-ferrand": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c9/Ville_de_Clermont-Ferrand.jpg",
+    "largeur": 464,
+    "hauteur": 680,
+    "auteur": "Fabien1309",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Ville_de_Clermont-Ferrand.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Clermont-Ferrand"
+  },
+  "clichy": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/34/%C3%89gliseclichyjpg.jpg",
+    "largeur": 1920,
+    "hauteur": 2560,
+    "auteur": "Parisette",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:%C3%89gliseclichyjpg.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Clichy"
+  },
+  "colombes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/H%C3%B4tel_Ville_-_Colombes_%28FR92%29_-_2024-04-06_-_2.jpg",
+    "largeur": 4656,
+    "hauteur": 4616,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_Ville_-_Colombes_(FR92)_-_2024-04-06_-_2.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Colombes"
+  },
+  "creteil": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c1/Vue_a%C3%A9rienne_du_lac_de_Cr%C3%A9teil.jpg",
+    "largeur": 3884,
+    "hauteur": 2904,
+    "auteur": "Suaudeau",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Vue_a%C3%A9rienne_du_lac_de_Cr%C3%A9teil.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Cr%C3%A9teil"
+  },
+  "dijon": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Dijon_-_Palais_des_Ducs_et_des_%C3%89tats_de_Bourgogne_-_01.jpg",
+    "largeur": 6384,
+    "hauteur": 3192,
+    "auteur": "Benjamin Smith",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Dijon_-_Palais_des_Ducs_et_des_%C3%89tats_de_Bourgogne_-_01.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Dijon"
+  },
+  "drancy": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/29/H%C3%B4tel_ville_Drancy_3.jpg",
+    "largeur": 7680,
+    "hauteur": 4813,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_ville_Drancy_3.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Drancy"
+  },
+  "dunkerque": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/69/Dunkerque_Belfort.JPG",
+    "largeur": 1632,
+    "hauteur": 2251,
+    "auteur": "Welleschik",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Dunkerque_Belfort.JPG",
+    "article": "https://fr.wikipedia.org/wiki/Dunkerque"
+  },
+  "evry-courcouronnes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7e/Courcouronnes%2C_l%27%C3%A9glise.jpg",
+    "largeur": 5760,
+    "hauteur": 3840,
+    "auteur": "Marjolaine Roland",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Courcouronnes,_l%27%C3%A9glise.jpg",
+    "article": "https://fr.wikipedia.org/wiki/%C3%89vry-Courcouronnes"
+  },
+  "fort-de-france": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/24/Fort-de-france-harbor.jpg",
+    "largeur": 3008,
+    "hauteur": 1970,
+    "auteur": "Scott S Bateman",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Fort-de-france-harbor.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Fort-de-France"
+  },
+  "frejus": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c0/Fr%C3%A9jus-Plage_-_panoramio.jpg",
+    "largeur": 2240,
+    "hauteur": 1680,
+    "auteur": "nirvana2013",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Fr%C3%A9jus-Plage_-_panoramio.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Fr%C3%A9jus"
+  },
+  "grenoble": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a5/Cath%C3%A9drale_Notre-Dame_%C3%A0_Grenoble_2014-09-27.jpg",
+    "largeur": 2795,
+    "hauteur": 4207,
+    "auteur": "Jvillafruela",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cath%C3%A9drale_Notre-Dame_%C3%A0_Grenoble_2014-09-27.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Grenoble"
+  },
+  "issy-les-moulineaux": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/ac/Petit_Bras_de_Seine_%40_Issy-les-Moulineaux_%40_Paris_%2830184037683%29.jpg",
+    "largeur": 5472,
+    "hauteur": 3648,
+    "auteur": "Guilhem Vellut from Paris, France",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Petit_Bras_de_Seine_@_Issy-les-Moulineaux_@_Paris_(30184037683).jpg",
+    "article": "https://fr.wikipedia.org/wiki/Issy-les-Moulineaux"
+  },
+  "ivry-sur-seine": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/dc/Mairie_d%27Ivry_et_centre_ville.jpg",
+    "largeur": 2602,
+    "hauteur": 1462,
+    "auteur": "H4stings",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Mairie_d%27Ivry_et_centre_ville.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Ivry-sur-Seine"
+  },
+  "la-rochelle": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/22/Entree_vieux_port_La_Rochelle.JPG",
+    "largeur": 2592,
+    "hauteur": 1944,
+    "auteur": "L’auteur n’a pas pu être identifié automatiquement. Il est supposé qu'il s'agit de : CaptainHaddock (étant donné la revendication de droit d’auteur).",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Entree_vieux_port_La_Rochelle.JPG",
+    "article": "https://fr.wikipedia.org/wiki/La_Rochelle"
+  },
+  "la-seyne-sur-mer": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ea/Port_de_La_Seyne-sur-Mer.JPG",
+    "largeur": 3456,
+    "hauteur": 2304,
+    "auteur": "Cyril-83",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Port_de_La_Seyne-sur-Mer.JPG",
+    "article": "https://fr.wikipedia.org/wiki/La_Seyne-sur-Mer"
+  },
+  "le-blanc-mesnil": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1c/La_Place_de_l%27eau_et_la_fl%C3%A8che_de_l%27H%C3%B4tel_de_ville.jpg",
+    "largeur": 2592,
+    "hauteur": 3888,
+    "auteur": "Lucien de Rubrempré",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:La_Place_de_l%27eau_et_la_fl%C3%A8che_de_l%27H%C3%B4tel_de_ville.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Le_Blanc-Mesnil"
+  },
+  "le-havre": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Cath%C3%A9drale_Notre-Dame_du_Havre%2C_10_August_2021.jpg",
+    "largeur": 3000,
+    "hauteur": 2000,
+    "auteur": "Alexandre Prevot from Nancy, France",
+    "licence": "CC BY-SA 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cath%C3%A9drale_Notre-Dame_du_Havre,_10_August_2021.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Le_Havre"
+  },
+  "le-mans": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/6f/Montage_du_Mans.jpg",
+    "largeur": 1025,
+    "hauteur": 1156,
+    "auteur": "Le Mans",
+    "licence": "CC BY 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Montage_du_Mans.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Le_Mans"
+  },
+  "le-tampon": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Eglise_tampon.jpg",
+    "largeur": 1310,
+    "hauteur": 878,
+    "auteur": "Dunog",
+    "licence": "Public domain",
+    "licenceUrl": null,
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Eglise_tampon.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Le_Tampon"
+  },
+  "levallois-perret": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/H%C3%B4tel_Ville_-_Levallois-Perret_%28FR92%29_-_2023-07-06_-_6.jpg",
+    "largeur": 4032,
+    "hauteur": 3024,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_Ville_-_Levallois-Perret_(FR92)_-_2023-07-06_-_6.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Levallois-Perret"
+  },
+  "lille": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/3/3b/Lille_Collage.jpg",
+    "largeur": 2457,
+    "hauteur": 3294,
+    "auteur": "Cereol89 , Velvet",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Lille_Collage.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Lille"
+  },
+  "limoges": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d7/Cour_du_Temple_-_Limoges.JPG",
+    "largeur": 2816,
+    "hauteur": 2112,
+    "auteur": "Babsy",
+    "licence": "CC BY 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cour_du_Temple_-_Limoges.JPG",
+    "article": "https://fr.wikipedia.org/wiki/Limoges"
+  },
+  "lorient": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f4/Lorient.jpg",
+    "largeur": 900,
+    "hauteur": 596,
+    "auteur": "Original téléversé par Jackmame sur Wikipédia français .",
+    "licence": "CC BY-SA 2.5",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.5",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Lorient.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Lorient"
+  },
+  "lyon": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ee/Montage-Lyon-2023.jpg",
+    "largeur": 650,
+    "hauteur": 800,
+    "auteur": "Aldg692VX",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Montage-Lyon-2023.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Lyon"
+  },
+  "marseille": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/40/Notre_Dame_de_la_Garde.jpg",
+    "largeur": 3888,
+    "hauteur": 2592,
+    "auteur": "Benh LIEU SONG",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Notre_Dame_de_la_Garde.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Marseille"
+  },
+  "merignac": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/75/H%C3%B4tel_de_ville_de_M%C3%A9rignac_%28Gironde%29.JPG",
+    "largeur": 4912,
+    "hauteur": 3264,
+    "auteur": "Michael Specht",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_de_ville_de_M%C3%A9rignac_(Gironde).JPG",
+    "article": "https://fr.wikipedia.org/wiki/M%C3%A9rignac_(Gironde)"
+  },
+  "montauban": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/85/Montage_Montauban_ville.png",
+    "largeur": 1062,
+    "hauteur": 1288,
+    "auteur": "FL2014",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Montage_Montauban_ville.png",
+    "article": "https://fr.wikipedia.org/wiki/Montauban"
+  },
+  "montpellier": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/8a/Place_de_la_Com%C3%A9die_%282377437375%29.jpg",
+    "largeur": 4288,
+    "hauteur": 2848,
+    "auteur": "Wolfgang Staudt from Saarbruecken, Germany",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Place_de_la_Com%C3%A9die_(2377437375).jpg",
+    "article": "https://fr.wikipedia.org/wiki/Montpellier"
+  },
+  "nancy": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/Place_Stanislas_et_ses_grilles_%C3%A0_Nancy.jpg",
+    "largeur": 2500,
+    "hauteur": 1668,
+    "auteur": "Nicolas Cornet",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Place_Stanislas_et_ses_grilles_%C3%A0_Nancy.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Nancy"
+  },
+  "nanterre": {
+    "url": "https://upload.wikimedia.org/wikipedia/fr/a/ab/Mairie_Nanterre_Immeuble_Pyramide.JPG",
+    "largeur": 2816,
+    "hauteur": 2112,
+    "auteur": "Daniel Rodet",
+    "licence": "CC-BY-SA-3.0",
+    "licenceUrl": null,
+    "fichierUrl": "https://fr.wikipedia.org/wiki/Fichier:Mairie_Nanterre_Immeuble_Pyramide.JPG",
+    "article": "https://fr.wikipedia.org/wiki/Nanterre"
+  },
+  "nantes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Ch%C3%A2teau_des_Ducs_de_Bretagne_%C3%A0_Nantes_-_Anne.jpg",
+    "largeur": 1092,
+    "hauteur": 840,
+    "auteur": "Olga.Mach",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Ch%C3%A2teau_des_Ducs_de_Bretagne_%C3%A0_Nantes_-_Anne.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Nantes"
+  },
+  "narbonne": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c4/Narbonne_Cathedrale_Saint_Just_et_Saint_Pasteur.jpg",
+    "largeur": 8225,
+    "hauteur": 6212,
+    "auteur": "Benh LIEU SONG",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Narbonne_Cathedrale_Saint_Just_et_Saint_Pasteur.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Narbonne"
+  },
+  "neuilly-sur-seine": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/71/Mairie_de_Neuilly-sur-Seine.JPG",
+    "largeur": 3597,
+    "hauteur": 2698,
+    "auteur": "Celette",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Mairie_de_Neuilly-sur-Seine.JPG",
+    "article": "https://fr.wikipedia.org/wiki/Neuilly-sur-Seine"
+  },
+  "nice": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/94/Promenade_des_Anglais_%2822261311858%29.jpg",
+    "largeur": 1800,
+    "hauteur": 1200,
+    "auteur": "piet theisohn from Leverkusen, Germany",
+    "licence": "CC BY 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Promenade_des_Anglais_(22261311858).jpg",
+    "article": "https://fr.wikipedia.org/wiki/Nice"
+  },
+  "nimes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c3/Maison_Carree_in_Nimes_%2812%29.jpg",
+    "largeur": 4965,
+    "hauteur": 3270,
+    "auteur": "Krzysztof Golik",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Maison_Carree_in_Nimes_(12).jpg",
+    "article": "https://fr.wikipedia.org/wiki/N%C3%AEmes"
+  },
+  "niort": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/b/bb/View_of_%C3%89glise_Saint-Andr%C3%A9_and_Les_Vieux_Ponts%2C_Niort.jpg",
+    "largeur": 4624,
+    "hauteur": 3468,
+    "auteur": "Dominic Nelson",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:View_of_%C3%89glise_Saint-Andr%C3%A9_and_Les_Vieux_Ponts,_Niort.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Niort"
+  },
+  "noisy-le-grand": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/ca/Mairie_Noisy_Grand_24.jpg",
+    "largeur": 4886,
+    "hauteur": 4030,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Mairie_Noisy_Grand_24.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Noisy-le-Grand"
+  },
+  "orleans": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d5/Orl%C3%A9ans_et_la_rue_jeanne_d%27arc_en_2021.jpg",
+    "largeur": 1537,
+    "hauteur": 1946,
+    "auteur": "Anthony BOURGOUIN",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Orl%C3%A9ans_et_la_rue_jeanne_d%27arc_en_2021.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Orl%C3%A9ans"
+  },
+  "pantin": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/f/f2/H%C3%B4tel_Ville_-_Pantin_%28FR93%29_-_2022-07-12_-_1.jpg",
+    "largeur": 6115,
+    "hauteur": 4551,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_Ville_-_Pantin_(FR93)_-_2022-07-12_-_1.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Pantin"
+  },
+  "paris": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/4b/La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques%2C_Paris_ao%C3%BBt_2014_%282%29.jpg",
+    "largeur": 4592,
+    "hauteur": 2870,
+    "auteur": "Yann Caradec from Paris, France",
+    "licence": "CC BY-SA 2.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/2.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:La_Tour_Eiffel_vue_de_la_Tour_Saint-Jacques,_Paris_ao%C3%BBt_2014_(2).jpg",
+    "article": "https://fr.wikipedia.org/wiki/Paris"
+  },
+  "pau": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/16/Montage_Pau_4.jpg",
+    "largeur": 1000,
+    "hauteur": 1308,
+    "auteur": "Flo641",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Montage_Pau_4.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Pau"
+  },
+  "perpignan": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/7/7c/Cour_du_Campo_Santo.jpg",
+    "largeur": 4896,
+    "hauteur": 3264,
+    "auteur": "©service Photo – Ville de Perpignan",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Cour_du_Campo_Santo.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Perpignan"
+  },
+  "pessac": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/60/Pessac_-_Mairie.jpg",
+    "largeur": 5445,
+    "hauteur": 3630,
+    "auteur": "PA",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Pessac_-_Mairie.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Pessac"
+  },
+  "poitiers": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/1d/Poitiers_panorama_01.jpg",
+    "largeur": 1600,
+    "hauteur": 1200,
+    "auteur": "Luca Aless",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Poitiers_panorama_01.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Poitiers"
+  },
+  "quimper": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/56/Quimper2011.png",
+    "largeur": 2754,
+    "hauteur": 2098,
+    "auteur": "Romain Cormier",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Quimper2011.png",
+    "article": "https://fr.wikipedia.org/wiki/Quimper"
+  },
+  "reims": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c6/Fontaine_sube_crop_HQ_v2.jpg",
+    "largeur": 876,
+    "hauteur": 1280,
+    "auteur": "Léonard Patakreppe",
+    "licence": "CC0",
+    "licenceUrl": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Fontaine_sube_crop_HQ_v2.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Reims"
+  },
+  "rennes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/2c/Rennes-Place-du-Champ-Jacquet-Statue-Leperdit-Mars-2020.jpg",
+    "largeur": 4864,
+    "hauteur": 3648,
+    "auteur": "Erwan Corre",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Rennes-Place-du-Champ-Jacquet-Statue-Leperdit-Mars-2020.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Rennes"
+  },
+  "roubaix": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e6/H%C3%B4tel_Ville_Roubaix_26.jpg",
+    "largeur": 5089,
+    "hauteur": 5217,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_Ville_Roubaix_26.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Roubaix"
+  },
+  "rouen": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/97/Rouen_mosaique.png",
+    "largeur": 450,
+    "hauteur": 703,
+    "auteur": "Foulques1996",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Rouen_mosaique.png",
+    "article": "https://fr.wikipedia.org/wiki/Rouen"
+  },
+  "rueil-malmaison": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/6/63/Rueil-Malmaison_Place%C3%89glise.jpg",
+    "largeur": 2064,
+    "hauteur": 1118,
+    "auteur": "Pymouss44",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Rueil-Malmaison_Place%C3%89glise.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Rueil-Malmaison"
+  },
+  "saint-etienne": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/c/c8/Saint_Etienne_views.png",
+    "largeur": 2528,
+    "hauteur": 3308,
+    "auteur": "Km42ify",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Saint_Etienne_views.png",
+    "article": "https://fr.wikipedia.org/wiki/Saint-%C3%89tienne"
+  },
+  "saint-maur-des-fosses": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/2/21/H%C3%B4tel_ville_St_Maur_Foss%C3%A9s_11.jpg",
+    "largeur": 8152,
+    "hauteur": 5208,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_ville_St_Maur_Foss%C3%A9s_11.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Saint-Maur-des-Foss%C3%A9s"
+  },
+  "saint-nazaire": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/e7/Saint-Nazaire.jpg",
+    "largeur": 1080,
+    "hauteur": 1080,
+    "auteur": "ND44",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Saint-Nazaire.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Saint-Nazaire"
+  },
+  "sarcelles": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/1/12/2018-0615-Flanades-008.jpg",
+    "largeur": 5069,
+    "hauteur": 3377,
+    "auteur": "Bentz",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:2018-0615-Flanades-008.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Sarcelles"
+  },
+  "toulon": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/42/Petite_rade_de_Toulon_%28vue_du_Mont_Faron%29.jpg",
+    "largeur": 3504,
+    "hauteur": 2336,
+    "auteur": "Pierre Sénard",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Petite_rade_de_Toulon_(vue_du_Mont_Faron).jpg",
+    "article": "https://fr.wikipedia.org/wiki/Toulon"
+  },
+  "toulouse": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/d/d0/Montage_Toulouse_3.jpg",
+    "largeur": 800,
+    "hauteur": 960,
+    "auteur": "See above. Compilation by Milou34",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Montage_Toulouse_3.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Toulouse"
+  },
+  "tourcoing": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/0/0a/Collage_Tourcoing.png",
+    "largeur": 2509,
+    "hauteur": 3345,
+    "auteur": "Velvet",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Collage_Tourcoing.png",
+    "article": "https://fr.wikipedia.org/wiki/Tourcoing"
+  },
+  "tours": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/a/a0/Tours_-_H%C3%B4tel_de_Ville_-_17.jpg",
+    "largeur": 6011,
+    "hauteur": 4293,
+    "auteur": "Benjamin Smith",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Tours_-_H%C3%B4tel_de_Ville_-_17.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Tours"
+  },
+  "troyes": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/e/ec/Maison_Commune_-_H%C3%B4tel_de_Ville%2C_Troyes_20140509_1.jpg",
+    "largeur": 5426,
+    "hauteur": 3452,
+    "auteur": "DXR",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Maison_Commune_-_H%C3%B4tel_de_Ville,_Troyes_20140509_1.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Troyes"
+  },
+  "venissieux": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/9/9a/V%C3%A9nissieux_-_H%C3%B4tel_de_ville_%28juin_2023%29.jpg",
+    "largeur": 4032,
+    "hauteur": 3024,
+    "auteur": "Sebleouf",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:V%C3%A9nissieux_-_H%C3%B4tel_de_ville_(juin_2023).jpg",
+    "article": "https://fr.wikipedia.org/wiki/V%C3%A9nissieux"
+  },
+  "versailles": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/5/54/Vue_a%C3%A9rienne_du_domaine_de_Versailles_par_ToucanWings_-_Creative_Commons_By_Sa_3.0_-_073.jpg",
+    "largeur": 4368,
+    "hauteur": 3276,
+    "auteur": "ToucanWings",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Vue_a%C3%A9rienne_du_domaine_de_Versailles_par_ToucanWings_-_Creative_Commons_By_Sa_3.0_-_073.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Versailles"
+  },
+  "villejuif": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/82/Mairie_Villejuif_9.jpg",
+    "largeur": 7704,
+    "hauteur": 5408,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Mairie_Villejuif_9.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Villejuif"
+  },
+  "villeneuve-d-ascq": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/81/Jielbeaumadier_chateau_flers_neige_vda_20101221_1.jpg",
+    "largeur": 2560,
+    "hauteur": 1440,
+    "auteur": "Jiel Beaumadier",
+    "licence": "CC BY-SA 3.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/3.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:Jielbeaumadier_chateau_flers_neige_vda_20101221_1.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Villeneuve-d'Ascq"
+  },
+  "villeurbanne": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/4/45/A_view_of_Le_Tonkin_district_in_Villeurbanne_in_spring.jpg",
+    "largeur": 4032,
+    "hauteur": 3024,
+    "auteur": "a.s.serov",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:A_view_of_Le_Tonkin_district_in_Villeurbanne_in_spring.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Villeurbanne"
+  },
+  "vitry-sur-seine": {
+    "url": "https://upload.wikimedia.org/wikipedia/commons/8/89/H%C3%B4tel_Ville_Vitry_Seine_3.jpg",
+    "largeur": 5089,
+    "hauteur": 3155,
+    "auteur": "Chabe01",
+    "licence": "CC BY-SA 4.0",
+    "licenceUrl": "https://creativecommons.org/licenses/by-sa/4.0",
+    "fichierUrl": "https://commons.wikimedia.org/wiki/File:H%C3%B4tel_Ville_Vitry_Seine_3.jpg",
+    "article": "https://fr.wikipedia.org/wiki/Vitry-sur-Seine"
+  }
+}

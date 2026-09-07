@@ -45,6 +45,7 @@ import {
 import type { CityAggregate } from "@/lib/cities";
 import { coverageDisclaimer } from "@/lib/dvf";
 import { breadcrumbNode } from "@/lib/seo/json-ld";
+import { CityPhoto } from "@/components/cities/city-photo";
 import { JsonLd } from "@/lib/seo/json-ld-script";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { formatNumber, formatPricePerSqm } from "@/lib/utils/format";
@@ -156,6 +157,13 @@ export default async function VillePage({ params }: PageProps) {
               Millésimes DVF {city.years[0]} à {city.latestYear}
             </Badge>
           </div>
+
+          {/* La photographie vient de Wikipédia, avec son crédit. Elle est
+              APRÈS les chiffres d'en-tête et non avant : cette page se lit
+              pour ce qu'elle mesure, l'image ne fait que situer. Onze communes
+              sur cent n'en ont pas dont la licence soit vérifiable ; elles
+              n'affichent alors rien. */}
+          <CityPhoto slug={city.slug} name={city.name} />
         </header>
 
         <section aria-label="Les chiffres clés" className="grid gap-4 sm:grid-cols-3">

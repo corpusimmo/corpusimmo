@@ -183,7 +183,7 @@ export default function RootLayout({
               'var m=localStorage.getItem("corpusimmo.metal");' +
               'if(m==="argent"||m==="violet")d.dataset.theme=m;' +
               'var s=localStorage.getItem("corpusimmo.signe");' +
-              'if(s==="strates"||s==="circuits")d.dataset.signe=s;}catch(e){}',
+              'if(s==="stack"||s==="circuits"||s==="strates")d.dataset.signe="stack";}catch(e){}',
           }}
         />
       </head>

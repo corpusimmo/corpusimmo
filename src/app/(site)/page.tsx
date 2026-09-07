@@ -77,12 +77,16 @@ export default function HomePage() {
                 pour être répétée. */}
             <h1 className="mt-6 font-display text-[3.25rem] leading-[0.98] font-extrabold tracking-[-0.04em] text-ink-inverted md:text-[4.5rem] lg:text-[5.25rem]">
               {siteConfig.nameParts[0]}
-              {/* Ici le bleu VIF est légitime, contrairement au mot-symbole de
-                  l'en-tête : à 52 px et plus, en gras, on est très au-delà du
-                  seuil de « grand texte », et le contraste requis tombe à 3:1.
-                  `--brand-400` détache mieux sur la photo assombrie du hero
-                  que le 500, qui s'y enfonce. */}
-              <span className="text-[color:var(--brand-400)]">
+              {/* LE SEUL BALAYAGE DE LA PAGE, et il est ici parce que c'est le
+                  premier mot lu. Un reflet qui passe est un événement : deux
+                  sur le même écran et ce n'est plus un événement, c'est un
+                  décor qui clignote.
+
+                  À 52 px et plus, en gras, on est très au-delà du seuil de
+                  « grand texte » et le contraste requis tombe à 3:1. La rampe
+                  repart donc du clair, l'arrêt le plus sombre du métal
+                  s'enfonçant dans la photo assombrie du hero. */}
+              <span className="balayage-metal">
                 {siteConfig.nameParts[1]}
               </span>
             </h1>

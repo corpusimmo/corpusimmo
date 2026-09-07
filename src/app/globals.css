@@ -254,6 +254,18 @@
   --metal-b: #e2c877;
   --metal-c: #a37f34;
   --metal-eclat: #fbf3d8;
+
+  /* Le halo posé autour d'un cadre. Il ne colore rien, il pose une lumière :
+     d'où une teinte franche et une opacité faible plutôt que l'inverse. */
+  --metal-halo: 200 142 52;
+
+  /* LA DISPERSION DU REFLET. Un vrai poli ne renvoie pas du blanc, il
+     décompose la lumière : le bord chaud d'un côté, le bord froid de l'autre.
+     Trois teintes suffisent à le suggérer, et c'est ce qui sépare un reflet
+     de métal d'un simple éclaircissement. */
+  --metal-prisme-1: 255 230 200;
+  --metal-prisme-2: 255 236 190;
+  --metal-prisme-3: 255 250 235;
 }
 
 :root[data-theme="argent"] {
@@ -261,6 +273,15 @@
   --metal-b: #dfe5ec;
   --metal-c: #8d97a5;
   --metal-eclat: #ffffff;
+
+  --metal-halo: 148 160 176;
+
+  /* L'argent disperse plus froid que l'or : le rose et le bleu prennent la
+     place de l'ambre. C'est la seule différence de nature entre les deux
+     métaux, tout le reste n'est qu'un changement de teinte. */
+  --metal-prisme-1: 255 200 220;
+  --metal-prisme-2: 220 220 255;
+  --metal-prisme-3: 200 240 255;
 }
 
 /* ============================================================================
@@ -735,6 +756,251 @@
   }
 }
 
+/* ----------------------------------------------------------------------------
+   LES QUATRE TRAITEMENTS DU MÉTAL, ET OÙ CHACUN SERT
+   ----------------------------------------------------------------------------
+   Un seul métal plat partout rend la marque terne aux grandes tailles ; le
+   même effet brillant partout la rend clinquante. Chaque traitement a donc
+   une place, et une seule.
+
+     feuille-metal    la feuille. Un dégradé qui va du creux à la lumière puis
+                      retombe : le relief d'une dorure sans qu'un pixel ne
+                      bouge. Logotype, accents de titre, à partir de 16 px.
+     balayage-metal   le reflet qui passe. UN mot par écran, jamais deux.
+     grave-metal      le relief gravé, une ombre dessous et une lumière
+                      dessus. Aucun dégradé, donc rien à perdre en petit.
+     cadre-metal      l'anneau tournant. Autour d'un objet, jamais d'un texte.
+
+   SUR FOND SOMBRE, LES ARRÊTS CHANGENT. L'arrêt le plus sombre de l'or
+   (#8A6A2F) donne 2,6:1 sur le marine du hero : illisible. Les variantes
+   « inversee » remontent toute la rampe d'un cran et repartent du clair.
+   -------------------------------------------------------------------------- */
+
+@utility feuille-metal {
+  background-image: linear-gradient(
+    100deg,
+    var(--metal-a) 0%,
+    var(--metal-c) 26%,
+    var(--metal-b) 44%,
+    var(--metal-eclat) 52%,
+    var(--metal-c) 68%,
+    var(--metal-a) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@utility feuille-metal-inversee {
+  background-image: linear-gradient(
+    100deg,
+    var(--metal-c) 0%,
+    var(--metal-b) 28%,
+    var(--metal-eclat) 50%,
+    var(--metal-b) 70%,
+    var(--metal-c) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/**
+ * LE BALAYAGE, ET SA CADENCE.
+ *
+ * La bande fait près de trois fois la largeur du mot : la lumière traverse,
+ * puis disparaît longtemps avant de revenir. Le mouvement occupe la première
+ * moitié du cycle et l'autre moitié est un temps mort. Une boucle serrée ne
+ * se lit pas comme un reflet, elle se lit comme un clignotant, et un
+ * clignotant sur un mot empêche de le lire.
+ */
+@keyframes balayage-metal {
+  0%,
+  100% {
+    background-position: 130% 0;
+  }
+  55% {
+    background-position: -30% 0;
+  }
+}
+
+/* La rampe du balayage part du CLAIR : il sert sur le hero, donc sur fond
+   sombre, où l'arrêt le plus creux du métal tomberait à 2,6:1. */
+@utility balayage-metal {
+  background-image: linear-gradient(
+    100deg,
+    var(--metal-b) 0%,
+    var(--metal-eclat) 34%,
+    var(--metal-b) 48%,
+    var(--metal-eclat) 62%,
+    var(--metal-b) 100%
+  );
+  background-size: 280% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: balayage-metal 7s ease-in-out infinite;
+}
+
+/**
+ * LE RELIEF GRAVÉ, pour ce qui descend sous seize pixels.
+ *
+ * Un dégradé découpé par des lettres de treize pixels se réduit à une
+ * bouillie : il n'y a pas assez de surface pour qu'on distingue les arrêts.
+ * Une ombre dessous et une lumière dessus donnent le même métal, et tiennent
+ * à n'importe quelle taille.
+ */
+@utility grave-metal {
+  color: var(--accent);
+  text-shadow: 0 -1px 0 rgb(255 255 255 / 0.6);
+}
+
+/* ----------------------------------------------------------------------------
+   L'ANNEAU TOURNANT
+   ----------------------------------------------------------------------------
+   Un dégradé conique qui tourne autour du bord, peint en anneau seul par une
+   soustraction de masques, et enveloppé d'un halo. C'est le seul effet du lot
+   qui tourne en permanence, et il le peut parce qu'il est en périphérie : le
+   mouvement n'est jamais sous le texte qu'on lit.
+
+   `@property` est OBLIGATOIRE ici et doit vivre hors de toute couche. Sans
+   déclaration typée, un navigateur interpole une variable personnalisée comme
+   une chaîne, c'est à dire par sauts : l'anneau tournerait par à-coups au lieu
+   de tourner.
+   -------------------------------------------------------------------------- */
+@utility cadre-metal {
+  position: relative;
+  isolation: isolate;
+}
+
+.cadre-metal::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1.5px;
+  background: conic-gradient(
+    from var(--angle-metal, 0deg),
+    color-mix(in srgb, var(--metal-a) 12%, transparent),
+    var(--metal-b),
+    var(--metal-eclat),
+    color-mix(in srgb, var(--metal-a) 20%, transparent),
+    var(--metal-b),
+    color-mix(in srgb, var(--metal-a) 12%, transparent)
+  );
+  /* La soustraction laisse le seul liseré : le remplissage est masqué par sa
+     propre boîte de contenu, ce qui évite un second élément. */
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: tourner-metal 7s linear infinite;
+  pointer-events: none;
+  z-index: 3;
+}
+
+.cadre-metal::after {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  box-shadow: 0 0 46px -12px rgb(var(--metal-halo) / 0.5);
+  pointer-events: none;
+  z-index: -1;
+}
+
+/* ----------------------------------------------------------------------------
+   LA PASTILLE POLIE
+   ----------------------------------------------------------------------------
+   Le poli tient à trois choses, et il en manque une dès qu'on en retire une :
+   une lumière rasante en haut, une ombre en bas, et un reflet qui passe.
+
+   LE REFLET EST DISPERSÉ, pas blanc. Un métal poli ne renvoie pas du blanc,
+   il décompose la lumière : le bord chaud d'un côté, le bord froid de
+   l'autre. Les trois teintes de prisme changent avec le thème, l'or
+   dispersant vers l'ambre et l'argent vers le rose et le bleu.
+
+   SEIZE SECONDES DE CYCLE dont quatre de mouvement. Le reste est un temps
+   mort assumé : le reflet doit passer de temps en temps, comme une lumière
+   ambiante, pas battre la mesure.
+   -------------------------------------------------------------------------- */
+@keyframes passage-metal {
+  0% {
+    background-position: -150% 0;
+  }
+  25%,
+  100% {
+    background-position: 250% 0;
+  }
+}
+
+@utility pastille-metal {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.42),
+    inset 0 -1px 0.5px rgb(0 0 0 / 0.14);
+}
+
+.pastille-metal::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    105deg,
+    transparent 0%,
+    transparent 36%,
+    rgb(var(--metal-prisme-1) / 0) 39%,
+    rgb(var(--metal-prisme-1) / 0.5) 45%,
+    rgb(var(--metal-prisme-2) / 0.45) 49%,
+    rgb(var(--metal-prisme-3) / 0.55) 55%,
+    rgb(255 255 255 / 0) 61%,
+    transparent 64%,
+    transparent 100%
+  );
+  background-size: 250% 100%;
+  background-position: -150% 0;
+  animation: passage-metal 16s ease-in-out infinite;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* L'ARGENT NE PEUT PAS PARTIR DU MÊME ARRÊT QUE L'OR.
+   Sa rampe haute est presque blanche : sur le hero, « Immo » devenait aussi
+   clair que « Corpus » juste à côté, et la coupure du mot en deux disparaissait.
+   Le balayage argenté part donc du gris d'acier et monte au clair, ce qui le
+   distingue de l'encre inversée tout en restant à 6:1 sur la photo assombrie.
+   C'est la seule règle du système à dépendre du thème, et c'est parce que les
+   deux métaux ne sont pas également lumineux. */
+:root[data-theme="argent"] .balayage-metal {
+  background-image: linear-gradient(
+    100deg,
+    var(--metal-c) 0%,
+    var(--metal-b) 34%,
+    var(--metal-eclat) 48%,
+    var(--metal-b) 62%,
+    var(--metal-c) 100%
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .balayage-metal,
+  .cadre-metal::before,
+  .pastille-metal::after {
+    animation: none;
+  }
+  .balayage-metal {
+    background-position: 50% 0;
+  }
+}
+
 @utility tap-target {
   &::after {
     content: "";
@@ -1012,4 +1278,19 @@
 
 .maplibregl-popup-close-button {
   display: none !important;
+}
+
+/* `@property` ne peut pas vivre dans une couche : déclarée à l'intérieur, elle
+   n'est pas enregistrée et l'angle redevient une chaîne, donc non
+   interpolable. C'est la raison de sa présence tout en bas du fichier. */
+@property --angle-metal {
+  syntax: "<angle>";
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes tourner-metal {
+  to {
+    --angle-metal: 360deg;
+  }
 }

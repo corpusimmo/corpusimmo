@@ -110,13 +110,17 @@ export function BrandLockup({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <BrandMark className={markClassName} tone={tone} />
-      {/* « Corpus » en encre, « Immo » en bleu de marque.
-          PAS le bleu vif : à 18 px demi-gras, le mot-symbole n'est pas du
-          « grand texte » au sens des règles de contraste, et `--brand-500`
-          (#0082c3) plafonne à 4,22:1 sur blanc. On prend donc `--brand-600`
-          (5,92:1), qui reste franchement azur sans passer sous le seuil.
-          Sur fond sombre, c'est l'inverse : il faut monter dans la rampe,
-          d'où `--brand-300`. */}
+      {/* « Corpus » en encre, « Immo » EN MÉTAL.
+          C'est le logotype des deux propositions retenues, marine et or ou
+          marine et argent : le nom se coupe en deux, l'encre puis le métal du
+          thème. Le métal est ici une FEUILLE, pas un balayage : le logotype
+          est présent sur chaque écran, et un reflet qui passe sur un élément
+          permanent finit par battre la mesure.
+
+          Le contraste est tenu par l'arrêt le plus sombre du dégradé, qui
+          porte l'essentiel du glyphe : #8A6A2F donne 5,0:1 sur blanc et
+          #78818F 4,6:1, tous deux au-dessus du seuil de 4,5 exigé à cette
+          taille. Sur fond sombre, la rampe repart du clair. */}
       <span
         className={cn(
           "font-display text-[1.125rem] font-semibold tracking-[-0.02em]",
@@ -126,9 +130,7 @@ export function BrandLockup({
         {siteConfig.nameParts[0]}
         <span
           className={
-            tone === "inverted"
-              ? "text-[color:var(--brand-300)]"
-              : "text-[color:var(--brand-600)]"
+            tone === "inverted" ? "feuille-metal-inversee" : "feuille-metal"
           }
         >
           {siteConfig.nameParts[1]}

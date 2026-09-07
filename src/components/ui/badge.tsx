@@ -21,7 +21,7 @@ export interface BadgeProps {
 const TONES: Record<BadgeTone, string> = {
   neutral: "border-border bg-surface-2 text-ink-muted",
   primary: "border-transparent bg-primary-soft text-primary-soft-fg",
-  accent: "border-transparent bg-accent-soft text-accent-soft-fg",
+  accent: "badge-metal border-transparent text-accent-soft-fg",
   success: "border-transparent bg-success-soft text-success-soft-fg",
   warning: "border-transparent bg-warning-soft text-warning-soft-fg",
   danger: "border-transparent bg-danger-soft text-danger-soft-fg",

@@ -93,7 +93,7 @@ export default function AProposPage() {
 
         <div
           aria-hidden
-          className="absolute inset-x-0 bottom-0 h-1 bg-[linear-gradient(90deg,var(--accent-rule),var(--accent),var(--accent-rule))]"
+          className="filet-metal absolute inset-x-0 bottom-0 h-1"
         />
       </header>
 

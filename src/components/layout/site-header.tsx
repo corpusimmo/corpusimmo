@@ -27,6 +27,7 @@ import { cn } from "@/lib/utils/cn";
 
 import { AccountMenu } from "./account-menu";
 import { BrandLockup } from "./brand-mark";
+import { ThemeMetal } from "./theme-metal";
 
 /** Actif sur la page elle-même ET sur ses sous-pages : `/outils/dcf` allume « Outils ». */
 function isActive(pathname: string, href: string): boolean {
@@ -78,7 +79,7 @@ export function SiteHeader() {
           institutionnelle que la barre se permet. */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-x-0 top-0 h-0.5 bg-[linear-gradient(90deg,var(--accent-rule),var(--accent)_45%,var(--accent-rule))]"
+        className="filet-metal pointer-events-none absolute inset-x-0 top-0 h-0.5"
       />
       {/* Un voile de flou SANS teinte derrière la barre : il adoucit le
           filet de page qui passe dans la gouttière, au-dessus et autour de
@@ -160,6 +161,10 @@ export function SiteHeader() {
         </div>
 
         <div className="col-start-3 flex items-center gap-2 justify-self-end">
+          {/* Le choix du métal, à côté du compte : c'est un réglage
+              d'affichage, il vit avec les autres réglages et non dans la
+              navigation, qui parle de contenu. */}
+          <ThemeMetal className="hidden md:inline-flex" />
           <AccountMenu className="hidden lg:inline-flex" />
           {/* `tap-target` : le CTA est dessiné en `sm` (36 px) pour ne pas
               écraser le bandeau, sa zone d'appui monte seule à 44 px. */}

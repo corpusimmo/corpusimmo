@@ -23,23 +23,26 @@
    Les ratios sont annotés là où le choix n'est pas évident.
    ========================================================================== */
 :root {
-  /* --- Rampe de marque : le bleu vif ---------------------------------------
-     Un azur franc, pas un bleu nuit. La rampe descend vite parce que le
-     sommet ne porte pas de texte : `--brand-500` (#0082c3) plafonne à 4,22:1
-     avec du blanc, sous le seuil de 4,5. Ce qui porte du texte commence à
-     `--brand-600` (5,92:1). Le haut de la rampe est fait pour les aplats,
-     les filets et les fonds, jamais pour une étiquette. */
-  --brand-50: #eef7fc;
-  --brand-100: #d9edf8;
-  --brand-200: #aedcf1;
-  --brand-300: #77c4e6;
-  --brand-400: #33a5d6;
-  --brand-500: #0082c3;
-  --brand-600: #0069a3;
-  --brand-700: #005b8f;
-  --brand-800: #00507e;
-  --brand-900: #003f61;
-  --brand-950: #002337;
+  /* --- Rampe de marque : le marine -----------------------------------------
+     LE BLEU A CHANGÉ, et ce n'est pas cosmétique. L'azur franc d'avant ne
+     correspondait à aucune des références réunies pour la direction
+     artistique, qui convergent toutes vers un marine profond. La rampe
+     descend donc de #3F6D9C à #0C1B2E.
+
+     Ce qui porte du texte commence à `--brand-600` (#14497A, 8,3:1 sur
+     blanc). Au-dessus, la rampe sert aux aplats, aux filets et aux fonds,
+     jamais à une étiquette. */
+  --brand-50: #f2f6fa;
+  --brand-100: #e3e9f0;
+  --brand-200: #c6d4e2;
+  --brand-300: #9db4c9;
+  --brand-400: #5b7da3;
+  --brand-500: #3f6d9c;
+  --brand-600: #14497a;
+  --brand-700: #10365d;
+  --brand-800: #0d2b4a;
+  --brand-900: #0c1b2e;
+  --brand-950: #070f19;
 
   /* --- Rampe bronze : la marque, la sélection, les filets -----------------
      Champagne patiné, jamais jaune. `--bronze-500` (#A8874A) ne tient que
@@ -67,10 +70,10 @@
   --paper-500: #64748b;
 
   /* --- Surfaces ----------------------------------------------------------- */
-  --canvas: #f5f8fa;
+  --canvas: #f7f5f1;
   --surface: #ffffff;
-  --surface-2: #fafcfd;
-  --surface-3: #e9f1f6;
+  --surface-2: #fdfbf8;
+  --surface-3: #f1ece3;
   --surface-inverted: #0b1017;
   --overlay: rgb(11 16 23 / 0.55);
 
@@ -83,9 +86,9 @@
   --ink-inverted: #ffffff;
 
   /* --- Bordures — teintées de marine, jamais grises ----------------------- */
-  --border: #dfe8ee;
-  --border-soft: #edf3f7;
-  --border-strong: #c3d2dc;
+  --border: #e6e1d8;
+  --border-soft: #f1ede6;
+  --border-strong: #d3ccbd;
 
   /* --- Action primaire ------------------------------------------------------
      DEUX BLEUS, ET C'EST MESURÉ. Le bleu de marque `--brand` (#0082c3) ne
@@ -96,12 +99,12 @@
      `--primary` descend d'un cran (5,92:1) et prend tout ce qui porte du
      texte ; `--brand` garde les aplats larges, les filets et les fonds où
      rien de petit ne s'écrit. */
-  --primary: #0069a3;
-  --primary-hover: #005b8f;
-  --primary-active: #00507e;
+  --primary: #14497a;
+  --primary-hover: #10365d;
+  --primary-active: #0d2b4a;
   --primary-fg: #ffffff;
-  --primary-soft: #e6f2f9;
-  --primary-soft-fg: #00507e;
+  --primary-soft: #e8eef5;
+  --primary-soft-fg: #0f3760;
 
   /* Le bleu de marque, vif. Aplats, filets, hero. Jamais du texte dessus. */
   --brand: var(--brand-500);
@@ -117,7 +120,7 @@
   --accent-soft: #f6efdf;
   --accent-soft-fg: #6a5024;
   /* Le bronze clair, réservé aux aplats larges et aux filets : jamais du texte. */
-  --accent-rule: #c2a468;
+  --accent-rule: #c9a227;
 
   /* --- Retour d'état — désaturés, à la hauteur du reste ------------------- */
   --success: #2f6b4f;
@@ -141,7 +144,7 @@
   --ring: #a8874a;
 
   /* --- Cartographie ------------------------------------------------------- */
-  --map-marker: #1b3349;
+  --map-marker: #0c1b2e;
   --map-marker-fg: #ffffff;
   --map-cluster: #3a5a80;
   --map-selected: #8a6a2f;
@@ -177,6 +180,87 @@
   --tracking-eyebrow: 0.12em;
 
   color-scheme: light;
+}
+
+/* ============================================================================
+   LES DEUX THÈMES — MARINE & OR, MARINE & ARGENT
+   ----------------------------------------------------------------------------
+   Ce n'est pas un thème clair et un thème sombre. Les deux sont clairs : ce
+   qui change est le MÉTAL, et avec lui la température de tout l'écran. L'or
+   réchauffe le fond de page, l'argent le refroidit ; le marine, lui, ne bouge
+   pas d'un thème à l'autre, parce que c'est lui qui porte l'identité.
+
+   POURQUOI DEUX. Le conseil patrimonial attend de l'or, le conseil aux
+   investisseurs attend de l'argent, et les deux publics visitent le même
+   site. Laisser le choix coûte un attribut sur `<html>` et évite de trancher
+   à la place du visiteur.
+
+   L'OR PAR DÉFAUT, parce que c'est la piste dominante des références. Le
+   thème est écrit dans `:root` plutôt que dans un bloc à part : une page
+   servie avant que le script de restauration ne s'exécute affiche donc l'or,
+   pas une absence de couleur.
+
+   AUCUN DE CES DEUX MÉTAUX NE PORTE DE TEXTE. `--accent-rule` est un filet et
+   un aplat, jamais une encre : l'or à #C9A227 donne 2,3:1 sur blanc et
+   l'argent à #A8B2C4 1,9:1. C'est `--accent` (#8A6A2F, 5,0:1) qui écrit.
+   ========================================================================== */
+
+:root[data-theme="argent"] {
+  --canvas: #f4f6fa;
+  --surface-2: #fafbfd;
+  --surface-3: #eaeef6;
+  --border: #dfe3ec;
+  --border-soft: #eef1f6;
+  --border-strong: #c3cad9;
+
+  /* Le marine descend d'un cran : Silver Rock est plus sombre que Nexus. */
+  --primary: #1b2a5b;
+  --primary-hover: #142046;
+  --primary-active: #0f1836;
+  --primary-soft: #e8ebf4;
+  --primary-soft-fg: #142046;
+  --brand-500: #5c6c9c;
+  --brand-600: #1b2a5b;
+  --brand-700: #16234a;
+  --brand-800: #101c3a;
+  --brand-900: #0a1226;
+
+  /* L'accent passe au gris-bleu. Il garde ses 4,5:1 : c'est lui qui écrit. */
+  --accent: #4f5765;
+  --accent-hover: #3f4653;
+  --accent-active: #333944;
+  --accent-soft: #eef0f4;
+  --accent-soft-fg: #474f5e;
+  --accent-rule: #a8b2c4;
+
+  --surface-inverted: #101c3a;
+  --map-marker: #101c3a;
+}
+
+/* ----------------------------------------------------------------------------
+   LE MÉTAL, ET SA BRILLANCE
+   ----------------------------------------------------------------------------
+   Un filet d'or plat n'est pas de l'or : c'est du jaune. Ce qui fait le métal
+   est la VARIATION, une bande claire qui traverse une teinte plus sombre. Les
+   trois arrêts ci-dessous suffisent à la produire, et ils sont déclinés par
+   thème puisque l'argent ne brille pas comme l'or.
+
+   `--metal-eclat` est la bande claire qui passe au survol. Elle est distincte
+   des trois arrêts parce qu'elle doit rester plus lumineuse que le plus clair
+   d'entre eux, sinon le passage ne se voit pas.
+   -------------------------------------------------------------------------- */
+:root {
+  --metal-a: #8a6a2f;
+  --metal-b: #e2c877;
+  --metal-c: #a37f34;
+  --metal-eclat: #fbf3d8;
+}
+
+:root[data-theme="argent"] {
+  --metal-a: #78818f;
+  --metal-b: #dfe5ec;
+  --metal-c: #8d97a5;
+  --metal-eclat: #ffffff;
 }
 
 /* ============================================================================
@@ -458,6 +542,87 @@
 /* Le filet bronze sous un titre de section. Un trait, pas une décoration. */
 @utility rule-accent {
   border-block-end: 2px solid var(--accent-rule);
+}
+
+/* ----------------------------------------------------------------------------
+   LE FILET MÉTAL
+   ----------------------------------------------------------------------------
+   Trois arrêts, jamais deux : un dégradé qui va simplement du sombre au clair
+   se lit comme une ombre. Ce qui fait le métal est la bande claire PRISE ENTRE
+   deux zones plus sombres, c'est à dire un reflet.
+
+   `background-size` est à 200 % pour laisser de la place au déplacement du
+   fond au survol. Sans cela, la bande n'aurait nulle part où aller.
+   -------------------------------------------------------------------------- */
+@utility filet-metal {
+  background-image: linear-gradient(
+    100deg,
+    var(--metal-a) 0%,
+    var(--metal-b) 38%,
+    var(--metal-eclat) 50%,
+    var(--metal-b) 62%,
+    var(--metal-c) 100%
+  );
+  background-size: 200% 100%;
+  background-position: 0% 0;
+  transition: background-position 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+/* Le reflet se déplace au survol du PARENT, pas du filet lui-même : un filet
+   de deux pixels de haut ne se survole pas, on survole la carte qui le porte. */
+.group:hover .filet-metal,
+.filet-metal:hover {
+  background-position: 100% 0;
+}
+
+/* ----------------------------------------------------------------------------
+   LE TEXTE MÉTAL
+   ----------------------------------------------------------------------------
+   RÉSERVÉ AU GRAND TEXTE ET AUX SURTITRES, jamais au texte courant. Un
+   dégradé découpé par des lettres fait varier le contraste d'un point à
+   l'autre du glyphe, et la mesure ne veut plus rien dire. On l'emploie sur du
+   18 pixels gras minimum, où le seuil est de 3:1 et où l'arrêt le plus sombre
+   du dégradé le tient.
+
+   Le repli `color` sert aux navigateurs sans `background-clip: text`, et il
+   est posé AVANT : si le découpage échoue, il reste une couleur lisible au
+   lieu d'un texte transparent.
+   -------------------------------------------------------------------------- */
+@utility texte-metal {
+  color: var(--accent);
+  background-image: linear-gradient(
+    100deg,
+    var(--metal-a) 0%,
+    var(--metal-b) 45%,
+    var(--metal-eclat) 55%,
+    var(--metal-c) 100%
+  );
+  background-size: 220% 100%;
+  background-position: 0% 0;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  transition: background-position 1100ms cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.group:hover .texte-metal,
+.texte-metal:hover {
+  background-position: 100% 0;
+}
+
+/* Le reflet est un agrément, pas une information : il disparaît pour qui a
+   demandé moins de mouvement, et rien d'autre ne change. */
+@media (prefers-reduced-motion: reduce) {
+  .filet-metal,
+  .texte-metal {
+    transition: none;
+  }
+  .group:hover .filet-metal,
+  .filet-metal:hover,
+  .group:hover .texte-metal,
+  .texte-metal:hover {
+    background-position: 0% 0;
+  }
 }
 
 /* La cible tactile de 44 px, gagnée sans grossir le dessin.

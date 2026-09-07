@@ -133,7 +133,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#1b3349",
+  themeColor: "#0c1b2e",
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
@@ -154,7 +154,35 @@ export default function RootLayout({
     <html
       lang="fr"
       className={`${inter.variable} ${outfit.variable} ${sourceSerif.variable}`}
+      /* Le script ci-dessous écrit `data-theme` sur cette balise avant que
+         React n'hydrate. Sans cette annonce, React compare le balisage servi
+         à celui du navigateur, trouve l'attribut en trop et se plaint. */
+      suppressHydrationWarning
     >
+      <head>
+        {/* ────────────────────────────────────────────────────────────────
+            LE MÉTAL, RESTAURÉ AVANT LA PREMIÈRE PEINTURE.
+
+            Ce script est en ligne et synchrone, et les deux le sont pour la
+            même raison : il doit s'exécuter AVANT que le navigateur ne peigne
+            quoi que ce soit. Différé ou chargé depuis un fichier, la page
+            s'afficherait une fraction de seconde en or avant de basculer en
+            argent, et ce clignotement est exactement ce que personne ne
+            pardonne à un sélecteur de thème.
+
+            Il ne fait rien d'autre que lire une préférence et poser un
+            attribut. `try` parce qu'un navigateur en navigation privée peut
+            refuser le stockage : le thème par défaut s'applique alors, ce qui
+            est le comportement correct.
+            ──────────────────────────────────────────────────────────────── */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var m=localStorage.getItem("corpusimmo.metal");' +
+              'if(m==="argent")document.documentElement.dataset.theme=m;}catch(e){}',
+          }}
+        />
+      </head>
       <body>
         {/* Les données structurées de SITE, posées une fois pour toutes les
             pages : l'éditeur et le site lui-même. Les schémas propres à une

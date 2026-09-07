@@ -67,8 +67,15 @@ export function BrandMark({
     return (
       <span
         className={cn(
-          "relative inline-block h-9 w-auto shrink-0 [&>img]:h-full [&>img]:w-auto [&>svg]:h-full [&>svg]:w-auto",
+          "relative inline-flex h-9 shrink-0 items-center",
+          "[&>img]:h-full [&>img]:w-auto [&>svg]:h-full [&>svg]:w-auto",
           className,
+          /* LA LARGEUR RESTE LIBRE, ET C'EST OBLIGATOIRE. Les appelants
+             passent `size-8` ou `size-9`, qui fixent la largeur AUTANT que la
+             hauteur : le signe en tours, plus haut que large, s'y écrasait
+             d'un tiers. On force donc la largeur à suivre la hauteur, après
+             `className` pour passer devant lui. */
+          "!w-auto",
         )}
       >
         {/* ── LE SIGNE EN STRATES, DESSINÉ ─────────────────────────────────
@@ -144,12 +151,57 @@ export function BrandMark({
     );
   }
 
+  /**
+   * SUR FOND SOMBRE, LE SIGNE EN STRATES EST TIRÉ EN RÉSERVE.
+   *
+   * Les fichiers de tours ne peuvent pas l'être : leur plaque de gauche est
+   * marine, et sur le marine du pied de page elle disparaît. Le tracé, lui,
+   * n'a pas ce problème puisqu'il prend les couleurs qu'on lui donne. Le pied
+   * de page suit donc le même choix de famille que l'en-tête, au lieu de
+   * garder un troisième signe que personne n'a choisi.
+   */
   return (
+    <>
+      <svg
+        viewBox="0 0 32 32"
+        aria-hidden="true"
+        focusable="false"
+        className={cn("signe-strates hidden shrink-0", className)}
+      >
+        <path
+          d="M16 19.5 4.8 24a1.3 1.3 0 0 0 0 2.4l10.3 4.1a2.4 2.4 0 0 0 1.8 0l10.3-4.1a1.3 1.3 0 0 0 0-2.4z"
+          fill="var(--ink-inverted)"
+          opacity=".45"
+        />
+        <path
+          d="M16 12.2 4.8 16.7a1.3 1.3 0 0 0 0 2.4l10.3 4.1a2.4 2.4 0 0 0 1.8 0l10.3-4.1a1.3 1.3 0 0 0 0-2.4z"
+          fill="var(--ink-inverted)"
+          opacity=".7"
+        />
+        <path
+          d="M16.9 1.4a2.4 2.4 0 0 0-1.8 0L4.8 5.5a1.3 1.3 0 0 0 0 2.4l10.3 4.1a2.4 2.4 0 0 0 1.8 0l10.3-4.1a1.3 1.3 0 0 0 0-2.4z"
+          fill="var(--ink-inverted)"
+        />
+        <g
+          fill="none"
+          stroke="var(--accent-rule)"
+          strokeWidth="0.9"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M9.6 7.1 12.4 5.9l2.2 1" />
+          <path d="M17.6 5.2l2.6 1.1-1.9 0.9" />
+          <path d="M12.2 8.7l2.4-1.1" />
+          <circle cx="16" cy="7" r="0.9" />
+          <circle cx="20.3" cy="6.3" r="0.7" />
+        </g>
+      </svg>
+
     <svg
       viewBox="0 0 32 32"
       aria-hidden="true"
       focusable="false"
-      className={cn("size-9 shrink-0", className)}
+      className={cn("signe-tours size-9 shrink-0", className)}
     >
       <path
         d={PAGE}
@@ -188,6 +240,7 @@ export function BrandMark({
         strokeLinecap="round"
       />
     </svg>
+    </>
   );
 }
 

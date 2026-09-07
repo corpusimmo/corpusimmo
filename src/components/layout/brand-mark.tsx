@@ -147,6 +147,31 @@ export function BrandMark({
           aria-hidden="true"
           className="signe-tours marque-violet hidden"
         />
+        {/* LA FAMILLE EN CIRCUITS, DANS LES TROIS MÉTAUX. Trois fichiers de
+            plus dans le balisage, et c'est le CSS qui n'en montre qu'un : le
+            composant reste rendu sur le serveur, donc le signe est peint avec
+            la première image. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/marque-circuits-or.webp"
+          alt=""
+          aria-hidden="true"
+          className="signe-circuits marque-or hidden"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/marque-circuits-argent.webp"
+          alt=""
+          aria-hidden="true"
+          className="signe-circuits marque-argent hidden"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/marque-circuits-violet.webp"
+          alt=""
+          aria-hidden="true"
+          className="signe-circuits marque-violet hidden"
+        />
       </span>
     );
   }

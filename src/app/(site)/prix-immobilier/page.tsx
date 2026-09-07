@@ -95,10 +95,6 @@ export default function PrixImmobilierPage() {
             chiffre de ces pages est accompagné du nombre de ventes qui le
             fonde, et rien n&apos;y est extrapolé depuis des annonces.
           </p>
-          <p className="mt-6 text-xs text-white/45">
-            Illustration&nbsp;: aucune commune du corpus n&apos;est
-            photographiée.
-          </p>
         </div>
       </header>
 

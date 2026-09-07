@@ -1,5 +1,8 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+
+import { cityPhoto } from "@/components/cities/city-photo";
 
 import { canPublishFigure } from "@/lib/cities/thresholds";
 import { cityPath } from "@/lib/cities/links";
@@ -27,6 +30,11 @@ export interface CityCardData {
   departmentName: string;
   apartment?: CityCardFigure;
   house?: CityCardFigure;
+  /* L'URL SEULE VOYAGE, PAS LE CATALOGUE. Le sommaire filtre ses vignettes
+     dans le navigateur : y importer le fichier des images enverrait les
+     licences, les auteurs et les dimensions des cent communes pour n'afficher
+     qu'une adresse par vignette. */
+  photo?: string;
 }
 
 function pick(figure: CityFigure | undefined): CityCardFigure | undefined {
@@ -39,6 +47,7 @@ function pick(figure: CityFigure | undefined): CityCardFigure | undefined {
 export function toCityCardData(city: CityAggregate): CityCardData {
   const apartment = pick(city.byType.apartment);
   const house = pick(city.byType.house);
+  const photo = cityPhoto(city.slug);
   return {
     slug: city.slug,
     name: city.name,
@@ -46,6 +55,7 @@ export function toCityCardData(city: CityAggregate): CityCardData {
     departmentName: city.departmentName,
     ...(apartment ? { apartment } : {}),
     ...(house ? { house } : {}),
+    ...(photo ? { photo: photo.url } : {}),
   };
 }
 
@@ -61,8 +71,38 @@ export function CityCard({ city }: { city: CityCardData }) {
   return (
     <Link
       href={cityPath(city.slug)}
-      className="group flex h-full flex-col gap-3 rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md"
+      className="group relative isolate flex h-full flex-col gap-3 overflow-hidden rounded-lg border border-border bg-surface p-5 transition-shadow hover:shadow-md"
     >
+      {/* LA PHOTOGRAPHIE RESTE UNE TEXTURE, PAS UNE ILLUSTRATION.
+          Le texte de la vignette est de l'encre sombre sur fond clair : une
+          image lisible dessous ferait tomber le contraste des petits corps.
+          Elle est donc très effacée, un peu moins au survol, et un voile blanc
+          la retient sur la moitié gauche, là où courent le nom et les
+          libellés. */}
+      {city.photo ? (
+        <>
+          <Image
+            src={city.photo}
+            alt=""
+            aria-hidden="true"
+            fill
+            sizes="(min-width: 1024px) 320px, 50vw"
+            className="-z-20 object-cover object-center opacity-[0.09] transition-opacity duration-300 group-hover:opacity-[0.11]"
+          />
+          <span
+            aria-hidden="true"
+            className="absolute inset-0 -z-10"
+            style={{
+              backgroundImage:
+                "linear-gradient(100deg," +
+                "var(--surface) 0%," +
+                "color-mix(in srgb, var(--surface) 90%, transparent) 46%," +
+                "color-mix(in srgb, var(--surface) 66%, transparent) 100%)",
+            }}
+          />
+        </>
+      ) : null}
+
       <div>
         <h3 className="text-base font-semibold text-ink">{city.name}</h3>
         <p className="text-xs text-ink-subtle">

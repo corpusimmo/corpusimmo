@@ -8,7 +8,7 @@ import { PriceByTypeTable } from "@/components/cities/price-table";
 import { PriceDistribution } from "@/components/cities/price-distribution";
 import { CityPriceSeries } from "@/components/cities/price-series";
 import { SectorTable } from "@/components/cities/sector-table";
-import { Badge, Button, Stat } from "@/components/ui";
+import { Button, Stat } from "@/components/ui";
 import { disclaimers } from "@/config/site";
 import {
   CITIES_ROOT,
@@ -45,7 +45,7 @@ import {
 import type { CityAggregate } from "@/lib/cities";
 import { coverageDisclaimer } from "@/lib/dvf";
 import { breadcrumbNode } from "@/lib/seo/json-ld";
-import { CityPhoto } from "@/components/cities/city-photo";
+import { CityPhotoBanner } from "@/components/cities/city-photo";
 import { JsonLd } from "@/lib/seo/json-ld-script";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { formatNumber, formatPricePerSqm } from "@/lib/utils/format";
@@ -129,14 +129,23 @@ export default async function VillePage({ params }: PageProps) {
             Toutes les communes
           </Link>
 
-          <div className="max-w-3xl">
-            <p className="eyebrow">
+          {/* LE BANDEAU PORTE LA PHOTOGRAPHIE EN FOND, et le titre passe donc
+              en réserve. Sans photographie il ne s'affiche pas, et le titre
+              reprend l'encre ordinaire : les deux jeux de couleurs sont dans
+              le même balisage, choisis par la présence de l'image. */}
+          <CityPhotoBanner slug={city.slug} name={city.name}>
+          {/* DEUX TIERS POUR LE TEXTE, LE DERNIER TIERS POUR LA PHOTOGRAPHIE.
+              Le voile s'ouvre à partir de 60 % de la largeur : le texte doit
+              s'arrêter avant, sinon la fin des lignes tombe sur l'image et le
+              contraste dépend de la commune. */}
+          <div className="max-w-lg lg:max-w-xl">
+            <p className="eyebrow !bg-white/10 !text-[color:var(--accent-rule)]">
               {city.departmentName} ({city.departmentCode})
             </p>
-            <h1 className="mt-2 font-display text-3xl leading-tight text-ink md:text-4xl">
+            <h1 className="mt-3 font-display text-3xl leading-tight text-ink-inverted md:text-4xl">
               {pageTitle(city)}
             </h1>
-            <p className="mt-3 text-lg leading-relaxed text-ink-muted">
+            <p className="mt-3 text-lg leading-relaxed text-ink-inverted/85">
               {formatNumber(city.dwellingSales)} ventes de logement enregistrées{" "}
               {periodLabel(city)}, dont {formatNumber(headline.sample)} exploitables au prix au
               m². Tous les chiffres de cette page viennent des actes notariés publiés par la
@@ -144,26 +153,26 @@ export default async function VillePage({ params }: PageProps) {
             </p>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Badge tone="neutral" size="sm">
+          {/* Les étiquettes sur fond sombre : le voile blanc à 12 % les
+              détache de la photographie sans peser, et l'encre reste en
+              réserve, qui tient 12:1 sur le marine du voile. */}
+          <div className="mt-5 flex max-w-lg flex-wrap items-center gap-2 lg:max-w-xl">
+            <span className="rounded-full bg-white/12 px-2.5 py-1 text-xs font-medium text-ink-inverted/90">
               Population&nbsp;: {formatNumber(city.population)}
-            </Badge>
+            </span>
             {city.postcodes.slice(0, 4).map((postcode) => (
-              <Badge key={postcode} tone="neutral" size="sm">
+              <span
+                key={postcode}
+                className="rounded-full bg-white/12 px-2.5 py-1 text-xs font-medium text-ink-inverted/90"
+              >
                 {postcode}
-              </Badge>
+              </span>
             ))}
-            <Badge tone="accent" size="sm">
+            <span className="rounded-full bg-white/12 px-2.5 py-1 text-xs font-medium text-[color:var(--accent-rule)]">
               Millésimes DVF {city.years[0]} à {city.latestYear}
-            </Badge>
+            </span>
           </div>
-
-          {/* La photographie vient de Wikipédia, avec son crédit. Elle est
-              APRÈS les chiffres d'en-tête et non avant : cette page se lit
-              pour ce qu'elle mesure, l'image ne fait que situer. Onze communes
-              sur cent n'en ont pas dont la licence soit vérifiable ; elles
-              n'affichent alors rien. */}
-          <CityPhoto slug={city.slug} name={city.name} />
+          </CityPhotoBanner>
         </header>
 
         <section aria-label="Les chiffres clés" className="grid gap-4 sm:grid-cols-3">

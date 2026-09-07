@@ -1180,24 +1180,53 @@
    Par défaut, les tours. Les strates sont dessinées et prennent les couleurs
    du thème toutes seules, donc une seule règle suffit pour les trois métaux,
    là où les tours en demandent une par fichier. */
-:root[data-signe="strates"] .signe-tours {
+/* ── LE MÉTAL, PUIS LA FAMILLE ────────────────────────────────────────────
+   L'ORDRE DE CES DEUX GROUPES EST LA RÈGLE, ET IL N'EST PAS ARBITRAIRE.
+   Le métal choisit un fichier dans une famille ; la famille décide ensuite
+   quelles familles se taisent. Écrites dans l'autre sens, les deux règles
+   avaient la même force et c'est le métal qui gagnait : en strates et en
+   argent, le signe en tours réapparaissait par-dessus. Les sélecteurs de
+   famille répètent donc leur classe, pour passer devant à coup sûr. */
+:root[data-theme="argent"] .signe-tours.marque-or,
+:root[data-theme="violet"] .signe-tours.marque-or {
+  display: none;
+}
+
+:root[data-theme="argent"] .signe-tours.marque-argent {
+  display: block;
+}
+
+:root[data-theme="violet"] .signe-tours.marque-violet {
+  display: block;
+}
+
+/* La famille en circuits : mêmes trois métaux, en bitmap gravé. */
+:root[data-signe="circuits"] .signe-circuits.marque-or {
+  display: block;
+}
+
+:root[data-signe="circuits"][data-theme="argent"] .signe-circuits.marque-or,
+:root[data-signe="circuits"][data-theme="violet"] .signe-circuits.marque-or {
+  display: none;
+}
+
+:root[data-signe="circuits"][data-theme="argent"] .signe-circuits.marque-argent {
+  display: block;
+}
+
+:root[data-signe="circuits"][data-theme="violet"] .signe-circuits.marque-violet {
+  display: block;
+}
+
+/* Ce que la famille choisie fait taire. */
+:root[data-signe="strates"] .signe-tours.signe-tours,
+:root[data-signe="strates"] .signe-circuits.signe-circuits,
+:root[data-signe="circuits"] .signe-tours.signe-tours,
+:root[data-signe="circuits"] .signe-strates.signe-strates {
   display: none;
 }
 
 :root[data-signe="strates"] .signe-strates {
-  display: block;
-}
-
-:root[data-theme="argent"] .marque-or,
-:root[data-theme="violet"] .marque-or {
-  display: none;
-}
-
-:root[data-theme="argent"] .marque-argent {
-  display: block;
-}
-
-:root[data-theme="violet"] .marque-violet {
   display: block;
 }
 

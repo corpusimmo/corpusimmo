@@ -529,16 +529,6 @@
     "fichierUrl": "https://commons.wikimedia.org/wiki/File:Place_Stanislas_et_ses_grilles_%C3%A0_Nancy.jpg",
     "article": "https://fr.wikipedia.org/wiki/Nancy"
   },
-  "nanterre": {
-    "url": "https://upload.wikimedia.org/wikipedia/fr/a/ab/Mairie_Nanterre_Immeuble_Pyramide.JPG",
-    "largeur": 2816,
-    "hauteur": 2112,
-    "auteur": "Daniel Rodet",
-    "licence": "CC-BY-SA-3.0",
-    "licenceUrl": null,
-    "fichierUrl": "https://fr.wikipedia.org/wiki/Fichier:Mairie_Nanterre_Immeuble_Pyramide.JPG",
-    "article": "https://fr.wikipedia.org/wiki/Nanterre"
-  },
   "nantes": {
     "url": "https://upload.wikimedia.org/wikipedia/commons/4/48/Ch%C3%A2teau_des_Ducs_de_Bretagne_%C3%A0_Nantes_-_Anne.jpg",
     "largeur": 1092,

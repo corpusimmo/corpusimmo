@@ -157,6 +157,16 @@ async function imageDeLArticle(titre) {
   const ii = info?.query?.pages?.[0]?.imageinfo?.[0];
   if (!ii) return null;
 
+  /* SEULEMENT LES FICHIERS DE COMMONS, jamais les dépôts locaux.
+     Un fichier servi depuis `/wikipedia/fr/` est une image que Commons n'a pas
+     acceptée, le plus souvent parce que le bâtiment photographié est encore
+     protégé : la France n'a pas de liberté de panorama. La licence affichée
+     porte alors sur la photographie, pas sur ce qu'elle montre. Le seul tri
+     sûr est le dépôt, et il se lit dans l'URL. */
+  if (!ii.url.includes("/wikipedia/commons/")) {
+    return { refuse: "hébergée hors de Commons" };
+  }
+
   const meta = ii.extmetadata ?? {};
   const licence = texteSeul(meta.LicenseShortName?.value);
   if (!licenceAcceptable(licence)) {

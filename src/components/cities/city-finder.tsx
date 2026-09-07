@@ -84,6 +84,18 @@ export function CityFinder({ cities }: { cities: CityCardData[] }) {
           }
         />
       )}
+
+      {/* L'ATTRIBUTION EST DUE, MÊME QUAND L'IMAGE EST UNE TEXTURE.
+          Les licences Creative Commons demandent le nom de l'auteur et celui
+          de la licence. Les répéter sur cent vignettes noierait le sommaire :
+          une ligne renvoie vers la page de commune, où le crédit complet est
+          affiché sous la photographie qu'il concerne. */}
+      {matches.some((c) => c.photo) ? (
+        <p className="text-xs text-ink-subtle">
+          Photographies&nbsp;: Wikimedia Commons. Auteur et licence sur chaque
+          page de commune.
+        </p>
+      ) : null}
     </div>
   );
 }

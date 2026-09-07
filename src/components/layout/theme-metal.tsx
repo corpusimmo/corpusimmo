@@ -30,11 +30,12 @@ export const CLE_METAL = "corpusimmo.metal";
 export const CLE_SIGNE = "corpusimmo.signe";
 
 /** La famille de signe. Le métal est un choix distinct : voir `globals.css`. */
-export type Signe = "tours" | "strates";
+export type Signe = "tours" | "strates" | "circuits";
 
 const SIGNES: ReadonlyArray<{ id: Signe; nom: string; titre: string }> = [
   { id: "tours", nom: "Tours", titre: "Signe en tours" },
   { id: "strates", nom: "Strates", titre: "Signe en strates" },
+  { id: "circuits", nom: "Circuits", titre: "Signe en strates gravées" },
 ];
 
 const METAUX: ReadonlyArray<{ id: Metal; nom: string; titre: string }> = [
@@ -61,9 +62,8 @@ function lireServeur(): Metal {
 }
 
 function lireSigne(): Signe {
-  return document.documentElement.dataset.signe === "strates"
-    ? "strates"
-    : "tours";
+  const s = document.documentElement.dataset.signe;
+  return s === "strates" || s === "circuits" ? s : "tours";
 }
 
 function signeServeur(): Signe {

@@ -148,12 +148,22 @@ export function ToolsShowcase() {
               href={entry.href}
               className={
                 // L'estimation est le chemin principal du site. Elle se
-                // distingue par son filet déjà à l'accent, pas par un fond ni
-                // une taille : les quatre entrées gardent le même poids.
-                "group flex h-full flex-col gap-3 border-t-2 pt-5 transition-colors duration-200 hover:border-accent-rule " +
-                (index === 0 ? "border-accent-rule" : "border-border")
+                // distingue par son filet, pas par un fond ni une taille : les
+                // quatre entrées gardent le même poids.
+                "group relative flex h-full flex-col gap-3 pt-5 " +
+                (index === 0 ? "" : "border-t-2 border-border")
               }
             >
+              {/* L'entrée principale porte une plaque de métal plutôt qu'une
+                  bordure : c'est le seul endroit de l'accueil où la matière du
+                  thème se voit vraiment, parce qu'elle a la place de brosser
+                  et de refléter. Les trois autres gardent un filet neutre. */}
+              {index === 0 ? (
+                <span
+                  aria-hidden="true"
+                  className="plaque-metal absolute inset-x-0 top-0 h-[3px] rounded-full"
+                />
+              ) : null}
               {/* Le surtitre, un filet de liaison, puis l'icône : la ligne dit
                   la nature de l'entrée avant d'en dire le nom. */}
               <span className="flex items-center gap-3">

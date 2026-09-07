@@ -545,103 +545,196 @@
 }
 
 /* ----------------------------------------------------------------------------
-   LE FILET MÉTAL
+   LE MÉTAL ANIMÉ
    ----------------------------------------------------------------------------
-   Trois arrêts, jamais deux : un dégradé qui va simplement du sombre au clair
-   se lit comme une ombre. Ce qui fait le métal est la bande claire PRISE ENTRE
-   deux zones plus sombres, c'est à dire un reflet.
+   TROIS ARRÊTS, JAMAIS DEUX. Un dégradé qui va simplement du sombre au clair
+   se lit comme une ombre. Ce qui fait le métal est une bande claire PRISE
+   ENTRE deux zones plus sombres, c'est à dire un reflet.
 
-   `background-size` est à 200 % pour laisser de la place au déplacement du
-   fond au survol. Sans cela, la bande n'aurait nulle part où aller.
+   LE MOTIF EST SYMÉTRIQUE, et c'est ce qui rend la boucle invisible : la
+   première et la dernière couleur sont la même, donc le raccord entre deux
+   passages ne se voit pas. Un dégradé qui finirait sur une autre teinte
+   produirait un saut à chaque tour, et un saut se remarque bien plus qu'un
+   reflet.
+
+   LE REFLET EST LENT, sept secondes pour traverser. C'est délibéré : un
+   reflet rapide sur un filet de deux pixels ne se lit pas comme du métal, il
+   se lit comme un chargement en cours, et il attire l'œil là où il n'y a rien
+   à lire. Le mouvement doit se remarquer quand on le cherche, pas quand on
+   lit autre chose.
    -------------------------------------------------------------------------- */
+
+@keyframes reflet-metal {
+  from {
+    background-position: 0% 0;
+  }
+  to {
+    background-position: 200% 0;
+  }
+}
+
+/**
+ * La bande claire qui passe une fois de temps en temps.
+ *
+ * Elle est SÉPARÉE du reflet continu parce qu'elle ne fait pas le même
+ * travail : le reflet dit que la matière est métallique, l'éclat dit qu'une
+ * lumière vient de passer dessus. Les deux ensemble donnent la texture ; l'un
+ * sans l'autre donne soit un dégradé mort, soit un clignotant.
+ *
+ * Quatre-vingt pour cent de la durée sont un temps mort, hors de l'écran.
+ * C'est ce qui empêche l'éclat de devenir un tic.
+ */
+@keyframes eclat-metal {
+  0%,
+  72% {
+    transform: translateX(-120%);
+  }
+  92%,
+  100% {
+    transform: translateX(120%);
+  }
+}
+
 @utility filet-metal {
+  position: relative;
+  overflow: hidden;
   background-image: linear-gradient(
     100deg,
     var(--metal-a) 0%,
+    var(--metal-c) 18%,
     var(--metal-b) 38%,
     var(--metal-eclat) 50%,
     var(--metal-b) 62%,
-    var(--metal-c) 100%
+    var(--metal-c) 82%,
+    var(--metal-a) 100%
   );
   background-size: 200% 100%;
-  background-position: 0% 0;
-  transition: background-position 900ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  background-repeat: repeat-x;
+  animation: reflet-metal 7s linear infinite;
 }
 
-/* Le reflet se déplace au survol du PARENT, pas du filet lui-même : un filet
-   de deux pixels de haut ne se survole pas, on survole la carte qui le porte. */
-.group:hover .filet-metal,
-.filet-metal:hover {
-  background-position: 100% 0;
+/* L'éclat traverse le filet toutes les neuf secondes. Il est posé en couche
+   séparée pour garder sa propre cadence : mêlé au dégradé du dessous, il
+   aurait été forcé de partager sa durée. */
+.filet-metal::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inline-size: 34%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    var(--metal-eclat),
+    transparent
+  );
+  opacity: 0.9;
+  animation: eclat-metal 9s ease-in-out infinite;
+}
+
+/* ----------------------------------------------------------------------------
+   LA PLAQUE MÉTAL — pour les surfaces, à partir de trois pixels
+   ----------------------------------------------------------------------------
+   Un filet de deux pixels ne peut pas porter de texture : il n'a pas la place.
+   À partir de trois ou quatre pixels, en revanche, le brossé se voit, et c'est
+   lui qui distingue une plaque d'un aplat coloré.
+
+   LE BROSSÉ EST FAIT DE LIGNES D'UN PIXEL espacées de trois, dans le sens du
+   dégradé. Plus serré, il moire à l'affichage ; plus lâche, il se lit comme
+   des rayures. Les deux couches sont déclarées dans le même `background`,
+   l'ordre comptant : le brossé passe DEVANT le dégradé.
+   -------------------------------------------------------------------------- */
+@utility plaque-metal {
+  position: relative;
+  overflow: hidden;
+  background-image:
+    repeating-linear-gradient(
+      100deg,
+      rgb(255 255 255 / 0.18) 0 1px,
+      transparent 1px 3px
+    ),
+    linear-gradient(
+      100deg,
+      var(--metal-a) 0%,
+      var(--metal-c) 18%,
+      var(--metal-b) 38%,
+      var(--metal-eclat) 50%,
+      var(--metal-b) 62%,
+      var(--metal-c) 82%,
+      var(--metal-a) 100%
+    );
+  background-size:
+    6px 100%,
+    200% 100%;
+  background-repeat: repeat, repeat-x;
+  animation: reflet-metal 9s linear infinite;
+}
+
+.plaque-metal::after {
+  content: "";
+  position: absolute;
+  inset-block: 0;
+  inline-size: 28%;
+  background: linear-gradient(
+    100deg,
+    transparent,
+    var(--metal-eclat),
+    transparent
+  );
+  opacity: 0.85;
+  animation: eclat-metal 11s ease-in-out infinite;
 }
 
 /* ----------------------------------------------------------------------------
    LE TEXTE MÉTAL
    ----------------------------------------------------------------------------
-   RÉSERVÉ AU GRAND TEXTE ET AUX SURTITRES, jamais au texte courant. Un
-   dégradé découpé par des lettres fait varier le contraste d'un point à
-   l'autre du glyphe, et la mesure ne veut plus rien dire. On l'emploie sur du
-   18 pixels gras minimum, où le seuil est de 3:1 et où l'arrêt le plus sombre
-   du dégradé le tient.
+   RÉSERVÉ AU GRAND TEXTE, jamais au texte courant. Un dégradé découpé par des
+   lettres fait varier le contraste d'un point à l'autre du glyphe, et la
+   mesure ne veut plus rien dire. On l'emploie à partir de 24 pixels gras, où
+   le seuil tombe à 3:1 et où l'arrêt le plus sombre du dégradé le tient.
 
-   Le repli `color` sert aux navigateurs sans `background-clip: text`, et il
-   est posé AVANT : si le découpage échoue, il reste une couleur lisible au
-   lieu d'un texte transparent.
+   Pas d'éclat en couche séparée ici : une couche posée par-dessus ne serait
+   pas découpée par le texte et couvrirait les lettres d'une barre. Le reflet
+   passe donc par le déplacement du fond, qui, lui, suit le découpage.
+
+   Le repli `color` est posé AVANT le découpage : si `background-clip: text`
+   échoue, il reste une couleur lisible plutôt qu'un texte transparent.
    -------------------------------------------------------------------------- */
 @utility texte-metal {
   color: var(--accent);
   background-image: linear-gradient(
     100deg,
     var(--metal-a) 0%,
-    var(--metal-b) 45%,
-    var(--metal-eclat) 55%,
-    var(--metal-c) 100%
+    var(--metal-c) 18%,
+    var(--metal-b) 38%,
+    var(--metal-eclat) 50%,
+    var(--metal-b) 62%,
+    var(--metal-c) 82%,
+    var(--metal-a) 100%
   );
-  background-size: 220% 100%;
-  background-position: 0% 0;
+  background-size: 200% 100%;
+  background-repeat: repeat-x;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
-  transition: background-position 1100ms cubic-bezier(0.22, 0.61, 0.36, 1);
+  animation: reflet-metal 8s linear infinite;
 }
 
-.group:hover .texte-metal,
-.texte-metal:hover {
-  background-position: 100% 0;
-}
-
-/* Le reflet est un agrément, pas une information : il disparaît pour qui a
-   demandé moins de mouvement, et rien d'autre ne change. */
+/* Le reflet est un agrément, pas une information. Il s'arrête pour qui a
+   demandé moins de mouvement, et la matière reste : le dégradé et le brossé
+   sont toujours là, seul le déplacement cesse. */
 @media (prefers-reduced-motion: reduce) {
   .filet-metal,
+  .plaque-metal,
   .texte-metal {
-    transition: none;
+    animation: none;
+    background-position: 50% 0;
   }
-  .group:hover .filet-metal,
-  .filet-metal:hover,
-  .group:hover .texte-metal,
-  .texte-metal:hover {
-    background-position: 0% 0;
+  .filet-metal::after,
+  .plaque-metal::after {
+    display: none;
   }
 }
 
-/* La cible tactile de 44 px, gagnée sans grossir le dessin.
-   Un signet de 32×28 px est visuellement JUSTE : c'est la main qui le rate,
-   pas l'œil. Grossir le bouton déséquilibrerait la carte qui le porte, alors
-   qu'un pseudo-élément centré étend la seule chose qui manque — la zone
-   d'appui. Le rendu ne bouge pas d'un pixel, et le doigt arrive.
-
-   `width`/`height` à 100 % pour ne jamais RÉTRÉCIR une cible déjà large ; les
-   deux `min-*` font le reste. À réserver aux contrôles isolés : deux zones de
-   44 px qui se recouvrent, c'est un mauvais clic sur deux, ce qui est pire que
-   la petite cible qu'on prétendait corriger. Dans une rangée qui peut passer à
-   la ligne, écarter les lignes d'autant (`gap-y-*`) fait partie du correctif.
-
-   L'utilitaire ne pose PAS `position` lui-même : il l'exigerait de l'élément au
-   moment même où certains contrôles sont déjà `absolute` (une flèche posée sur
-   une image), et la déclaration gagnante dépendrait alors de l'ordre des
-   classes. À accompagner donc de `relative` — ou du positionnement que le
-   contrôle porte déjà. */
 @utility tap-target {
   &::after {
     content: "";

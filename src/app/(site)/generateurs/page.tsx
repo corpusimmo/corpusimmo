@@ -72,7 +72,7 @@ export default async function GenerateursPage() {
         </div>
         <div
           aria-hidden
-          className="filet-metal absolute inset-x-0 bottom-0 h-1"
+          className="plaque-metal absolute inset-x-0 bottom-0 h-1"
         />
       </header>
 

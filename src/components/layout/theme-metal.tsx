@@ -33,31 +33,47 @@ const METAUX: ReadonlyArray<{ id: Metal; nom: string; titre: string }> = [
   { id: "argent", nom: "Argent", titre: "Thème marine et argent" },
 ];
 
-function lireMetal(): Metal {
-  if (typeof document === "undefined") return "or";
+/** L'événement par lequel toutes les instances du bouton se tiennent au courant. */
+const EVENEMENT = "corpusimmo:metal";
+
+function lireClient(): Metal {
   return document.documentElement.dataset.theme === "argent" ? "argent" : "or";
+}
+
+/**
+ * Ce que le SERVEUR croit. Toujours l'or, puisque c'est le thème écrit dans
+ * `:root` : le serveur ne sait rien du stockage du navigateur, et prétendre le
+ * contraire produirait un balisage qu'aucune restauration ne pourrait tenir.
+ */
+function lireServeur(): Metal {
+  return "or";
+}
+
+function abonner(reagir: () => void): () => void {
+  window.addEventListener(EVENEMENT, reagir);
+  return () => window.removeEventListener(EVENEMENT, reagir);
 }
 
 export function ThemeMetal({ className }: { className?: string }) {
   /**
-   * L'ÉTAT DÉMARRE À « or » ET SE CORRIGE APRÈS LE MONTAGE, sans exception.
+   * LA SOURCE DE VÉRITÉ EST L'ATTRIBUT SUR `<html>`, PAS UN ÉTAT REACT.
    *
-   * Lire `document` pendant le rendu donnerait un balisage différent de celui
-   * que le serveur a produit, et React remplacerait tout l'arbre en signalant
-   * une erreur d'hydratation. On rend donc ce que le serveur a rendu, puis on
-   * se réaccorde à l'attribut que le script en ligne a déjà posé. L'écart ne
-   * dure qu'une image, et il ne concerne que l'état pressé du bouton : les
-   * couleurs de la page, elles, sont déjà les bonnes.
+   * C'est ce que dit `useSyncExternalStore` : le serveur rend l'or, le
+   * navigateur lit l'attribut que le script en ligne a posé, et React fait la
+   * jonction sans erreur d'hydratation. Une version antérieure gardait l'état
+   * dans `useState` et le corrigeait dans un effet ; le bouton restait sur
+   * « Or » alors que la page était bien en argent. Un état local qui recopie
+   * une valeur vivant ailleurs finit toujours par diverger d'elle.
+   *
+   * L'abonnement sert au cas où deux instances coexistent, en-tête et menu
+   * mobile par exemple : elles se tiennent au courant par l'événement plutôt
+   * que de se relire l'une l'autre.
    */
-  const [metal, setMetal] = React.useState<Metal>("or");
-
-  React.useEffect(() => {
-    setMetal(lireMetal());
-  }, []);
+  const metal = React.useSyncExternalStore(abonner, lireClient, lireServeur);
 
   const choisir = (suivant: Metal): void => {
-    setMetal(suivant);
     document.documentElement.dataset.theme = suivant;
+    window.dispatchEvent(new Event(EVENEMENT));
     try {
       window.localStorage.setItem(CLE_METAL, suivant);
     } catch {

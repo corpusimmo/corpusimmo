@@ -60,7 +60,7 @@ const ENTRIES = [
   {
     href: "/outils",
     icon: Layers,
-    kicker: "Calculs",
+    kicker: "Outils",
     fond: "/illustrations/carte-calculs.webp",
     title: "Dix outils de calcul",
     body: "Rentabilité locative, coût réel d'un prêt, arbitrage fiscal, DCF sur dix ans, charge foncière, WAULT… avec les barèmes affichés et modifiables.",

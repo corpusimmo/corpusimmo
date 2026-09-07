@@ -27,7 +27,6 @@ import { cn } from "@/lib/utils/cn";
 
 import { AccountMenu } from "./account-menu";
 import { BrandLockup } from "./brand-mark";
-import { ThemeMetal } from "./theme-metal";
 
 /** Actif sur la page elle-même ET sur ses sous-pages : `/outils/dcf` allume « Outils ». */
 function isActive(pathname: string, href: string): boolean {
@@ -81,15 +80,16 @@ export function SiteHeader() {
         aria-hidden="true"
         className="filet-metal pointer-events-none absolute inset-x-0 top-0 h-0.5"
       />
-      {/* Un voile de flou SANS teinte derrière la barre : il adoucit le
-          filet de page qui passe dans la gouttière, au-dessus et autour de
-          la pastille, et il fonctionne aussi bien sur le héros sombre que
-          sur le canvas clair, précisément parce qu'il ne colore rien. Le
-          masque le fait disparaître avant le bas du bandeau. */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10 backdrop-blur-[6px] [mask-image:linear-gradient(180deg,black_55%,transparent)]"
-      />
+      {/* PLUS DE VOILE DE FLOU PLEINE LARGEUR ICI, ET C'EST UN CORRECTIF.
+          Il adoucissait le filet de page dans la gouttière autour de la
+          pastille, mais un `backdrop-filter` posé sur toute la largeur produit
+          une ARÊTE là où son masque s'arrête. Sur le fond sombre du héros elle
+          ne se voyait pas ; dès que le bandeau de chiffres, blanc, passait
+          dessous en défilant, la bande devenait un rectangle gris à bord franc
+          en travers du panneau.
+
+          La pastille garde son propre flou, qui suffit : il est borné par ses
+          coins arrondis, donc il n'a pas de bord à trahir. */}
       <a
         href="#contenu"
         className="sr-only focus:not-sr-only focus:absolute focus:left-6 focus:top-5 focus:z-50 focus:rounded-full focus:bg-primary focus:px-4 focus:py-2 focus:text-sm focus:text-primary-fg"
@@ -161,10 +161,6 @@ export function SiteHeader() {
         </div>
 
         <div className="col-start-3 flex items-center gap-2 justify-self-end">
-          {/* Le choix du métal, à côté du compte : c'est un réglage
-              d'affichage, il vit avec les autres réglages et non dans la
-              navigation, qui parle de contenu. */}
-          <ThemeMetal className="hidden md:inline-flex" />
           <AccountMenu className="hidden lg:inline-flex" />
           {/* `tap-target` : le CTA est dessiné en `sm` (36 px) pour ne pas
               écraser le bandeau, sa zone d'appui monte seule à 44 px. */}

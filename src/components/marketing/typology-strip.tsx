@@ -157,20 +157,45 @@ export function TypologyStrip() {
         </div>
       </div>
 
-      {/* La rangée déborde du conteneur à droite, et démarre alignée sur la
-          marge : le bord tronqué de la dernière carte dit qu'il y a une suite. */}
-      <div className="scroll-slim reveal-late mt-8 overflow-x-auto pb-8">
-        <ul className="container-page flex w-max snap-x snap-mandatory gap-4 pr-5 md:pr-8">
-          {TYPOLOGIES.map((typology) => (
+      {/* ── LA RANGÉE DÉFILE TOUTE SEULE ──────────────────────────────────
+          Elle demandait un geste pour livrer ce qu'elle contenait : dix
+          typologies dont trois se voyaient. Un bandeau qui exige qu'on le
+          fasse défiler est un bandeau dont on ne voit jamais la fin.
+
+          LA LISTE EST ÉCRITE DEUX FOIS, et c'est ce qui rend la boucle
+          invisible. L'animation déplace la piste de la moitié de sa largeur,
+          donc exactement d'une copie : à l'instant du retour à zéro, ce qui
+          est à l'écran est identique à ce qui y était juste avant, et le saut
+          ne se voit pas. La seconde copie est masquée aux lecteurs d'écran,
+          qui n'ont pas à entendre vingt vignettes pour dix typologies.
+
+          PLEINE LARGEUR, sans la marge du conteneur. Une piste qui défile et
+          qui commencerait à la marge laisserait un vide à gauche au premier
+          tour, puis plus jamais.
+
+          LE DÉFILEMENT S'ARRÊTE AU SURVOL et au focus : on ne lit pas une
+          étiquette qui fuit. */}
+      <div
+        className="reveal-late group mt-8 overflow-hidden pb-8"
+        role="group"
+        aria-label="Les typologies couvertes par le corpus"
+      >
+        <ul className="flex w-max gap-4 motion-safe:animate-[defile_64s_linear_infinite] motion-safe:group-hover:[animation-play-state:paused] motion-safe:group-focus-within:[animation-play-state:paused] motion-reduce:overflow-x-auto">
+          {[...TYPOLOGIES, ...TYPOLOGIES].map((typology, index) => (
             <li
-              key={typology.label}
-              className="w-[15.5rem] shrink-0 snap-start md:w-[17rem]"
+              key={`${typology.label}-${index}`}
+              className="w-[15.5rem] shrink-0 md:w-[17rem]"
+              aria-hidden={index >= TYPOLOGIES.length ? true : undefined}
             >
               <figure className="flex h-full flex-col overflow-hidden rounded-lg border border-border bg-surface shadow-xs">
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-surface-3">
                   <Image
                     src={typology.src}
-                    alt={`Illustration : ${typology.illustration}.`}
+                    alt={
+                      index >= TYPOLOGIES.length
+                        ? ""
+                        : `Illustration : ${typology.illustration}.`
+                    }
                     fill
                     sizes="(min-width: 768px) 272px, 248px"
                     className="object-cover"

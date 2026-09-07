@@ -23,7 +23,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils/cn";
 
-export type Metal = "or" | "argent";
+export type Metal = "or" | "argent" | "violet";
 
 /** La clé est partagée avec le script en ligne du gabarit racine. */
 export const CLE_METAL = "corpusimmo.metal";
@@ -31,13 +31,15 @@ export const CLE_METAL = "corpusimmo.metal";
 const METAUX: ReadonlyArray<{ id: Metal; nom: string; titre: string }> = [
   { id: "or", nom: "Or", titre: "Thème marine et or" },
   { id: "argent", nom: "Argent", titre: "Thème marine et argent" },
+  { id: "violet", nom: "Violet", titre: "Thème marine et violet" },
 ];
 
 /** L'événement par lequel toutes les instances du bouton se tiennent au courant. */
 const EVENEMENT = "corpusimmo:metal";
 
 function lireClient(): Metal {
-  return document.documentElement.dataset.theme === "argent" ? "argent" : "or";
+  const t = document.documentElement.dataset.theme;
+  return t === "argent" || t === "violet" ? t : "or";
 }
 
 /**
@@ -83,9 +85,24 @@ export function ThemeMetal({ className }: { className?: string }) {
   };
 
   return (
+    /* ── ÉPINGLÉ EN BAS À GAUCHE, ET PAS DANS L'EN-TÊTE ────────────────
+       L'en-tête est l'endroit des chemins, pas des réglages : le choix du
+       métal y prenait la place d'une entrée de navigation et suivait la page
+       partout, en haut, là où l'œil cherche autre chose.
+
+       En bas à gauche il reste accessible sans rien disputer : la droite est
+       occupée par les retours et les bandeaux, et le bas de page n'est
+       atteint qu'après lecture. `z-30` le place sous l'en-tête collant
+       (`z-40`) et sous les fenêtres modales, mais au-dessus du contenu.
+
+       Il ne se masque jamais, y compris en format réduit : un réglage qu'on
+       ne trouve que sur grand écran n'est pas un réglage, c'est une option
+       cachée. */
     <div
       className={cn(
-        "inline-flex items-center gap-0.5 rounded-full border border-border bg-surface p-0.5",
+        "fixed bottom-4 left-4 z-30 inline-flex items-center gap-0.5 rounded-full",
+        "border border-border bg-surface/95 p-0.5 shadow-lg backdrop-blur-sm",
+        "md:bottom-6 md:left-6",
         className,
       )}
       role="group"
@@ -116,7 +133,9 @@ export function ThemeMetal({ className }: { className?: string }) {
                 "size-3 rounded-full",
                 m.id === "or"
                   ? "bg-[linear-gradient(135deg,#8a6a2f,#e2c877_45%,#fbf3d8_55%,#a37f34)]"
-                  : "bg-[linear-gradient(135deg,#78818f,#dfe5ec_45%,#ffffff_55%,#8d97a5)]",
+                  : m.id === "argent"
+                    ? "bg-[linear-gradient(135deg,#78818f,#dfe5ec_45%,#ffffff_55%,#8d97a5)]"
+                    : "bg-[linear-gradient(135deg,#4a25b4,#b9a6f2_45%,#f0eaff_55%,#6d4fd0)]",
               )}
             />
             {m.nom}

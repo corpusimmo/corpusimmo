@@ -51,6 +51,51 @@ export function BrandMark({
 }) {
   const inverted = tone === "inverted";
 
+  /**
+   * LE SIGNE FOURNI, SUR FOND CLAIR. Deux fichiers, un par métal, et le
+   * BASCULEMENT SE FAIT EN CSS plutôt qu'en JavaScript : les deux sont dans
+   * le balisage et le thème en montre un. Choisir en JavaScript obligerait ce
+   * composant à devenir client, et le signe apparaîtrait après l'hydratation,
+   * c'est à dire en retard sur le reste de l'en-tête.
+   *
+   * SUR FOND SOMBRE, ON GARDE LE DESSIN. La tour de gauche du fichier est
+   * marine : posée sur le marine du pied de page, elle disparaît. Tant qu'il
+   * n'existe pas de version en réserve, le tracé fait le travail, lui qui
+   * s'adapte à son fond.
+   */
+  if (!inverted) {
+    return (
+      <span
+        className={cn(
+          "relative inline-block h-9 w-auto shrink-0 [&>img]:h-full [&>img]:w-auto",
+          className,
+        )}
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/marque-or.webp"
+          alt=""
+          aria-hidden="true"
+          className="marque-or block"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/marque-argent.webp"
+          alt=""
+          aria-hidden="true"
+          className="marque-argent hidden"
+        />
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/marque-violet.webp"
+          alt=""
+          aria-hidden="true"
+          className="marque-violet hidden"
+        />
+      </span>
+    );
+  }
+
   return (
     <svg
       viewBox="0 0 32 32"
@@ -110,17 +155,20 @@ export function BrandLockup({
   return (
     <span className={cn("inline-flex items-center gap-2.5", className)}>
       <BrandMark className={markClassName} tone={tone} />
-      {/* « Corpus » en encre, « Immo » EN MÉTAL.
-          C'est le logotype des deux propositions retenues, marine et or ou
-          marine et argent : le nom se coupe en deux, l'encre puis le métal du
-          thème. Le métal est ici une FEUILLE, pas un balayage : le logotype
-          est présent sur chaque écran, et un reflet qui passe sur un élément
-          permanent finit par battre la mesure.
+      {/* « Corpus » en encre, « Immo » EN MÉTAL GRAVÉ, pas en feuille.
 
-          Le contraste est tenu par l'arrêt le plus sombre du dégradé, qui
-          porte l'essentiel du glyphe : #8A6A2F donne 5,0:1 sur blanc et
-          #78818F 4,6:1, tous deux au-dessus du seuil de 4,5 exigé à cette
-          taille. Sur fond sombre, la rampe repart du clair. */}
+          LA FEUILLE A ÉTÉ ESSAYÉE ET RETIRÉE. Son dégradé place la lumière au
+          MILIEU du mot : sur quatre lettres de dix-huit pixels, les deux du
+          centre tombaient dans la bande claire et disparaissaient presque.
+          Ce qui fait le relief d'une dorure sur un titre de cinquante pixels
+          se retourne contre un mot-symbole, où chaque lettre compte et où
+          aucune ne peut être sacrifiée à un reflet.
+
+          Le gravé donne le même métal autrement : la couleur reste PLEINE,
+          donc lisible partout, et le relief vient d'une lumière posée au-dessus
+          de la lettre. Aucun dégradé, donc rien à perdre en petit. Sur fond
+          sombre, la feuille reste légitime : la rampe y repart du clair et
+          aucune lettre ne passe sous le seuil. */}
       <span
         className={cn(
           "font-display text-[1.125rem] font-semibold tracking-[-0.02em]",
@@ -130,7 +178,7 @@ export function BrandLockup({
         {siteConfig.nameParts[0]}
         <span
           className={
-            tone === "inverted" ? "feuille-metal-inversee" : "feuille-metal"
+            tone === "inverted" ? "feuille-metal-inversee" : "grave-metal"
           }
         >
           {siteConfig.nameParts[1]}

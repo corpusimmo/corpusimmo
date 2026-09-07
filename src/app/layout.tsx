@@ -5,6 +5,7 @@ import { Analytics } from "@/components/analytics/analytics";
 import { ConsentBanner } from "@/components/consent/consent-banner";
 import { AuthSessionProvider } from "@/components/layout/session-provider";
 import { PwaRuntime } from "@/components/pwa";
+import { ThemeMetal } from "@/components/layout/theme-metal";
 import { ToastProvider } from "@/components/ui/toast";
 import { safeUrl } from "@/config/app-url";
 import { siteConfig } from "@/config/site";
@@ -179,7 +180,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html:
               'try{var m=localStorage.getItem("corpusimmo.metal");' +
-              'if(m==="argent")document.documentElement.dataset.theme=m;}catch(e){}',
+              'if(m==="argent"||m==="violet")document.documentElement.dataset.theme=m;}catch(e){}',
           }}
         />
       </head>
@@ -192,6 +193,12 @@ export default function RootLayout({
         <JsonLd nodes={[organizationNode(), webSiteNode()]} />
         <AuthSessionProvider>
           <ToastProvider>{children}</ToastProvider>
+
+        {/* Le choix du métal, épinglé, hors de l'en-tête et hors du flux : il
+            vaut pour tout le site et ne dépend d'aucune page. Posé ici plutôt
+            que dans la mise en page du site, il couvre aussi les écrans qui
+            n'ont pas d'en-tête. */}
+        <ThemeMetal />
         </AuthSessionProvider>
 
         {/* Le bandeau de consentement, puis la mesure d'audience qu'il commande.

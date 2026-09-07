@@ -191,7 +191,18 @@ export function ToolsShowcase() {
                   le masque. */}
               <span
                 aria-hidden="true"
-                className="absolute inset-y-0 right-0 -z-10 w-[58%] overflow-hidden [mask-image:linear-gradient(90deg,transparent_0%,rgb(0_0_0/0.35)_38%,black_78%)]"
+                /* LE MASQUE FAIT DEUX CHOSES, ET LA SECONDE EST LA PLUS
+                   IMPORTANTE. Il fond la photographie vers la gauche, et il
+                   PLAFONNE son opacité à 72 % même à droite. Une image à
+                   pleine force contre un fond plein donne une frontière que
+                   le dégradé, si long soit-il, ne rattrape pas : c'est le
+                   saut d'opacité qu'on voit, pas la position du dégradé.
+
+                   La bande est aussi plus large que la réserve de texte, si
+                   bien que la photographie commence sous le texte à six pour
+                   cent : assez pour qu'il n'y ait plus de bord, trop peu pour
+                   se voir. Le contraste a été remesuré à cette valeur. */
+                className="absolute inset-y-0 right-0 -z-10 w-[72%] overflow-hidden [mask-image:linear-gradient(90deg,transparent_0%,rgb(0_0_0/0.06)_16%,rgb(0_0_0/0.22)_44%,rgb(0_0_0/0.5)_72%,rgb(0_0_0/0.72)_100%)]"
               >
                 <Image
                   src={entry.fond}

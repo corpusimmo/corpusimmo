@@ -101,12 +101,6 @@ export const mainNav: NavEntry[] = [
         status: "live",
         description: "Dix calculateurs métier, barèmes affichés",
       },
-      {
-        label: "Générateurs",
-        href: "/generateurs",
-        status: "live",
-        description: "Teaser, mémorandum, avis de valeur : trames à vos couleurs",
-      },
     ],
   },
 ];

@@ -37,12 +37,15 @@
   --brand-200: #c6d4e2;
   --brand-300: #9db4c9;
   --brand-400: #5b7da3;
-  --brand-500: #3f6d9c;
-  --brand-600: #14497a;
-  --brand-700: #10365d;
-  --brand-800: #0d2b4a;
-  --brand-900: #0c1b2e;
-  --brand-950: #070f19;
+  /* LA RAMPE PASSE AU VIOLET dans le thème par défaut : c'est lui qui porte
+     l'action, et `--brand` sert les aplats larges où rien de petit ne
+     s'écrit. Les deux autres thèmes la redéfinissent à leur tour. */
+  --brand-500: #6d4fd0;
+  --brand-600: #5b2fd6;
+  --brand-700: #41279c;
+  --brand-800: #331e7d;
+  --brand-900: #1b1145;
+  --brand-950: #110b2c;
 
   /* --- Rampe bronze : la marque, la sélection, les filets -----------------
      Champagne patiné, jamais jaune. `--bronze-500` (#A8874A) ne tient que
@@ -70,11 +73,11 @@
   --paper-500: #64748b;
 
   /* --- Surfaces ----------------------------------------------------------- */
-  --canvas: #f7f5f1;
+  --canvas: #f7f7fb;
   --surface: #ffffff;
-  --surface-2: #fdfbf8;
-  --surface-3: #f1ece3;
-  --surface-inverted: #0b1017;
+  --surface-2: #fbfbfe;
+  --surface-3: #eeeef8;
+  --surface-inverted: #111a35;
   --overlay: rgb(11 16 23 / 0.55);
 
   /* --- Encres -------------------------------------------------------------
@@ -85,10 +88,10 @@
   --ink-subtle: #5b6673;
   --ink-inverted: #ffffff;
 
-  /* --- Bordures — teintées de marine, jamais grises ----------------------- */
-  --border: #e6e1d8;
-  --border-soft: #f1ede6;
-  --border-strong: #d3ccbd;
+  /* --- Bordures — teintées, jamais grises --------------------------------- */
+  --border: #e3e4ee;
+  --border-soft: #eff0f7;
+  --border-strong: #c8cade;
 
   /* --- Action primaire ------------------------------------------------------
      DEUX BLEUS, ET C'EST MESURÉ. Le bleu de marque `--brand` (#0082c3) ne
@@ -99,32 +102,34 @@
      `--primary` descend d'un cran (5,92:1) et prend tout ce qui porte du
      texte ; `--brand` garde les aplats larges, les filets et les fonds où
      rien de petit ne s'écrit. */
-  --primary: #14497a;
-  --primary-hover: #10365d;
-  --primary-active: #0d2b4a;
+  --primary: #5b2fd6;
+  --primary-hover: #4a25b4;
+  --primary-active: #3b1d90;
   --primary-fg: #ffffff;
-  --primary-soft: #e8eef5;
-  --primary-soft-fg: #0f3760;
+  --primary-soft: #eee9fc;
+  --primary-soft-fg: #42219e;
 
   /* Le bleu de marque, vif. Aplats, filets, hero. Jamais du texte dessus. */
   --brand: var(--brand-500);
   --brand-soft: var(--brand-100);
 
-  /* --- Accent — l'or, en TOUCHE. Sélection, comparable retenu, filets.
-     Il ne porte plus la marque : c'est le bleu qui la porte désormais, et
-     l'or n'intervient plus que pour signaler et souligner. --------------- */
-  /* L'OR A ÉTÉ REMONTÉ. À #8A6A2F il se lisait comme un brun, pas comme un
-     métal : la teinte était juste mais la saturation trop basse pour qu'on y
-     voie de l'or sur une pastille de onze pixels. #8F6A18 garde ses 5,0:1 sur
-     blanc et gagne le jaune qui manquait. */
-  --accent: #8f6a18;
-  --accent-hover: #745514;
-  --accent-active: #5b4310;
+  /* --- Accent — L'ARGENT, EN SECOND. -------------------------------------
+     Le thème par défaut met le violet à l'action et l'argent partout ailleurs.
+     C'est ce qui le sépare du thème violet plein : la couleur ne prend que ce
+     qui se clique, le reste est froid. Un violet qui tient aussi les filets,
+     les pastilles et les étiquettes sature la page entière.
+
+     L'ARGENT ÉCRIT, LE FILET NON. #495669 tient 6,9:1 sur blanc et penche vers
+     le froid, ce qui distingue l'acier d'un gris de texte ordinaire.
+     `--accent-rule` (#9FB0C6, 1,9:1) est un aplat et un filet, jamais une
+     encre. */
+  --accent: #495669;
+  --accent-hover: #3a4554;
+  --accent-active: #2e3743;
   --accent-fg: #ffffff;
-  --accent-soft: #f7f0d9;
-  --accent-soft-fg: #6b4f11;
-  /* Le bronze clair, réservé aux aplats larges et aux filets : jamais du texte. */
-  --accent-rule: #c9a227;
+  --accent-soft: #eaeef4;
+  --accent-soft-fg: #3f4c60;
+  --accent-rule: #9fb0c6;
 
   /* --- Retour d'état — désaturés, à la hauteur du reste ------------------- */
   --success: #2f6b4f;
@@ -305,36 +310,20 @@
    des trois arrêts parce qu'elle doit rester plus lumineuse que le plus clair
    d'entre eux, sinon le passage ne se voit pas.
    -------------------------------------------------------------------------- */
-:root {
-  --metal-a: #8a6a2f;
-  --metal-b: #e2c877;
-  --metal-c: #a37f34;
-  --metal-eclat: #fbf3d8;
-
-  /* Le halo posé autour d'un cadre. Il ne colore rien, il pose une lumière :
-     d'où une teinte franche et une opacité faible plutôt que l'inverse. */
-  --metal-halo: 200 142 52;
-
-  /* LA DISPERSION DU REFLET. Un vrai poli ne renvoie pas du blanc, il
-     décompose la lumière : le bord chaud d'un côté, le bord froid de l'autre.
-     Trois teintes suffisent à le suggérer, et c'est ce qui sépare un reflet
-     de métal d'un simple éclaircissement. */
-  --metal-prisme-1: 255 230 200;
-  --metal-prisme-2: 255 236 190;
-  --metal-prisme-3: 255 250 235;
-}
-
+:root,
 :root[data-theme="argent"] {
   --metal-a: #78818f;
   --metal-b: #dfe5ec;
   --metal-c: #8d97a5;
   --metal-eclat: #ffffff;
 
+  /* Le halo posé autour d'un cadre. Il ne colore rien, il pose une lumière :
+     d'où une teinte franche et une opacité faible plutôt que l'inverse. */
   --metal-halo: 148 160 176;
 
-  /* L'argent disperse plus froid que l'or : le rose et le bleu prennent la
-     place de l'ambre. C'est la seule différence de nature entre les deux
-     métaux, tout le reste n'est qu'un changement de teinte. */
+  /* LA DISPERSION DU REFLET. Un vrai poli ne renvoie pas du blanc, il
+     décompose la lumière : le bord chaud d'un côté, le bord froid de l'autre.
+     L'argent disperse froid : le rose et le bleu à la place de l'ambre. */
   --metal-prisme-1: 255 200 220;
   --metal-prisme-2: 220 220 255;
   --metal-prisme-3: 200 240 255;
@@ -1183,34 +1172,29 @@
    L'ORDRE DE CES DEUX GROUPES EST LA RÈGLE, ET IL N'EST PAS ARBITRAIRE.
    Le métal choisit un fichier dans une famille ; la famille décide ensuite
    quelle famille se tait. Écrites dans l'autre sens, les deux règles avaient
-   la même force et c'est le métal qui gagnait : en pile et en argent, le
+   la même force et c'est le métal qui gagnait : en pile et en violet, le
    signe en tours réapparaissait par-dessus. Les sélecteurs de famille
-   répètent donc leur classe, pour passer devant à coup sûr. */
-:root[data-theme="argent"] .signe-tours.marque-or,
-:root[data-theme="violet"] .signe-tours.marque-or {
-  display: none;
-}
+   répètent donc leur classe, pour passer devant à coup sûr.
 
-:root[data-theme="argent"] .signe-tours.marque-argent {
-  display: block;
+   DEUX FICHIERS PAR FAMILLE, ET NON TROIS. Le thème par défaut mêle le violet
+   à l'argent : son signe est celui d'argent, puisque c'est l'argent qui y
+   tient tout ce qui n'est pas une action. Seul le thème violet plein change
+   de signe. */
+:root[data-theme="violet"] .signe-tours.marque-argent {
+  display: none;
 }
 
 :root[data-theme="violet"] .signe-tours.marque-violet {
   display: block;
 }
 
-/* La famille en pile : mêmes trois métaux, en plaques gravées. */
-:root[data-signe="stack"] .signe-stack.marque-or {
+/* La famille en pile : mêmes métaux, en plaques gravées. */
+:root[data-signe="stack"] .signe-stack.marque-argent {
   display: block;
 }
 
-:root[data-signe="stack"][data-theme="argent"] .signe-stack.marque-or,
-:root[data-signe="stack"][data-theme="violet"] .signe-stack.marque-or {
+:root[data-signe="stack"][data-theme="violet"] .signe-stack.marque-argent {
   display: none;
-}
-
-:root[data-signe="stack"][data-theme="argent"] .signe-stack.marque-argent {
-  display: block;
 }
 
 :root[data-signe="stack"][data-theme="violet"] .signe-stack.marque-violet {

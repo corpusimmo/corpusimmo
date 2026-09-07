@@ -1,3 +1,10 @@
+/* ── PAGE RETIRÉE DU SITE, PAS SUPPRIMÉE ──────────────────────────────────
+   Le dossier commence par un souligné : App Router le tient alors pour privé
+   et n'en fait aucune route. La page ne répond plus, ne s'indexe plus et ne
+   figure plus au menu, mais son contenu reste là, prêt à revenir quand les
+   générateurs le seront. La retirer du seul menu ne suffisait pas : l'adresse
+   restait servie, et le plan de site continuait de l'annoncer. */
+
 import type { Metadata } from "next";
 import Link from "next/link";
 import { FileStack, Lock, Shield, Sparkles, Table2 } from "lucide-react";

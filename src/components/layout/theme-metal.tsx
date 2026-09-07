@@ -1,13 +1,13 @@
 "use client";
 
 /**
- * LE CHOIX DU MÉTAL — or ou argent.
+ * LE CHOIX DU THÈME — argent, mixte ou violet.
  *
- * Ce n'est pas un thème clair contre un thème sombre : les deux sont clairs,
- * et ce qui change est la température de l'écran. L'or réchauffe le fond de
- * page, l'argent le refroidit ; le marine ne bouge pas, parce que c'est lui
- * qui porte l'identité. Les valeurs vivent dans `globals.css`, ce composant
- * ne fait que poser un attribut.
+ * Ce n'est pas un thème clair contre un thème sombre : les trois sont clairs,
+ * et ce qui change est la part de couleur. L'argent ne colore rien, le violet
+ * colore tout, et le mixte, qui est le thème par défaut, met le violet sur ce
+ * qui se clique et l'argent sur tout le reste. Les valeurs vivent dans
+ * `globals.css`, ce composant ne fait que poser un attribut.
  *
  * POURQUOI UN ATTRIBUT SUR `<html>` ET NON UN ÉTAT REACT. Les couleurs sont
  * des variables CSS lues par toute la page, y compris par des morceaux rendus
@@ -23,7 +23,7 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils/cn";
 
-export type Metal = "or" | "argent" | "violet";
+export type Metal = "mixte" | "argent" | "violet";
 
 /** Les clés sont partagées avec le script en ligne du gabarit racine. */
 export const CLE_METAL = "corpusimmo.metal";
@@ -38,9 +38,9 @@ const SIGNES: ReadonlyArray<{ id: Signe; nom: string; titre: string }> = [
 ];
 
 const METAUX: ReadonlyArray<{ id: Metal; nom: string; titre: string }> = [
-  { id: "or", nom: "Or", titre: "Thème marine et or" },
   { id: "argent", nom: "Argent", titre: "Thème marine et argent" },
-  { id: "violet", nom: "Violet", titre: "Thème marine et violet" },
+  { id: "mixte", nom: "Mixte", titre: "Thème violet, argent en second" },
+  { id: "violet", nom: "Violet", titre: "Thème violet" },
 ];
 
 /** L'événement par lequel toutes les instances du bouton se tiennent au courant. */
@@ -48,16 +48,17 @@ const EVENEMENT = "corpusimmo:metal";
 
 function lireClient(): Metal {
   const t = document.documentElement.dataset.theme;
-  return t === "argent" || t === "violet" ? t : "or";
+  return t === "argent" || t === "violet" ? t : "mixte";
 }
 
 /**
- * Ce que le SERVEUR croit. Toujours l'or, puisque c'est le thème écrit dans
- * `:root` : le serveur ne sait rien du stockage du navigateur, et prétendre le
- * contraire produirait un balisage qu'aucune restauration ne pourrait tenir.
+ * Ce que le SERVEUR croit. Toujours le mixte, puisque c'est le thème écrit
+ * dans `:root` : le serveur ne sait rien du stockage du navigateur, et
+ * prétendre le contraire produirait un balisage qu'aucune restauration ne
+ * pourrait tenir.
  */
 function lireServeur(): Metal {
-  return "or";
+  return "mixte";
 }
 
 function lireSigne(): Signe {
@@ -77,7 +78,7 @@ export function ThemeMetal({ className }: { className?: string }) {
   /**
    * LA SOURCE DE VÉRITÉ EST L'ATTRIBUT SUR `<html>`, PAS UN ÉTAT REACT.
    *
-   * C'est ce que dit `useSyncExternalStore` : le serveur rend l'or, le
+   * C'est ce que dit `useSyncExternalStore` : le serveur rend le mixte, le
    * navigateur lit l'attribut que le script en ligne a posé, et React fait la
    * jonction sans erreur d'hydratation. Une version antérieure gardait l'état
    * dans `useState` et le corrigeait dans un effet ; le bouton restait sur
@@ -107,7 +108,12 @@ export function ThemeMetal({ className }: { className?: string }) {
   };
 
   const choisir = (suivant: Metal): void => {
-    document.documentElement.dataset.theme = suivant;
+    /* LE MIXTE EST L'ABSENCE D'ATTRIBUT, et non une valeur de plus. Il est
+       écrit dans `:root` : lui donner son propre `data-theme` obligerait à
+       recopier tout le bloc par défaut pour rien, et à le tenir à jour deux
+       fois. */
+    if (suivant === "mixte") delete document.documentElement.dataset.theme;
+    else document.documentElement.dataset.theme = suivant;
     window.dispatchEvent(new Event(EVENEMENT));
     try {
       window.localStorage.setItem(CLE_METAL, suivant);
@@ -162,17 +168,19 @@ export function ThemeMetal({ className }: { className?: string }) {
                 : "text-ink-muted hover:text-ink",
             )}
           >
-            {/* La pastille montre le métal lui-même, dégradé compris : c'est
-                plus rapide à lire qu'un libellé, et le libellé reste là pour
-                qui ne distingue pas les deux teintes. */}
+            {/* La pastille montre la couleur elle-même, dégradé compris :
+                c'est plus rapide à lire qu'un libellé, et le libellé reste là
+                pour qui ne distingue pas les teintes. Celle du mixte est
+                coupée en deux, violet puis argent, ce qui dit exactement ce
+                que fait le thème. */}
             <span
               aria-hidden="true"
               className={cn(
                 "size-3 rounded-full",
-                m.id === "or"
-                  ? "bg-[linear-gradient(135deg,#8a6a2f,#e2c877_45%,#fbf3d8_55%,#a37f34)]"
-                  : m.id === "argent"
-                    ? "bg-[linear-gradient(135deg,#78818f,#dfe5ec_45%,#ffffff_55%,#8d97a5)]"
+                m.id === "argent"
+                  ? "bg-[linear-gradient(135deg,#78818f,#dfe5ec_45%,#ffffff_55%,#8d97a5)]"
+                  : m.id === "mixte"
+                    ? "bg-[linear-gradient(135deg,#5b2fd6_0%,#6d4fd0_48%,#dfe5ec_52%,#8d97a5_100%)]"
                     : "bg-[linear-gradient(135deg,#4a25b4,#b9a6f2_45%,#f0eaff_55%,#6d4fd0)]",
               )}
             />

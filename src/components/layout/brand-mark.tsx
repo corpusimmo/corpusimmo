@@ -2,45 +2,17 @@ import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils/cn";
 
 /**
- * Le logotype est dessiné, jamais importé en bitmap : il doit rester net à
- * toutes les tailles, hériter des couleurs du thème et ne coûter aucune requête.
+ * LA MARQUE, EN DEUX FAMILLES DE SIGNE ET TROIS MÉTAUX.
  *
- * LE SIGNE — un titre de propriété.
- *
- * C'est la seule forme où les deux moitiés du nom ne sont pas juxtaposées mais
- * CONFONDUES : un titre de propriété est à la fois la pièce et le bien. La page
- * porte un toit, et la ligne bronze en dessous est celle de la signature —
- * l'acte est ce qui transforme un bâtiment en une mutation enregistrée, ce que
- * DVF publie et ce que ce produit lit.
- *
- * Le coin corné n'est pas décoratif : c'est lui qui empêche la forme d'être lue
- * comme une simple carte, et il rappelle qu'un corpus est fait de feuillets.
+ * Les six fichiers sont TOUS dans le balisage, et c'est le CSS qui n'en montre
+ * qu'un, selon `data-signe` et `data-theme` posés sur la racine. Choisir en
+ * JavaScript obligerait ce composant à passer client, et le signe
+ * n'apparaîtrait qu'après l'hydratation, donc en retard sur le reste de
+ * l'en-tête. Six requêtes d'image contre un signe qui clignote : le choix est
+ * vite fait, d'autant que les fichiers pèsent sept kilo-octets chacun.
  */
 
-/**
- * Le fond derrière la marque décide de son traitement.
- *
- * `inverted` n'est pas un thème : c'est le tirage en réserve, pour le bleu nuit
- * du pied de page où une page pleine en bleu nuit disparaîtrait purement et
- * simplement. Le trait remplace l'aplat, le bronze ne bouge pas.
- */
 export type BrandMarkTone = "default" | "inverted";
-
-/**
- * La géométrie, écrite une fois : les deux tirages la partagent.
- *
- * La maison porte des MURS, et ce n'est pas un détail de dessin. Le toit seul
- * se lit comme un chevron — une flèche vers le haut, un bouton « replier » —
- * dès qu'on descend sous 32 px. Deux traits verticaux suffisent à lever
- * l'ambiguïté, et ils s'arrêtent juste au-dessus de la ligne bronze : celle-ci
- * devient alors le SOL sur lequel la maison est posée autant que la ligne de
- * signature de l'acte. Un seul trait, deux rôles.
- */
-const PAGE =
-  "M7.5 3h11L26 10.5v16.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 6 27.5v-23A1.5 1.5 0 0 1 7.5 3z";
-const ROOF = "M11 18.5 16 13.5l5 5";
-const WALLS = "M12.6 18.5v4M19.4 18.5v4";
-const SIGNATURE = "M10.5 25h11";
 
 export function BrandMark({
   className,
@@ -51,18 +23,8 @@ export function BrandMark({
 }) {
   const inverted = tone === "inverted";
 
-  /**
-   * LE SIGNE FOURNI, SUR FOND CLAIR. Deux fichiers, un par métal, et le
-   * BASCULEMENT SE FAIT EN CSS plutôt qu'en JavaScript : les deux sont dans
-   * le balisage et le thème en montre un. Choisir en JavaScript obligerait ce
-   * composant à devenir client, et le signe apparaîtrait après l'hydratation,
-   * c'est à dire en retard sur le reste de l'en-tête.
-   *
-   * SUR FOND SOMBRE, ON GARDE LE DESSIN. La tour de gauche du fichier est
-   * marine : posée sur le marine du pied de page, elle disparaît. Tant qu'il
-   * n'existe pas de version en réserve, le tracé fait le travail, lui qui
-   * s'adapte à son fond.
-   */
+  /* Les deux tirages montrent les MÊMES fichiers : seule la plaque claire du
+     tirage en réserve les sépare. */
   if (!inverted) {
     return (
       <span
@@ -78,146 +40,75 @@ export function BrandMark({
           "!w-auto",
         )}
       >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/marque-or.webp"
-          alt=""
-          aria-hidden="true"
-          className="signe-tours marque-or block"
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/marque-argent.webp"
-          alt=""
-          aria-hidden="true"
-          className="signe-tours marque-argent hidden"
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/marque-violet.webp"
-          alt=""
-          aria-hidden="true"
-          className="signe-tours marque-violet hidden"
-        />
-        {/* LA FAMILLE EN PILE, DANS LES TROIS MÉTAUX. Trois fichiers de
-            plus dans le balisage, et c'est le CSS qui n'en montre qu'un : le
-            composant reste rendu sur le serveur, donc le signe est peint avec
-            la première image. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/marque-stack-or.webp"
-          alt=""
-          aria-hidden="true"
-          className="signe-stack marque-or hidden"
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/marque-stack-argent.webp"
-          alt=""
-          aria-hidden="true"
-          className="signe-stack marque-argent hidden"
-        />
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src="/marque-stack-violet.webp"
-          alt=""
-          aria-hidden="true"
-          className="signe-stack marque-violet hidden"
-        />
+        <Signes />
       </span>
     );
   }
 
   /**
-   * SUR FOND SOMBRE, LE PIED DE PAGE SUIT LA MÊME FAMILLE QUE L'EN-TÊTE.
+   * SUR FOND SOMBRE, LE MÊME SIGNE, POSÉ SUR UNE PLAQUE CLAIRE.
    *
-   * Les plaques du signe en pile sont séparées par des liserés blancs et
-   * gravées de pistes dorées : ce sont eux qui portent la forme, et ils
-   * tiennent sur le marine du pied de page sans retouche. Le fichier y va
-   * donc tel quel, plutôt que de laisser un second signe que personne n'a
-   * choisi.
+   * Les six fichiers sont des aplats marine. Sur le marine du pied de page,
+   * la moitié des plaques disparaît et il ne reste qu'un liseré doré ou
+   * violet : la marque n'est plus reconnaissable. La plaque claire lui rend
+   * le fond pour lequel elle a été dessinée, et le pied de page montre alors
+   * exactement le signe choisi dans le sélecteur, famille et métal compris.
    *
-   * Les tours, elles, restent le TRACÉ et non le fichier : leur plaque de
-   * gauche est marine pleine, et sur le marine du pied de page elle
-   * disparaîtrait. Le tracé prend les couleurs qu'on lui donne, donc il se
-   * tire en réserve.
+   * Le tracé qui tenait ce rôle a été retiré : il montrait un signe que
+   * personne n'avait choisi, et l'en-tête et le pied de page ne parlaient
+   * plus de la même marque.
    */
   return (
     <span
       className={cn(
-        "relative inline-flex h-9 shrink-0 items-center",
-        "[&>img]:h-full [&>img]:w-auto [&>svg]:h-full [&>svg]:w-auto",
+        "relative inline-flex h-9 shrink-0 items-center rounded-lg bg-surface p-1",
+        "[&>img]:h-full [&>img]:w-auto",
         className,
         "!w-auto",
       )}
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/marque-stack-or.webp"
-        alt=""
-        aria-hidden="true"
-        className="signe-stack marque-or hidden"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/marque-stack-argent.webp"
-        alt=""
-        aria-hidden="true"
-        className="signe-stack marque-argent hidden"
-      />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src="/marque-stack-violet.webp"
-        alt=""
-        aria-hidden="true"
-        className="signe-stack marque-violet hidden"
-      />
-      <svg
-      viewBox="0 0 32 32"
-      aria-hidden="true"
-      focusable="false"
-      className="signe-tours size-9 shrink-0"
-    >
-      <path
-        d={PAGE}
-        fill={inverted ? "none" : "var(--primary)"}
-        stroke={inverted ? "var(--ink-inverted)" : "none"}
-        strokeWidth={inverted ? 1.6 : undefined}
-        strokeLinejoin="round"
-      />
-
-      {/* Le coin corné. Absent du tirage en réserve : à cette épaisseur de
-          trait, il encombrerait la forme au lieu de la préciser. */}
-      {inverted ? null : (
-        <path
-          d="M18.5 3 26 10.5h-7.5z"
-          fill="var(--primary-fg)"
-          opacity="0.18"
-        />
-      )}
-
-      <g
-        fill="none"
-        stroke={inverted ? "var(--ink-inverted)" : "var(--primary-fg)"}
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      >
-        <path d={ROOF} />
-        <path d={WALLS} />
-      </g>
-
-      {/* La ligne de signature. Le seul trait bronze de la marque. */}
-      <path
-        d={SIGNATURE}
-        stroke="var(--accent-rule)"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      </svg>
+      <Signes />
     </span>
   );
 }
+
+/**
+ * LES SIX FICHIERS, ÉCRITS UNE FOIS.
+ *
+ * Les deux tirages montrent le même jeu : les répéter dans chaque branche
+ * garantissait qu'un ajout de métal n'atterrisse que dans l'une des deux.
+ */
+function Signes() {
+  return (
+    <>
+      {SIGNES.map((signe) => (
+        /* eslint-disable-next-line @next/next/no-img-element */
+        <img
+          key={signe.fichier}
+          src={signe.fichier}
+          alt=""
+          aria-hidden="true"
+          className={cn(
+            signe.famille,
+            signe.metal,
+            /* L'or en tours est le seul montré par défaut : c'est le thème
+               écrit dans `:root`, celui que le serveur rend. */
+            signe.defaut ? "block" : "hidden",
+          )}
+        />
+      ))}
+    </>
+  );
+}
+
+const SIGNES = [
+  { fichier: "/marque-or.webp", famille: "signe-tours", metal: "marque-or", defaut: true },
+  { fichier: "/marque-argent.webp", famille: "signe-tours", metal: "marque-argent", defaut: false },
+  { fichier: "/marque-violet.webp", famille: "signe-tours", metal: "marque-violet", defaut: false },
+  { fichier: "/marque-stack-or.webp", famille: "signe-stack", metal: "marque-or", defaut: false },
+  { fichier: "/marque-stack-argent.webp", famille: "signe-stack", metal: "marque-argent", defaut: false },
+  { fichier: "/marque-stack-violet.webp", famille: "signe-stack", metal: "marque-violet", defaut: false },
+] as const;
 
 export function BrandLockup({
   className,

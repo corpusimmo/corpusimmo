@@ -133,9 +133,14 @@ export function ThemeMetal({ className }: { className?: string }) {
        cachée. */
     <div
       className={cn(
-        "fixed bottom-4 left-4 z-30 inline-flex items-center gap-0.5 rounded-full",
+        /* EN FORMAT RÉDUIT, CENTRÉ EN BAS. Collé au bord gauche, il tombait
+           sous le pouce au même endroit que les boutons de l'application et
+           sortait à moitié de l'écran sur les appareils étroits. Centré, il
+           reste à égale distance des deux bords. Au-delà, il retourne au coin
+           gauche, où il ne dispute rien à la lecture. */
+        "fixed bottom-4 left-1/2 z-30 -translate-x-1/2 inline-flex items-center gap-0.5 rounded-full",
         "border border-border bg-surface/95 p-0.5 shadow-lg backdrop-blur-sm",
-        "md:bottom-6 md:left-6",
+        "md:bottom-6 md:left-6 md:translate-x-0",
         className,
       )}
       role="group"

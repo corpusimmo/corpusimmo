@@ -175,52 +175,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ─────────────────────────────────────────────────────── la signature */}
-      <section
-        aria-label="Notre engagement"
-        className="container-page pt-6 md:pt-8"
-      >
-        <div className="reveal relative isolate overflow-hidden rounded-2xl bg-primary text-ink-inverted shadow-lg">
-          {/* Les toits d'une ville en fin de journée, sous un voile de marine :
-            l'image installe le registre de l'observatoire sans jamais
-            concurrencer le texte. `priority` non : elle est sous le pli. */}
-          <Image
-            src="/illustrations/ville-toits.webp"
-            alt=""
-            fill
-            sizes="100vw"
-            className="-z-20 object-cover object-center opacity-60"
-          />
-          <div
-            aria-hidden="true"
-            className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,var(--primary)_0%,color-mix(in_srgb,var(--primary)_90%,transparent)_45%,color-mix(in_srgb,var(--primary)_55%,transparent)_100%)]"
-          />
-          <div className="grid gap-10 px-6 py-14 md:px-12 md:py-16 lg:grid-cols-[minmax(0,6fr)_minmax(0,6fr)] lg:items-center lg:px-16">
-            {/* La citation est le seul texte du site en sérif : c'est là que
-              vit la part institutionnelle du registre. */}
-            <p className="font-serif text-3xl leading-[1.15] italic md:text-[2.5rem]">
-              «&nbsp;Un corpus est un ensemble clos de pièces authentiques. Rien
-              n&apos;y entre qui n&apos;ait été constaté.&nbsp;»
-            </p>
-            <ul className="grid gap-6 sm:grid-cols-3">
-              {PLEDGES.map((pledge) => (
-                <li
-                  key={pledge.title}
-                  className="border-t border-accent-rule pt-4"
-                >
-                  <p className="font-display text-lg leading-snug">
-                    {pledge.title}
-                  </p>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-inverted/75">
-                    {pledge.body}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-      </section>
-
       {/* ───────────────────────────────────────────────── honnêteté données */}
       <section
         aria-labelledby="donnees"
@@ -330,21 +284,6 @@ const METHOD = [
   {
     title: "On donne une fourchette",
     body: "Jamais un prix ferme. Sa largeur dépend de la qualité du jeu de comparables, et un score de confiance dit ce qu'elle vaut.",
-  },
-] as const;
-
-const PLEDGES = [
-  {
-    title: "Des actes, pas des annonces",
-    body: "Un prix demandé n'est pas un prix. Nous ne lisons que ce qui a été signé devant notaire.",
-  },
-  {
-    title: "Une méthode écrite",
-    body: "Chaque étape du calcul est publiée, et chaque vente écartée est comptée.",
-  },
-  {
-    title: "Sans compte pour l'essentiel",
-    body: "Estimateur, carte et observatoire restent ouverts. Ils sont la preuve, pas l'appât.",
   },
 ] as const;
 

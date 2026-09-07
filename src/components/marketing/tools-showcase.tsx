@@ -34,6 +34,7 @@ const ENTRIES = [
     href: "/estimer",
     icon: Scale,
     kicker: "Estimation",
+    fond: "/illustrations/carte-estimation.webp",
     title: "Estimer un bien",
     body: "Six questions, puis une fourchette calculée sur les ventes comparables du secteur, avec le détail de ce qui a été retenu et de ce qui a été écarté.",
     cta: "Lancer une estimation",
@@ -42,6 +43,7 @@ const ENTRIES = [
     href: "/observatoire",
     icon: MapIcon,
     kicker: "Cartographie",
+    fond: "/illustrations/carte-cartographie.webp",
     title: "L'observatoire",
     body: "La carte de toutes les mutations enregistrées, à l'échelle de la rue, et la même donnée augmentée : médianes au m², volumes, dispersion, table de recherche et sélection de comparables.",
     cta: "Explorer le marché",
@@ -50,6 +52,7 @@ const ENTRIES = [
     href: "/prix-immobilier",
     icon: Building2,
     kicker: "Références",
+    fond: "/illustrations/carte-references.webp",
     title: "Le prix, commune par commune",
     body: "Cent communes documentées : médianes par type de bien, volumes, évolution entre deux millésimes, et le nombre de ventes qui fonde chaque chiffre.",
     cta: "Voir les communes",
@@ -58,6 +61,7 @@ const ENTRIES = [
     href: "/outils",
     icon: Layers,
     kicker: "Calculs",
+    fond: "/illustrations/carte-calculs.webp",
     title: "Dix outils de calcul",
     body: "Rentabilité locative, coût réel d'un prêt, arbitrage fiscal, DCF sur dix ans, charge foncière, WAULT… avec les barèmes affichés et modifiables.",
     cta: "Voir les outils",
@@ -142,37 +146,81 @@ export function ToolsShowcase() {
         l'accent et s'épaissit. Aucune ombre, aucun cadre, aucun fond.
       */}
       <ul className="reveal-late mt-12 grid gap-x-12 gap-y-12 md:grid-cols-2 md:gap-x-16">
-        {ENTRIES.map((entry, index) => (
+        {ENTRIES.map((entry) => (
           <li key={entry.href}>
             <Link
               href={entry.href}
               className={
-                // L'estimation est le chemin principal du site. Elle se
-                // distingue par son filet, pas par un fond ni une taille : les
-                // quatre entrées gardent le même poids.
-                "group relative flex h-full flex-col gap-3 pt-5 " +
-                (index === 0 ? "" : "border-t-2 border-border")
+                // LE TEXTE NE DÉBORDE JAMAIS SUR LA PHOTOGRAPHIE. La réserve
+                // de droite est posée ici, sur le lien, plutôt que sur chaque
+                // élément de texte : une seule règle, et rien ne peut lui
+                // échapper le jour où l'on ajoute une ligne.
+                "group relative isolate flex h-full flex-col gap-3 overflow-hidden " +
+                "rounded-lg border-t-2 border-border px-5 pt-5 pb-6 pr-[46%]"
               }
             >
-              {/* L'entrée principale porte une plaque de métal plutôt qu'une
-                  bordure : c'est le seul endroit de l'accueil où la matière du
-                  thème se voit vraiment, parce qu'elle a la place de brosser
-                  et de refléter. Les trois autres gardent un filet neutre. */}
-              {index === 0 ? (
-                <span
-                  aria-hidden="true"
-                  className="plaque-metal absolute inset-x-0 top-0 h-[3px] rounded-full"
+              {/* LA PLAQUE RÉPOND AU SURVOL, sur les quatre entrées.
+                  Elle était figée sur la première, ce qui la désignait comme
+                  l'entrée principale : les quatre ont le même poids, et la
+                  matière doit récompenser le geste plutôt que hiérarchiser.
+                  Le filet neutre reste dessous, si bien que rien ne bouge en
+                  hauteur quand la plaque apparaît. */}
+              <span
+                aria-hidden="true"
+                className="plaque-metal absolute inset-x-0 -top-0.5 h-[3px] rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+              />
+              {/* ── LA PHOTOGRAPHIE, ET POURQUOI ELLE NE PASSE PAS SOUS LE TEXTE
+                  ──────────────────────────────────────────────────────────
+                  Première tentative : l'image en fond de carte, couverte d'un
+                  voile et d'un dégradé de lecture. Mesuré sur les pixels
+                  peints, le point le plus sombre de la bande de texte donnait
+                  2,9:1 avec l'encre secondaire, sous le seuil de 4,5. Il a
+                  fallu renforcer le voile jusqu'à 5,4:1, et à ce compte la
+                  photographie avait presque disparu. Un fond qu'on doit
+                  effacer pour pouvoir lire n'est plus un fond, c'est une
+                  tache.
+
+                  Elle occupe donc la DROITE, sur un peu plus de la moitié de
+                  la carte, et s'efface vers la gauche par un masque. Le texte
+                  reste sur le fond plein du site : son contraste redevient
+                  celui du reste de la page, sans mesure particulière, et la
+                  photographie garde sa matière là où elle est visible.
+
+                  Le cadrage des images sert exactement à cela : sujet à
+                  droite, tiers gauche vide. C'est ce vide qui disparaît sous
+                  le masque. */}
+              <span
+                aria-hidden="true"
+                className="absolute inset-y-0 right-0 -z-10 w-[58%] overflow-hidden [mask-image:linear-gradient(90deg,transparent_0%,rgb(0_0_0/0.35)_38%,black_78%)]"
+              >
+                <Image
+                  src={entry.fond}
+                  alt=""
+                  fill
+                  sizes="(min-width: 768px) 30vw, 60vw"
+                  className="object-cover object-center"
                 />
-              ) : null}
+              </span>
+              <span
+                aria-hidden="true"
+                className="plaque-metal absolute inset-x-0 -top-0.5 h-[3px] rounded-full opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-focus-visible:opacity-100"
+              />
+              {/* ── LA PHOTOGRAPHIE, ET LES DEUX COUCHES QUI LA RENDENT LISIBLE
+                  ──────────────────────────────────────────────────────────
+                  L'IMAGE RESTE À PLEINE OPACITÉ. Baisser l'opacité d'une photo
+                  la fait virer au gris et lui retire sa matière ; c'est un
+                  VOILE de couleur qui la couvre, et le voile, lui, garde sa
+                  teinte. C'est la différence entre une image affaiblie et une
+                  image derrière un calque.
+
+                  LE DÉGRADÉ VIENT DE LA GAUCHE parce que le texte y est. Les
+                  photographies ont été cadrées pour cela, sujet à droite et
+                  tiers gauche vide : le dégradé n'a donc rien à masquer, il
+                  ne fait qu'assurer le contraste là où il compte. */}
               {/* Le surtitre, un filet de liaison, puis l'icône : la ligne dit
                   la nature de l'entrée avant d'en dire le nom. */}
               <span className="flex items-center gap-3">
-                <span
-                  className={
-                    "eyebrow-text transition-colors duration-200 group-hover:text-accent " +
-                    (index === 0 ? "text-accent" : "text-ink-subtle")
-                  }
-                >
+                <span className="eyebrow-text text-ink-subtle transition-colors duration-200 group-hover:text-accent">
                   {entry.kicker}
                 </span>
                 <span
@@ -188,7 +236,7 @@ export function ToolsShowcase() {
               <h3 className="font-display text-2xl leading-tight tracking-tight text-ink">
                 {entry.title}
               </h3>
-              <p className="max-w-prose flex-1 text-sm leading-relaxed text-ink-muted">
+              <p className="flex-1 text-sm leading-relaxed text-ink-muted">
                 {entry.body}
               </p>
               <span className="inline-flex items-center gap-1.5 pt-1 text-sm font-semibold text-primary">

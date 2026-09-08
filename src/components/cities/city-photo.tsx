@@ -83,7 +83,7 @@ export function CityPhotoBanner({
   if (!photo) return <>{children}</>;
 
   return (
-    <div className="relative isolate overflow-hidden rounded-xl bg-primary text-ink-inverted">
+    <div className="relative isolate overflow-hidden rounded-xl bg-surface-inverted text-ink-inverted">
       <Image
         src={photo.url}
         alt=""
@@ -105,11 +105,11 @@ export function CityPhotoBanner({
         style={{
           backgroundImage:
             "linear-gradient(100deg," +
-            "var(--primary) 0%," +
-            "var(--primary) 44%," +
-            "color-mix(in srgb, var(--primary) 86%, transparent) 60%," +
-            "color-mix(in srgb, var(--primary) 42%, transparent) 84%," +
-            "color-mix(in srgb, var(--primary) 22%, transparent) 100%)",
+            "var(--surface-inverted) 0%," +
+            "var(--surface-inverted) 44%," +
+            "color-mix(in srgb, var(--surface-inverted) 86%, transparent) 60%," +
+            "color-mix(in srgb, var(--surface-inverted) 42%, transparent) 84%," +
+            "color-mix(in srgb, var(--surface-inverted) 22%, transparent) 100%)",
         }}
       />
       <div className="px-6 pt-8 pb-10 md:px-10 md:pt-10">{children}</div>

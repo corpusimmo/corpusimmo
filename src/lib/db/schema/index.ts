@@ -47,3 +47,24 @@ export type { ConsentInsert, ConsentPurpose, ConsentRow } from "./consents";
 
 export { contacts, leads } from "./leads";
 export type { ContactInsert, ContactRow, LeadInsert, LeadRow } from "./leads";
+
+export {
+  CONTACT_STAGES,
+  DEAL_STAGES,
+  NOTE_KINDS,
+  crmDeals,
+  crmNotes,
+  crmTasks,
+} from "./crm";
+export type {
+  ContactFields,
+  ContactStage,
+  CrmDealInsert,
+  CrmDealRow,
+  CrmNoteInsert,
+  CrmNoteRow,
+  CrmTaskInsert,
+  CrmTaskRow,
+  DealStage,
+  NoteKind,
+} from "./crm";

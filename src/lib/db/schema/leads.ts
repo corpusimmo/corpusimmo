@@ -51,6 +51,7 @@ import type { LeadStatus } from "@/types/lead";
 import type { ProjectIntent, PropertyType } from "@/types/property";
 
 import { users } from "./auth";
+import type { ContactFields, ContactStage } from "./crm";
 import { estimations } from "./estimations";
 
 export const contacts = pgTable(
@@ -76,8 +77,25 @@ export const contacts = pgTable(
     updatedAt: timestamp("updated_at", { mode: "date", withTimezone: true })
       .notNull()
       .defaultNow(),
+
+    // --- Le CRM de l'équipe. Voir `schema/crm.ts`. ---
+    /** Société ou activité, quand la personne l'a dite. */
+    company: text("company"),
+    /** Où en est la relation : `nouveau`, `a_contacter`… Voir `CONTACT_STAGES`. */
+    stage: text("stage").$type<ContactStage>().notNull().default("nouveau"),
+    /** Le membre de l'équipe qui suit ce contact. Nul : personne encore. */
+    ownerEmail: text("owner_email"),
+    /** D'où vient la première trace : `site`, `aimant:<slug>`, `manuel`… */
+    origin: text("origin"),
+    /** Étiquettes libres, celles de la machine comprises. */
+    tags: jsonb("tags").$type<string[]>().notNull().default([]),
+    /** Les réponses de qualification de la machine, clé : valeur. */
+    fields: jsonb("fields").$type<ContactFields>().notNull().default({}),
+    /** Le dernier événement sur la fiche, pour trier « à relancer ». */
+    lastActivityAt: timestamp("last_activity_at", { mode: "date", withTimezone: true }),
   },
   (table) => [
+    index("contacts_stage_idx").on(table.stage, table.lastActivityAt.desc()),
     // Une personne, une fiche. C'est cette contrainte qui rend l'insertion
     // idempotente : la deuxième demande met la fiche à jour au lieu d'en créer
     // une seconde.

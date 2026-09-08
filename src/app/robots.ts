@@ -46,6 +46,7 @@ export default function robots(): MetadataRoute.Robots {
           "/api/",
           "/connexion",
           "/mon-espace",
+          "/crm",
           "/observatoire/comparables",
           // Le joker médian est compris par Google et Bing ; les fiches
           // `/outils/<slug>` restent explorables, seul le calculateur est fermé.

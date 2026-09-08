@@ -1,11 +1,11 @@
 "use client";
 
 /**
- * LE CHOIX DU THÈME — argent, mixte ou violet.
+ * LE CHOIX DU THÈME — argent ou mixte.
  *
  * Ce n'est pas un thème clair contre un thème sombre : les trois sont clairs,
- * et ce qui change est la part de couleur. L'argent ne colore rien, le violet
- * colore tout, et le mixte, qui est le thème par défaut, met le violet sur ce
+ * et ce qui change est la part de couleur. L'argent ne colore rien, et le
+ * mixte, qui est le thème par défaut, met le violet sur ce
  * qui se clique et l'argent sur tout le reste. Les valeurs vivent dans
  * `globals.css`, ce composant ne fait que poser un attribut.
  *
@@ -23,15 +23,14 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils/cn";
 
-export type Metal = "mixte" | "argent" | "violet";
+export type Metal = "mixte" | "argent";
 
 /** La clé est partagée avec le script en ligne du gabarit racine. */
 export const CLE_METAL = "corpusimmo.metal";
 
 const METAUX: ReadonlyArray<{ id: Metal; nom: string; titre: string }> = [
-  { id: "argent", nom: "Argent", titre: "Thème marine et argent" },
-  { id: "mixte", nom: "Mixte", titre: "Thème violet, argent en second" },
-  { id: "violet", nom: "Violet", titre: "Thème violet" },
+  { id: "argent", nom: "Bleu", titre: "Thème bleu et argent" },
+  { id: "mixte", nom: "Violet", titre: "Thème violet, argent en second" },
 ];
 
 /** L'événement par lequel toutes les instances du bouton se tiennent au courant. */
@@ -39,7 +38,7 @@ const EVENEMENT = "corpusimmo:metal";
 
 function lireClient(): Metal {
   const t = document.documentElement.dataset.theme;
-  return t === "argent" || t === "violet" ? t : "mixte";
+  return t === "argent" ? t : "mixte";
 }
 
 /**
@@ -145,10 +144,8 @@ export function ThemeMetal({ className }: { className?: string }) {
               className={cn(
                 "size-3 rounded-full",
                 m.id === "argent"
-                  ? "bg-[linear-gradient(135deg,#78818f,#dfe5ec_45%,#ffffff_55%,#8d97a5)]"
-                  : m.id === "mixte"
-                    ? "bg-[linear-gradient(135deg,#5b2fd6_0%,#6d4fd0_48%,#dfe5ec_52%,#8d97a5_100%)]"
-                    : "bg-[linear-gradient(135deg,#4a25b4,#b9a6f2_45%,#f0eaff_55%,#6d4fd0)]",
+                  ? "bg-[linear-gradient(135deg,#1d4ed8_0%,#3b82f6_48%,#dfe5ec_52%,#8d97a5_100%)]"
+                  : "bg-[linear-gradient(135deg,#5b2fd6_0%,#6d4fd0_48%,#dfe5ec_52%,#8d97a5_100%)]",
               )}
             />
             {m.nom}

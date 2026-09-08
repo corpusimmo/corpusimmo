@@ -188,7 +188,7 @@ export default function RootLayout({
             __html:
               'try{var d=document.documentElement;' +
               'var m=localStorage.getItem("corpusimmo.metal");' +
-              'if(m==="argent"||m==="violet")d.dataset.theme=m;' +
+              'if(m==="argent")d.dataset.theme=m;' +
               '}catch(e){}',
           }}
         />

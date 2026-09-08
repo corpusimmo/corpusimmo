@@ -95,3 +95,31 @@ export { eraseUser, forgetEmail, purgeExpired } from "./erasure";
 
 export type { SavedComparable } from "../mappers";
 export type { WriteFailure, WriteOutcome } from "../outcome";
+
+export {
+  addDeal,
+  addNote,
+  addTask,
+  createContact,
+  dashboardCounts,
+  deleteContact,
+  deleteDeal,
+  deleteNote,
+  deleteTask,
+  listContacts,
+  listDeals,
+  listDealsOfContact,
+  listLeadsOfContact as listLeadsOfContactForCrm,
+  listNotes,
+  listOpenTasks,
+  listTasksOfContact,
+  lookupForMachine,
+  readContact,
+  setDealStage,
+  setTaskDone,
+  updateContact,
+  upsertFromMachine,
+  type ContactFilter,
+  type ContactPatch,
+  type MachineContact,
+} from "./crm";

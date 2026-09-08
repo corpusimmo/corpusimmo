@@ -15,6 +15,13 @@
       "when": 1788503085058,
       "tag": "0001_charte_graphique",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1788892606991,
+      "tag": "0002_crm_equipe",
+      "breakpoints": true
     }
   ]
 }

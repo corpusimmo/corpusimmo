@@ -214,55 +214,6 @@
    l'argent à #A8B2C4 1,9:1. C'est `--accent` (#8A6A2F, 5,0:1) qui écrit.
    ========================================================================== */
 
-:root[data-theme="violet"] {
-  --canvas: #f7f7fb;
-  --surface-2: #fbfbfe;
-  --surface-3: #eeeef8;
-  --border: #e3e4ee;
-  --border-soft: #eff0f7;
-  --border-strong: #c8cade;
-
-  /* L'action passe au violet, le marine reste l'aplat. La règle du thème
-     tient en une phrase : ce qui est marine est du document, ce qui est
-     violet est une action ou une donnée vivante. */
-  --primary: #5b2fd6;
-  --primary-hover: #4a25b4;
-  --primary-active: #3b1d90;
-  --primary-soft: #eee9fc;
-  --primary-soft-fg: #42219e;
-  --brand-500: #6d4fd0;
-  --brand-600: #5b2fd6;
-  --brand-700: #41279c;
-  --brand-800: #331e7d;
-  --brand-900: #1b1145;
-
-  /* CE THÈME N'A PAS DE MÉTAL, et il ne faut pas faire semblant. Le violet
-     n'est pas une matière : ses arrêts clairs sont des teintes, pas des
-     reflets. Le système de brillance continue de fonctionner, mais il produit
-     un satin plutôt qu'un poli, ce qui est la seule chose honnête à faire
-     avec une couleur qui n'existe pas en métal. */
-  --accent: #5b2fd6;
-  --accent-hover: #4a25b4;
-  --accent-active: #3b1d90;
-  --accent-soft: #eee9fc;
-  --accent-soft-fg: #42219e;
-  --accent-rule: #a98fe8;
-
-  --surface-inverted: #111a35;
-  --map-marker: #111a35;
-}
-
-:root[data-theme="violet"] {
-  --metal-a: #4a25b4;
-  --metal-b: #b9a6f2;
-  --metal-c: #6d4fd0;
-  --metal-eclat: #f0eaff;
-  --metal-halo: 145 116 232;
-  --metal-prisme-1: 232 214 255;
-  --metal-prisme-2: 214 220 255;
-  --metal-prisme-3: 245 240 255;
-}
-
 :root[data-theme="argent"] {
   --canvas: #f4f6fa;
   --surface-2: #fafbfd;
@@ -331,8 +282,7 @@
   --mot-grave-ombre: var(--primary-active);
 }
 
-:root[data-theme="argent"],
-:root[data-theme="violet"] {
+:root[data-theme="argent"] {
   --mot-a: var(--metal-b);
   --mot-eclat: var(--metal-eclat);
   --mot-grave: var(--accent);

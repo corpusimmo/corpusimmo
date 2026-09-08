@@ -330,7 +330,7 @@ describe("contacts", () => {
 });
 
 describe("inventaire", () => {
-  it("livre les quatorze tables attendues, et pas une de plus", () => {
+  it("livre les dix-sept tables attendues, et pas une de plus", () => {
     expect([...byName.keys()].sort()).toEqual([
       "accounts",
       "brand_profiles",
@@ -338,6 +338,9 @@ describe("inventaire", () => {
       "comparable_sets",
       "consents",
       "contacts",
+      "crm_deals",
+      "crm_notes",
+      "crm_tasks",
       "estimation_results",
       "estimations",
       "leads",

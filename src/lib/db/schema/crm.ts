@@ -23,7 +23,6 @@
 import {
   index,
   integer,
-  jsonb,
   pgTable,
   text,
   timestamp,

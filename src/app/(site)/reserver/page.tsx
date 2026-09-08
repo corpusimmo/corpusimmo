@@ -67,7 +67,7 @@ export default function ReserverPage() {
           <div className="panel p-8">
             <h2 className="font-display text-2xl">Le calendrier arrive</h2>
             <p className="mt-3 text-sm leading-relaxed text-ink-muted">
-              La prise de rendez-vous en ligne n'est pas encore ouverte. Écrivez-nous, on vous
+              La prise de rendez-vous en ligne n&rsquo;est pas encore ouverte. Écrivez-nous, on vous
               propose un créneau par retour.
             </p>
             <Button asChild className="mt-6">

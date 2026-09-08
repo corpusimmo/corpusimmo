@@ -31,7 +31,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
         actions={
           <form method="get" className="flex items-center gap-2">
             <Select name="pour" defaultValue={assignee ?? ""} aria-label="Pour qui" className="w-40">
-              <option value="">Toute l'équipe</option>
+              <option value="">Toute l&rsquo;équipe</option>
               {members.map((member) => (
                 <option key={member.email} value={member.email}>
                   {member.firstName}

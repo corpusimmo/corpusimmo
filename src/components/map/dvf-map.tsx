@@ -44,6 +44,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
   Box,
+  Coins,
   Tag,
   TrainFront,
   Layers,
@@ -100,8 +101,22 @@ import { installGtfsLayers, setGtfsVisibility } from "./transports-gtfs";
 import {
   buildTerritoryScale,
   installTerritoryLayers,
+  setTerritoryVisibility,
   type TerritoryScale,
 } from "./territories";
+import {
+  attachLoyersPopup,
+  fetchLoyersIndex,
+  fetchLoyersObservesIndex,
+  installLoyersLayers,
+  LoyersLoader,
+  loyersScale,
+  setLoyersVisibility,
+  SOURCE_LOYERS_COMMUNES,
+  type LoyersIndex,
+  type LoyersObservesIndex,
+} from "./loyers";
+import { LoyersLegend } from "./loyers-legend";
 import { buildPriceScale, byPriceClass, type PriceScale } from "./price-scale";
 import {
   installZoningLayers,
@@ -286,6 +301,15 @@ export function DvfMap({
   /** Le calque transports et commodités est-il allumé, et disponible ? */
   const [transports, setTransports] = React.useState(false);
   const [transportsAvailable, setTransportsAvailable] = React.useState(false);
+  /**
+   * Le calque des loyers est-il allumé ? Son index (bornes, boîtes des
+   * départements) n'est chargé qu'à la première demande : 20 ko que la page
+   * des ventes n'a aucune raison de payer d'avance.
+   */
+  const [loyers, setLoyers] = React.useState(false);
+  const [loyersIndex, setLoyersIndex] = React.useState<LoyersIndex | null>(null);
+  const [loyersObserves, setLoyersObserves] = React.useState<LoyersObservesIndex | null>(null);
+  const [loyersError, setLoyersError] = React.useState(false);
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
   const [internalSelectedId, setInternalSelectedId] = React.useState<
@@ -333,6 +357,9 @@ export function DvfMap({
   zoningRef.current = zoning;
   const transportsRef = React.useRef(transports);
   transportsRef.current = transports;
+  const loyersRef = React.useRef(loyers);
+  loyersRef.current = loyers;
+  const loyersLoaderRef = React.useRef<LoyersLoader | null>(null);
   const showPricesRef = React.useRef(showPrices);
   showPricesRef.current = showPrices;
   const scaleRef = React.useRef<PriceScale | null>(scale);
@@ -697,6 +724,82 @@ export function DvfMap({
       "building",
     );
   }, [territoryScale, styleReady]);
+
+  /* ── Loyers ────────────────────────────────────────────────────────────── */
+
+  // L'index ne se charge qu'à la première demande, et une seule fois.
+  React.useEffect(() => {
+    if (!loyers || loyersIndex || loyersError) return;
+    let alive = true;
+    Promise.all([fetchLoyersIndex(), fetchLoyersObservesIndex()])
+      .then(([index, observes]) => {
+        if (!alive) return;
+        setLoyersIndex(index);
+        setLoyersObserves(observes);
+      })
+      .catch(() => {
+        if (alive) setLoyersError(true);
+      });
+    return () => {
+      alive = false;
+    };
+  }, [loyers, loyersIndex, loyersError]);
+
+  // Les couches se posent APRÈS celles des territoires, donc au-dessus : un
+  // loyer allumé recouvre la médiane départementale, qui s'éteint d'ailleurs
+  // en même temps (voir plus bas). Rejoué à chaque style prêt.
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    const container = containerRef.current;
+    if (!instance || !container || !loyersIndex || !styleReady) return;
+    if (!instance.getStyle()) return;
+
+    const tokens = tokensRef.current ?? readMapTokens(container);
+    const fresh = !instance.getSource(SOURCE_LOYERS_COMMUNES);
+    installLoyersLayers(
+      instance,
+      loyersScale(loyersIndex),
+      { line: tokens.ink, label: tokens.ink, halo: tokens.surface },
+      "building",
+    );
+    setLoyersVisibility(instance, loyersRef.current);
+
+    if (!loyersLoaderRef.current) {
+      loyersLoaderRef.current = new LoyersLoader(instance, loyersIndex);
+    } else if (fresh) {
+      // Fond de carte changé : les sources sont neuves, les données non.
+      loyersLoaderRef.current.replay();
+    }
+    if (loyersRef.current) loyersLoaderRef.current.sync();
+  }, [loyersIndex, styleReady]);
+
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    if (!instance || !loyersIndex || !styleReady) return;
+    setLoyersVisibility(instance, loyers);
+    // Deux choroplèthes superposés ne se lisent pas : les médianes de vente
+    // par département s'effacent tant que les loyers sont affichés.
+    setTerritoryVisibility(instance, !loyers);
+    if (!loyers) return;
+
+    const loader = loyersLoaderRef.current;
+    const sync = (): void => loader?.sync();
+    sync();
+    instance.on("moveend", sync);
+    const detach = attachLoyersPopup(instance, loyersIndex, () => loyersRef.current);
+    return () => {
+      instance.off("moveend", sync);
+      detach();
+    };
+  }, [loyers, loyersIndex, styleReady]);
+
+  React.useEffect(
+    () => () => {
+      loyersLoaderRef.current?.dispose();
+      loyersLoaderRef.current = null;
+    },
+    [],
+  );
 
   /* ── Affectation du sol ────────────────────────────────────────────────── */
 
@@ -1581,7 +1684,37 @@ export function DvfMap({
             </button>
           ) : null}
 
+          {/* LOYERS. Deux sources publiques sous un seul interrupteur : les
+              baux observés là où un observatoire existe, les loyers d'annonce
+              partout ailleurs. L'utilisateur demande « les loyers », pas une
+              méthodologie. Le bouton disparaît si l'index ne répond pas :
+              un calque qu'on ne peut pas peindre ne se propose pas. */}
+          {loyersError ? null : (
+            <button
+              type="button"
+              onClick={() => setLoyers((on) => !on)}
+              aria-pressed={loyers}
+              className={cn(
+                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
+                loyers
+                  ? "bg-primary text-primary-fg"
+                  : "bg-surface text-ink-muted hover:text-ink",
+              )}
+            >
+              <Coins aria-hidden="true" className="size-3.5" />
+              Loyers
+            </button>
+          )}
+
           </div>
+          {loyers && loyersIndex ? (
+            <LoyersLegend
+              scale={loyersScale(loyersIndex)}
+              index={loyersIndex}
+              observes={loyersObserves}
+              className="max-h-[11rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none"
+            />
+          ) : null}
           {zoning ? (
             <ZoningLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none" />
           ) : null}

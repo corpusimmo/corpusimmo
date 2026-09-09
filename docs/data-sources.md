@@ -49,13 +49,28 @@ Classés par rapport valeur / effort.
 **PriceHubble**, **Pappers Immobilier**, **Codata**, **Data-B**, **MyTraffic**
 (flux piétons), **IEIF**. Aucune n'est nécessaire au MVP.
 
-## 3. Le trou dans la raquette : les loyers
+## 3. Les loyers : deux sources publiques, résidentiel seulement
 
-**Aucune source publique française ne couvre les loyers ni les transactions
-locatives.** C'est la limite structurante du produit, et elle explique une
-décision d'architecture : les modules **Rendement** et **DCF** ne peuvent pas
-être alimentés par de l'open data. Ils resteront en préparation tant que la
-donnée d'entrée viendra de la saisie de l'utilisateur ou d'un partenariat.
+Aucune source publique ne couvre les **transactions locatives** (baux
+signés, un par un). Deux jeux ouverts approchent le loyer au m², et le
+produit les superpose sur la carte de l'observatoire (calque « Loyers »,
+`src/components/map/loyers.ts`) :
+
+| Source | Ce que c'est | Couverture | Script |
+|---|---|---|---|
+| **Carte des loyers** (DGALN / ANIL, avec SeLoger et leboncoin) | loyers d'**annonce**, charges comprises, non meublé, estimés par modèle pour un bien type (52 m² appartement, 92 m² maison) | toutes les communes, millésime annuel ; 1 commune sur 6 estimée sur place, les autres par « maille » de voisinage | `agreger-loyers.mjs` puis `contours-communes-loyers.mjs` → `src/data/loyers.json`, `public/geo/loyers/` |
+| **Observatoires locaux des loyers** (réseau ANIL) | loyers de **baux en cours** au 1er janvier, hors charges, parc privé, relevés auprès des bailleurs et gestionnaires | une cinquantaine d'agglomérations, découpées en zones ; chaque observatoire publie à son rythme | `agreger-loyers-observes.mjs` → `public/geo/loyers-observes.geojson` |
+
+Règles d'usage :
+
+- Là où un observatoire existe, **le bail signé prime sur l'annonce**.
+- Un loyer d'annonce est un plafond, jamais un revenu : `src/lib/loyers/rendement.ts`
+  ne calcule qu'un rendement **brut**, et le dit.
+- Attribution obligatoire de la carte des loyers : « Estimations ANIL, à partir
+  des données du Groupe SeLoger et de leboncoin ».
+- **Résidentiel uniquement.** Aucune source publique ne donne de loyer de
+  bureaux, de commerces ni de locaux d'activité : ces marchés relèvent des
+  observatoires professionnels payants (§ 2.3) ou de la saisie utilisateur.
 
 Ne jamais présenter un loyer dérivé de DVF : DVF ne contient que des ventes.
 

@@ -111,7 +111,6 @@ import {
   fetchLoyersIndex,
   fetchLoyersObservesIndex,
   installLoyersLayers,
-  LOYERS_TYPES,
   LoyersLoader,
   loyersScale,
   setLoyersType,
@@ -354,6 +353,13 @@ export function DvfMap({
     return maison && !appartement ? "mai" : "app";
   })();
   const loyersType: LoyersType = loyersTypeChoisi ?? famille;
+  /* LE CHOIX EXPLICITE NE SURVIT PAS À UN CHANGEMENT DE FAMILLE. Passer les
+     filtres sur les maisons alors qu'on lisait les T1-T2 doit montrer des
+     maisons : le réglage fin appartenait à la famille qu'on vient de
+     quitter. */
+  React.useEffect(() => {
+    setLoyersTypeChoisi(null);
+  }, [famille]);
   const loyersTypeRef = React.useRef(loyersType);
   loyersTypeRef.current = loyersType;
   const [has3d, setHas3d] = React.useState(false);
@@ -1808,18 +1814,28 @@ export function DvfMap({
               )}
             </div>
 
-            {/* LE TYPE DE BIEN DU CALQUE DES LOYERS, quand il est allumé.
-                Il n'apparaît pas autrement : un réglage qui n'agit sur rien
-                de visible est un réglage qui égare. Les quatre cartes de la
-                source vivent déjà dans le fichier, changer de type ne
-                déclenche aucun téléchargement. */}
-            {loyers && loyersIndex ? (
+            {/* LA TYPOLOGIE D'APPARTEMENT, ET RIEN QUE CE QUE LES FILTRES NE
+                SAVENT PAS DIRE.
+
+                Ce sélecteur a porté un instant les quatre cartes, appartement
+                et maison compris : il redoublait alors mot pour mot les
+                filtres du haut de page, deux boutons « Maisons » à deux
+                endroits, sans que rien ne dise lequel commandait l'autre. La
+                famille vient donc des filtres, et il ne reste ici que le
+                découpage par nombre de pièces, que DVF ne connaît pas et
+                qu'aucun filtre ne peut donc exprimer.
+
+                Il disparaît sur les maisons — la source ne les ventile pas —
+                et quand le calque est éteint : un réglage qui n'agit sur rien
+                de visible égare. Changer de typologie ne télécharge rien, les
+                quatre valeurs sont déjà dans chaque commune. */}
+            {loyers && loyersIndex && famille === "app" ? (
               <div
                 role="group"
-                aria-label="Type de bien des loyers"
+                aria-label="Typologie des appartements"
                 className="pointer-events-auto flex shrink-0 items-stretch overflow-hidden rounded-lg border border-border bg-surface"
               >
-                {LOYERS_TYPES.map((option, index) => (
+                {TYPOLOGIES.map((option, index) => (
                   <React.Fragment key={option.id}>
                     {index > 0 ? <Separateur /> : null}
                     <button
@@ -2287,6 +2303,18 @@ function liveMessage(
   if (count === 0) return "Aucune vente dans cette zone.";
   return `${count} vente${count > 1 ? "s" : ""} affichée${count > 1 ? "s" : ""} sur la carte.`;
 }
+
+/**
+ * Les trois découpages d'appartement de la source.
+ *
+ * La maison n'y est pas : elle se choisit dans les filtres de la page, avec
+ * le reste des types de biens. Ce qui vit ici est ce que DVF ignore.
+ */
+const TYPOLOGIES: ReadonlyArray<{ id: LoyersType; nom: string }> = [
+  { id: "app", nom: "Tous" },
+  { id: "a12", nom: "T1-T2" },
+  { id: "a3", nom: "T3 et plus" },
+];
 
 /** Le trait qui sépare deux commandes dans la pastille des calques. */
 function Separateur() {

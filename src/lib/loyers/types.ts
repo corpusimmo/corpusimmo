@@ -54,6 +54,17 @@ export interface LoyersCommune {
   /** Code département, tel que publié : `01` à `95`, `2A`/`2B`, `971`… */
   dep: string;
   appartement: IndicateurLoyer | null;
+  /**
+   * Les deux typologies d'appartement de la source, T1-T2 et T3 et plus.
+   *
+   * Elles ne servent PAS au rendement : DVF ne ventile pas ses prix par
+   * nombre de pièces, et croiser un T2 loué avec un prix au m² tous
+   * appartements confondus produirait un taux faux. Elles servent à dire ce
+   * qu'un loyer unique par commune cache — un studio se loue trois euros du
+   * mètre de plus qu'un quatre-pièces.
+   */
+  appartementT12: IndicateurLoyer | null;
+  appartementT3: IndicateurLoyer | null;
   maison: IndicateurLoyer | null;
 }
 

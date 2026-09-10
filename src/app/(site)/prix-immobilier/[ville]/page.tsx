@@ -8,6 +8,8 @@ import { PriceByTypeTable } from "@/components/cities/price-table";
 import { PriceDistribution } from "@/components/cities/price-distribution";
 import { CityPriceSeries } from "@/components/cities/price-series";
 import { SectorTable } from "@/components/cities/sector-table";
+import { RentalMarket } from "@/components/cities/rental-market";
+import { jeuLoyers, loyersDeCommune } from "@/lib/loyers/jeu";
 import { Button, Stat } from "@/components/ui";
 import { disclaimers } from "@/config/site";
 import {
@@ -99,6 +101,11 @@ export default async function VillePage({ params }: PageProps) {
   const flats = city.byType.apartment;
   const houses = city.byType.house;
   const headline = canPublishFigure(flats) ? flats : houses;
+  /* Les arrondissements de Paris, Lyon et Marseille portent leur propre code
+     INSEE dans la carte des loyers ; les autres communes aussi. Absent : le
+     bloc locatif ne s'affiche pas, plutôt que d'emprunter la commune
+     voisine. */
+  const loyers = loyersDeCommune(city.insee);
 
   return (
     <div className="bg-canvas py-8 md:py-12">
@@ -274,6 +281,20 @@ export default async function VillePage({ params }: PageProps) {
         </section>
 
         <EvolutionSection city={city} />
+
+        {/* LE MARCHÉ LOCATIF, APRÈS L'ÉVOLUTION ET AVANT LES SECTEURS.
+            Il vient après ce qui décrit la vente, parce qu'il s'y adosse : le
+            rendement n'a de sens qu'une fois le prix médian lu. Il vient avant
+            le découpage interne, qui redescend d'un cran dans le détail. Une
+            commune sans indicateur publié ne montre rien — le composant rend
+            `null` plutôt qu'un bloc vide. */}
+        {loyers ? (
+          <RentalMarket
+            city={city}
+            loyers={loyers}
+            surfaces={jeuLoyers().surfacesType}
+          />
+        ) : null}
 
         {sectors ? (
           <section aria-labelledby="secteurs" className="flex flex-col gap-4">

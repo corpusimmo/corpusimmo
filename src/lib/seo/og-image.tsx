@@ -26,7 +26,7 @@
  *   `var(--primary)` n'y vaut rien. Ces valeurs DOIVENT donc être tenues à jour
  *   à la main si la palette de `globals.css` bouge.
  *     #0F1E2B nuit profonde (--surface-inverted)
- *     #C2A468 or aplat (--accent-rule)    · #F6EFDF or pâle (--accent-soft)
+ *     #8B7CC4 violet de marque (--brand-500) · #E9E4F6 violet pâle
  *     #FFFFFF réserve (--ink-inverted)
  *
  * ─────────────────────────────────────────────────────────────────────────────
@@ -57,8 +57,20 @@ export const OG_CONTENT_TYPE = "image/png";
 /* ------------------------------------------------------------------ palette */
 
 const NIGHT = "#0f1e2b";
-const GOLD_RULE = "#c2a468";
-const GOLD_SOFT = "#f6efdf";
+/**
+ * LE VIOLET DE LA MARQUE, ET SON TIRAGE PÂLE.
+ *
+ * L'image sociale a longtemps porté de l'or, du temps où le site proposait
+ * deux thèmes métalliques. Le thème unique est violet depuis le 2026-09-10 :
+ * une vignette de partage qui garde l'ancienne couleur donne à voir un autre
+ * produit que celui qu'on ouvre en cliquant.
+ *
+ * `#8b7cc4` est `--brand-500` et ne porte que des filets et des surtitres sur
+ * fond nuit — 6,4:1 dessus, largement au-dessus du seuil. `#e9e4f6` est la
+ * réserve teintée du sous-titre.
+ */
+const BRAND_RULE = "#8b7cc4";
+const BRAND_SOFT = "#e9e4f6";
 const RESERVE = "#ffffff";
 
 /**
@@ -159,7 +171,7 @@ function dataUri(svg: string): string {
  * Le logotype en RÉSERVE : le tirage au trait, celui du pied de page.
  *
  * Sur une photographie voilée de bleu nuit, la page pleine en bleu nuit
- * disparaîtrait purement et simplement. Le trait la rend, l'or ne bouge pas.
+ * disparaîtrait purement et simplement. Le trait la rend, le violet ne bouge pas.
  * Le coin corné saute : à cette épaisseur de trait il encombre la forme.
  */
 function brandMark(size: number): string {
@@ -168,7 +180,7 @@ function brandMark(size: number): string {
       `<path d="${PAGE}" fill="none" stroke="${RESERVE}" stroke-width="1.6" stroke-linejoin="round"/>` +
       `<g fill="none" stroke="${RESERVE}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
       `<path d="${ROOF}"/><path d="${WALLS}"/></g>` +
-      `<path d="${SIGNATURE}" stroke="${GOLD_RULE}" stroke-width="2" stroke-linecap="round"/>` +
+      `<path d="${SIGNATURE}" stroke="${BRAND_RULE}" stroke-width="2" stroke-linecap="round"/>` +
       `</svg>`,
   );
 }
@@ -313,9 +325,9 @@ export function renderOgImage({
                 }}
               >
                 {siteConfig.nameParts[0]}
-                {/* L'or clair, pas l'or plein : sur le bleu nuit, le second
+                {/* Le violet clair, pas le violet plein : sur le bleu nuit, le second
                     ne se détacherait pas. */}
-                <span style={{ color: GOLD_RULE }}>
+                <span style={{ color: BRAND_RULE }}>
                   {siteConfig.nameParts[1]}
                 </span>
               </span>
@@ -349,7 +361,7 @@ export function renderOgImage({
         >
           {/* Le surtitre en pastille : le même composant que sur le site,
                 transposé. Sur fond sombre il passe en réserve translucide, et
-                son texte prend l'or pâle plutôt que l'or plein, qui ne tient
+                son texte prend le violet pâle plutôt que le violet plein, qui ne tient
                 pas 4,5:1 sur du bleu nuit. */}
           <div
             style={{
@@ -368,7 +380,7 @@ export function renderOgImage({
             <span
               style={{
                 fontSize: 18,
-                color: GOLD_SOFT,
+                color: BRAND_SOFT,
                 letterSpacing: 3,
                 textTransform: "uppercase",
                 whiteSpace: "nowrap",
@@ -456,7 +468,7 @@ export function renderOgImage({
           top: height - 5,
           width,
           height: 5,
-          backgroundColor: GOLD_RULE,
+          backgroundColor: BRAND_RULE,
         }}
       />
     </div>,

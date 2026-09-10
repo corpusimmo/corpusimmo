@@ -2,6 +2,12 @@ import { formatNumber } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 import { ChartEmpty, niceTicks } from "./chart-primitives";
 
+export interface BarChartRepere {
+  /** Position sur l'axe des abscisses, de 0 (bord gauche) à 1 (bord droit). */
+  position: number;
+  label: string;
+}
+
 export interface BarChartProps {
   data: { label: string; value: number }[];
   height?: number;
@@ -10,6 +16,24 @@ export interface BarChartProps {
   className?: string;
   /** Short description used as the chart's accessible name. */
   caption?: string;
+  /**
+   * Les barres à colorier pleinement, les autres passant en teinte pâle.
+   *
+   * Un histogramme d'un seul ton dit combien, jamais où. Une distribution de
+   * prix se lit d'abord par sa moitié centrale : la marquer dans la couleur
+   * évite au lecteur de reporter à la main deux bornes citées dans le texte.
+   * Tableau vide ou absent : toutes les barres sont pleines, comme avant.
+   */
+  emphasis?: boolean[];
+  /**
+   * Repères verticaux — la médiane, typiquement.
+   *
+   * Ils traversent le graphique en pointillé plutôt que de se poser sur une
+   * barre : une médiane tombe presque toujours À L'INTÉRIEUR d'une tranche,
+   * et la coller au bord de la tranche la plus proche la déplacerait de
+   * plusieurs centaines d'euros.
+   */
+  reperes?: BarChartRepere[];
 }
 
 const BAR_TONES: Record<"primary" | "accent", string> = {
@@ -26,6 +50,8 @@ export function BarChart({
   tone = "primary",
   className,
   caption,
+  emphasis,
+  reperes,
 }: BarChartProps) {
   if (data.length === 0) {
     return <ChartEmpty height={height} className={className} />;
@@ -38,8 +64,9 @@ export function BarChart({
   const { max: axisMax, ticks } = niceTicks(rawMax, 4);
 
   const showValues = data.length <= 10;
-  // Headroom so the value label never sits on top of its own bar.
-  const headroom = showValues ? 20 : 6;
+  // Headroom so the value label never sits on top of its own bar. Un repère
+  // écrit son étiquette au-dessus du cadre : il lui faut la même place.
+  const headroom = showValues || (reperes?.length ?? 0) > 0 ? 20 : 6;
   const plotHeight = Math.max(height - headroom, 10);
 
   const slot = 100 / data.length;
@@ -80,6 +107,31 @@ export function BarChart({
               />
             ))}
 
+            {(reperes ?? []).map((repere) => {
+              const x = Math.min(Math.max(repere.position, 0), 1) * 100;
+              return (
+                <g key={repere.label}>
+                  <line
+                    x1={`${x}%`}
+                    x2={`${x}%`}
+                    y1={headroom}
+                    y2={height}
+                    strokeWidth="1.5"
+                    strokeDasharray="4 3"
+                    className="stroke-accent"
+                  />
+                  <text
+                    x={`${x}%`}
+                    y={headroom - 8}
+                    textAnchor="middle"
+                    className="fill-accent text-[0.6875rem] font-semibold"
+                  >
+                    {repere.label}
+                  </text>
+                </g>
+              );
+            })}
+
             {data.map((item, index) => {
               const value = Number.isFinite(item.value) ? Math.max(item.value, 0) : 0;
               const barHeight = (value / axisMax) * plotHeight;
@@ -97,6 +149,9 @@ export function BarChart({
                     className={cn(
                       BAR_TONES[tone],
                       "transition-opacity duration-150 hover:opacity-80",
+                      emphasis && emphasis.length > 0 && !emphasis[index]
+                        ? "opacity-40"
+                        : "",
                     )}
                   >
                     <title>{`${item.label} : ${valueFormat(item.value)}`}</title>

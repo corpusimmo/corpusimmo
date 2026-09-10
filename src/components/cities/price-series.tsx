@@ -53,9 +53,26 @@ export function CityPriceSeries({
     usable
       .map(
         (point) =>
-          `${point.year}, ${formatPricePerSqm(point.median)} sur ${formatNumber(point.sample)} ventes`,
+          `${point.year}, ${formatPricePerSqm(point.median)} sur ${formatNumber(point.sample)} ventes` +
+          (point.partial ? " (millésime incomplet)" : ""),
       )
       .join(" ; ");
+
+  /* L'AIRE SOUS LA COURBE, fermée sur le bas du cadre. Elle ne porte aucune
+     information de plus que la ligne ; elle donne à la courbe un sens de
+     lecture — ce qui est sous elle est le marché — là où une ligne seule
+     flottait entre deux graduations. Très pâle, pour ne pas prétendre à
+     une surface qui se mesure. */
+  const aire =
+    usable
+      .map(
+        (point, index) =>
+          `${index === 0 ? "M" : "L"}${xFor(index)} ${(yFor(point.median) / HEIGHT) * 100}`,
+      )
+      .join(" ") + ` L${xFor(usable.length - 1)} 100 L${xFor(0)} 100 Z`;
+
+  const premier = usable[0];
+  const dernier = usable[usable.length - 1];
 
   return (
     <figure role="img" aria-label={summary} className="w-full">
@@ -73,6 +90,16 @@ export function CityPriceSeries({
         </div>
 
         <div className="relative min-w-0 flex-1" style={{ height: HEIGHT }}>
+          {/* Calque étiré : l'aire suit la largeur du conteneur. */}
+          <svg
+            viewBox="0 0 100 100"
+            preserveAspectRatio="none"
+            className="absolute inset-0 h-full w-full"
+            aria-hidden="true"
+          >
+            <path d={aire} className="fill-primary/10" />
+          </svg>
+
           <svg className="absolute inset-0 h-full w-full" aria-hidden="true">
             {ticks.map((tick) => (
               <line
@@ -98,10 +125,42 @@ export function CityPriceSeries({
                   y2={yFor(point.median)}
                   strokeWidth="2"
                   strokeLinecap="round"
+                  /* UN MILLÉSIME INCOMPLET SE VOIT. La publication de DVF
+                     s'étale : le dernier millésime est souvent partiel, et son
+                     point se lisait comme les autres alors qu'il repose sur
+                     une fraction de l'année. Le segment qui y mène passe en
+                     pointillé — le trait plein est réservé à ce qui est clos. */
+                  strokeDasharray={point.partial ? "5 4" : undefined}
                   className="stroke-primary"
                 />
               );
             })}
+
+            {/* LES DEUX BOUTS SONT ÉCRITS. « De combien à combien » est la
+                question posée à une courbe de médianes ; sans étiquette, le
+                lecteur reportait chaque point sur une graduation de deux
+                cents euros de pas. Les millésimes du milieu restent dans
+                l'infobulle et dans la phrase qui précède le graphique. */}
+            {premier && dernier && premier !== dernier
+              ? [
+                  { point: premier, index: 0, ancre: "start" as const },
+                  {
+                    point: dernier,
+                    index: usable.length - 1,
+                    ancre: "end" as const,
+                  },
+                ].map(({ point, index, ancre }) => (
+                  <text
+                    key={`bout-${point.year}`}
+                    x={`${xFor(index)}%`}
+                    y={yFor(point.median) - 11}
+                    textAnchor={ancre}
+                    className="fill-ink text-[0.6875rem] font-semibold tabular-nums"
+                  >
+                    {formatPricePerSqm(point.median)}
+                  </text>
+                ))
+              : null}
 
             {usable.map((point, index) => (
               <circle
@@ -110,6 +169,7 @@ export function CityPriceSeries({
                 cy={yFor(point.median)}
                 r="4"
                 strokeWidth="2"
+                strokeDasharray={point.partial ? "3 2" : undefined}
                 className="fill-surface stroke-primary"
               >
                 {/* L'effectif voyage avec le point, jusque dans l'infobulle. */}

@@ -181,6 +181,40 @@ export function LineChart({
               />
             ))}
 
+            {/* LES DEUX BOUTS SONT ÉCRITS.
+                Une courbe de médianes se lit d'abord par « d'où à où » ; sans
+                étiquette, le lecteur reportait chaque point sur une graduation
+                de deux cents euros de pas et retrouvait un chiffre faux. Les
+                deux extrémités suffisent : les millésimes du milieu sont dans
+                la phrase qui précède le graphique, et six étiquettes sur une
+                courbe en font un tableau. Une seule série, sinon deux jeux
+                d'étiquettes se croisent au même endroit. */}
+            {resolved.length === 1
+              ? resolved.flatMap((line) => {
+                  const bouts = [line.points[0], line.points[line.points.length - 1]].filter(
+                    (point, index, tous) =>
+                      point !== undefined && tous.indexOf(point) === index,
+                  );
+                  return bouts.map((point, rang) => {
+                    if (!point) return null;
+                    const debut = rang === 0 && bouts.length > 1;
+                    return (
+                      <text
+                        key={`bout-${point.index}`}
+                        x={`${point.x}%`}
+                        y={(point.y / 100) * height - 10}
+                        textAnchor={
+                          bouts.length === 1 ? "middle" : debut ? "start" : "end"
+                        }
+                        className="fill-ink text-[0.6875rem] font-semibold tabular-nums"
+                      >
+                        {valueFormat(point.value)}
+                      </text>
+                    );
+                  });
+                })
+              : null}
+
             {showDots
               ? resolved.flatMap((line) =>
                   line.points.map((point) => (

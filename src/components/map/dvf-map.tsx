@@ -342,16 +342,23 @@ export function DvfMap({
    * les filtres de la page.
    *
    * DVF ne connaît pas le nombre de pièces, donc les filtres ne peuvent
-   * désigner qu'une famille : appartement ou maison. Les typologies restent
-   * un choix de lecture, offert dans le bandeau dès que la famille est
-   * l'appartement.
+   * désigner qu'une famille : appartement ou maison, et seulement quand une
+   * seule des deux est cochée. Les typologies restent un choix de lecture,
+   * offert dans le bandeau.
    */
-  const famille: LoyersType = (() => {
+  const filtreTranche = (() => {
     const types = filters?.propertyTypes ?? [];
     const maison = types.includes("house");
     const appartement = types.includes("apartment");
-    return maison && !appartement ? "mai" : "app";
+    /* LES DEUX COCHÉS, OU AUCUN : LE FILTRE NE TRANCHE PAS. Il ne dit alors
+       pas quelle famille de loyer lire, et deviner à sa place enfermait le
+       lecteur — la carte restait sur l'appartement sans qu'aucune commande
+       ne permette d'en sortir. Dans ce cas seulement, la maison rejoint le
+       sélecteur du calque. */
+    if (maison === appartement) return null;
+    return maison ? ("mai" as const) : ("app" as const);
   })();
+  const famille: LoyersType = filtreTranche ?? "app";
   const loyersType: LoyersType = loyersTypeChoisi ?? famille;
   /* LE CHOIX EXPLICITE NE SURVIT PAS À UN CHANGEMENT DE FAMILLE. Passer les
      filtres sur les maisons alors qu'on lisait les T1-T2 doit montrer des
@@ -1825,10 +1832,16 @@ export function DvfMap({
                 découpage par nombre de pièces, que DVF ne connaît pas et
                 qu'aucun filtre ne peut donc exprimer.
 
-                Il disparaît sur les maisons — la source ne les ventile pas —
-                et quand le calque est éteint : un réglage qui n'agit sur rien
-                de visible égare. Changer de typologie ne télécharge rien, les
-                quatre valeurs sont déjà dans chaque commune. */}
+                Il disparaît quand les filtres disent « maisons », que la
+                source ne ventile pas par pièces, et quand le calque est
+                éteint : un réglage qui n'agit sur rien de visible égare. À
+                l'inverse, quand les filtres ne tranchent pas — les deux
+                familles cochées, ou aucune — la maison rejoint ce groupe,
+                faute de quoi la carte resterait sur l'appartement sans
+                qu'aucune commande ne permette d'en sortir.
+
+                Changer de type ne télécharge rien : les quatre valeurs sont
+                déjà dans chaque commune. */}
             {/* SUR LES MAISONS, PAS DE SÉLECTEUR MAIS UN RAPPEL. La famille
                 vient des filtres, et rien ne le disait sur le bandeau : la
                 carte changeait de calque sans qu'aucune commande visible ne
@@ -1846,7 +1859,10 @@ export function DvfMap({
                 aria-label="Typologie des appartements"
                 className="pointer-events-auto flex shrink-0 items-stretch overflow-hidden rounded-lg border border-border bg-surface"
               >
-                {TYPOLOGIES.map((option, index) => (
+                {(filtreTranche === "app"
+                  ? TYPOLOGIES
+                  : [...TYPOLOGIES, { id: "mai" as const, nom: "Maisons" }]
+                ).map((option, index) => (
                   <React.Fragment key={option.id}>
                     {index > 0 ? <Separateur /> : null}
                     <button

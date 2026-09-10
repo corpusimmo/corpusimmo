@@ -2,14 +2,12 @@ import { siteConfig } from "@/config/site";
 import { cn } from "@/lib/utils/cn";
 
 /**
- * LA MARQUE, EN DEUX FAMILLES DE SIGNE ET TROIS MÉTAUX.
+ * LA MARQUE, EN UN SEUL SIGNE.
  *
- * Les deux fichiers sont TOUS DEUX dans le balisage, et c'est le CSS qui n'en
- * montre qu'un, selon `data-theme` posé sur la racine. Choisir en
- * JavaScript obligerait ce composant à passer client, et le signe
- * n'apparaîtrait qu'après l'hydratation, donc en retard sur le reste de
- * l'en-tête. Deux requêtes d'image contre un signe qui clignote : le choix est
- * vite fait, d'autant que les fichiers pèsent sept kilo-octets chacun.
+ * Le site a porté deux signes, violet et argent, et le CSS n'en montrait
+ * qu'un selon le thème choisi. Le choix de thème a été retiré : il ne reste
+ * que le violet, servi tel quel depuis le serveur, sans classe conditionnelle
+ * et sans seconde requête d'image.
  */
 
 export type BrandMarkTone = "default" | "inverted";
@@ -23,7 +21,7 @@ export function BrandMark({
 }) {
   const inverted = tone === "inverted";
 
-  /* Les deux tirages montrent les MÊMES fichiers : seule la plaque claire du
+  /* Les deux tirages montrent le MÊME fichier : seule la plaque claire du
      tirage en réserve les sépare. */
   if (!inverted) {
     return (
@@ -48,11 +46,10 @@ export function BrandMark({
   /**
    * SUR FOND SOMBRE, LE MÊME SIGNE, POSÉ SUR UNE PLAQUE CLAIRE.
    *
-   * Les deux fichiers sont des aplats sombres. Sur le fond du pied de page,
-   * la moitié des plaques disparaît et il ne reste qu'un liseré doré ou
-   * violet : la marque n'est plus reconnaissable. La plaque claire lui rend
-   * le fond pour lequel elle a été dessinée, et le pied de page montre alors
-   * exactement le signe du thème choisi dans le sélecteur.
+   * Le signe est un aplat sombre. Sur le fond du pied de page, la moitié des
+   * plaques disparaît et il ne reste qu'un liseré violet : la marque n'est
+   * plus reconnaissable. La plaque claire lui rend le fond pour lequel elle a
+   * été dessinée.
    *
    * Le tracé qui tenait ce rôle a été retiré : il montrait un signe que
    * personne n'avait choisi, et l'en-tête et le pied de page ne parlaient
@@ -73,37 +70,17 @@ export function BrandMark({
 }
 
 /**
- * LES DEUX FICHIERS, ÉCRITS UNE FOIS.
+ * LE SIGNE, ÉCRIT UNE FOIS.
  *
- * Les deux tirages montrent le même jeu : les répéter dans chaque branche
- * garantissait qu'un ajout de métal n'atterrisse que dans l'une des deux.
+ * Les deux tirages montrent le même signe : l'écrire dans chaque branche
+ * garantissait qu'une retouche n'atterrisse que dans l'une des deux.
  */
 function Signes() {
   return (
-    <>
-      {SIGNES.map((signe) => (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          key={signe.fichier}
-          src={signe.fichier}
-          alt=""
-          aria-hidden="true"
-          className={cn(
-            signe.metal,
-            /* Le violet en tours est le seul montré par défaut : c'est le
-               signe du thème écrit dans `:root`, celui que le serveur rend. */
-            signe.defaut ? "block" : "hidden",
-          )}
-        />
-      ))}
-    </>
+    /* eslint-disable-next-line @next/next/no-img-element */
+    <img src="/marque-violet.webp" alt="" aria-hidden="true" />
   );
 }
-
-const SIGNES = [
-  { fichier: "/marque-violet.webp", metal: "marque-violet", defaut: true },
-  { fichier: "/marque-argent.webp", metal: "marque-argent", defaut: false },
-] as const;
 
 export function BrandLockup({
   className,

@@ -5,7 +5,6 @@ import { Analytics } from "@/components/analytics/analytics";
 import { ConsentBanner } from "@/components/consent/consent-banner";
 import { AuthSessionProvider } from "@/components/layout/session-provider";
 import { PwaRuntime } from "@/components/pwa";
-import { ThemeMetal } from "@/components/layout/theme-metal";
 import { ToastProvider } from "@/components/ui/toast";
 import { safeUrl } from "@/config/app-url";
 import { siteConfig } from "@/config/site";
@@ -120,9 +119,8 @@ export const metadata: Metadata = {
    * être listée ici.
    *
    * Les fichiers sortent de `scripts/icones.mjs`, qui tire le signe en pile
-   * sur un carré marine. Le signe en bleu et argent est le seul des trois
-   * métaux qui convienne : une icône ne suit pas le thème choisi par le
-   * visiteur, elle est posée une fois pour toutes.
+   * sur un carré marine. Une icône est posée une fois pour toutes : elle ne
+   * suivait déjà aucun thème du temps où le site en proposait deux.
    *
    * L'icône Apple, elle, doit rester déclarée : depuis iOS 16.4 Safari lit les
    * icônes du manifeste, mais les versions antérieures ne connaissent que
@@ -162,37 +160,7 @@ export default function RootLayout({
     <html
       lang="fr"
       className={`${inter.variable} ${outfit.variable} ${sourceSerif.variable}`}
-      /* Le script ci-dessous écrit `data-theme` sur cette balise avant que
-         React n'hydrate. Sans cette annonce, React compare le balisage servi
-         à celui du navigateur, trouve l'attribut en trop et se plaint. */
-      suppressHydrationWarning
     >
-      <head>
-        {/* ────────────────────────────────────────────────────────────────
-            LE MÉTAL, RESTAURÉ AVANT LA PREMIÈRE PEINTURE.
-
-            Ce script est en ligne et synchrone, et les deux le sont pour la
-            même raison : il doit s'exécuter AVANT que le navigateur ne peigne
-            quoi que ce soit. Différé ou chargé depuis un fichier, la page
-            s'afficherait une fraction de seconde en or avant de basculer en
-            argent, et ce clignotement est exactement ce que personne ne
-            pardonne à un sélecteur de thème.
-
-            Il ne fait rien d'autre que lire une préférence et poser un
-            attribut. `try` parce qu'un navigateur en navigation privée peut
-            refuser le stockage : le thème par défaut s'applique alors, ce qui
-            est le comportement correct.
-            ──────────────────────────────────────────────────────────────── */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html:
-              'try{var d=document.documentElement;' +
-              'var m=localStorage.getItem("corpusimmo.metal");' +
-              'if(m==="argent")d.dataset.theme=m;' +
-              '}catch(e){}',
-          }}
-        />
-      </head>
       <body>
         {/* Les données structurées de SITE, posées une fois pour toutes les
             pages : l'éditeur et le site lui-même. Les schémas propres à une
@@ -202,12 +170,6 @@ export default function RootLayout({
         <JsonLd nodes={[organizationNode(), webSiteNode()]} />
         <AuthSessionProvider>
           <ToastProvider>{children}</ToastProvider>
-
-        {/* Le choix du métal, épinglé, hors de l'en-tête et hors du flux : il
-            vaut pour tout le site et ne dépend d'aucune page. Posé ici plutôt
-            que dans la mise en page du site, il couvre aussi les écrans qui
-            n'ont pas d'en-tête. */}
-        <ThemeMetal />
         </AuthSessionProvider>
 
         {/* Le bandeau de consentement, puis la mesure d'audience qu'il commande.

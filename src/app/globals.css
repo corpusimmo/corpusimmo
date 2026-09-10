@@ -37,15 +37,15 @@
   --brand-200: #c6d4e2;
   --brand-300: #9db4c9;
   --brand-400: #5b7da3;
-  /* LA RAMPE PASSE AU VIOLET dans le thème par défaut : c'est lui qui porte
-     l'action, et `--brand` sert les aplats larges où rien de petit ne
-     s'écrit. Les deux autres thèmes la redéfinissent à leur tour. */
-  --brand-500: #6d4fd0;
-  --brand-600: #5b2fd6;
-  --brand-700: #41279c;
-  --brand-800: #331e7d;
-  --brand-900: #1b1145;
-  --brand-950: #110b2c;
+  /* LA RAMPE HAUTE PASSE AU VIOLET : c'est lui qui porte l'action, et
+     `--brand` sert les aplats larges où rien de petit ne s'écrit. Le violet a
+     été adouci le 2026-09-10 ; la rampe descend de #8b7cc4 à #201a37. */
+  --brand-500: #8b7cc4;
+  --brand-600: #6c5ab0;
+  --brand-700: #5c4b98;
+  --brand-800: #4b3d7c;
+  --brand-900: #2f2650;
+  --brand-950: #201a37;
 
   /* --- Rampe bronze : la marque, la sélection, les filets -----------------
      Champagne patiné, jamais jaune. `--bronze-500` (#A8874A) ne tient que
@@ -94,30 +94,29 @@
   --border-strong: #c8cade;
 
   /* --- Action primaire ------------------------------------------------------
-     DEUX BLEUS, ET C'EST MESURÉ. Le bleu de marque `--brand` (#0082c3) ne
-     donne que 4,22:1 avec du blanc : sous le seuil de 4,5, il ne peut donc
-     PAS porter de texte. Un bouton bleu vif à texte blanc échouerait, et
-     l'erreur ne se voit pas à l'œil de celui qui la commet.
+     DEUX VIOLETS, ET C'EST MESURÉ. Le violet de marque `--brand` (#8b7cc4) ne
+     donne que 3,6:1 avec du blanc : sous le seuil de 4,5, il ne peut donc PAS
+     porter de texte. Un bouton clair à texte blanc échouerait, et l'erreur ne
+     se voit pas à l'œil de celui qui la commet.
 
-     `--primary` descend d'un cran (5,92:1) et prend tout ce qui porte du
-     texte ; `--brand` garde les aplats larges, les filets et les fonds où
-     rien de petit ne s'écrit. */
-  --primary: #5b2fd6;
-  --primary-hover: #4a25b4;
-  --primary-active: #3b1d90;
+     `--primary` (#6c5ab0, 5,6:1) prend tout ce qui porte du texte ; `--brand`
+     garde les aplats larges, les filets et les fonds où rien de petit ne
+     s'écrit. */
+  --primary: #6c5ab0;
+  --primary-hover: #5c4b98;
+  --primary-active: #4b3d7c;
   --primary-fg: #ffffff;
-  --primary-soft: #eee9fc;
-  --primary-soft-fg: #42219e;
+  --primary-soft: #f1eef8;
+  --primary-soft-fg: #4b3d7c;
 
-  /* Le bleu de marque, vif. Aplats, filets, hero. Jamais du texte dessus. */
+  /* Le violet de marque, clair. Aplats, filets, hero. Jamais du texte dessus. */
   --brand: var(--brand-500);
   --brand-soft: var(--brand-100);
 
   /* --- Accent — L'ARGENT, EN SECOND. -------------------------------------
-     Le thème par défaut met le violet à l'action et l'argent partout ailleurs.
-     C'est ce qui le sépare du thème violet plein : la couleur ne prend que ce
-     qui se clique, le reste est froid. Un violet qui tient aussi les filets,
-     les pastilles et les étiquettes sature la page entière.
+     Le violet tient l'action, l'argent tient tout le reste : la couleur ne
+     prend que ce qui se clique, le reste est froid. Un violet qui tient aussi
+     les filets, les pastilles et les étiquettes sature la page entière.
 
      L'ARGENT ÉCRIT, LE FILET NON. #495669 tient 6,9:1 sur blanc et penche vers
      le froid, ce qui distingue l'acier d'un gris de texte ordinaire.
@@ -192,62 +191,28 @@
 }
 
 /* ============================================================================
-   LES DEUX THÈMES — MARINE & OR, MARINE & ARGENT
+   UN SEUL THÈME — VIOLET PÂLE & ARGENT
    ----------------------------------------------------------------------------
-   Ce n'est pas un thème clair et un thème sombre. Les deux sont clairs : ce
-   qui change est le MÉTAL, et avec lui la température de tout l'écran. L'or
-   réchauffe le fond de page, l'argent le refroidit ; le marine, lui, ne bouge
-   pas d'un thème à l'autre, parce que c'est lui qui porte l'identité.
+   LE CHOIX DE THÈME A ÉTÉ RETIRÉ. Le site proposait un second thème, bleu et
+   argent, sous un bouton épinglé en bas de l'écran. Deux thèmes valaient deux
+   identités : la moitié des visiteurs voyait une marque que l'autre moitié ne
+   reconnaissait pas, et chaque nouvelle surface devait être vérifiée deux
+   fois. À choisir, autant en tenir une.
 
-   POURQUOI DEUX. Le conseil patrimonial attend de l'or, le conseil aux
-   investisseurs attend de l'argent, et les deux publics visitent le même
-   site. Laisser le choix coûte un attribut sur `<html>` et évite de trancher
-   à la place du visiteur.
+   LE VIOLET A ÉTÉ ADOUCI. #5b2fd6 était saturé au point de battre le
+   contenu : sur une page de chiffres, un violet vif tire l'œil vers les
+   boutons et non vers les prix. #6c5ab0 garde la teinte, perd la stridence,
+   et tient 5,6:1 avec du blanc — au-dessus du seuil de 4,5 pour le texte.
 
-   L'OR PAR DÉFAUT, parce que c'est la piste dominante des références. Le
-   thème est écrit dans `:root` plutôt que dans un bloc à part : une page
-   servie avant que le script de restauration ne s'exécute affiche donc l'or,
-   pas une absence de couleur.
+   LA COULEUR NE PREND QUE CE QUI SE CLIQUE. Le violet est à l'action,
+   l'argent à tout le reste : filets, pastilles, étiquettes. Un violet qui
+   tient aussi les filets sature la page entière.
 
-   AUCUN DE CES DEUX MÉTAUX NE PORTE DE TEXTE. `--accent-rule` est un filet et
-   un aplat, jamais une encre : l'or à #C9A227 donne 2,3:1 sur blanc et
-   l'argent à #A8B2C4 1,9:1. C'est `--accent` (#8A6A2F, 5,0:1) qui écrit.
+   L'ARGENT NE PORTE PAS DE TEXTE. `--accent-rule` (#9FB0C6, 1,9:1) est un
+   filet et un aplat, jamais une encre. C'est `--accent` (#495669, 6,9:1) qui
+   écrit.
    ========================================================================== */
 
-:root[data-theme="argent"] {
-  --canvas: #f4f6fa;
-  --surface-2: #fafbfd;
-  --surface-3: #eaeef6;
-  --border: #dfe3ec;
-  --border-soft: #eef1f6;
-  --border-strong: #c3cad9;
-
-  /* Le marine descend d'un cran : Silver Rock est plus sombre que Nexus. */
-  --primary: #1b2a5b;
-  --primary-hover: #142046;
-  --primary-active: #0f1836;
-  --primary-soft: #e8ebf4;
-  --primary-soft-fg: #142046;
-  --brand-500: #5c6c9c;
-  --brand-600: #1b2a5b;
-  --brand-700: #16234a;
-  --brand-800: #101c3a;
-  --brand-900: #0a1226;
-
-  /* L'accent passe au gris-bleu. Il garde ses 4,5:1 : c'est lui qui écrit. */
-  /* L'ARGENT A ÉTÉ REFROIDI. À #4F5765 il se lisait comme un gris de texte
-     ordinaire : il lui manquait le bleu qui distingue l'acier du gris.
-     #495669 tient 6,9:1 sur blanc et penche franchement vers le froid. */
-  --accent: #495669;
-  --accent-hover: #3a4554;
-  --accent-active: #2e3743;
-  --accent-soft: #eaeef4;
-  --accent-soft-fg: #3f4c60;
-  --accent-rule: #9fb0c6;
-
-  --surface-inverted: #101c3a;
-  --map-marker: #101c3a;
-}
 
 /* ----------------------------------------------------------------------------
    LE MÉTAL, ET SA BRILLANCE
@@ -264,17 +229,12 @@
 /* ----------------------------------------------------------------------------
    LE MOT DE LA MARQUE
    ----------------------------------------------------------------------------
-   « Immo » ne prend PAS le métal du thème, il prend sa propre couleur, et
-   c'est la seule exception du système.
-
-   Le thème mixte met le violet sur ce qui se clique et l'argent sur tout le
-   reste. Le nom du produit n'est ni l'un ni l'autre : c'est l'identité, et
-   elle doit dire de quel thème on parle. En argent pur, « CorpusImmo » y
-   perdait sa couleur et le mixte ne se distinguait plus de l'argent au premier
-   coup d'œil.
-
-   Dans les deux thèmes purs, ces tokens repointent vers le métal : le mot y
-   suit la matière du thème, comme avant. */
+   « Immo » ne prend PAS l'argent du reste de la page, il prend le violet, et
+   c'est la seule exception du système. La couleur est à l'action partout
+   ailleurs ; ici elle est à l'identité, parce que le nom du produit doit se
+   reconnaître avant tout le reste. En argent, « CorpusImmo » se fondait dans
+   les filets qui l'entourent.
+   -------------------------------------------------------------------------- */
 :root {
   --mot-a: #b9a6f2;
   --mot-eclat: #f0eaff;
@@ -282,15 +242,7 @@
   --mot-grave-ombre: var(--primary-active);
 }
 
-:root[data-theme="argent"] {
-  --mot-a: var(--metal-b);
-  --mot-eclat: var(--metal-eclat);
-  --mot-grave: var(--accent);
-  --mot-grave-ombre: var(--accent-active);
-}
-
-:root,
-:root[data-theme="argent"] {
+:root {
   --metal-a: #78818f;
   --metal-b: #dfe5ec;
   --metal-c: #8d97a5;
@@ -1093,23 +1045,6 @@
   z-index: 1;
 }
 
-/* L'ARGENT NE PEUT PAS PARTIR DU MÊME ARRÊT QUE L'OR.
-   Sa rampe haute est presque blanche : sur le hero, « Immo » devenait aussi
-   clair que « Corpus » juste à côté, et la coupure du mot en deux disparaissait.
-   Le balayage argenté part donc du gris d'acier et monte au clair, ce qui le
-   distingue de l'encre inversée tout en restant à 6:1 sur la photo assombrie.
-   C'est la seule règle du système à dépendre du thème, et c'est parce que les
-   deux métaux ne sont pas également lumineux. */
-:root[data-theme="argent"] .balayage-metal {
-  background-image: linear-gradient(
-    100deg,
-    var(--metal-c) 0%,
-    var(--metal-b) 34%,
-    var(--metal-eclat) 48%,
-    var(--metal-b) 62%,
-    var(--metal-c) 100%
-  );
-}
 
 @media (prefers-reduced-motion: reduce) {
   .balayage-metal,
@@ -1134,28 +1069,6 @@
   to {
     transform: translateX(-50%);
   }
-}
-
-/* LE SIGNE SUIT LE THÈME, SANS JAVASCRIPT. Les deux fichiers sont dans le
-   balisage, et l'attribut de thème décide lequel se voit. Un choix fait en
-   JavaScript rendrait le signe absent jusqu'à l'hydratation, donc en retard
-   sur tout le reste de l'en-tête, et garde le composant de marque côté
-   serveur. */
-/* ── LE SIGNE SUIT LE THÈME ───────────────────────────────────────────────
-   Deux fichiers, et le thème décide lequel se voit. Le signe porte
-   l'identité, pas la température de l'écran : il est VIOLET par défaut comme
-   en thème violet, et seul le thème argent, qui ne colore rien, le prend en
-   argent.
-
-   LA FAMILLE EN PILE A ÉTÉ ABANDONNÉE, et avec elle le second réglage du
-   sélecteur. Deux signes valaient deux identités : à choisir, autant en tenir
-   une. */
-:root[data-theme="argent"] .marque-violet {
-  display: none;
-}
-
-:root[data-theme="argent"] .marque-argent {
-  display: block;
 }
 
 @utility tap-target {

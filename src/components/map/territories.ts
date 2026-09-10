@@ -189,19 +189,41 @@ export function installTerritoryLayers(
     // Le fondu se fait sur l'OPACITÉ et non sur `minzoom` / `maxzoom` seuls :
     // une couche qui disparaît d'un coup fait clignoter tout l'écran au
     // passage du seuil.
-    const opacity: unknown[] = [
-      "interpolate",
-      ["linear"],
-      ["zoom"],
-      minzoom,
-      key === "region" ? 0.85 : 0,
-      minzoom + FADE,
-      0.85,
-      maxzoom - FADE,
-      0.85,
-      maxzoom,
-      0,
-    ];
+    //
+    // LE DÉPARTEMENT S'ÉCLAIRCIT AVANT DE PARTIR. Il tenait 0,85 jusqu'au
+    // zoom 12,5 : arrivé sur une ville, l'écran entier était un aplat bleu
+    // uni — un seul département sous les yeux, donc une seule couleur, et
+    // plus une rue lisible. L'aplat perd les deux tiers de sa densité sur les
+    // derniers zooms, là où l'échelon départemental n'apprend déjà plus rien
+    // et où c'est la ville qu'on est venu regarder.
+    const opacity: unknown[] =
+      key === "region"
+        ? [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            minzoom,
+            0.85,
+            maxzoom - FADE,
+            0.85,
+            maxzoom,
+            0,
+          ]
+        : [
+            "interpolate",
+            ["linear"],
+            ["zoom"],
+            minzoom,
+            0,
+            minzoom + FADE,
+            0.85,
+            maxzoom - 2.5,
+            0.85,
+            maxzoom - FADE,
+            0.3,
+            maxzoom,
+            0,
+          ];
 
     map.addLayer(
       {
@@ -229,6 +251,22 @@ export function installTerritoryLayers(
       } as never,
       before,
     );
+    /* LE LIBELLÉ NE SUIT PAS L'APLAT DANS SA PÂLEUR. L'aplat s'efface pour
+       rendre la ville lisible ; le nom et le prix, eux, restent la seule
+       chose que cet échelon apprenne encore. Ils gardent leur pleine encre
+       jusqu'au fondu final. */
+    const labelOpacity: unknown[] = [
+      "interpolate",
+      ["linear"],
+      ["zoom"],
+      minzoom + FADE,
+      1,
+      maxzoom - FADE,
+      1,
+      maxzoom,
+      0,
+    ];
+
     map.addLayer(
       {
         id: labelId,
@@ -242,7 +280,20 @@ export function installTerritoryLayers(
             "case",
             ["==", ["get", "ppsm"], null],
             ["get", "nom"],
-            ["concat", ["get", "nom"], "\n", ["get", "ppsm"], " €/m²"],
+            /* `number-format` plutôt que la valeur brute : « 2237 €/m² » se
+               lisait sans séparateur de milliers, seule écriture du produit à
+               ne pas suivre la typographie française. */
+            [
+              "concat",
+              ["get", "nom"],
+              "\n",
+              [
+                "number-format",
+                ["get", "ppsm"],
+                { locale: "fr-FR", "max-fraction-digits": 0 },
+              ],
+              " €/m²",
+            ],
           ],
           "text-size": key === "region" ? 12 : 11,
           "text-max-width": 9,
@@ -253,7 +304,7 @@ export function installTerritoryLayers(
           "text-color": chrome.label,
           "text-halo-color": chrome.halo,
           "text-halo-width": 1.4,
-          "text-opacity": opacity,
+          "text-opacity": labelOpacity,
         },
       } as never,
       before,

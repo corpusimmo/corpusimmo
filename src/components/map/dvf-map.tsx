@@ -44,6 +44,7 @@ import {
 import "maplibre-gl/dist/maplibre-gl.css";
 import {
   Box,
+  ChevronDown,
   Coins,
   Tag,
   TrainFront,
@@ -87,6 +88,7 @@ import { useDvfData } from "./use-dvf-data";
 import { PRICE_RAMP } from "./base-palette";
 import { PriceLegend } from "./price-legend";
 import { ZoningLegend } from "./zoning-legend";
+import { TerritoryLegend } from "./territory-legend";
 import {
   installTransportLayers,
   setTileTransitLinesVisibility,
@@ -310,6 +312,16 @@ export function DvfMap({
   const [loyersIndex, setLoyersIndex] = React.useState<LoyersIndex | null>(null);
   const [loyersObserves, setLoyersObserves] = React.useState<LoyersObservesIndex | null>(null);
   const [loyersError, setLoyersError] = React.useState(false);
+  /**
+   * LE PANNEAU DES LÉGENDES : ouvert sur grand écran, fermé en format réduit.
+   *
+   * Ce n'est pas un caprice de largeur. Sur un téléphone, le panneau couvre
+   * la moitié de la carte, donc la chose même qu'il explique ; sur un écran
+   * large il ne prend qu'un coin, et une carte thématique dont la légende est
+   * cachée par défaut se lit à l'aveugle. Le choix du visiteur tient jusqu'au
+   * prochain changement de format, qui est rare et qui change la réponse.
+   */
+  const [legendOpen, setLegendOpen] = React.useState(false);
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
   const [internalSelectedId, setInternalSelectedId] = React.useState<
@@ -830,7 +842,14 @@ export function DvfMap({
   // écrasait un encart de 19 rem sur un écran de téléphone.
   React.useEffect(() => {
     const query = window.matchMedia("(max-width: 767px)");
-    const sync = () => setIsCompact(query.matches);
+    const sync = () => {
+      setIsCompact(query.matches);
+      // Le panneau des légendes suit le format, dans les deux sens : il n'y a
+      // pas de bonne valeur par défaut commune au téléphone et au grand
+      // écran, et un changement de format est assez rare pour qu'on ait le
+      // droit d'y reprendre la main.
+      setLegendOpen(!query.matches);
+    };
     sync();
     query.addEventListener("change", sync);
     return () => query.removeEventListener("change", sync);
@@ -1483,6 +1502,12 @@ export function DvfMap({
   const chrome = styleReady && !basemapError;
   /** Une légende sans ventes à l'écran ne décrit rien. */
   const showLegend = rows.length > 0 && !(zoomTooLow && !controlled);
+  /* Ce que le panneau aurait à montrer. Zéro : pas de bouton, pas de panneau. */
+  const legendCount =
+    (loyers && loyersIndex ? 1 : 0) +
+    (zoning ? 1 : 0) +
+    (transports ? 1 : 0) +
+    (showLegend && showPrices ? 1 : 0);
   const distanceToSubject = (row: DvfTransaction): number | undefined =>
     subject ? haversineMeters(subject.point, row.coordinates) : undefined;
 
@@ -1542,19 +1567,28 @@ export function DvfMap({
         </div>
       ) : null}
 
-      {/* TOUT EN BAS, COMMANDES ET LÉGENDES ENSEMBLE.
+      {/* TOUT EN BAS, LES COMMANDES ; LES LÉGENDES DANS UN PANNEAU.
           Un bouton et sa légende disent la même chose : les séparer aux deux
           extrémités de la carte obligeait à faire l'aller-retour du regard
           pour relier une couleur à ce qu'elle signifie. Et le haut d'une carte
           est la zone qu'on balaie, alors que le bas porte déjà l'échelle et
           l'attribution : c'est la lisière la moins chère.
 
-          Une seule rangée, alignée sur le bas, qui défile horizontalement
-          plutôt que de recouvrir la carte quand les trois calques sont
-          allumés sur un écran étroit. Les commandes restent en tête, donc
-          toujours atteignables sans faire défiler. */}
+          LES QUATRE COMMANDES SONT UNE SEULE PASTILLE. Elles ont été quatre
+          boutons détachés, chacun avec sa bordure et son ombre, empilés en
+          colonne : quatre objets flottants pour un seul réglage, et le
+          bandeau prenait la hauteur d'un quart de carte. Un groupe unique,
+          séparé par des traits, dit ce que quatre pastilles ne disaient pas —
+          que ces calques se choisissent ensemble.
+
+          LES LÉGENDES SORTENT DE LA RANGÉE. Empilées à côté des commandes,
+          elles étaient trois panneaux hauts à faire défiler horizontalement,
+          et le bandeau changeait de hauteur à chaque calque allumé. Elles
+          vivent maintenant dans un panneau, posé sur la carte au-dessus du
+          bandeau, ouvert d'office sur grand écran et fermé en format réduit,
+          où la carte n'a pas de place à prêter. */}
       {chrome ? (
-        <div className="flex shrink-0 flex-col gap-2 border-t border-border bg-surface px-3 py-2.5">
+        <div className="relative flex shrink-0 flex-col gap-2 border-t border-border bg-surface px-3 py-2.5">
           {/* La couverture ouvre le bandeau plutôt que de flotter sur la
               carte : c'est une mise en garde sur les données affichées, elle
               se lit avec les légendes et non par-dessus les ventes. */}
@@ -1574,160 +1608,192 @@ export function DvfMap({
             </p>
           ) : null}
 
-          <div className="flex items-end gap-2 overflow-x-auto">
-          <div className="flex shrink-0 flex-col items-start gap-2">
-          {/* PRIX — une seule commande, jamais deux.
-              L'unité vivait dans un bloc qui apparaissait sous l'interrupteur :
-              le décalage à chaque bascule était plus bruyant que le réglage
-              lui-même. Tout tient maintenant dans une pastille : l'état à
-              gauche, l'unité à droite, séparés d'un trait. Prix décoché,
-              l'unité disparaît — il n'y a plus rien à cadrer, et comme elle
-              vit DANS la pastille, sa disparition la rétrécit sans déplacer
-              quoi que ce soit en dessous. C'était le décalage vertical du
-              bloc précédent qui gênait, pas le fait de masquer. */}
-          <div className="pointer-events-auto flex items-stretch overflow-hidden rounded-md border border-border bg-surface shadow-md">
-            <button
-              type="button"
-              onClick={() => setShowPrices((on) => !on)}
-              aria-pressed={showPrices}
-              className={cn(
-                "flex min-h-9 items-center gap-1.5 px-2.5 text-xs font-medium transition-colors",
-                showPrices
-                  ? "bg-primary text-primary-fg"
-                  : "text-ink-muted hover:bg-surface-2 hover:text-ink",
-              )}
+          {/* LE PANNEAU DES LÉGENDES, posé SUR la carte et non dans le flux :
+              son ouverture ne doit rien pousser. Il s'arrête à 60 % de la
+              hauteur et défile au-delà, faute de quoi trois calques allumés
+              recouvriraient la vue qu'ils commentent. */}
+          {legendCount > 0 && legendOpen ? (
+            <div
+              id="carte-legendes"
+              className="animate-fade-in absolute bottom-full left-3 z-20 mb-2 flex max-h-[60vh] w-[16.5rem] max-w-[calc(100%-1.5rem)] flex-col gap-2 overflow-y-auto rounded-lg border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-sm"
             >
-              <Tag aria-hidden="true" className="size-3.5" />
-              Prix
-            </button>
+              {loyers && loyersIndex ? (
+                <LoyersLegend
+                  scale={loyersScale(loyersIndex)}
+                  index={loyersIndex}
+                  observes={loyersObserves}
+                  className="max-w-none border-0 bg-transparent p-0 shadow-none backdrop-blur-none"
+                />
+              ) : null}
+              {zoning ? (
+                <ZoningLegend className="max-w-none border-0 bg-transparent p-0 shadow-none backdrop-blur-none" />
+              ) : null}
+              {transports ? (
+                <TransportsLegend className="max-w-none border-0 bg-transparent p-0 shadow-none backdrop-blur-none" />
+              ) : null}
+              {showLegend && showPrices ? (
+                <PriceLegend
+                  scale={scale}
+                  className="border-0 bg-transparent p-0 shadow-none backdrop-blur-none"
+                />
+              ) : null}
+            </div>
+          ) : null}
 
-            {showPrices ? (
-              <div
-                aria-hidden="true"
-                className="w-px shrink-0 self-stretch bg-border"
-              />
-            ) : null}
-
+          <div className="flex items-center gap-3 overflow-x-auto">
+            {/* ── LES CALQUES, EN UN SEUL GROUPE ────────────────────────── */}
             <div
               role="group"
-              aria-label="Unité affichée sur les marqueurs"
-              hidden={!showPrices}
-              className="flex items-stretch"
+              aria-label="Calques de la carte"
+              className="pointer-events-auto flex shrink-0 items-stretch overflow-hidden rounded-lg border border-border bg-surface shadow-xs"
             >
-              {(
-                [
-                  { id: "perSqm", label: "€/m²" },
-                  { id: "total", label: "Total" },
-                ] as const
-              ).map((option) => (
-                <button
-                  key={option.id}
-                  type="button"
-                  disabled={!showPrices}
-                  aria-pressed={priceMode === option.id}
-                  onClick={() => setPriceMode(option.id)}
-                  className={cn(
-                    "min-h-9 px-2.5 text-xs transition-colors",
-                    // L'unité retenue prend l'or, pas le bleu : le bleu est déjà
-                    // pris par l'interrupteur, à sa gauche, et deux segments
-                    // bleus côte à côte ne diraient plus lequel est quoi. Un
-                    // simple fond gris ne suffisait pas — à côté du blanc de la
-                    // pastille, il ne se voyait pas, et on ne savait plus quelle
-                    // unité était affichée.
-                    priceMode === option.id
-                      ? "bg-accent font-semibold text-accent-fg"
-                      : "font-medium text-ink-muted enabled:hover:bg-surface-2 enabled:hover:text-ink",
-                  )}
-                >
-                  {option.label}
-                </button>
-              ))}
+              {/* PRIX — une seule commande, jamais deux.
+                  L'unité vivait dans un bloc qui apparaissait sous
+                  l'interrupteur : le décalage à chaque bascule était plus
+                  bruyant que le réglage lui-même. Prix décoché, l'unité
+                  disparaît — il n'y a plus rien à cadrer. */}
+              <button
+                type="button"
+                onClick={() => setShowPrices((on) => !on)}
+                aria-pressed={showPrices}
+                className={cn(
+                  "flex min-h-9 items-center gap-1.5 px-2.5 text-xs font-medium transition-colors",
+                  showPrices
+                    ? "bg-primary text-primary-fg"
+                    : "text-ink-muted hover:bg-surface-2 hover:text-ink",
+                )}
+              >
+                <Tag aria-hidden="true" className="size-3.5" />
+                Prix
+              </button>
+
+              {showPrices ? <Separateur /> : null}
+
+              <div
+                role="group"
+                aria-label="Unité affichée sur les marqueurs"
+                hidden={!showPrices}
+                className="flex items-stretch"
+              >
+                {(
+                  [
+                    { id: "perSqm", label: "€/m²" },
+                    { id: "total", label: "Total" },
+                  ] as const
+                ).map((option) => (
+                  <button
+                    key={option.id}
+                    type="button"
+                    disabled={!showPrices}
+                    aria-pressed={priceMode === option.id}
+                    onClick={() => setPriceMode(option.id)}
+                    className={cn(
+                      "min-h-9 px-2.5 text-xs transition-colors",
+                      // L'unité retenue prend l'argent, pas le violet : le
+                      // violet est déjà pris par l'interrupteur, à sa gauche,
+                      // et deux segments violets côte à côte ne diraient plus
+                      // lequel est quoi. Un simple fond gris ne suffisait pas —
+                      // à côté du blanc de la pastille, il ne se voyait pas.
+                      priceMode === option.id
+                        ? "bg-accent font-semibold text-accent-fg"
+                        : "font-medium text-ink-muted enabled:hover:bg-surface-2 enabled:hover:text-ink",
+                    )}
+                  >
+                    {option.label}
+                  </button>
+                ))}
+              </div>
+
+              {/* AFFECTATION DU SOL. Un interrupteur, pas un sélecteur : une
+                  seule source aujourd'hui. Le jour où la BDNB et le PLU
+                  arrivent, ce bouton devient une liste — et jamais des cases à
+                  cocher, car deux affectations peintes ensemble ne répondent
+                  pas à la même question et se recouvriraient sans que rien ne
+                  le dise. */}
+              {zoningAvailable ? (
+                <>
+                  <Separateur />
+                  <Calque
+                    actif={zoning}
+                    onClick={() => setZoning((on) => !on)}
+                    icone={<Layers aria-hidden="true" className="size-3.5" />}
+                  >
+                    Zonage
+                  </Calque>
+                </>
+              ) : null}
+
+              {transportsAvailable ? (
+                <>
+                  <Separateur />
+                  <Calque
+                    actif={transports}
+                    onClick={() => setTransports((on) => !on)}
+                    icone={
+                      <TrainFront aria-hidden="true" className="size-3.5" />
+                    }
+                  >
+                    Transports
+                  </Calque>
+                </>
+              ) : null}
+
+              {/* LOYERS. Deux sources publiques sous un seul interrupteur : les
+                  baux observés là où un observatoire existe, les loyers
+                  d'annonce partout ailleurs. L'utilisateur demande « les
+                  loyers », pas une méthodologie. Le bouton disparaît si l'index
+                  ne répond pas : un calque qu'on ne peut pas peindre ne se
+                  propose pas. */}
+              {loyersError ? null : (
+                <>
+                  <Separateur />
+                  <Calque
+                    actif={loyers}
+                    onClick={() => setLoyers((on) => !on)}
+                    icone={<Coins aria-hidden="true" className="size-3.5" />}
+                  >
+                    Loyers
+                  </Calque>
+                </>
+              )}
             </div>
-          </div>
 
-          {/* AFFECTATION DU SOL. Un interrupteur, pas un sélecteur : une seule
-              source aujourd'hui. Le jour où la BDNB et le PLU arrivent, ce
-              bouton devient une liste — et jamais des cases à cocher, car deux
-              affectations peintes ensemble ne répondent pas à la même
-              question et se recouvriraient sans que rien ne le dise. */}
-          {zoningAvailable ? (
-            <button
-              type="button"
-              onClick={() => setZoning((on) => !on)}
-              aria-pressed={zoning}
-              className={cn(
-                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
-                zoning
-                  ? "bg-primary text-primary-fg"
-                  : "bg-surface text-ink-muted hover:text-ink",
-              )}
-            >
-              <Layers aria-hidden="true" className="size-3.5" />
-              Zonage
-            </button>
-          ) : null}
+            {/* LE BOUTON DE LÉGENDE NE S'AFFICHE QUE S'IL Y A QUELQUE CHOSE À
+                LÉGENDER. Un bouton qui ouvre un panneau vide est un bouton qui
+                ment. Le compte est écrit dessus : il dit combien de calques
+                parlent, sans qu'il faille ouvrir pour le savoir. */}
+            {legendCount > 0 ? (
+              <button
+                type="button"
+                onClick={() => setLegendOpen((on) => !on)}
+                aria-expanded={legendOpen}
+                aria-controls="carte-legendes"
+                className={cn(
+                  "pointer-events-auto flex min-h-9 shrink-0 items-center gap-1.5 rounded-lg border border-border px-2.5 text-xs font-medium transition-colors",
+                  legendOpen
+                    ? "bg-surface-2 text-ink"
+                    : "bg-surface text-ink-muted hover:text-ink",
+                )}
+              >
+                Légende
+                <span className="tnum text-ink-subtle">{legendCount}</span>
+                <ChevronDown
+                  aria-hidden="true"
+                  className={cn(
+                    "size-3.5 transition-transform",
+                    legendOpen ? "rotate-180" : "",
+                  )}
+                />
+              </button>
+            ) : null}
 
-          {transportsAvailable ? (
-            <button
-              type="button"
-              onClick={() => setTransports((on) => !on)}
-              aria-pressed={transports}
-              className={cn(
-                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
-                transports
-                  ? "bg-primary text-primary-fg"
-                  : "bg-surface text-ink-muted hover:text-ink",
-              )}
-            >
-              <TrainFront aria-hidden="true" className="size-3.5" />
-              Transports
-            </button>
-          ) : null}
-
-          {/* LOYERS. Deux sources publiques sous un seul interrupteur : les
-              baux observés là où un observatoire existe, les loyers d'annonce
-              partout ailleurs. L'utilisateur demande « les loyers », pas une
-              méthodologie. Le bouton disparaît si l'index ne répond pas :
-              un calque qu'on ne peut pas peindre ne se propose pas. */}
-          {loyersError ? null : (
-            <button
-              type="button"
-              onClick={() => setLoyers((on) => !on)}
-              aria-pressed={loyers}
-              className={cn(
-                "pointer-events-auto flex min-h-9 items-center gap-1.5 rounded-md border border-border px-2.5 text-xs font-medium shadow-md transition-colors",
-                loyers
-                  ? "bg-primary text-primary-fg"
-                  : "bg-surface text-ink-muted hover:text-ink",
-              )}
-            >
-              <Coins aria-hidden="true" className="size-3.5" />
-              Loyers
-            </button>
-          )}
-
-          </div>
-          {loyers && loyersIndex ? (
-            <LoyersLegend
-              scale={loyersScale(loyersIndex)}
-              index={loyersIndex}
-              observes={loyersObserves}
-              className="max-h-[11rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none"
-            />
-          ) : null}
-          {zoning ? (
-            <ZoningLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none" />
-          ) : null}
-          {transports ? (
-            <TransportsLegend className="max-h-[8.5rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none" />
-          ) : null}
-          {showLegend && showPrices ? (
-            <PriceLegend
-              scale={scale}
-              compact={isCompact}
-              className="max-h-[8.5rem] shrink-0 overflow-y-auto border-0 bg-transparent shadow-none"
-            />
-          ) : null}
+            {/* LES APLATS NATIONAUX ONT LEUR LÉGENDE DANS LA RANGÉE, pas dans
+                le panneau : c'est la première vue du site, elle ne doit rien
+                demander à personne. Elle s'efface dès que les ventes prennent
+                le relais, où l'échelle affichée n'est plus la sienne. */}
+            {zoomTooLow && !controlled && !loyers ? (
+              <TerritoryLegend scale={territoryScale} className="ms-auto" />
+            ) : null}
           </div>
         </div>
       ) : null}
@@ -2138,6 +2204,47 @@ function liveMessage(
   if (failed) return "Les données de ventes n'ont pas pu être chargées.";
   if (count === 0) return "Aucune vente dans cette zone.";
   return `${count} vente${count > 1 ? "s" : ""} affichée${count > 1 ? "s" : ""} sur la carte.`;
+}
+
+/** Le trait qui sépare deux commandes dans la pastille des calques. */
+function Separateur() {
+  return (
+    <div aria-hidden="true" className="w-px shrink-0 self-stretch bg-border" />
+  );
+}
+
+/**
+ * UN CALQUE DANS LA PASTILLE. Les quatre interrupteurs partagent la même
+ * forme : les écrire une fois évite qu'un cinquième calque arrive avec une
+ * bordure ou une ombre que les autres n'ont pas.
+ */
+function Calque({
+  actif,
+  onClick,
+  icone,
+  children,
+}: {
+  actif: boolean;
+  onClick: () => void;
+  icone: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={actif}
+      className={cn(
+        "flex min-h-9 items-center gap-1.5 px-2.5 text-xs font-medium transition-colors",
+        actif
+          ? "bg-primary text-primary-fg"
+          : "text-ink-muted hover:bg-surface-2 hover:text-ink",
+      )}
+    >
+      {icone}
+      {children}
+    </button>
+  );
 }
 
 function Banner({

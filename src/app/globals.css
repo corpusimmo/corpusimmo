@@ -1323,6 +1323,22 @@
   border-top: 1px solid var(--border-soft) !important;
 }
 
+/* LES QUATRE GROUPES FORMENT UNE COLONNE, PAS QUATRE OBJETS FLOTTANTS.
+   MapLibre pose dix pixels autour de chaque groupe : navigation, plein écran,
+   géolocalisation et vue 3D se retrouvaient à égale distance les uns des
+   autres et du bord de la carte, et rien ne disait qu'ils appartenaient au
+   même outil. Six pixels les rassemblent sans les souder — un groupe reste un
+   groupe, et le bord garde sa marge pleine. */
+.maplibregl-ctrl-top-right .maplibregl-ctrl,
+.maplibregl-ctrl-top-left .maplibregl-ctrl {
+  margin-block: 0 6px !important;
+}
+
+.maplibregl-ctrl-top-right .maplibregl-ctrl:first-child,
+.maplibregl-ctrl-top-left .maplibregl-ctrl:first-child {
+  margin-block-start: 10px !important;
+}
+
 .maplibregl-ctrl-attrib {
   background: color-mix(in oklab, var(--surface) 88%, transparent) !important;
   border-radius: var(--radius-xs) 0 0 0 !important;

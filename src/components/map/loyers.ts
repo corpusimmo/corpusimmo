@@ -226,6 +226,25 @@ export function observeProperty(type: LoyersType): string {
 }
 
 /**
+ * L'étiquette d'une zone observée : sa médiane du type affiché, et sa médiane
+ * tous logements en repli.
+ *
+ * Le repli n'est pas cosmétique : une zone peut n'avoir aucune médiane maison
+ * publiée, faute d'assez de baux. Sans lui, l'étiquette écrirait « null €/m² ».
+ */
+function labelExpression(type: LoyersType): unknown[] {
+  const clef = observeProperty(type);
+  return [
+    "concat",
+    [
+      "to-string",
+      ["case", ["==", ["get", clef], null], ["get", "m2"], ["get", clef]],
+    ],
+    " €/m²",
+  ];
+}
+
+/**
  * Repeint les deux calques pour un autre type de bien.
  *
  * Changer de type ne recharge RIEN : les quatre valeurs voyagent déjà dans
@@ -255,6 +274,13 @@ export function setLoyersType(
       LAYER_LOYERS_OBSERVE_FILL,
       "fill-color",
       fillExpression(scale, observeProperty(type), "horsCharges"),
+    );
+  }
+  if (map.getLayer(LAYER_LOYERS_OBSERVE_LABEL)) {
+    map.setLayoutProperty(
+      LAYER_LOYERS_OBSERVE_LABEL,
+      "text-field",
+      labelExpression(type) as never,
     );
   }
 }
@@ -373,7 +399,12 @@ export function installLoyersLayers(
       layout: {
         visibility: "none",
         "symbol-placement": "point",
-        "text-field": ["concat", ["to-string", ["get", "m2"]], " €/m²"],
+        /* LE CHIFFRE ÉCRIT SUIT LE TYPE AFFICHÉ. Il est resté sur la
+           médiane tous logements (`m2`) alors que la couleur, elle,
+           changeait avec le type : basculer sur les maisons repeignait la
+           carte sans toucher un seul nombre, et le calque avait l'air de ne
+           pas répondre. C'est le nombre qu'on lit, pas la teinte. */
+        "text-field": labelExpression(type),
         "text-size": 11,
         "text-allow-overlap": false,
         "text-padding": 4,

@@ -1829,6 +1829,17 @@ export function DvfMap({
                 et quand le calque est éteint : un réglage qui n'agit sur rien
                 de visible égare. Changer de typologie ne télécharge rien, les
                 quatre valeurs sont déjà dans chaque commune. */}
+            {/* SUR LES MAISONS, PAS DE SÉLECTEUR MAIS UN RAPPEL. La famille
+                vient des filtres, et rien ne le disait sur le bandeau : la
+                carte changeait de calque sans qu'aucune commande visible ne
+                bouge, ce qui se lit comme une panne. Cette pastille inerte
+                nomme ce que la carte montre et d'où ça vient. */}
+            {loyers && loyersIndex && famille === "mai" ? (
+              <span className="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-2 text-xs text-ink-muted">
+                Loyers de maison, selon les filtres
+              </span>
+            ) : null}
+
             {loyers && loyersIndex && famille === "app" ? (
               <div
                 role="group"

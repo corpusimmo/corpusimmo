@@ -80,13 +80,52 @@ export const LOYERS_RAMP = [
 
 const NO_DATA_FILL = "rgba(0,0,0,0)";
 
+/**
+ * LES QUATRE CARTES DE LOYER, ET CELLE QU'ON REGARDE.
+ *
+ * La source publie un loyer par commune pour QUATRE familles de biens :
+ * appartements tous types, T1-T2, T3 et plus, maisons. Un studio se loue
+ * couramment trois euros du mètre de plus qu'un quatre-pièces : n'en montrer
+ * qu'une laissait croire à un loyer unique par commune, et le faisait payer
+ * au lecteur qui cherchait le sien.
+ *
+ * Les clefs sont celles des propriétés du GeoJSON, pas des libellés : c'est
+ * `["get", "a12"]` que MapLibre lira.
+ */
+export type LoyersType = "app" | "a12" | "a3" | "mai";
+
+export const LOYERS_TYPES: ReadonlyArray<{
+  id: LoyersType;
+  nom: string;
+  /** Ce que la fiche écrit à côté du chiffre. */
+  bien: string;
+}> = [
+  { id: "app", nom: "Tous appartements", bien: "appartement" },
+  { id: "a12", nom: "T1-T2", bien: "appartement T1-T2" },
+  { id: "a3", nom: "T3 et plus", bien: "appartement T3 et plus" },
+  { id: "mai", nom: "Maisons", bien: "maison" },
+];
+
 /** Le contrat de `public/geo/loyers/index.json`. */
 export interface LoyersIndex {
   annee: number;
   attribution: string;
   page: string;
-  surfacesType: { appartement: number; maison: number };
+  surfacesType: {
+    appartement: number;
+    appartementT12?: number;
+    appartementT3?: number;
+    maison: number;
+  };
+  /** Bornes des appartements tous types. Conservé pour la compatibilité. */
   breaks: number[];
+  /**
+   * Une échelle PAR TYPE, et c'est la seule lecture honnête : peindre les
+   * T1-T2 sur les bornes des appartements tous types donnerait une France de
+   * studios uniformément chère. Absent d'un index ancien : on retombe alors
+   * sur `breaks`.
+   */
+  breaksParType?: Partial<Record<LoyersType, number[]>>;
   departements: Record<string, [number, number, number, number]>;
 }
 
@@ -125,12 +164,16 @@ export interface LoyersScale {
  * entière de la rampe — alors que le marché y est le même. Les bornes
  * passent hors charges, et ce sont les communes qu'on ramène à elles.
  */
-export function loyersScale(index: LoyersIndex): LoyersScale {
+export function loyersScale(
+  index: LoyersIndex,
+  type: LoyersType = "app",
+): LoyersScale {
+  const bornes = index.breaksParType?.[type] ?? index.breaks;
   return {
-    breaks: index.breaks.map(
+    breaks: bornes.map(
       (borne) => Math.round((loyerHorsCharges(borne) ?? borne) * 10) / 10,
     ),
-    breaksAnnonce: index.breaks,
+    breaksAnnonce: bornes,
     colors: LOYERS_RAMP,
   };
 }
@@ -170,6 +213,52 @@ function fillExpression(
   ] as unknown as ExpressionSpecification;
 }
 
+/**
+ * Ce que la zone d'observatoire montre quand la carte affiche tel type.
+ *
+ * Les observatoires publient la médiane tous logements (`m2`) et, par zone,
+ * une médiane appartement et une médiane maison. Ils ne découpent PAS par
+ * nombre de pièces : demander les T1-T2 laisse donc la zone sur sa médiane
+ * appartement plutôt que d'inventer une ventilation. La légende le dit.
+ */
+export function observeProperty(type: LoyersType): string {
+  return type === "mai" ? "mai" : "app";
+}
+
+/**
+ * Repeint les deux calques pour un autre type de bien.
+ *
+ * Changer de type ne recharge RIEN : les quatre valeurs voyagent déjà dans
+ * chaque commune, et seule l'expression de couleur change. C'est aussi
+ * pourquoi l'échelle est passée en argument — elle change avec le type.
+ */
+export function setLoyersType(
+  map: MapLibreMap,
+  scale: LoyersScale,
+  type: LoyersType,
+): void {
+  if (map.getLayer(LAYER_LOYERS_COMMUNE_FILL)) {
+    map.setPaintProperty(
+      LAYER_LOYERS_COMMUNE_FILL,
+      "fill-color",
+      fillExpression(scale, type, "annonce"),
+    );
+    map.setPaintProperty(LAYER_LOYERS_COMMUNE_FILL, "fill-opacity", [
+      "case",
+      ["==", ["get", type === "mai" ? "mai_ech" : "app_ech"], "commune"],
+      0.6,
+      0.32,
+    ] as never);
+  }
+  if (map.getLayer(LAYER_LOYERS_OBSERVE_FILL)) {
+    map.setPaintProperty(
+      LAYER_LOYERS_OBSERVE_FILL,
+      "fill-color",
+      fillExpression(scale, observeProperty(type), "horsCharges"),
+    );
+  }
+}
+
 /** Le strict nécessaire : le projet n'embarque pas `@types/geojson`. */
 type Feature = { type: "Feature"; properties: Record<string, unknown>; geometry: unknown };
 type FeatureCollection = { type: "FeatureCollection"; features: Feature[] };
@@ -191,6 +280,7 @@ export function installLoyersLayers(
   scale: LoyersScale,
   chrome: LoyersChrome,
   beforeId?: string,
+  type: LoyersType = "app",
 ): void {
   const before = beforeId && map.getLayer(beforeId) ? beforeId : undefined;
 
@@ -210,12 +300,19 @@ export function installLoyersLayers(
       minzoom: LOYERS_MIN_ZOOM,
       layout: { visibility: "none" },
       paint: {
-        "fill-color": fillExpression(scale, "app", "annonce"),
+        "fill-color": fillExpression(scale, type, "annonce"),
         // Une estimation LOCALE est peinte franchement ; une valeur héritée
         // des communes voisines s'efface à moitié. La légende le dit.
+        //
+        // L'ÉCHELLE LUE RESTE CELLE DES APPARTEMENTS TOUS TYPES, quel que
+        // soit le type affiché : la source ne publie `TYPPRED` que sur les
+        // quatre cartes principales, et les typologies n'emportent que leur
+        // valeur (voir `scripts/contours-communes-loyers.mjs`). Une commune
+        // estimée sur ses voisines l'est pour toutes ses typologies à la
+        // fois : c'est le même modèle qui les produit.
         "fill-opacity": [
           "case",
-          ["==", ["get", "app_ech"], "commune"],
+          ["==", ["get", type === "mai" ? "mai_ech" : "app_ech"], "commune"],
           0.6,
           0.32,
         ],
@@ -246,7 +343,7 @@ export function installLoyersLayers(
       minzoom: LOYERS_MIN_ZOOM,
       layout: { visibility: "none" },
       paint: {
-        "fill-color": fillExpression(scale, "m2", "horsCharges"),
+        "fill-color": fillExpression(scale, observeProperty(type), "horsCharges"),
         "fill-opacity": 0.66,
       },
     } as never,
@@ -453,33 +550,58 @@ function observedHtml(p: Record<string, unknown>): string {
  * l'ordre dans lequel la question se pose, et taire la source rendrait le
  * chiffre invérifiable.
  */
-function communeHtml(p: Record<string, unknown>, index: LoyersIndex): string {
+function communeHtml(
+  p: Record<string, unknown>,
+  index: LoyersIndex,
+  type: LoyersType,
+): string {
   const lignes: string[] = [];
-  if (typeof p.app === "number") {
-    const corrige = loyerHorsCharges(p.app);
+  const choisi = LOYERS_TYPES.find((t) => t.id === type) ?? LOYERS_TYPES[0]!;
+  const valeur = p[type];
+  const echelleClef = type === "mai" ? "mai_ech" : "app_ech";
+
+  if (typeof valeur === "number") {
     lignes.push(
-      `<p class="loyers-popup__value">${euro(corrige)} €/m² <span>appartement, hors charges, estimé</span></p>` +
-        `<p class="loyers-popup__line">Annonce ${euro(p.app)} €/m² charges comprises, ` +
-        `fourchette ${euro(p.app_bas)} à ${euro(p.app_haut)} €/m², ` +
-        `${escapeHtml(ECHELLE_LABEL[String(p.app_ech)] ?? "échelle inconnue")}</p>`,
+      `<p class="loyers-popup__value">${euro(loyerHorsCharges(valeur))} €/m² ` +
+        `<span>${escapeHtml(choisi.bien)}, hors charges, estimé</span></p>` +
+        `<p class="loyers-popup__line">Annonce ${euro(valeur)} €/m² charges comprises, ` +
+        `${escapeHtml(ECHELLE_LABEL[String(p[echelleClef])] ?? "échelle inconnue")}</p>`,
     );
   }
-  if (typeof p.mai === "number") {
-    lignes.push(
-      `<p class="loyers-popup__line">Maison ${euro(loyerHorsCharges(p.mai))} €/m² hors charges ` +
-        `(annonce ${euro(p.mai)} €/m²), ` +
-        `${escapeHtml(ECHELLE_LABEL[String(p.mai_ech)] ?? "échelle inconnue")}</p>`,
-    );
+
+  /* LES AUTRES TYPES SUIVENT, SUR UNE LIGNE. Le lecteur qui ouvre une commune
+     compare presque toujours : un T2 contre un T4, un appartement contre une
+     maison. Les avoir sous les yeux évite de rebasculer la carte entière
+     pour lire un second chiffre. */
+  const autres = LOYERS_TYPES.filter((t) => t.id !== type)
+    .map((t) => {
+      const v = p[t.id];
+      if (typeof v !== "number") return null;
+      return `${escapeHtml(t.nom)} ${euro(loyerHorsCharges(v))} €/m²`;
+    })
+    .filter((ligne): ligne is string => ligne !== null);
+  if (autres.length > 0) {
+    lignes.push(`<p class="loyers-popup__line">${autres.join(" · ")}</p>`);
   }
+
   if (lignes.length === 0) {
     lignes.push(`<p class="loyers-popup__line">Pas d'indicateur publié pour cette commune.</p>`);
   }
-  const obs = typeof p.app_obs === "number" && p.app_obs > 0 ? `${entier(p.app_obs)} annonces · ` : "";
+  const obsBrut = type === "mai" ? p.mai_obs : p.app_obs;
+  const obs = typeof obsBrut === "number" && obsBrut > 0 ? `${entier(obsBrut)} annonces · ` : "";
+  const surface =
+    type === "mai"
+      ? index.surfacesType.maison
+      : type === "a12"
+        ? (index.surfacesType.appartementT12 ?? index.surfacesType.appartement)
+        : type === "a3"
+          ? (index.surfacesType.appartementT3 ?? index.surfacesType.appartement)
+          : index.surfacesType.appartement;
   return `
     <p class="loyers-popup__eyebrow">Loyers estimés · ${escapeHtml(index.annee)}</p>
     <p class="loyers-popup__title">${escapeHtml(p.nom)}</p>
     ${lignes.join("")}
-    <p class="loyers-popup__meta">${obs}bien type ${index.surfacesType.appartement} m² · ${escapeHtml(index.attribution)}, calé sur les observatoires locaux (${escapeHtml(CALIBRATION_LOYERS.generatedAt.slice(0, 4))})</p>
+    <p class="loyers-popup__meta">${obs}bien type ${surface} m² · ${escapeHtml(index.attribution)}, calé sur les observatoires locaux (${escapeHtml(CALIBRATION_LOYERS.generatedAt.slice(0, 4))})</p>
   `;
 }
 
@@ -493,6 +615,7 @@ export function attachLoyersPopup(
   map: MapLibreMap,
   index: LoyersIndex,
   isEnabled: () => boolean,
+  typeCourant: () => LoyersType = () => "app",
 ): () => void {
   const popup = new Popup({
     closeButton: false,
@@ -513,7 +636,9 @@ export function attachLoyersPopup(
     if (!hit) return false;
     const props = hit.properties as Record<string, unknown>;
     const html =
-      hit.layer.id === LAYER_LOYERS_OBSERVE_FILL ? observedHtml(props) : communeHtml(props, index);
+      hit.layer.id === LAYER_LOYERS_OBSERVE_FILL
+        ? observedHtml(props)
+        : communeHtml(props, index, typeCourant());
     popup.setLngLat(lngLat).setHTML(`<div class="loyers-popup__body">${html}</div>`);
     if (!shown) {
       popup.addTo(map);

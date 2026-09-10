@@ -111,11 +111,14 @@ import {
   fetchLoyersIndex,
   fetchLoyersObservesIndex,
   installLoyersLayers,
+  LOYERS_TYPES,
   LoyersLoader,
   loyersScale,
+  setLoyersType,
   setLoyersVisibility,
   SOURCE_LOYERS_COMMUNES,
   type LoyersIndex,
+  type LoyersType,
   type LoyersObservesIndex,
 } from "./loyers";
 import { LoyersLegend } from "./loyers-legend";
@@ -322,6 +325,37 @@ export function DvfMap({
    * prochain changement de format, qui est rare et qui change la réponse.
    */
   const [legendOpen, setLegendOpen] = React.useState(false);
+  /**
+   * LE TYPE DE BIEN DU CALQUE DES LOYERS.
+   *
+   * Il SUIT LES FILTRES tant que personne n'y touche : quelqu'un qui filtre
+   * la carte sur les maisons ne veut pas lire des loyers d'appartement, et
+   * lui faire recliquer un second sélecteur pour dire ce qu'il vient de dire
+   * serait lui reprocher d'avoir filtré. `null` est donc l'état normal — « ce
+   * que disent les filtres » — et un choix explicite le fige jusqu'à ce que
+   * les filtres eux-mêmes changent de famille.
+   */
+  const [loyersTypeChoisi, setLoyersTypeChoisi] =
+    React.useState<LoyersType | null>(null);
+
+  /**
+   * Le type effectivement peint : le choix explicite, sinon ce que disent
+   * les filtres de la page.
+   *
+   * DVF ne connaît pas le nombre de pièces, donc les filtres ne peuvent
+   * désigner qu'une famille : appartement ou maison. Les typologies restent
+   * un choix de lecture, offert dans le bandeau dès que la famille est
+   * l'appartement.
+   */
+  const famille: LoyersType = (() => {
+    const types = filters?.propertyTypes ?? [];
+    const maison = types.includes("house");
+    const appartement = types.includes("apartment");
+    return maison && !appartement ? "mai" : "app";
+  })();
+  const loyersType: LoyersType = loyersTypeChoisi ?? famille;
+  const loyersTypeRef = React.useRef(loyersType);
+  loyersTypeRef.current = loyersType;
   const [has3d, setHas3d] = React.useState(false);
   const [pitched, setPitched] = React.useState(false);
   const [internalSelectedId, setInternalSelectedId] = React.useState<
@@ -770,9 +804,10 @@ export function DvfMap({
     const fresh = !instance.getSource(SOURCE_LOYERS_COMMUNES);
     installLoyersLayers(
       instance,
-      loyersScale(loyersIndex),
+      loyersScale(loyersIndex, loyersTypeRef.current),
       { line: tokens.ink, label: tokens.ink, halo: tokens.surface },
       "building",
+      loyersTypeRef.current,
     );
     setLoyersVisibility(instance, loyersRef.current);
 
@@ -784,6 +819,14 @@ export function DvfMap({
     }
     if (loyersRef.current) loyersLoaderRef.current.sync();
   }, [loyersIndex, styleReady]);
+
+  /* Changer de type ne recharge rien : les quatre valeurs sont déjà dans
+     chaque commune, seule l'expression de couleur et l'échelle changent. */
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    if (!instance || !loyersIndex || !styleReady) return;
+    setLoyersType(instance, loyersScale(loyersIndex, loyersType), loyersType);
+  }, [loyersType, loyersIndex, styleReady]);
 
   React.useEffect(() => {
     const instance = mapRef.current;
@@ -798,7 +841,12 @@ export function DvfMap({
     const sync = (): void => loader?.sync();
     sync();
     instance.on("moveend", sync);
-    const detach = attachLoyersPopup(instance, loyersIndex, () => loyersRef.current);
+    const detach = attachLoyersPopup(
+      instance,
+      loyersIndex,
+      () => loyersRef.current,
+      () => loyersTypeRef.current,
+    );
     return () => {
       instance.off("moveend", sync);
       detach();
@@ -1500,6 +1548,7 @@ export function DvfMap({
    * l'écran d'erreur qu'il recouvre. Une seule chose à lire à la fois.
    */
   const chrome = styleReady && !basemapError;
+
   /** Une légende sans ventes à l'écran ne décrit rien. */
   const showLegend = rows.length > 0 && !(zoomTooLow && !controlled);
   /* Ce que le panneau aurait à montrer. Zéro : pas de bouton, pas de panneau. */
@@ -1619,7 +1668,8 @@ export function DvfMap({
             >
               {loyers && loyersIndex ? (
                 <LoyersLegend
-                  scale={loyersScale(loyersIndex)}
+                  scale={loyersScale(loyersIndex, loyersType)}
+                  type={loyersType}
                   index={loyersIndex}
                   observes={loyersObserves}
                   className="max-w-none border-0 bg-transparent p-0 shadow-none backdrop-blur-none"
@@ -1757,6 +1807,38 @@ export function DvfMap({
                 </>
               )}
             </div>
+
+            {/* LE TYPE DE BIEN DU CALQUE DES LOYERS, quand il est allumé.
+                Il n'apparaît pas autrement : un réglage qui n'agit sur rien
+                de visible est un réglage qui égare. Les quatre cartes de la
+                source vivent déjà dans le fichier, changer de type ne
+                déclenche aucun téléchargement. */}
+            {loyers && loyersIndex ? (
+              <div
+                role="group"
+                aria-label="Type de bien des loyers"
+                className="pointer-events-auto flex shrink-0 items-stretch overflow-hidden rounded-lg border border-border bg-surface"
+              >
+                {LOYERS_TYPES.map((option, index) => (
+                  <React.Fragment key={option.id}>
+                    {index > 0 ? <Separateur /> : null}
+                    <button
+                      type="button"
+                      onClick={() => setLoyersTypeChoisi(option.id)}
+                      aria-pressed={loyersType === option.id}
+                      className={cn(
+                        "min-h-9 px-2.5 text-xs whitespace-nowrap transition-colors",
+                        loyersType === option.id
+                          ? "bg-accent font-semibold text-accent-fg"
+                          : "font-medium text-ink-muted hover:bg-surface-2 hover:text-ink",
+                      )}
+                    >
+                      {option.nom}
+                    </button>
+                  </React.Fragment>
+                ))}
+              </div>
+            ) : null}
 
             {/* LE BOUTON DE LÉGENDE NE S'AFFICHE QUE S'IL Y A QUELQUE CHOSE À
                 LÉGENDER. Un bouton qui ouvre un panneau vide est un bouton qui

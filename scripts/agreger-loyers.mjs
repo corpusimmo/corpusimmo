@@ -63,16 +63,25 @@ const CATALOGUE = "https://www.data.gouv.fr/api/1/datasets/?q=carte+des+loyers";
 const TITRE_MILLESIME = /loyers\s+d(?:’|')annonce\s+par\s+commune\s+en\s+(\d{4})/i;
 
 /**
- * Les deux ressources retenues, reconnues à leur nom de fichier.
+ * Les QUATRE ressources retenues, reconnues à leur nom de fichier.
  *
- * `pred-app` couvre toutes les typologies d'appartement confondues ;
- * `pred-mai` les maisons. Le jeu publie aussi `pred-app12` et `pred-app3`
- * (T1-T2 et T3+) : les ignorer est un choix, parce que nos médianes DVF ne
- * sont pas ventilées par nombre de pièces et qu'un rendement croisant un T2
- * loué avec un prix au m² tous appartements confondus serait un faux.
+ * `pred-app` couvre toutes les typologies d'appartement confondues,
+ * `pred-mai` les maisons, `pred-app12` les T1-T2 et `pred-app3` les T3 et
+ * plus.
+ *
+ * LES DEUX TYPOLOGIES ÉTAIENT ÉCARTÉES, ET C'ÉTAIT UNE ERREUR DE CADRAGE. Le
+ * motif tenait au rendement : croiser un T2 loué avec un prix au m² tous
+ * appartements confondus produit un faux. Il reste vrai, et le calcul de
+ * rendement s'en tient donc au « tous appartements ». Mais un loyer n'existe
+ * pas que pour un rendement : un studio se loue bien plus cher au mètre qu'un
+ * quatre-pièces, et refuser de le montrer laissait le visiteur croire à un
+ * loyer unique par commune. Les quatre cartes sont donc reprises ; c'est
+ * l'affichage qui décide laquelle répond à la question posée.
  */
 const RESSOURCES = {
   appartement: /pred-app-mef/i,
+  appartementT12: /pred-app12-mef/i,
+  appartementT3: /pred-app3-mef/i,
   maison: /pred-mai-mef/i,
 };
 
@@ -85,7 +94,12 @@ const RESSOURCES = {
  * mètre. Ne pas transporter cette information reviendrait à laisser croire à
  * une valeur universelle.
  */
-const SURFACES_TYPE = { appartement: 52, maison: 92 };
+const SURFACES_TYPE = {
+  appartement: 52,
+  appartementT12: 34,
+  appartementT3: 71,
+  maison: 92,
+};
 
 const ATTRIBUTION =
   "Estimations ANIL, à partir des données du Groupe SeLoger et de leboncoin";
@@ -293,13 +307,17 @@ async function main() {
   const communes = {};
   for (const code of [...codes].sort()) {
     const appartement = familles.appartement.get(code);
+    const appartementT12 = familles.appartementT12.get(code);
+    const appartementT3 = familles.appartementT3.get(code);
     const maison = familles.maison.get(code);
-    const identite = appartement ?? maison;
+    const identite = appartement ?? maison ?? appartementT3 ?? appartementT12;
 
     communes[code] = {
       nom: identite.nom,
       dep: identite.dep,
       appartement: appartement?.indicateur ?? null,
+      appartementT12: appartementT12?.indicateur ?? null,
+      appartementT3: appartementT3?.indicateur ?? null,
       maison: maison?.indicateur ?? null,
     };
   }
@@ -320,7 +338,7 @@ async function main() {
       "Loyers d'ANNONCE, charges comprises, biens loués vides : ils surestiment le loyer net encaissé.",
       "Une échelle « maille » ou « epci » signale une valeur estimée sur des communes voisines, pas sur la commune elle-même.",
       "L'ANIL invite à la prudence quand r2 < 0,5, obs < 30, ou quand l'écart bas–haut est très large.",
-      "Indicateurs estimés pour un bien type (52 m² en appartement, 92 m² en maison) : ils ne se transposent pas à un studio.",
+      "Indicateurs estimés pour un bien type, propre à chaque carte (52 m² tous appartements, 34 m² en T1-T2, 71 m² en T3 et plus, 92 m² en maison) : deux cartes ne se comparent pas au mètre carré près.",
     ],
     communes,
   };

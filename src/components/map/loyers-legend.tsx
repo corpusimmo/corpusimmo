@@ -4,7 +4,7 @@ import { cn } from "@/lib/utils/cn";
 
 import { CALIBRATION_LOYERS } from "@/lib/loyers/calibration";
 
-import type { LoyersIndex, LoyersObservesIndex, LoyersScale } from "./loyers";
+import { LOYERS_TYPES, type LoyersIndex, type LoyersObservesIndex, type LoyersScale, type LoyersType } from "./loyers";
 
 /**
  * La légende du calque des loyers.
@@ -25,15 +25,27 @@ export function LoyersLegend({
   scale,
   index,
   observes,
+  type = "app",
   className,
 }: {
   scale: LoyersScale;
   index: LoyersIndex;
   observes: LoyersObservesIndex | null;
+  /** Le type de bien peint sur la carte : la légende en parle nommément. */
+  type?: LoyersType;
   className?: string;
 }) {
   const labels = scaleLabels(scale.breaks);
   const annees = observes?.annees.join(" et ");
+  const choisi = LOYERS_TYPES.find((t) => t.id === type) ?? LOYERS_TYPES[0]!;
+  const surface =
+    type === "mai"
+      ? index.surfacesType.maison
+      : type === "a12"
+        ? (index.surfacesType.appartementT12 ?? index.surfacesType.appartement)
+        : type === "a3"
+          ? (index.surfacesType.appartementT3 ?? index.surfacesType.appartement)
+          : index.surfacesType.appartement;
 
   return (
     <div
@@ -45,6 +57,7 @@ export function LoyersLegend({
       <p className="text-[11px] font-medium text-ink">
         Loyer au m², par mois, hors charges
       </p>
+      <p className="text-[10px] text-ink-subtle">{choisi.nom}</p>
       <ul className="mt-1.5 flex flex-col gap-1">
         {scale.colors.map((color, i) => (
           <li key={color} className="flex items-center gap-2 text-[11px] text-ink-muted tnum">
@@ -69,6 +82,13 @@ export function LoyersLegend({
             <strong className="font-medium text-ink-muted">Contour marqué :</strong> loyers de
             baux signés, hors charges, observatoires locaux des loyers
             {annees ? ` (${annees})` : ""}.
+            {type === "a12" || type === "a3" ? (
+              <>
+                {" "}
+                Les observatoires ne découpent pas par nombre de pièces : ces zones restent
+                sur leur médiane appartement, tous types confondus.
+              </>
+            ) : null}
           </span>
         </li>
         <li className="flex items-start gap-2">
@@ -79,8 +99,7 @@ export function LoyersLegend({
           />
           <span>
             <strong className="font-medium text-ink-muted">Aplat clair :</strong> loyers
-            d’annonce par commune, appartement type {index.surfacesType.appartement} m² (
-            {index.annee}), <strong className="font-medium text-ink-muted">ramenés hors
+            d’annonce par commune, {choisi.bien} type {surface} m² ({index.annee}), <strong className="font-medium text-ink-muted">ramenés hors
             charges</strong> par le facteur mesuré sur les zones d’observatoire
             ({CALIBRATION_LOYERS.appariement.zones} zones,{" "}
             {Math.round((1 - CALIBRATION_LOYERS.global) * 100)} % d’écart médian). Demi-teinte :

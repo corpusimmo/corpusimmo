@@ -134,8 +134,10 @@ function quantile(sorted, q) {
   return sorted[lower] + (sorted[upper] - sorted[lower]) * (position - lower);
 }
 
-/** Les propriétés d'un indicateur, aplaties sous un préfixe : MapLibre lit
- *  `["get", "app"]`, pas un objet imbriqué. */
+/**
+ * Les propriétés d'un indicateur, aplaties sous un préfixe : MapLibre lit
+ * `["get", "app"]`, pas un objet imbriqué.
+ */
 function flatten(prefix, indicateur) {
   if (!indicateur) {
     return { [prefix]: null, [`${prefix}_bas`]: null, [`${prefix}_haut`]: null, [`${prefix}_ech`]: null, [`${prefix}_obs`]: 0 };
@@ -147,6 +149,20 @@ function flatten(prefix, indicateur) {
     [`${prefix}_ech`]: indicateur.echelle,
     [`${prefix}_obs`]: indicateur.obs,
   };
+}
+
+/**
+ * LES TYPOLOGIES N'EMPORTENT QUE LEUR VALEUR, PAS LEUR APPAREIL.
+ *
+ * Chaque indicateur complet coûte cinq propriétés sur 34 900 communes. Les
+ * quatre cartes au complet feraient passer les contours de 18 à 26 Mo, pour
+ * une fourchette et un effectif que la fiche n'affiche que sur l'indicateur
+ * principal du type choisi. Les T1-T2 et les T3 et plus ne voyagent donc
+ * qu'avec leur loyer : c'est ce que la couleur lit et ce que la fiche
+ * compare.
+ */
+function valeurSeule(prefix, indicateur) {
+  return { [prefix]: indicateur?.m2 ?? null };
 }
 
 /* ── Programme ───────────────────────────────────────────────────────────── */
@@ -180,6 +196,8 @@ async function main() {
         nom: feature.properties.nom,
         ...flatten("app", commune?.appartement ?? null),
         ...flatten("mai", commune?.maison ?? null),
+        ...valeurSeule("a12", commune?.appartementT12 ?? null),
+        ...valeurSeule("a3", commune?.appartementT3 ?? null),
       },
       geometry,
     };
@@ -198,19 +216,39 @@ async function main() {
     total += body.length;
   }
 
-  // Bornes : quintiles des loyers d'appartement de toutes les communes
-  // estimées. Le fichier index les porte pour que la carte et sa légende
-  // lisent les mêmes chiffres.
-  const valeurs = Object.values(loyers.communes)
-    .map((c) => c.appartement?.m2)
-    .filter((v) => typeof v === "number")
-    .sort((a, b) => a - b);
-  const breaks = [];
-  for (let i = 1; i < CLASSES; i += 1) {
-    const brute = quantile(valeurs, i / CLASSES);
-    const arrondie = Math.round(brute / ROUNDING) * ROUNDING;
-    if (breaks.length === 0 || arrondie > breaks[breaks.length - 1]) breaks.push(arrondie);
-  }
+  /**
+   * Bornes : quintiles nationaux, UNE ÉCHELLE PAR TYPE DE BIEN.
+   *
+   * Un T1-T2 se loue couramment trois euros du mètre de plus qu'un T3 :
+   * peindre les quatre cartes sur les bornes des appartements tous types
+   * confondus aurait affiché une France de studios uniformément chère et une
+   * France de grands logements uniformément abordable. Chaque carte se cale
+   * donc sur sa propre distribution ; la légende change de bornes en même
+   * temps que la carte change de type.
+   */
+  const bornesDe = (lire) => {
+    const valeurs = Object.values(loyers.communes)
+      .map(lire)
+      .filter((v) => typeof v === "number")
+      .sort((a, b) => a - b);
+    const bornes = [];
+    for (let i = 1; i < CLASSES; i += 1) {
+      const brute = quantile(valeurs, i / CLASSES);
+      const arrondie = Math.round(brute / ROUNDING) * ROUNDING;
+      if (bornes.length === 0 || arrondie > bornes[bornes.length - 1]) {
+        bornes.push(arrondie);
+      }
+    }
+    return bornes;
+  };
+
+  const breaks = bornesDe((c) => c.appartement?.m2);
+  const breaksParType = {
+    app: breaks,
+    a12: bornesDe((c) => c.appartementT12?.m2),
+    a3: bornesDe((c) => c.appartementT3?.m2),
+    mai: bornesDe((c) => c.maison?.m2),
+  };
 
   const index = {
     generatedAt: new Date().toISOString().slice(0, 10),
@@ -219,7 +257,9 @@ async function main() {
     attribution: loyers.attribution,
     page: loyers.page,
     surfacesType: loyers.surfacesType,
+    /** Conservé pour la compatibilité : c'est celui des appartements. */
     breaks,
+    breaksParType,
     departements: Object.fromEntries(
       Object.entries(boites).map(([dep, b]) => [dep, b.map((v) => Number(v.toFixed(PRECISION)))]),
     ),
@@ -230,7 +270,9 @@ async function main() {
     `\nÉcrit ${parDepartement.size} départements dans ${dossier}\n` +
       `  ${contours.features.length} communes, ${jointes} avec indicateur, ` +
       `${(total / 1024 / 1024).toFixed(1)} Mo au total\n` +
-      `  bornes appartement : ${breaks.join(" / ")} €/m²\n`,
+      Object.entries(breaksParType)
+        .map(([type, bornes]) => `  bornes ${type} : ${bornes.join(" / ")} €/m²\n`)
+        .join(""),
   );
 }
 

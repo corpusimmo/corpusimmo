@@ -42,6 +42,8 @@ import type {
 } from "maplibre-gl";
 import { Popup } from "maplibre-gl";
 
+import { CALIBRATION_LOYERS, loyerHorsCharges } from "@/lib/loyers/calibration";
+
 export const SOURCE_LOYERS_COMMUNES = "corpusimmo-loyers-communes";
 export const SOURCE_LOYERS_OBSERVES = "corpusimmo-loyers-observes";
 
@@ -96,12 +98,41 @@ export interface LoyersObservesIndex {
 }
 
 export interface LoyersScale {
+  /**
+   * Bornes de l'échelle affichée, HORS CHARGES : c'est l'espace dans lequel
+   * la légende écrit et dans lequel les zones observées sont déjà mesurées.
+   */
   breaks: number[];
+  /**
+   * Les MÊMES bornes, en loyer d'annonce charges comprises.
+   *
+   * Elles servent à peindre les communes, dont les propriétés restent brutes
+   * dans le GeoJSON : colorier sur la borne d'origine revient exactement à
+   * colorier la valeur corrigée sur la borne corrigée, sans recalculer
+   * 34 900 valeurs dans une expression de style.
+   */
+  breaksAnnonce: number[];
   colors: readonly string[];
 }
 
+/**
+ * L'ÉCHELLE VIT HORS CHARGES, ET C'ÉTAIT UN BOGUE DE LECTURE.
+ *
+ * Les mêmes bornes servaient aux deux calques : les communes portent des
+ * loyers d'annonce charges comprises, les zones d'observatoire des loyers de
+ * bail hors charges. Une zone observée paraissait donc systématiquement moins
+ * chère que les communes qui l'entourent — d'environ 15 %, soit une classe
+ * entière de la rampe — alors que le marché y est le même. Les bornes
+ * passent hors charges, et ce sont les communes qu'on ramène à elles.
+ */
 export function loyersScale(index: LoyersIndex): LoyersScale {
-  return { breaks: index.breaks, colors: LOYERS_RAMP };
+  return {
+    breaks: index.breaks.map(
+      (borne) => Math.round((loyerHorsCharges(borne) ?? borne) * 10) / 10,
+    ),
+    breaksAnnonce: index.breaks,
+    colors: LOYERS_RAMP,
+  };
 }
 
 export async function fetchLoyersIndex(): Promise<LoyersIndex> {
@@ -123,9 +154,14 @@ export async function fetchLoyersObservesIndex(): Promise<LoyersObservesIndex | 
 /* ── Expressions ─────────────────────────────────────────────────────────── */
 
 /** `["step", valeur, c0, b0, c1, …]`, avec le vide traité avant toute borne. */
-function fillExpression(scale: LoyersScale, property: string): ExpressionSpecification {
+function fillExpression(
+  scale: LoyersScale,
+  property: string,
+  espace: "annonce" | "horsCharges",
+): ExpressionSpecification {
+  const bornes = espace === "annonce" ? scale.breaksAnnonce : scale.breaks;
   const step: unknown[] = ["step", ["get", property], scale.colors[0]];
-  scale.breaks.forEach((bound, i) => step.push(bound, scale.colors[i + 1]));
+  bornes.forEach((bound, i) => step.push(bound, scale.colors[i + 1]));
   return [
     "case",
     ["==", ["get", property], null],
@@ -174,7 +210,7 @@ export function installLoyersLayers(
       minzoom: LOYERS_MIN_ZOOM,
       layout: { visibility: "none" },
       paint: {
-        "fill-color": fillExpression(scale, "app"),
+        "fill-color": fillExpression(scale, "app", "annonce"),
         // Une estimation LOCALE est peinte franchement ; une valeur héritée
         // des communes voisines s'efface à moitié. La légende le dit.
         "fill-opacity": [
@@ -210,7 +246,7 @@ export function installLoyersLayers(
       minzoom: LOYERS_MIN_ZOOM,
       layout: { visibility: "none" },
       paint: {
-        "fill-color": fillExpression(scale, "m2"),
+        "fill-color": fillExpression(scale, "m2", "horsCharges"),
         "fill-opacity": 0.66,
       },
     } as never,
@@ -407,19 +443,31 @@ function observedHtml(p: Record<string, unknown>): string {
   `;
 }
 
-/** Le contenu HTML de la fiche d'une commune (carte des loyers). */
+/**
+ * Le contenu HTML de la fiche d'une commune (carte des loyers).
+ *
+ * LES CHIFFRES SONT CALIBRÉS, PAS BRUTS. La source publie des annonces
+ * charges comprises ; ce qu'un bailleur encaisse est le bail signé hors
+ * charges, environ 15 % plus bas (voir `src/lib/loyers/calibration.ts`). La
+ * fiche montre donc la valeur corrigée en tête et l'annonce en second : c'est
+ * l'ordre dans lequel la question se pose, et taire la source rendrait le
+ * chiffre invérifiable.
+ */
 function communeHtml(p: Record<string, unknown>, index: LoyersIndex): string {
   const lignes: string[] = [];
   if (typeof p.app === "number") {
+    const corrige = loyerHorsCharges(p.app);
     lignes.push(
-      `<p class="loyers-popup__value">${euro(p.app)} €/m² <span>appartement, charges comprises</span></p>` +
-        `<p class="loyers-popup__line">Fourchette ${euro(p.app_bas)} à ${euro(p.app_haut)} €/m², ` +
+      `<p class="loyers-popup__value">${euro(corrige)} €/m² <span>appartement, hors charges, estimé</span></p>` +
+        `<p class="loyers-popup__line">Annonce ${euro(p.app)} €/m² charges comprises, ` +
+        `fourchette ${euro(p.app_bas)} à ${euro(p.app_haut)} €/m², ` +
         `${escapeHtml(ECHELLE_LABEL[String(p.app_ech)] ?? "échelle inconnue")}</p>`,
     );
   }
   if (typeof p.mai === "number") {
     lignes.push(
-      `<p class="loyers-popup__line">Maison ${euro(p.mai)} €/m², ` +
+      `<p class="loyers-popup__line">Maison ${euro(loyerHorsCharges(p.mai))} €/m² hors charges ` +
+        `(annonce ${euro(p.mai)} €/m²), ` +
         `${escapeHtml(ECHELLE_LABEL[String(p.mai_ech)] ?? "échelle inconnue")}</p>`,
     );
   }
@@ -428,10 +476,10 @@ function communeHtml(p: Record<string, unknown>, index: LoyersIndex): string {
   }
   const obs = typeof p.app_obs === "number" && p.app_obs > 0 ? `${entier(p.app_obs)} annonces · ` : "";
   return `
-    <p class="loyers-popup__eyebrow">Loyers d'annonce · ${escapeHtml(index.annee)}</p>
+    <p class="loyers-popup__eyebrow">Loyers estimés · ${escapeHtml(index.annee)}</p>
     <p class="loyers-popup__title">${escapeHtml(p.nom)}</p>
     ${lignes.join("")}
-    <p class="loyers-popup__meta">${obs}bien type ${index.surfacesType.appartement} m² · ${escapeHtml(index.attribution)}</p>
+    <p class="loyers-popup__meta">${obs}bien type ${index.surfacesType.appartement} m² · ${escapeHtml(index.attribution)}, calé sur les observatoires locaux (${escapeHtml(CALIBRATION_LOYERS.generatedAt.slice(0, 4))})</p>
   `;
 }
 

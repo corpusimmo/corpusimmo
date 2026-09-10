@@ -1,0 +1,54 @@
+{
+  "generatedAt": "2026-09-10",
+  "objet": "Facteur qui ramène un loyer d'annonce charges comprises (carte des loyers) à un loyer de bail signé hors charges (observatoires locaux des loyers).",
+  "methode": "Rapport médian « zone d'observatoire / communes d'annonce qu'elle contient », en cinq tranches de niveau de loyer, interpolé linéairement entre les ancrages.",
+  "ancrages": [
+    {
+      "niveau": 10.45,
+      "facteur": 0.873,
+      "zones": 24
+    },
+    {
+      "niveau": 12.79,
+      "facteur": 0.845,
+      "zones": 24
+    },
+    {
+      "niveau": 14.54,
+      "facteur": 0.845,
+      "zones": 24
+    },
+    {
+      "niveau": 16.3,
+      "facteur": 0.831,
+      "zones": 24
+    },
+    {
+      "niveau": 22.18,
+      "facteur": 0.793,
+      "zones": 21
+    }
+  ],
+  "global": 0.841,
+  "dispersion": {
+    "q10": 0.754,
+    "q25": 0.799,
+    "q75": 0.881,
+    "q90": 0.937
+  },
+  "appariement": {
+    "zones": 117,
+    "communes": 2527
+  },
+  "controle": {
+    "agglomerations": 48,
+    "ecartMedian": 0.0329,
+    "ecartAbsMedian": 0.0565,
+    "source": "Résultats des observatoires locaux des loyers par agglomération (ANIL), ligne « ensemble »"
+  },
+  "precautions": [
+    "Le facteur est mesuré sur les agglomérations dotées d'un observatoire : l'appliquer ailleurs suppose que l'écart annonce/bail y est de même nature.",
+    "Il corrige un biais MOYEN, pas le cas particulier : la moitié des zones s'écarte du facteur de plus de cinq points.",
+    "Il ne transforme pas une estimation de voisinage en observation locale : une commune en échelle « maille » reste une commune sans annonce relevée."
+  ]
+}

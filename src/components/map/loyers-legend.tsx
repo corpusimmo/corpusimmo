@@ -2,12 +2,14 @@
 
 import { cn } from "@/lib/utils/cn";
 
+import { CALIBRATION_LOYERS } from "@/lib/loyers/calibration";
+
 import type { LoyersIndex, LoyersObservesIndex, LoyersScale } from "./loyers";
 
 /**
  * La légende du calque des loyers.
  *
- * Elle doit dire trois choses que la couleur seule ne dit pas :
+ * Elle doit dire quatre choses que la couleur seule ne dit pas :
  *
  *   · DEUX SOURCES, pas une. L'aplat plein est un loyer de bail signé, hors
  *     charges, relevé par un observatoire local. L'aplat clair est un loyer
@@ -40,7 +42,9 @@ export function LoyersLegend({
         className,
       )}
     >
-      <p className="text-[11px] font-medium text-ink">Loyer au m², par mois</p>
+      <p className="text-[11px] font-medium text-ink">
+        Loyer au m², par mois, hors charges
+      </p>
       <ul className="mt-1.5 flex flex-col gap-1">
         {scale.colors.map((color, i) => (
           <li key={color} className="flex items-center gap-2 text-[11px] text-ink-muted tnum">
@@ -75,9 +79,12 @@ export function LoyersLegend({
           />
           <span>
             <strong className="font-medium text-ink-muted">Aplat clair :</strong> loyers
-            d’annonce par commune, charges comprises, appartement type{" "}
-            {index.surfacesType.appartement} m² ({index.annee}). Demi-teinte : estimé sur les
-            communes voisines, faute d’annonces locales.
+            d’annonce par commune, appartement type {index.surfacesType.appartement} m² (
+            {index.annee}), <strong className="font-medium text-ink-muted">ramenés hors
+            charges</strong> par le facteur mesuré sur les zones d’observatoire
+            ({CALIBRATION_LOYERS.appariement.zones} zones,{" "}
+            {Math.round((1 - CALIBRATION_LOYERS.global) * 100)} % d’écart médian). Demi-teinte :
+            estimé sur les communes voisines, faute d’annonces locales.
           </span>
         </li>
       </ul>

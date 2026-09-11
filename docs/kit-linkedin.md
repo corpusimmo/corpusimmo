@@ -10,8 +10,21 @@ Les visuels se **régénèrent** :
 node scripts/kit-linkedin.mjs
 ```
 
-Ils sortent dans `public/brand/linkedin/`. Palette, logotype et fontes sont
-ceux du site : quand la charte bouge, on relance, et rien ne dérive.
+Ils sortent dans `public/brand/linkedin/`. Palette, signe et fontes sont ceux
+du site : quand la charte bouge, on relance, et rien ne dérive.
+
+**Le signe est le fichier du site**, `public/marque-violet.webp`, converti une
+fois en PNG dans `scripts/assets/corpusimmo-mark.png` parce que le moteur
+d'image ne lit pas le WebP. Une première version le redessinait en SVG, et les
+deux tracés ont divergé : la bannière montrait une marque que personne ne
+retrouvait en arrivant sur le site.
+
+**La bannière de Mathieu porte les deux marques.** CorpusImmo est ce qu'il
+construit, Scalenvia est le studio qui le construit : un profil qui tait l'un
+des deux ment par omission sur ce qu'il fait de ses journées. Le signe du
+studio (`scripts/assets/scalenvia-mark.png`, repris du dépôt Scalenvia) vient
+en second, sans pastille et en plus petit — c'est une signature, pas un second
+titre. La bannière de Gaël, elle, est entièrement CorpusImmo.
 
 ---
 
@@ -20,6 +33,7 @@ ceux du site : quand la charte bouge, on relance, et rien ne dérive.
 | Fichier | Format | Où il va |
 | --- | --- | --- |
 | `banniere-corpusimmo.png` | 1584 × 396 | Bannière de la page entreprise |
+| `logo-page-entreprise.png` | 400 × 400 | Logo de la page entreprise |
 | `banniere-mathieu.png` | 1584 × 396 | Bannière du profil de Mathieu |
 | `banniere-gael.png` | 1584 × 396 | Bannière du profil de Gaël |
 | `selection-estimer.png` | 1200 × 627 | Section « Sélection », lien vers l'estimateur |

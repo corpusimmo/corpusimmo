@@ -148,41 +148,29 @@ function fonts(): Fonte[] {
 /* --------------------------------------------------------------- le logotype */
 
 /**
- * La géométrie EXACTE du logotype, reprise de
- * `src/components/layout/brand-mark.tsx` : la page, le coin corné, le toit avec
- * ses murs, et la ligne de signature en bronze.
+ * LE SIGNE DE LA MARQUE, LE VRAI, ET PLUS UN TRACÉ DE SUBSTITUTION.
  *
- * Elle est recopiée ici parce que Satori ne sait pas rendre un composant React
- * de l'application dans une image : il lui faut du SVG autonome. Les deux
- * fichiers doivent donc bouger ensemble, et c'est le seul point de duplication
- * de la marque.
- */
-const PAGE =
-  "M7.5 3h11L26 10.5v16.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 6 27.5v-23A1.5 1.5 0 0 1 7.5 3z";
-const ROOF = "M11 18.5 16 13.5l5 5";
-const WALLS = "M12.6 18.5v4M19.4 18.5v4";
-const SIGNATURE = "M10.5 25h11";
-
-function dataUri(svg: string): string {
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
-/**
- * Le logotype en RÉSERVE : le tirage au trait, celui du pied de page.
+ * Cette image a longtemps redessiné un logotype en SVG — une page, un toit,
+ * une ligne de signature — parce que Satori ne sait pas rendre un composant
+ * React de l'application. Le site, lui, sert un fichier. Les deux ont
+ * divergé : la vignette de partage montrait une marque que le visiteur ne
+ * retrouvait nulle part en arrivant.
  *
- * Sur une photographie voilée de bleu nuit, la page pleine en bleu nuit
- * disparaîtrait purement et simplement. Le trait la rend, le violet ne bouge pas.
- * Le coin corné saute : à cette épaisseur de trait il encombre la forme.
+ * On embarque donc le MÊME signe que l'en-tête, converti une fois en PNG
+ * parce que Satori ne lit pas le WebP, et lu sur le disque comme la
+ * photographie de fond. Il n'y a plus de géométrie dupliquée à tenir à jour.
+ *
+ * IL EST POSÉ SUR UNE PLAQUE CLAIRE, comme dans le pied de page du site. Le
+ * signe a deux faces sombres : sur une photographie voilée de bleu nuit,
+ * elles disparaissent et il ne reste qu'un éclat violet flottant.
  */
-function brandMark(size: number): string {
-  return dataUri(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${size}" height="${size}">` +
-      `<path d="${PAGE}" fill="none" stroke="${RESERVE}" stroke-width="1.6" stroke-linejoin="round"/>` +
-      `<g fill="none" stroke="${RESERVE}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
-      `<path d="${ROOF}"/><path d="${WALLS}"/></g>` +
-      `<path d="${SIGNATURE}" stroke="${BRAND_RULE}" stroke-width="2" stroke-linecap="round"/>` +
-      `</svg>`,
-  );
+let marque: string | undefined;
+
+function signeMarque(): string {
+  marque ??= `data:image/png;base64,${readFileSync(
+    join(process.cwd(), "src/lib/seo/marque-violet.png"),
+  ).toString("base64")}`;
+  return marque;
 }
 
 /* ------------------------------------------------------------------ l'entrée */
@@ -305,8 +293,20 @@ export function renderOgImage({
       >
         <div style={{ display: "flex", flexDirection: "column" }}>
           <div style={{ display: "flex", alignItems: "center" }}>
-            {/* eslint-disable-next-line @next/next/no-img-element -- idem. */}
-            <img src={brandMark(76)} width={76} height={76} alt="" />
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: 76,
+                height: 76,
+                borderRadius: 16,
+                backgroundColor: RESERVE,
+              }}
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element -- idem. */}
+              <img src={signeMarque()} width={40} height={60} alt="" />
+            </div>
             <div
               style={{
                 display: "flex",

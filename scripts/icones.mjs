@@ -7,8 +7,12 @@
  *
  * LE FOND EST PLEIN, ET C'EST LA RÈGLE. Une icône d'onglet est posée sur un
  * fond que nous ne choisissons pas, clair chez les uns et sombre chez les
- * autres. Le carré marine lui donne le sien, et le signe, dont les liserés
- * sont blancs, s'y détache dans les deux cas.
+ * autres. Le carré lui donne le sien.
+ *
+ * IL EST CLAIR, ET CE N'EST PAS UN GOÛT. Le signe a deux faces sombres et une
+ * face violette : posé sur le marine d'avant, il y disparaissait aux deux
+ * tiers, et l'icône n'était plus qu'un rectangle bleuté. Le fond reprend donc
+ * la plaque claire sur laquelle l'en-tête pose déjà la marque.
  *
  * DEUX MARGES, PAS UNE. Les icônes ordinaires laissent une marge courte, pour
  * que le signe reste grand à seize pixels. Les icônes « maskable » en laissent
@@ -29,10 +33,18 @@ import { join } from "node:path";
 const { chromium } = await import(process.env.PLAYWRIGHT_CORE ?? "playwright-core");
 
 const RACINE = process.cwd();
-const MARINE = "#0c1b2e";
-/* Le signe en bleu et argent : c'est celui qui tient sur le marine sans
-   dépendre du thème choisi par le visiteur, puisqu'une icône ne change pas. */
-const SIGNE = join(RACINE, "public/marque-stack-argent.webp");
+/** `--surface` : la plaque claire de l'en-tête, et non le fond de page. */
+const FOND = "#ffffff";
+/**
+ * LE SIGNE DE LA MARQUE, celui de l'en-tête et d'aucun autre.
+ *
+ * Les icônes ont longtemps été tirées d'un signe « en pile » bleu et argent,
+ * du temps où le site proposait deux thèmes métalliques et où une icône, qui
+ * ne peut pas suivre un thème, devait trancher. Ce signe n'existe plus nulle
+ * part ailleurs : l'onglet montrait donc une marque que la page ne montrait
+ * pas. Une icône n'a qu'un travail, se faire reconnaître.
+ */
+const SIGNE = join(RACINE, "public/marque-violet.webp");
 
 const FORMATS = [
   { fichier: "icone-32.png", taille: 32, part: 0.9, rond: 0.18 },
@@ -50,7 +62,7 @@ const page = await navigateur.newPage();
 
 for (const format of FORMATS) {
   const donnees = await page.evaluate(
-    async ({ source, taille, part, rond, marine }) => {
+    async ({ source, taille, part, rond, fond }) => {
       const image = new Image();
       image.src = "data:image/webp;base64," + source;
       await image.decode();
@@ -66,7 +78,7 @@ for (const format of FORMATS) {
         c.roundRect(0, 0, taille, taille, r);
         c.clip();
       }
-      c.fillStyle = marine;
+      c.fillStyle = fond;
       c.fillRect(0, 0, taille, taille);
 
       const large = taille * part;
@@ -76,7 +88,7 @@ for (const format of FORMATS) {
       c.drawImage(image, (taille - l) / 2, (taille - h) / 2, l, h);
       return toile.toDataURL("image/png");
     },
-    { source, taille: format.taille, part: format.part, rond: format.rond, marine: MARINE },
+    { source, taille: format.taille, part: format.part, rond: format.rond, fond: FOND },
   );
   writeFileSync(
     join(RACINE, "public/icons", format.fichier),

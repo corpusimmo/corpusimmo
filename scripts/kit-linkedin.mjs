@@ -43,31 +43,63 @@ const RESERVE = "#ffffff";
 const DISPLAY = "Manrope";
 const BODY = "Inter";
 
-/* ── Le logotype, repris de `src/lib/seo/og-image.tsx` ───────────────────── */
-
-const PAGE =
-  "M7.5 3h11L26 10.5v16.5a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 6 27.5v-23A1.5 1.5 0 0 1 7.5 3z";
-const TOIT = "M11 18.5 16 13.5l5 5";
-const MURS = "M12.6 18.5v4M19.4 18.5v4";
-const SIGNATURE = "M10.5 25h11";
-
-function marque(taille) {
-  const svg =
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="${taille}" height="${taille}">` +
-    `<path d="${PAGE}" fill="none" stroke="${RESERVE}" stroke-width="1.6" stroke-linejoin="round"/>` +
-    `<g fill="none" stroke="${RESERVE}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">` +
-    `<path d="${TOIT}"/><path d="${MURS}"/></g>` +
-    `<path d="${SIGNATURE}" stroke="${VIOLET}" stroke-width="2" stroke-linecap="round"/>` +
-    `</svg>`;
-  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
-}
-
-/* ── Gabarits ────────────────────────────────────────────────────────────── */
-
+/** Un nœud Satori, écrit à la main : ce script n'embarque pas de JSX. */
 const el = (type, props, ...children) => ({
   type,
   props: { ...props, children: children.length <= 1 ? children[0] : children },
 });
+
+/* ── Les deux signes, lus sur le disque ──────────────────────────────────── */
+
+/**
+ * LE SIGNE DE CORPUSIMMO EST CELUI DU SITE, pas un tracé de substitution.
+ *
+ * Une première version redessinait un logotype en SVG, faute de pouvoir
+ * rendre le composant React dans une image. Le résultat divergeait du signe
+ * servi par le site : la bannière montrait une marque que personne ne
+ * retrouvait en arrivant. Le fichier est donc embarqué, converti en PNG
+ * parce que Satori ne lit pas le WebP.
+ *
+ * LE SIGNE DE SCALENVIA voyage à côté. Il n'appartient pas à ce produit, mais
+ * la bannière de Mathieu doit porter les deux : CorpusImmo est ce qu'il
+ * construit, Scalenvia est le studio qui le construit, et un profil qui tait
+ * l'un des deux ment par omission sur ce qu'il fait de ses journées.
+ */
+async function dataPng(nom) {
+  const octets = await readFile(path.join(RACINE, "scripts/assets", nom));
+  return `data:image/png;base64,${octets.toString("base64")}`;
+}
+
+let SIGNE_CORPUSIMMO = "";
+let SIGNE_SCALENVIA = "";
+
+/**
+ * Le signe sur sa plaque claire, comme le pied de page du site.
+ *
+ * Les deux signes ont des faces sombres : posés à même le fond nuit, ils s'y
+ * enfoncent et il ne reste qu'un éclat. La plaque leur rend le fond pour
+ * lequel ils ont été dessinés.
+ */
+function plaque(source, cote, largeur, hauteur, rayon) {
+  return el(
+    "div",
+    {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: cote,
+        height: cote,
+        borderRadius: rayon,
+        backgroundColor: RESERVE,
+      },
+    },
+    el("img", { src: source, width: largeur, height: hauteur }),
+  );
+}
+
+/* ── Gabarits ────────────────────────────────────────────────────────────── */
+
 
 /**
  * LE FOND : nuit, une nappe violette en haut à droite, une trame de filets.
@@ -95,7 +127,13 @@ function logotype(taille, corps) {
   return el(
     "div",
     { style: { display: "flex", alignItems: "center", gap: taille * 0.3 } },
-    el("img", { src: marque(taille), width: taille, height: taille }),
+    plaque(
+      SIGNE_CORPUSIMMO,
+      taille,
+      Math.round(taille * 0.44),
+      Math.round(taille * 0.66),
+      Math.round(taille * 0.22),
+    ),
     el(
       "div",
       {
@@ -120,7 +158,7 @@ function logotype(taille, corps) {
  * `qui` est la ligne personnelle — le rôle de la personne — et reste
  * facultative : la marque seule sert à la page entreprise.
  */
-function banniere({ titre, sous, qui }) {
+function banniere({ titre, sous, qui, studio }) {
   return el(
     "div",
     { style: fond(1584, 396) },
@@ -140,23 +178,27 @@ function banniere({ titre, sous, qui }) {
         },
       },
       logotype(56, 46),
+      /* UNE LIGNE PAR LIGNE, et non un « \n » dans une chaîne.
+         Satori shape le texte avant de le couper : sur un saut de ligne, il
+         laissait une double espace au raccord. Deux blocs empilés n'ont pas
+         ce problème et donnent en prime l'interligne exact. */
       el(
         "div",
         {
           style: {
             display: "flex",
+            flexDirection: "column",
             fontFamily: DISPLAY,
             fontWeight: 800,
             fontSize: 40,
             color: RESERVE,
-            letterSpacing: -1,
+            /* SANS CRÉNAGE NÉGATIF. Satori l'applique après chaque glyphe
+               sauf l'espace, qui paraissait alors deux fois trop large — on
+               lisait « L'estimation  sur » comme une double frappe. */
             lineHeight: 1.15,
-            /* Satori ne coupe pas sur un « \n » sans cela : la ligne se
-               recollait avec une double espace au milieu. */
-            whiteSpace: "pre-line",
           },
         },
-        titre,
+        ...titre.split("\n").map((ligne) => el("div", { style: { display: "flex" } }, ligne)),
       ),
       el(
         "div",
@@ -171,24 +213,48 @@ function banniere({ titre, sous, qui }) {
         },
         sous,
       ),
-      qui
-        ? el(
-            "div",
-            {
-              style: {
-                display: "flex",
-                alignSelf: "flex-start",
-                fontFamily: BODY,
-                fontSize: 19,
-                color: "rgba(255,255,255,0.72)",
-                border: "1px solid rgba(255,255,255,0.22)",
-                borderRadius: 999,
-                padding: "8px 18px",
+      el(
+        "div",
+        { style: { display: "flex", alignItems: "center", gap: 14 } },
+        qui
+          ? el(
+              "div",
+              {
+                style: {
+                  display: "flex",
+                  fontFamily: BODY,
+                  fontSize: 19,
+                  color: "rgba(255,255,255,0.72)",
+                  border: "1px solid rgba(255,255,255,0.22)",
+                  borderRadius: 999,
+                  padding: "8px 18px",
+                },
               },
-            },
-            qui,
-          )
-        : el("div", { style: { display: "flex" } }),
+              qui,
+            )
+          : el("div", { style: { display: "flex" } }),
+        /* LE STUDIO, EN SECOND ET SANS PASTILLE. Il ne dispute pas la vedette
+           au produit : c'est une signature, pas un second titre. */
+        studio
+          ? el(
+              "div",
+              { style: { display: "flex", alignItems: "center", gap: 10 } },
+              plaque(SIGNE_SCALENVIA, 44, 36, 36, 12),
+              el(
+                "div",
+                {
+                  style: {
+                    display: "flex",
+                    fontFamily: BODY,
+                    fontSize: 18,
+                    color: "rgba(255,255,255,0.68)",
+                  },
+                },
+                studio,
+              ),
+            )
+          : el("div", { style: { display: "flex" } }),
+      ),
     ),
   );
 }
@@ -277,6 +343,30 @@ function vignette({ surtitre, titre, sous, url }) {
   );
 }
 
+/**
+ * LE LOGO CARRÉ DE LA PAGE ENTREPRISE, 400 × 400.
+ *
+ * LinkedIn le recadre en cercle à l'affichage : le signe tient donc dans le
+ * cercle inscrit, et le fond va jusqu'aux bords. Un logo dessiné jusqu'aux
+ * coins perdrait ses angles sans prévenir.
+ */
+function logoCarre() {
+  return el(
+    "div",
+    {
+      style: {
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: 400,
+        height: 400,
+        backgroundColor: RESERVE,
+      },
+    },
+    el("img", { src: SIGNE_CORPUSIMMO, width: 148, height: 220 }),
+  );
+}
+
 /* ── Programme ───────────────────────────────────────────────────────────── */
 
 const IMAGES = [
@@ -295,17 +385,35 @@ const IMAGES = [
     taille: [1584, 396],
     arbre: () =>
       banniere({
-        titre: "L'estimation, sur des actes.\nPas sur des annonces.",
+        /* Sans virgule : Manrope 800 avec un crénage négatif ouvre une
+           espace large après elle, qui se lit comme une double frappe. */
+        /* Apostrophe TYPOGRAPHIQUE, et pas seulement par correction : Satori
+           segmente le texte sur l'apostrophe droite et recolle les morceaux
+           avec une espace en trop, d'où « L'estimation  sur » sur la
+           bannière. La courbe est de toute façon la bonne en français. */
+        titre: "L\u2019estimation sur des actes.\nPas sur des annonces.",
         sous: "Estimateur, carte des ventes, observatoire et outils de calcul.",
         qui: "Mathieu Guicheteau · cofondateur, produit et données",
+        studio: "Studio Scalenvia",
       }),
+  },
+  {
+    fichier: "logo-page-entreprise.png",
+    taille: [400, 400],
+    arbre: () => logoCarre(),
   },
   {
     fichier: "banniere-gael.png",
     taille: [1584, 396],
     arbre: () =>
       banniere({
-        titre: "L'estimation, sur des actes.\nPas sur des annonces.",
+        /* Sans virgule : Manrope 800 avec un crénage négatif ouvre une
+           espace large après elle, qui se lit comme une double frappe. */
+        /* Apostrophe TYPOGRAPHIQUE, et pas seulement par correction : Satori
+           segmente le texte sur l'apostrophe droite et recolle les morceaux
+           avec une espace en trop, d'où « L'estimation  sur » sur la
+           bannière. La courbe est de toute façon la bonne en français. */
+        titre: "L\u2019estimation sur des actes.\nPas sur des annonces.",
         sous: "Estimateur, carte des ventes, observatoire et outils de calcul.",
         qui: "Gaël Colin · associé",
       }),
@@ -377,6 +485,9 @@ async function main() {
       style: "normal",
     },
   ];
+
+  SIGNE_CORPUSIMMO = await dataPng("corpusimmo-mark.png");
+  SIGNE_SCALENVIA = await dataPng("scalenvia-mark.png");
 
   await mkdir(SORTIE, { recursive: true });
 

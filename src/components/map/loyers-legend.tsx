@@ -107,6 +107,16 @@ export function LoyersLegend({
           </span>
         </li>
       </ul>
+      {/* LE CHEMIN DE RETOUR VERS LE CHIFFRE PUBLIÉ.
+          Quelqu'un qui a lu « 17,2 €/m² » sur la carte des loyers de l'ANIL
+          ne retrouve pas ce nombre ici, et sans cette ligne il conclut à une
+          erreur plutôt qu'à une correction. Le facteur est écrit, pas
+          seulement son principe. */}
+      <p className="mt-2 text-[10px] leading-snug text-ink-subtle">
+        Le chiffre publié par l’ANIL est charges comprises : ajouter environ{" "}
+        {Math.round((1 / CALIBRATION_LOYERS.global - 1) * 100)} % à la valeur
+        affichée pour le retrouver.
+      </p>
       <p className="mt-1.5 text-[10px] leading-snug text-ink-subtle">{index.attribution}.</p>
     </div>
   );

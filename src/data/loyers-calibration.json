@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-10",
+  "generatedAt": "2026-09-11",
   "objet": "Facteur qui ramène un loyer d'annonce charges comprises (carte des loyers) à un loyer de bail signé hors charges (observatoires locaux des loyers).",
   "methode": "Rapport médian « zone d'observatoire / communes d'annonce qu'elle contient », en cinq tranches de niveau de loyer, interpolé linéairement entre les ancrages.",
   "ancrages": [
@@ -41,9 +41,13 @@
     "communes": 2527
   },
   "controle": {
-    "agglomerations": 48,
-    "ecartMedian": 0.0329,
-    "ecartAbsMedian": 0.0565,
+    "agglomerations": 49,
+    "ecartMedian": 0.0228,
+    "ecartAbsMedian": 0.0519,
+    "millesimes": [
+      "2024",
+      "2025"
+    ],
     "source": "Résultats des observatoires locaux des loyers par agglomération (ANIL), ligne « ensemble »"
   },
   "precautions": [

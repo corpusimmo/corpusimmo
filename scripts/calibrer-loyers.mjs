@@ -39,12 +39,16 @@
  * retirer. Elle vit dans un fichier séparé, avec ses diagnostics.
  *
  * ── LE CONTRÔLE, PAR UNE TROISIÈME SOURCE ──────────────────────────────────
- * `data/loyers-oll-agglomerations.csv` est l'export agglomération par
- * agglomération du même réseau d'observatoires : une ligne « ensemble » par
- * périmètre, indépendante du découpage en zones utilisé pour le calage. Le
- * script compare la médiane calibrée à cette ligne et écrit l'écart obtenu.
- * Un calage qui ne se vérifie pas sur une source qu'il n'a pas servi à
- * construire ne vaut rien.
+ * `data/loyers-oll/*.csv` sont les exports agglomération par agglomération du
+ * même réseau d'observatoires : une ligne « ensemble » par périmètre,
+ * indépendante du découpage en zones utilisé pour le calage. Le script compare
+ * la médiane calibrée à cette ligne et écrit l'écart obtenu. Un calage qui ne
+ * se vérifie pas sur une source qu'il n'a pas servi à construire ne vaut rien.
+ *
+ * UN FICHIER PAR MILLÉSIME, ET LE PLUS RÉCENT GAGNE. Les observatoires ne
+ * publient pas tous la même année : le dossier les empile, et un périmètre
+ * présent en 2024 et en 2025 est contrôlé sur 2025. Ajouter un millésime se
+ * fait en déposant un CSV, sans toucher au code.
  *
  *   node scripts/calibrer-loyers.mjs
  */
@@ -54,7 +58,7 @@ import path from "node:path";
 
 const RACINE = process.cwd();
 const GEO = path.join(RACINE, "public/geo");
-const CSV_CONTROLE = path.join(RACINE, "data/loyers-oll-agglomerations.csv");
+const DOSSIER_CONTROLE = path.join(RACINE, "data/loyers-oll");
 const SORTIE = path.join(RACINE, "src/data/loyers-calibration.json");
 
 /** Cinq tranches : assez pour voir la pente, assez peu pour que chacune tienne. */
@@ -259,9 +263,32 @@ function normaliser(nom) {
 }
 
 async function lireControle() {
+  let fichiers;
+  try {
+    fichiers = (await readdir(DOSSIER_CONTROLE))
+      .filter((n) => n.endsWith(".csv"))
+      .sort();
+  } catch {
+    return null;
+  }
+  if (fichiers.length === 0) return null;
+
+  const par = new Map();
+  let millesimes = [];
+  // Ordre croissant : le millésime le plus récent écrase le précédent.
+  for (const nom of fichiers) {
+    const lu = await lireControleFichier(path.join(DOSSIER_CONTROLE, nom));
+    if (!lu) continue;
+    millesimes.push(nom.replace(/\.csv$/, ""));
+    for (const [clef, valeur] of lu) par.set(clef, valeur);
+  }
+  return par.size === 0 ? null : { par, millesimes };
+}
+
+async function lireControleFichier(chemin) {
   let texte;
   try {
-    texte = await readFile(CSV_CONTROLE, "utf8");
+    texte = await readFile(chemin, "utf8");
   } catch {
     return null;
   }
@@ -328,7 +355,7 @@ async function main() {
     }
     const ecarts = [];
     for (const [clef, calibres] of parAgglo) {
-      const attendu = controleSource.get(clef);
+      const attendu = controleSource.par.get(clef);
       if (!attendu) continue;
       const obtenu = mediane(calibres);
       ecarts.push((obtenu - attendu) / attendu);
@@ -338,6 +365,7 @@ async function main() {
         agglomerations: ecarts.length,
         ecartMedian: arrondi(mediane(ecarts), 4),
         ecartAbsMedian: arrondi(mediane(ecarts.map(Math.abs)), 4),
+        millesimes: controleSource.millesimes,
         source:
           "Résultats des observatoires locaux des loyers par agglomération (ANIL), ligne « ensemble »",
       };

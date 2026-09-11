@@ -1804,7 +1804,7 @@ export function DvfMap({
             {/* ── LES CALQUES, EN UN SEUL GROUPE ────────────────────────── */}
             <div
               role="group"
-              aria-label="Calques de la carte"
+              aria-label="Calques chiffrés"
               className="pointer-events-auto flex shrink-0 items-stretch overflow-hidden rounded-lg border border-border bg-surface shadow-xs"
             >
               {/* PRIX — une seule commande, jamais deux.
@@ -1864,40 +1864,6 @@ export function DvfMap({
                 ))}
               </div>
 
-              {/* AFFECTATION DU SOL. Un interrupteur, pas un sélecteur : une
-                  seule source aujourd'hui. Le jour où la BDNB et le PLU
-                  arrivent, ce bouton devient une liste — et jamais des cases à
-                  cocher, car deux affectations peintes ensemble ne répondent
-                  pas à la même question et se recouvriraient sans que rien ne
-                  le dise. */}
-              {zoningAvailable ? (
-                <>
-                  <Separateur />
-                  <Calque
-                    actif={zoning}
-                    onClick={() => setZoning((on) => !on)}
-                    icone={<Layers aria-hidden="true" className="size-3.5" />}
-                  >
-                    Zonage
-                  </Calque>
-                </>
-              ) : null}
-
-              {transportsAvailable ? (
-                <>
-                  <Separateur />
-                  <Calque
-                    actif={transports}
-                    onClick={() => setTransports((on) => !on)}
-                    icone={
-                      <TrainFront aria-hidden="true" className="size-3.5" />
-                    }
-                  >
-                    Transports
-                  </Calque>
-                </>
-              ) : null}
-
               {/* LOYERS. Deux sources publiques sous un seul interrupteur : les
                   baux observés là où un observatoire existe, les loyers
                   d'annonce partout ailleurs. L'utilisateur demande « les
@@ -1934,6 +1900,56 @@ export function DvfMap({
                 </>
               )}
             </div>
+
+            {/* ── LES REPÈRES, DANS LEUR PROPRE PASTILLE ─────────────────
+                Cinq calques dans un seul groupe mettaient sur le même plan
+                deux choses qui ne se décident pas ensemble : les trois
+                premiers portent un CHIFFRE et se lisent l'un contre l'autre
+                — un prix, un loyer, un taux, tous les trois sur la même
+                commune — tandis que le zonage et les transports ne mesurent
+                rien et servent à comprendre ce qu'on vient de lire.
+
+                Le groupe est donc séparé, et sa pastille plus discrète :
+                fond gris plutôt que blanc, pas d'ombre. La hiérarchie visuelle
+                dit ce que le libellé ne dit pas, à savoir lequel des deux
+                groupes répond à la question qu'on est venu poser. */}
+            {zoningAvailable || transportsAvailable ? (
+              <div
+                role="group"
+                aria-label="Repères de contexte"
+                className="pointer-events-auto flex shrink-0 items-stretch overflow-hidden rounded-lg border border-border bg-surface-2"
+              >
+                {/* AFFECTATION DU SOL. Un interrupteur, pas un sélecteur : une
+                    seule source aujourd'hui. Le jour où la BDNB et le PLU
+                    arrivent, ce bouton devient une liste — et jamais des cases
+                    à cocher, car deux affectations peintes ensemble ne
+                    répondent pas à la même question et se recouvriraient sans
+                    que rien ne le dise. */}
+                {zoningAvailable ? (
+                  <Calque
+                    actif={zoning}
+                    onClick={() => setZoning((on) => !on)}
+                    icone={<Layers aria-hidden="true" className="size-3.5" />}
+                  >
+                    Zonage
+                  </Calque>
+                ) : null}
+
+                {zoningAvailable && transportsAvailable ? <Separateur /> : null}
+
+                {transportsAvailable ? (
+                  <Calque
+                    actif={transports}
+                    onClick={() => setTransports((on) => !on)}
+                    icone={
+                      <TrainFront aria-hidden="true" className="size-3.5" />
+                    }
+                  >
+                    Transports
+                  </Calque>
+                ) : null}
+              </div>
+            ) : null}
 
             {/* LA TYPOLOGIE D'APPARTEMENT, ET RIEN QUE CE QUE LES FILTRES NE
                 SAVENT PAS DIRE.

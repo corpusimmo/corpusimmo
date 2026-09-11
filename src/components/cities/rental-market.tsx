@@ -1,8 +1,7 @@
 import { CALIBRATION_LOYERS, loyerHorsCharges } from "@/lib/loyers/calibration";
-import { lireRendement } from "@/lib/loyers/rendement";
 import type { IndicateurLoyer, LoyersCommune } from "@/lib/loyers/types";
 import type { CityAggregate } from "@/lib/cities";
-import { formatNumber, formatPercent, formatPrice } from "@/lib/utils/format";
+import { formatNumber, formatPrice } from "@/lib/utils/format";
 
 /**
  * LE MARCHÉ LOCATIF, À CÔTÉ DU MARCHÉ À LA VENTE.
@@ -18,11 +17,10 @@ import { formatNumber, formatPercent, formatPrice } from "@/lib/utils/format";
  * trois euros du mètre de plus qu'un quatre-pièces et qu'un loyer unique par
  * commune ment à qui cherche le sien.
  *
- * Les rendements, eux, ne sont calculés QUE sur « tous appartements » et
- * « maisons ». DVF ne ventile pas ses prix par nombre de pièces : croiser un
- * T2 loué avec un prix au m² tous appartements confondus donnerait un taux
- * qui a l'air d'un rendement de T2 sans en être un. La ligne reste, sans son
- * taux, plutôt que de porter un chiffre faux.
+ * LE RENDEMENT VIT AILLEURS, dans `investment-market.tsx`. Cette section
+ * répond à « combien ça se loue », pas à « combien ça rapporte » : mêler les
+ * deux obligeait à laisser deux cases vides sur quatre, puisque DVF ne
+ * ventile pas ses prix par nombre de pièces.
  *
  * ── LES LOYERS SONT CALIBRÉS ───────────────────────────────────────────────
  * La source donne des loyers d'ANNONCE, charges comprises. Ce qui s'encaisse
@@ -33,23 +31,10 @@ import { formatNumber, formatPercent, formatPrice } from "@/lib/utils/format";
  */
 
 const LIGNES = [
-  {
-    clef: "appartement",
-    nom: "Appartements",
-    /** Le prix au m² auquel comparer, ou `null` quand la comparaison ment. */
-    prix: "apartment",
-  },
-  {
-    clef: "appartementT12",
-    nom: "Appartements T1-T2",
-    prix: null,
-  },
-  {
-    clef: "appartementT3",
-    nom: "Appartements T3 et plus",
-    prix: null,
-  },
-  { clef: "maison", nom: "Maisons", prix: "house" },
+  { clef: "appartement", nom: "Appartements" },
+  { clef: "appartementT12", nom: "Appartements T1-T2" },
+  { clef: "appartementT3", nom: "Appartements T3 et plus" },
+  { clef: "maison", nom: "Maisons" },
 ] as const;
 
 function loyerMensuel(
@@ -78,50 +63,42 @@ export function RentalMarket({
     const corrige = loyerHorsCharges(indicateur.m2);
     if (corrige === null) return null;
 
-    const prixM2 = ligne.prix ? city.byType[ligne.prix]?.median : undefined;
-    /* Le rendement se calcule sur le loyer CORRIGÉ : le calculer sur
-       l'annonce reviendrait à publier un plafond en l'appelant un
-       rendement. */
-    const lecture = ligne.prix
-      ? lireRendement({ ...indicateur, m2: corrige }, prixM2)
-      : null;
-
     return {
       ...ligne,
       indicateur,
       corrige,
       mensuel: loyerMensuel(indicateur, surfaces[ligne.clef]),
       surface: surfaces[ligne.clef],
-      lecture,
     };
   }).filter((ligne): ligne is NonNullable<typeof ligne> => ligne !== null);
 
   if (lignes.length === 0) return null;
 
-  const fragile = lignes.some((ligne) => ligne.lecture?.fragile);
-
   return (
-    <section aria-labelledby="location" className="flex flex-col gap-4">
+    <section
+      aria-labelledby="location"
+      className="flex scroll-mt-32 flex-col gap-4"
+      id="location"
+    >
       <div className="max-w-3xl">
         <h2 id="location" className="font-display text-2xl text-ink">
           Le marché locatif
         </h2>
         <p className="mt-1.5 text-sm leading-relaxed text-ink-muted">
-          Les ventes disent ce qu&apos;un logement coûte, pas ce qu&apos;il
-          rapporte. Ces loyers viennent des annonces relevées à {city.name},
-          ramenés hors charges par l&apos;écart mesuré avec les baux réellement
-          signés des observatoires locaux. Le rendement croise ce loyer avec le
-          prix médian de la même page&nbsp;: il est BRUT, et il n&apos;est
-          calculé que là où les deux chiffres portent sur le même bien.
+          Ce qu&apos;un logement se loue à {city.name}, par type de bien. Ces
+          loyers viennent des annonces relevées sur la commune, ramenés hors
+          charges par l&apos;écart mesuré avec les baux réellement signés des
+          observatoires locaux. Un studio se loue plus cher au mètre
+          qu&apos;un quatre-pièces&nbsp;: les typologies sont donc séparées
+          plutôt que moyennées.
         </p>
       </div>
 
       <div className="overflow-x-auto rounded-lg border border-border bg-surface">
         <table className="w-full min-w-[36rem] border-collapse text-sm">
           <caption className="sr-only">
-            Loyers médians hors charges et rendement locatif brut à{" "}
-            {city.name}, par type de bien, avec le nombre d&apos;annonces
-            relevées
+            Loyers médians hors charges à {city.name}, par type de bien, avec
+            le nombre d&apos;annonces relevées
           </caption>
           <thead>
             <tr className="border-b border-border text-left text-xs text-ink-subtle">
@@ -134,9 +111,7 @@ export function RentalMarket({
               <th scope="col" className="px-4 py-3 text-right font-medium">
                 Loyer du bien type
               </th>
-              <th scope="col" className="px-4 py-3 text-right font-medium">
-                Rendement brut
-              </th>
+
             </tr>
           </thead>
           <tbody>
@@ -174,27 +149,7 @@ export function RentalMarket({
                     </>
                   )}
                 </td>
-                <td className="px-4 py-3 text-right tnum">
-                  {ligne.lecture?.taux === null || ligne.lecture === null ? (
-                    <span className="text-xs text-ink-subtle">
-                      {ligne.prix === null
-                        ? "pas de prix par typologie"
-                        : "prix médian manquant"}
-                    </span>
-                  ) : (
-                    <>
-                      <span className="font-semibold text-ink">
-                        {formatPercent(ligne.lecture.taux, 2)}
-                      </span>
-                      {ligne.lecture.fourchette ? (
-                        <span className="block text-xs text-ink-subtle">
-                          {formatPercent(ligne.lecture.fourchette.bas, 1)} à{" "}
-                          {formatPercent(ligne.lecture.fourchette.haut, 1)}
-                        </span>
-                      ) : null}
-                    </>
-                  )}
-                </td>
+
               </tr>
             ))}
           </tbody>
@@ -203,28 +158,16 @@ export function RentalMarket({
 
       <div className="flex flex-col gap-1.5 text-xs leading-relaxed text-ink-subtle">
         <p>
-          Un rendement brut ne retire ni la taxe foncière, ni les charges non
-          récupérables, ni la vacance, ni les frais d&apos;acquisition, ni
-          l&apos;impôt. Le net tourne couramment entre 60 et 75&nbsp;% du brut,
-          et nous ne le calculons pas&nbsp;: aucune source publique ne porte ces
-          postes à l&apos;échelle de la commune, et un abattement forfaitaire
-          appliqué à toute la France donnerait un chiffre qui a l&apos;air net
-          sans l&apos;être.
+          Loyers d&apos;annonce, pour des biens loués vides, ramenés hors
+          charges&nbsp;: un bail signé se conclut sous le prix demandé, et la
+          source inclut les charges. Ce que ce tableau montre est donc une
+          estimation de ce qui s&apos;encaisse, pas de ce qui s&apos;affiche.
         </p>
         <p>
-          Les T1-T2 et les T3 et plus n&apos;ont pas de rendement ici parce que
-          DVF ne publie pas de prix par nombre de pièces&nbsp;: le taux serait
-          celui d&apos;un loyer de T2 rapporté au prix de tous les
-          appartements.
+          Chaque colonne a son bien type, propre à sa carte&nbsp;: deux lignes
+          ne se comparent pas au mètre carré près, un petit logement se louant
+          structurellement plus cher au mètre.
         </p>
-        {fragile ? (
-          <p>
-            Au moins un de ces loyers est estimé sur des communes voisines, ou
-            repose sur moins de trente annonces, ou sort d&apos;un modèle dont
-            le R² est bas. L&apos;ANIL invite alors à la prudence, et nous la
-            relayons plutôt que de masquer le chiffre.
-          </p>
-        ) : null}
         <p>
           {CALIBRATION_LOYERS.appariement.zones} zones d&apos;observatoire ont
           servi à mesurer l&apos;écart entre annonce et bail signé, contrôlé sur{" "}

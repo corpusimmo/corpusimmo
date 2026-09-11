@@ -9,7 +9,11 @@ import { PriceDistribution } from "@/components/cities/price-distribution";
 import { CityPriceSeries } from "@/components/cities/price-series";
 import { SectorTable } from "@/components/cities/sector-table";
 import { RentalMarket } from "@/components/cities/rental-market";
+import { InvestmentMarket } from "@/components/cities/investment-market";
+import { MarketNav, type MarketEntry } from "@/components/cities/market-nav";
 import { jeuLoyers, loyersDeCommune } from "@/lib/loyers/jeu";
+import { loyerHorsCharges } from "@/lib/loyers/calibration";
+import { lireRendement } from "@/lib/loyers/rendement";
 import { Button, Stat } from "@/components/ui";
 import { disclaimers } from "@/config/site";
 import {
@@ -50,7 +54,7 @@ import { breadcrumbNode } from "@/lib/seo/json-ld";
 import { CityPhotoBanner } from "@/components/cities/city-photo";
 import { JsonLd } from "@/lib/seo/json-ld-script";
 import { pageMetadata } from "@/lib/seo/metadata";
-import { formatNumber, formatPricePerSqm } from "@/lib/utils/format";
+import { formatNumber, formatPercent, formatPricePerSqm } from "@/lib/utils/format";
 
 interface PageProps {
   params: Promise<{ ville: string }>;
@@ -106,6 +110,57 @@ export default async function VillePage({ params }: PageProps) {
      bloc locatif ne s'affiche pas, plutôt que d'emprunter la commune
      voisine. */
   const loyers = loyersDeCommune(city.insee);
+
+  /**
+   * LES TROIS MARCHÉS, RÉSUMÉS EN TROIS CHIFFRES.
+   *
+   * La barre de tête ne se contente pas de renvoyer plus bas : elle répond
+   * déjà. Un visiteur qui cherche un rendement doit le lire avant de
+   * décider s'il descend, et un marché sans donnée n'apparaît pas — une
+   * entrée qui mène à une section absente est une promesse qu'on ne tient
+   * pas.
+   */
+  const loyerAppartement = loyers
+    ? loyerHorsCharges(loyers.appartement?.m2)
+    : null;
+  const rendementAppartement = loyers
+    ? lireRendement(
+        loyers.appartement && loyerAppartement
+          ? { ...loyers.appartement, m2: loyerAppartement }
+          : null,
+        flats.median,
+      ).taux
+    : null;
+
+  const marches: MarketEntry[] = [
+    {
+      id: "vente",
+      label: "Vente",
+      valeur: canPublishFigure(headline)
+        ? formatPricePerSqm(headline.median)
+        : "Non publié",
+      precision: `médiane ${headline === flats ? "appartement" : "maison"}, ${formatNumber(headline.sample)} ventes`,
+    },
+  ];
+  if (loyerAppartement !== null) {
+    marches.push({
+      id: "location",
+      label: "Location",
+      valeur: `${loyerAppartement.toLocaleString("fr-FR", {
+        minimumFractionDigits: 1,
+        maximumFractionDigits: 1,
+      })} €/m²`,
+      precision: "appartement, hors charges, par mois",
+    });
+  }
+  if (rendementAppartement !== null) {
+    marches.push({
+      id: "investissement",
+      label: "Investissement",
+      valeur: formatPercent(rendementAppartement, 2),
+      precision: "rendement brut, appartement",
+    });
+  }
 
   return (
     <div className="bg-canvas py-8 md:py-12">
@@ -182,7 +237,13 @@ export default async function VillePage({ params }: PageProps) {
           </CityPhotoBanner>
         </header>
 
-        <section aria-label="Les chiffres clés" className="grid gap-4 sm:grid-cols-3">
+        {marches.length > 1 ? <MarketNav entries={marches} /> : null}
+
+        <section
+          aria-label="Les chiffres clés de la vente"
+          className="grid scroll-mt-32 gap-4 sm:grid-cols-3"
+          id="vente"
+        >
           <Stat
             label="Appartement, prix médian au m²"
             value={canPublishFigure(flats) ? formatPricePerSqm(flats.median) : "Non publié"}
@@ -289,11 +350,18 @@ export default async function VillePage({ params }: PageProps) {
             commune sans indicateur publié ne montre rien — le composant rend
             `null` plutôt qu'un bloc vide. */}
         {loyers ? (
-          <RentalMarket
-            city={city}
-            loyers={loyers}
-            surfaces={jeuLoyers().surfacesType}
-          />
+          <>
+            <RentalMarket
+              city={city}
+              loyers={loyers}
+              surfaces={jeuLoyers().surfacesType}
+            />
+            <InvestmentMarket
+              city={city}
+              loyers={loyers}
+              surfaces={jeuLoyers().surfacesType}
+            />
+          </>
         ) : null}
 
         {sectors ? (

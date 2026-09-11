@@ -126,6 +126,10 @@ export interface LoyersIndex {
    * sur `breaks`.
    */
   breaksParType?: Partial<Record<LoyersType, number[]>>;
+  /** Bornes du rendement brut, en pourcent, par famille de bien. */
+  rendementBreaks?: { ra?: number[]; rm?: number[] };
+  /** D'où vient le prix qui sert de dénominateur au rendement. */
+  rendement?: { annees: number[]; seuil: number; source: string };
   departements: Record<string, [number, number, number, number]>;
 }
 

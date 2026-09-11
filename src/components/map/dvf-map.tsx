@@ -46,6 +46,7 @@ import {
   Box,
   ChevronDown,
   Coins,
+  Percent,
   Tag,
   TrainFront,
   Layers,
@@ -89,6 +90,16 @@ import { PRICE_RAMP } from "./base-palette";
 import { PriceLegend } from "./price-legend";
 import { ZoningLegend } from "./zoning-legend";
 import { TerritoryLegend } from "./territory-legend";
+import {
+  attachRendementPopup,
+  installRendementLayers,
+  RENDEMENT_RAMP,
+  rendementHtml,
+  setRendementType,
+  setRendementVisibility,
+  type RendementScale,
+} from "./rendement";
+import { RendementLegend } from "./rendement-legend";
 import {
   installTransportLayers,
   setTileTransitLinesVisibility,
@@ -311,6 +322,16 @@ export function DvfMap({
    * des ventes n'a aucune raison de payer d'avance.
    */
   const [loyers, setLoyers] = React.useState(false);
+  /**
+   * LE RENDEMENT, EXCLUSIF DES LOYERS.
+   *
+   * Les deux peignent les mêmes communes, l'un en orange, l'autre en vert :
+   * superposés, ils ne se lisent plus, et le dernier posé gagnerait sans que
+   * rien ne le dise. Allumer l'un éteint donc l'autre. Ils partagent en
+   * revanche la même source de contours — dix-huit méga-octets qu'il serait
+   * absurde de télécharger deux fois.
+   */
+  const [rendement, setRendement] = React.useState(false);
   const [loyersIndex, setLoyersIndex] = React.useState<LoyersIndex | null>(null);
   const [loyersObserves, setLoyersObserves] = React.useState<LoyersObservesIndex | null>(null);
   const [loyersError, setLoyersError] = React.useState(false);
@@ -360,6 +381,18 @@ export function DvfMap({
   })();
   const famille: LoyersType = filtreTranche ?? "app";
   const loyersType: LoyersType = loyersTypeChoisi ?? famille;
+  /** L'échelle du rendement, tirée de l'index comme celle des loyers. */
+  const rendementScale: RendementScale | null = React.useMemo(() => {
+    const bornes =
+      loyersType === "mai"
+        ? loyersIndex?.rendementBreaks?.rm
+        : loyersIndex?.rendementBreaks?.ra;
+    return bornes && bornes.length > 0
+      ? { breaks: bornes, colors: RENDEMENT_RAMP }
+      : null;
+  }, [loyersIndex, loyersType]);
+  const rendementScaleRef = React.useRef(rendementScale);
+  rendementScaleRef.current = rendementScale;
   /* LE CHOIX EXPLICITE NE SURVIT PAS À UN CHANGEMENT DE FAMILLE. Passer les
      filtres sur les maisons alors qu'on lisait les T1-T2 doit montrer des
      maisons : le réglage fin appartenait à la famille qu'on vient de
@@ -418,6 +451,12 @@ export function DvfMap({
   transportsRef.current = transports;
   const loyersRef = React.useRef(loyers);
   loyersRef.current = loyers;
+  const rendementRef = React.useRef(rendement);
+  rendementRef.current = rendement;
+  /** Les contours communaux servent aux deux calques : un seul chargement. */
+  const communesChargees = loyers || rendement;
+  const communesRef = React.useRef(communesChargees);
+  communesRef.current = communesChargees;
   const loyersLoaderRef = React.useRef<LoyersLoader | null>(null);
   const showPricesRef = React.useRef(showPrices);
   showPricesRef.current = showPrices;
@@ -788,7 +827,7 @@ export function DvfMap({
 
   // L'index ne se charge qu'à la première demande, et une seule fois.
   React.useEffect(() => {
-    if (!loyers || loyersIndex || loyersError) return;
+    if ((!loyers && !rendement) || loyersIndex || loyersError) return;
     let alive = true;
     Promise.all([fetchLoyersIndex(), fetchLoyersObservesIndex()])
       .then(([index, observes]) => {
@@ -802,7 +841,7 @@ export function DvfMap({
     return () => {
       alive = false;
     };
-  }, [loyers, loyersIndex, loyersError]);
+  }, [loyers, rendement, loyersIndex, loyersError]);
 
   // Les couches se posent APRÈS celles des territoires, donc au-dessus : un
   // loyer allumé recouvre la médiane départementale, qui s'éteint d'ailleurs
@@ -824,13 +863,24 @@ export function DvfMap({
     );
     setLoyersVisibility(instance, loyersRef.current);
 
+    if (rendementScaleRef.current) {
+      installRendementLayers(
+        instance,
+        rendementScaleRef.current,
+        tokens.ink,
+        "building",
+        loyersTypeRef.current,
+      );
+      setRendementVisibility(instance, rendementRef.current);
+    }
+
     if (!loyersLoaderRef.current) {
       loyersLoaderRef.current = new LoyersLoader(instance, loyersIndex);
     } else if (fresh) {
       // Fond de carte changé : les sources sont neuves, les données non.
       loyersLoaderRef.current.replay();
     }
-    if (loyersRef.current) loyersLoaderRef.current.sync();
+    if (communesRef.current) loyersLoaderRef.current.sync();
   }, [loyersIndex, styleReady]);
 
   /* Changer de type ne recharge rien : les quatre valeurs sont déjà dans
@@ -839,7 +889,45 @@ export function DvfMap({
     const instance = mapRef.current;
     if (!instance || !loyersIndex || !styleReady) return;
     setLoyersType(instance, loyersScale(loyersIndex, loyersType), loyersType);
-  }, [loyersType, loyersIndex, styleReady]);
+    if (rendementScale) setRendementType(instance, rendementScale, loyersType);
+  }, [loyersType, loyersIndex, rendementScale, styleReady]);
+
+  /* ── Rendement ─────────────────────────────────────────────────────────── */
+
+  React.useEffect(() => {
+    const instance = mapRef.current;
+    const container = containerRef.current;
+    if (!instance || !container || !loyersIndex || !rendementScale) return;
+    if (!styleReady || !instance.getStyle()) return;
+
+    const tokens = tokensRef.current ?? readMapTokens(container);
+    installRendementLayers(
+      instance,
+      rendementScale,
+      tokens.ink,
+      "building",
+      loyersTypeRef.current,
+    );
+    setRendementVisibility(instance, rendement);
+    /* Le rendement recouvre les aplats départementaux exactement comme les
+       loyers : deux choroplèthes superposés ne se lisent pas. */
+    setTerritoryVisibility(instance, !rendement && !loyersRef.current);
+    if (!rendement) return;
+
+    const loader = loyersLoaderRef.current;
+    const sync = (): void => loader?.sync();
+    sync();
+    instance.on("moveend", sync);
+
+    /* LA FICHE DU RENDEMENT montre le taux ET ses deux termes : un 9 % sur
+       une commune à 900 €/m² ne dit pas la même chose qu'un 9 % sur une
+       commune à 4 000. */
+    const detach = attachRendementPopup(instance, () => loyersTypeRef.current);
+    return () => {
+      instance.off("moveend", sync);
+      detach();
+    };
+  }, [rendement, rendementScale, loyersIndex, styleReady]);
 
   React.useEffect(() => {
     const instance = mapRef.current;
@@ -847,7 +935,7 @@ export function DvfMap({
     setLoyersVisibility(instance, loyers);
     // Deux choroplèthes superposés ne se lisent pas : les médianes de vente
     // par département s'effacent tant que les loyers sont affichés.
-    setTerritoryVisibility(instance, !loyers);
+    setTerritoryVisibility(instance, !loyers && !rendementRef.current);
     if (!loyers) return;
 
     const loader = loyersLoaderRef.current;
@@ -1566,6 +1654,7 @@ export function DvfMap({
   const showLegend = rows.length > 0 && !(zoomTooLow && !controlled);
   /* Ce que le panneau aurait à montrer. Zéro : pas de bouton, pas de panneau. */
   const legendCount =
+    (rendement && loyersIndex && rendementScale ? 1 : 0) +
     (loyers && loyersIndex ? 1 : 0) +
     (zoning ? 1 : 0) +
     (transports ? 1 : 0) +
@@ -1679,6 +1768,14 @@ export function DvfMap({
               id="carte-legendes"
               className="animate-fade-in absolute bottom-full left-3 z-20 mb-2 flex max-h-[60vh] w-[16.5rem] max-w-[calc(100%-1.5rem)] flex-col gap-2 overflow-y-auto rounded-lg border border-border bg-surface/95 p-2 shadow-lg backdrop-blur-sm"
             >
+              {rendement && loyersIndex && rendementScale ? (
+                <RendementLegend
+                  scale={rendementScale}
+                  index={loyersIndex}
+                  type={loyersType}
+                  className="max-w-none border-0 bg-transparent p-0 shadow-none backdrop-blur-none"
+                />
+              ) : null}
               {loyers && loyersIndex ? (
                 <LoyersLegend
                   scale={loyersScale(loyersIndex, loyersType)}
@@ -1812,10 +1909,27 @@ export function DvfMap({
                   <Separateur />
                   <Calque
                     actif={loyers}
-                    onClick={() => setLoyers((on) => !on)}
+                    onClick={() => {
+                      setLoyers((on) => !on);
+                      setRendement(false);
+                    }}
                     icone={<Coins aria-hidden="true" className="size-3.5" />}
                   >
                     Loyers
+                  </Calque>
+                  {/* RENDEMENT : le croisement des deux moitiés du produit,
+                      ce qui se vend et ce qui se loue. Exclusif des loyers,
+                      qu'il recouvrirait commune pour commune. */}
+                  <Separateur />
+                  <Calque
+                    actif={rendement}
+                    onClick={() => {
+                      setRendement((on) => !on);
+                      setLoyers(false);
+                    }}
+                    icone={<Percent aria-hidden="true" className="size-3.5" />}
+                  >
+                    Rendement
                   </Calque>
                 </>
               )}
@@ -1847,13 +1961,13 @@ export function DvfMap({
                 carte changeait de calque sans qu'aucune commande visible ne
                 bouge, ce qui se lit comme une panne. Cette pastille inerte
                 nomme ce que la carte montre et d'où ça vient. */}
-            {loyers && loyersIndex && famille === "mai" ? (
+            {(loyers || rendement) && loyersIndex && famille === "mai" ? (
               <span className="shrink-0 rounded-lg border border-border bg-surface-2 px-2.5 py-2 text-xs text-ink-muted">
                 Loyers de maison, selon les filtres
               </span>
             ) : null}
 
-            {loyers && loyersIndex && famille === "app" ? (
+            {(loyers || rendement) && loyersIndex && famille === "app" ? (
               <div
                 role="group"
                 aria-label="Typologie des appartements"

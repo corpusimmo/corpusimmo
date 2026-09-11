@@ -165,6 +165,46 @@ function valeurSeule(prefix, indicateur) {
   return { [prefix]: indicateur?.m2 ?? null };
 }
 
+/**
+ * Le facteur annonce → bail signé, interpolé entre les ancrages mesurés.
+ *
+ * Recopié de `src/lib/loyers/calibration.ts` parce qu'un script Node ne peut
+ * pas importer un module TypeScript du bundle. Les deux lisent le MÊME
+ * fichier d'ancrages : c'est la table qui fait foi, pas le code.
+ */
+function facteurLoyer(annonce, ancrages) {
+  if (ancrages.length === 0) return 1;
+  const premier = ancrages[0];
+  const dernier = ancrages[ancrages.length - 1];
+  if (annonce <= premier.niveau) return premier.facteur;
+  if (annonce >= dernier.niveau) return dernier.facteur;
+  for (let i = 1; i < ancrages.length; i += 1) {
+    const a = ancrages[i - 1];
+    const b = ancrages[i];
+    if (annonce > b.niveau) continue;
+    const largeur = b.niveau - a.niveau;
+    if (largeur <= 0) return b.facteur;
+    return a.facteur + ((annonce - a.niveau) / largeur) * (b.facteur - a.facteur);
+  }
+  return dernier.facteur;
+}
+
+/**
+ * Le rendement locatif BRUT annuel, en pourcent.
+ *
+ * `loyer hors charges × 12 ÷ prix au m²`. `null` dès qu'un des deux termes
+ * manque : sans les deux, il n'y a pas de ratio, et emprunter le prix du
+ * département produirait un rendement indiscernable d'un rendement mesuré.
+ */
+function rendement(loyerAnnonce, prixM2, ancrages) {
+  if (typeof loyerAnnonce !== "number" || loyerAnnonce <= 0) return null;
+  if (typeof prixM2 !== "number" || prixM2 <= 0) return null;
+  const horsCharges = loyerAnnonce * facteurLoyer(loyerAnnonce, ancrages);
+  const taux = (horsCharges * 12 * 100) / prixM2;
+  if (!Number.isFinite(taux)) return null;
+  return Math.round(taux * 100) / 100;
+}
+
 /* ── Programme ───────────────────────────────────────────────────────────── */
 
 async function main() {
@@ -172,11 +212,50 @@ async function main() {
     await readFile(path.join(process.cwd(), "src/data/loyers.json"), "utf8"),
   );
 
+  /**
+   * LES DEUX AUTRES MOITIÉS DU RENDEMENT.
+   *
+   * Les prix viennent de `agreger-communes-prix.mjs`, la correction
+   * annonce → bail signé de `calibrer-loyers.mjs`. Les trois fichiers sont
+   * produits séparément, et celui-ci les assemble : on ne recalcule un
+   * rendement nulle part ailleurs, ni dans le navigateur, ni au rendu.
+   */
+  const prix = JSON.parse(
+    await readFile(path.join(process.cwd(), "src/data/prix-communes.json"), "utf8"),
+  );
+  const calibration = JSON.parse(
+    await readFile(
+      path.join(process.cwd(), "src/data/loyers-calibration.json"),
+      "utf8",
+    ),
+  );
+
   process.stderr.write(`Contours ← ${CONTOURS}\n`);
   const contours = await fetch(CONTOURS).then((r) => {
     if (!r.ok) throw new Error(`${CONTOURS} a répondu ${r.status}`);
     return r.json();
   });
+
+  /**
+   * Prix, rendements et effectifs d'une commune, aplatis pour MapLibre.
+   *
+   * Les effectifs voyagent avec les taux parce que la fiche les montre : un
+   * rendement calculé sur trente et une ventes et un rendement calculé sur
+   * trois mille ne se lisent pas pareil, et le produit ne publie aucun
+   * chiffre sans son effectif.
+   */
+  const ancrages = calibration.ancrages ?? [];
+  const rendements = (code, commune) => {
+    const p = prix.communes[code];
+    return {
+      pxa: p?.app ?? null,
+      pxm: p?.mai ?? null,
+      napp: p?.nApp ?? 0,
+      nmai: p?.nMai ?? 0,
+      ra: rendement(commune?.appartement?.m2, p?.app, ancrages),
+      rm: rendement(commune?.maison?.m2, p?.mai, ancrages),
+    };
+  };
 
   const parDepartement = new Map();
   const boites = {};
@@ -198,6 +277,7 @@ async function main() {
         ...flatten("mai", commune?.maison ?? null),
         ...valeurSeule("a12", commune?.appartementT12 ?? null),
         ...valeurSeule("a3", commune?.appartementT3 ?? null),
+        ...rendements(code, commune),
       },
       geometry,
     };
@@ -243,6 +323,39 @@ async function main() {
   };
 
   const breaks = bornesDe((c) => c.appartement?.m2);
+
+  /**
+   * Les bornes du rendement, en pourcent, arrondies au dixième.
+   *
+   * Quintiles nationaux comme pour les loyers, mais sur leur propre
+   * distribution : un rendement d'appartement et un rendement de maison ne
+   * vivent pas dans la même plage, et les peindre sur une échelle commune
+   * afficherait une France de maisons uniformément rentable.
+   */
+  const bornesRendement = (lire) => {
+    const valeurs = Object.entries(loyers.communes)
+      .map(([code, commune]) => lire(code, commune))
+      .filter((v) => typeof v === "number")
+      .sort((a, b) => a - b);
+    const bornes = [];
+    for (let i = 1; i < CLASSES; i += 1) {
+      const brute = quantile(valeurs, i / CLASSES);
+      const arrondie = Math.round(brute * 10) / 10;
+      if (bornes.length === 0 || arrondie > bornes[bornes.length - 1]) {
+        bornes.push(arrondie);
+      }
+    }
+    return bornes;
+  };
+
+  const rendementBreaks = {
+    ra: bornesRendement((code, commune) =>
+      rendement(commune.appartement?.m2, prix.communes[code]?.app, ancrages),
+    ),
+    rm: bornesRendement((code, commune) =>
+      rendement(commune.maison?.m2, prix.communes[code]?.mai, ancrages),
+    ),
+  };
   const breaksParType = {
     app: breaks,
     a12: bornesDe((c) => c.appartementT12?.m2),
@@ -260,6 +373,12 @@ async function main() {
     /** Conservé pour la compatibilité : c'est celui des appartements. */
     breaks,
     breaksParType,
+    rendementBreaks,
+    rendement: {
+      annees: prix.annees,
+      seuil: prix.seuil,
+      source: prix.source,
+    },
     departements: Object.fromEntries(
       Object.entries(boites).map(([dep, b]) => [dep, b.map((v) => Number(v.toFixed(PRECISION)))]),
     ),
@@ -272,6 +391,9 @@ async function main() {
       `${(total / 1024 / 1024).toFixed(1)} Mo au total\n` +
       Object.entries(breaksParType)
         .map(([type, bornes]) => `  bornes ${type} : ${bornes.join(" / ")} €/m²\n`)
+        .join("") +
+      Object.entries(rendementBreaks)
+        .map(([type, bornes]) => `  rendement ${type} : ${bornes.join(" / ")} %\n`)
         .join(""),
   );
 }

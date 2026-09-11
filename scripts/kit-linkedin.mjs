@@ -170,10 +170,17 @@ function banniere({ titre, sous, qui, studio }) {
           flexDirection: "column",
           justifyContent: "center",
           gap: 18,
-          /* La photo de profil mord le coin bas-gauche sur 300 px environ, et
-             la carte du profil recouvre le bas sur mobile : le texte part de
-             470 px et s'arrête à 300 px du bas. */
-          padding: "0 80px 96px 470px",
+          /* LA ZONE UTILE N'EST NI LA SURFACE NI SON CENTRE.
+             À gauche, la photo de profil mord le coin sur environ 300 px :
+             le texte part de 470. En bas, la carte du profil recouvre une
+             bande sur mobile : on lui laisse 72 px.
+
+             Le reste doit être CENTRÉ DANS CE QUI RESTE, et c'était le
+             défaut de la première version : un simple `padding-bottom` de
+             96 px poussait tout le bloc vers le haut, collant le logotype au
+             bord supérieur pendant qu'un vide s'ouvrait en bas. On rend donc
+             au haut la moitié de ce qu'on retire au bas. */
+          padding: "36px 80px 72px 470px",
           width: "100%",
         },
       },

@@ -276,35 +276,16 @@ export function installTerritoryLayers(
         minzoom: minzoom + FADE,
         maxzoom,
         layout: {
-          /* LE PRIX N'EST ÉCRIT QU'À L'ÉCHELON RÉGION.
-             Treize régions tiennent leur prix sans se marcher dessus. Les
-             cent départements, non : deux lignes par étiquette sur une
-             maille dix fois plus fine, et la carte devenait un mur de
-             chiffres qui cachait ce qu'elle colorie. La couleur porte déjà
-             le niveau, la légende en donne les bornes, et le prix exact d'un
-             département s'obtient en s'y arrêtant. */
-          "text-field":
-            key === "region"
-              ? [
-                  "case",
-                  ["==", ["get", "ppsm"], null],
-                  ["get", "nom"],
-                  [
-                    "concat",
-                    ["get", "nom"],
-                    "\n",
-                    /* `number-format` plutôt que la valeur brute : « 2237 €/m² »
-                       se lisait sans séparateur de milliers, seule écriture du
-                       produit à ignorer la typographie française. */
-                    [
-                      "number-format",
-                      ["get", "ppsm"],
-                      { locale: "fr-FR", "max-fraction-digits": 0 },
-                    ],
-                    " €/m²",
-                  ],
-                ]
-              : ["get", "nom"],
+          /* AUCUN PRIX DANS LES ÉTIQUETTES, NI RÉGION NI DÉPARTEMENT.
+             Le prix y a d'abord été écrit aux deux échelons, puis retiré des
+             départements — cent étiquettes sur deux lignes faisaient un mur
+             de chiffres par-dessus la couleur qu'elles commentent. Le même
+             reproche vaut pour les treize régions : une médiane régionale
+             recouvre des marchés qui n'ont rien à voir, et l'écrire en toutes
+             lettres sur la carte lui donne une autorité que sa maille
+             n'a pas. La couleur porte le niveau, la légende en donne les
+             bornes, et le chiffre exact s'obtient en s'approchant. */
+          "text-field": ["get", "nom"],
           "text-size": key === "region" ? 12 : 11,
           "text-max-width": 9,
           "text-allow-overlap": false,

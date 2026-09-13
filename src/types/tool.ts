@@ -59,6 +59,12 @@ export interface ToolCard {
   limits: string;
   /** État du classeur Excel équivalent. */
   matrix: MatrixStatus;
+  /**
+   * Le classeur téléchargeable, sous `public/outils/matrices/`. Présent si et
+   * seulement si `matrix` vaut « available » : un bouton de téléchargement ne
+   * s'affiche jamais sans fichier derrière.
+   */
+  matrixFile?: string;
 }
 
 /** Facettes actives, toutes optionnelles, toutes lues dans la query string. */

@@ -5,16 +5,15 @@
  * le fichier réel prouve en une seconde ce qu'aucune description ne prouve :
  * qu'il existe, qu'il calcule, et à quoi il ressemble.
  *
- * DEUX AVERTISSEMENTS, tenus par le code plutôt que par la mémoire :
+ * ELLES SONT TIRÉES DES CLASSEURS TÉLÉCHARGEABLES, pas refaites à la main :
+ * `scripts/outils/apercus.py` ouvre chaque matrice de `public/outils/matrices/`,
+ * la met en page et photographie chaque onglet, mode d'emploi excepté. Quand
+ * une matrice change, on relance le script et on recopie ici le relevé qu'il
+ * imprime. La première capture sert d'illustration dans la bibliothèque : elle
+ * montre le calculateur, jamais la prose.
  *
- * 1. Ces captures datent de la version précédente des classeurs. Les matrices
- *    ont été révisées depuis (voir `matrix: "coming"` dans le catalogue). La
- *    légende de la galerie le dit à voix haute : mieux vaut une capture datée
- *    et annoncée qu'une promesse floue.
- *
- * 2. Elles ont été prises quand le projet portait un autre nom. Le bandeau et
- *    la mention de bas de page ont été recomposés au nom de CorpusImmo, à
- *    l'identique de la typographie d'origine. Aucun chiffre n'a été touché.
+ * Le bilan promoteur fait exception : sa matrice n'est pas encore livrée, et
+ * ses captures datent de la version précédente.
  *
  * Les dimensions sont MESURÉES sur les fichiers, pas estimées : elles réservent
  * la place exacte à l'affichage et évitent que la page saute au chargement.
@@ -42,57 +41,61 @@ export const MAX_PREVIEW_TALLNESS = 1.35;
 
 const SHOTS: Partial<Record<ToolId, Array<[label: string, width: number, height: number]>>> = {
   "rentabilite-locative": [
-    ["Calculateur", 1400, 1021],
-    ["Paramètres", 1400, 1191],
-    ["Méthode", 1400, 1140],
+    ["Calculateur", 1400, 1486],
+    ["Paramètres", 1400, 1880],
+    ["Méthode", 1400, 2366],
   ],
   "pret-amortissement": [
-    ["Mon prêt", 1400, 986],
-    ["Échéancier", 1400, 3000],
-    ["Comparer trois offres", 1400, 1229],
-    ["Méthode", 1400, 1140],
+    ["Mon prêt", 1400, 1017],
+    ["Échéancier", 1400, 7647],
+    ["Comparateur", 1400, 910],
+    ["Détail des offres", 1400, 4689],
+    ["Paramètres", 1400, 1750],
+    ["Méthode", 1400, 2336],
   ],
   "arbitrage-fiscal": [
-    ["Comparateur", 1400, 1113],
-    ["Paramètres", 1400, 1132],
-    ["Méthode", 1400, 1140],
+    ["Hypothèses", 1400, 1291],
+    ["Comparateur", 1400, 1248],
+    ["Pluriannuel", 1400, 779],
+    ["Paramètres", 1400, 3124],
+    ["Méthode", 1400, 3802],
   ],
   "chiffrage-travaux": [
-    ["Chiffrage", 1400, 1436],
-    ["Prix de référence", 1400, 1271],
-    ["Méthode", 1400, 1140],
+    ["Chiffrage", 1400, 2111],
+    ["Référentiel", 1400, 2287],
+    ["Méthode", 1400, 2616],
   ],
   "capacite-emprunt": [
-    ["Capacité d'emprunt", 1400, 1085],
-    ["Bilan patrimonial", 1400, 1229],
-    ["Paramètres", 1400, 1132],
-    ["Méthode", 1400, 1140],
+    ["Capacité d'emprunt", 1400, 1378],
+    ["Bilan patrimonial", 1400, 1138],
+    ["Paramètres", 1400, 1883],
+    ["Méthode", 1400, 2673],
   ],
   dcf: [
-    ["Hypothèses", 1400, 1213],
-    ["Flux actualisés", 1400, 893],
-    ["Sensibilité", 1400, 1498],
-    ["Méthode", 1400, 1132],
+    ["DCF", 1400, 673],
+    ["Méthode", 1400, 1109],
+  ],
+  wault: [
+    ["Rent roll", 1400, 671],
+    ["Synthèse", 1400, 1021],
+    ["Échéancier", 1400, 645],
+    ["Paramètres", 1400, 1753],
+    ["Méthode", 1400, 2654],
+  ],
+  "avis-de-valeur": [
+    ["Avis de valeur", 1400, 1105],
+    ["Référentiel", 1400, 2948],
+    ["Méthode", 1400, 2537],
+  ],
+  "net-vendeur": [
+    ["Net vendeur", 1400, 1267],
+    ["Qualifier le mandat", 1400, 1062],
+    ["Paramètres", 1400, 2313],
+    ["Méthode", 1400, 2621],
   ],
   "bilan-promoteur": [
     ["Bilan", 1400, 1095],
     ["Sensibilité", 1400, 1440],
-    ["Méthode", 1400, 1127],
-  ],
-  wault: [
-    ["Rent roll", 1400, 1480],
-    ["Échéancier des baux", 1400, 1418],
-    ["Méthode", 1400, 1140],
-  ],
-  "avis-de-valeur": [
-    ["Avis de valeur", 1400, 1087],
-    ["Barème", 1400, 1176],
-    ["Méthode", 1400, 1127],
-  ],
-  "net-vendeur": [
-    ["Net vendeur", 1400, 961],
-    ["Qualifier le mandat", 1400, 1197],
-    ["Paramètres", 1400, 1146],
     ["Méthode", 1400, 1127],
   ],
 };

@@ -245,6 +245,35 @@ export default async function OutilPage({ params }: PageProps) {
               </section>
             ) : null}
 
+            {/* LE CLASSEUR, TÉLÉCHARGEABLE TEL QU'IL EST LIVRÉ.
+                Un lien direct vers le fichier et non une page intermédiaire :
+                le simulateur en ligne est déjà la version sans friction, le
+                classeur est pour qui veut garder la main sur chaque cellule.
+                `download` suggère au navigateur un enregistrement plutôt
+                qu'une ouverture dans un onglet, que Chrome refuserait de
+                rendre de toute façon. */}
+            {tool.matrix === "available" && tool.matrixFile ? (
+              <section className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-6">
+                <h2 className="flex items-center gap-2 text-sm font-semibold text-ink">
+                  <FileSpreadsheet
+                    aria-hidden="true"
+                    className="size-4 text-primary"
+                  />
+                  Le classeur Excel
+                </h2>
+                <p className="text-sm leading-relaxed text-ink-muted">
+                  La matrice complète, avec son mode d&apos;emploi, ses
+                  paramètres réglementaires et sa méthode. Les cellules bleues
+                  sont à remplir, tout le reste se calcule.
+                </p>
+                <Button asChild variant="secondary" size="sm">
+                  <a href={`/outils/matrices/${tool.matrixFile}`} download>
+                    Télécharger le classeur (.xlsx)
+                  </a>
+                </Button>
+              </section>
+            ) : null}
+
             <p className="text-xs leading-relaxed text-ink-subtle">
               {disclaimers.toolResult}
             </p>

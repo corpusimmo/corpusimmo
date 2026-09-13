@@ -9,9 +9,10 @@
  * l'outil parle, sous quels axes il se filtre, et où s'arrête honnêtement ce
  * qu'il calcule.
  *
- * LES CLASSEURS EXCEL — aucun n'est versionné dans cette version. Les matrices
- * sont en cours de révision ; chaque fiche l'annonce (`matrix: "coming"`)
- * plutôt que d'exposer un bouton de téléchargement qui ne téléchargerait rien.
+ * LES CLASSEURS EXCEL vivent dans `public/outils/matrices/`, servis tels que
+ * livrés. Neuf sont disponibles ; le bilan promoteur annonce encore le sien
+ * (`matrix: "coming"`) plutôt que d'exposer un bouton qui ne téléchargerait
+ * rien.
  */
 
 import { toolSpecs } from "@/lib/tools/definitions";
@@ -38,7 +39,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Le calcul est une photographie de la première année. Il n'anticipe ni la revalorisation des loyers, ni l'augmentation de la taxe foncière, ni un changement de régime fiscal en cours de détention.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "calculateur-rentabilite-locative.xlsx",
   },
 
   "pret-amortissement": {
@@ -58,7 +60,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Les taux sont fixes sur toute la durée. Un prêt à taux variable, un prêt relais ou un différé d'amortissement demandent un autre calcul.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "tableau-amortissement-et-comparateur-de-prets.xlsx",
   },
 
   "capacite-emprunt": {
@@ -78,7 +81,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Une banque tient compte d'éléments que ce calcul ignore : stabilité professionnelle, épargne résiduelle, historique bancaire, politique commerciale du moment. Le résultat est un ordre de grandeur, pas un accord de principe.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "capacite-emprunt-et-bilan-patrimonial.xlsx",
   },
 
   "chiffrage-travaux": {
@@ -98,7 +102,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Les prix unitaires proposés sont des ordres de grandeur nationaux, hors Île-de-France et hors sites contraints. Ils ne remplacent pas un devis d'entreprise, et ne couvrent ni les travaux structurels imprévus, ni les frais de maîtrise d'œuvre.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "chiffrage-de-travaux-par-lot.xlsx",
   },
 
   "arbitrage-fiscal": {
@@ -118,7 +123,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Comparaison sur la PREMIÈRE ANNÉE uniquement. Le LMNP amortit, la SCI à l'IS reporte : leur avantage relatif se déplace avec le temps, et la fiscalité de la revente diffère radicalement d'un régime à l'autre. Ce calcul ne vaut pas conseil fiscal.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "arbitrage-fiscal-nu-lmnp-sci-is.xlsx",
   },
 
   "avis-de-valeur": {
@@ -138,7 +144,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Un avis de valeur n'est pas une expertise au sens réglementaire. Seul un professionnel ayant visité le bien peut établir une valeur vénale ferme, et DVF ne publie ni l'état intérieur, ni le DPE, ni le contexte de la vente.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "avis-de-valeur-par-comparaison.xlsx",
   },
 
   "net-vendeur": {
@@ -158,7 +165,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "La plus-value est calculée dans le régime de droit commun des particuliers. Elle ne couvre ni la résidence principale exonérée, ni les cessions par une société, ni les régimes dérogatoires.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "net-vendeur-honoraires-et-qualification.xlsx",
   },
 
   dcf: {
@@ -178,7 +186,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Un DCF vaut ce que valent ses hypothèses. Le taux de sortie et le taux d'actualisation portent l'essentiel du résultat, et aucun des deux ne s'observe : ils se justifient. À manier avec une analyse de sensibilité, jamais seul.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "dcf-valorisation.xlsx",
   },
 
   "bilan-promoteur": {
@@ -218,7 +227,8 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     ],
     limits:
       "Le calcul suppose des baux à loyer fixe et n'intègre ni les franchises, ni les paliers, ni les loyers variables indexés sur le chiffre d'affaires du preneur.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "rent-roll-et-wault.xlsx",
   },
 };
 

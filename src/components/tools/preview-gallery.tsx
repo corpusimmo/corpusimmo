@@ -128,9 +128,8 @@ export function PreviewGallery({ shots, title }: { shots: ToolPreviewShot[]; tit
       ) : null}
 
       <figcaption className="text-xs leading-relaxed text-ink-subtle">
-        Captures du classeur réel, avec ses valeurs d&apos;exemple calculées : les cellules bleues
-        sont les vôtres, les blanches se calculent seules. Elles datent de la version précédente du
-        fichier ; la matrice en cours de révision reprend la même structure, à quelques postes près.
+        Captures du classeur téléchargeable, avec ses valeurs d&apos;exemple calculées : les
+        cellules bleues sont les vôtres, les blanches se calculent seules.
       </figcaption>
     </figure>
   );

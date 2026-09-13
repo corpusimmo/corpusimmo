@@ -265,7 +265,7 @@ export const netVendeur: ToolSpec = {
   id: "net-vendeur",
   title: "Net vendeur et qualification du mandat",
   intro:
-    "Du prix affiché au virement du notaire : honoraires, solde du prêt, impôt de plus-value et net en poche. Puis la grille qui dit si le mandat vaut vos six prochains mois.",
+    "Du prix affiché au virement du notaire, impôt de plus-value compris. Puis la grille qui dit si le mandat vaut le coup.",
   sections: [
     {
       title: "La vente",

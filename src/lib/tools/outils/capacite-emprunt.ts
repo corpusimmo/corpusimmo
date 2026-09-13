@@ -179,7 +179,7 @@ export const capaciteEmprunt: ToolSpec = {
   id: "capacite-emprunt",
   title: "Capacité d'emprunt",
   intro:
-    "Jusqu'où la banque peut vous suivre, ce qu'il vous reste pour vivre, le prix d'achat maximal frais réels déduits, et votre patrimoine avant et après l'achat.",
+    "Ce que la banque vous prête, ce qu'il reste pour vivre, le prix d'achat maximal, et votre patrimoine avant et après.",
   sections: [
     {
       title: "Revenus mensuels nets du foyer",

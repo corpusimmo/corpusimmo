@@ -456,7 +456,7 @@ export const arbitrageFiscal: ToolSpec = {
   id: "arbitrage-fiscal",
   title: "Arbitrage fiscal : nu, LMNP ou SCI à l'IS",
   intro:
-    "Le même bien sous cinq régimes, sur toute la durée de détention, revente comprise : le seul horizon où les régimes se départagent vraiment.",
+    "Le même bien sous cinq régimes, sur toute la détention, revente comprise : là où les régimes se départagent.",
   sections: [
     {
       title: "Le bien",

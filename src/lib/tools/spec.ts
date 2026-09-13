@@ -64,6 +64,17 @@ export interface ToolColumn {
   value: number;
   /** En-tête court pour l'affichage en tableau. */
   short?: string;
+  /**
+   * Une liste fermée, l'équivalent d'une liste déroulante Excel dans un
+   * tableau : l'assiette de l'assurance d'une offre, la nature d'un bail.
+   *
+   * LA VALEUR RESTE UN NOMBRE — le rang de l'option — et c'est délibéré.
+   * L'état d'un tableau est une grille de nombres, que la persistance, la
+   * remise à zéro et les calculs lisent sans cas particulier ; y glisser du
+   * texte obligerait chacun d'eux à le traiter. Le libellé ne sert qu'à
+   * l'affichage.
+   */
+  options?: { value: number; label: string }[];
 }
 
 export interface ToolTable {
@@ -76,6 +87,12 @@ export interface ToolTable {
   addLabel: string;
   /** Nombre de lignes en dessous duquel on ne peut pas descendre. */
   min?: number;
+  /**
+   * Nombre de lignes au-delà duquel le bouton d'ajout disparaît. Le
+   * comparateur de prêts du classeur en compte trois : en proposer une
+   * quatrième ferait croire à un calcul que la matrice ne fait pas.
+   */
+  max?: number;
   /**
    * Noms des lignes, quand elles en ont un — les lots d'un chiffrage, les
    * offres d'un comparateur. Les lignes ajoutées au-delà reçoivent

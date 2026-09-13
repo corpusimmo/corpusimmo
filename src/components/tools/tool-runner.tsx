@@ -520,6 +520,7 @@ function TableInput({
   onChange: (rows: number[][]) => void;
 }) {
   const min = table.min ?? 1;
+  const max = table.max ?? Number.POSITIVE_INFINITY;
 
   const setCell = (ligne: number, colonne: number, brut: string) => {
     const col = table.columns[colonne];
@@ -642,30 +643,49 @@ function TableInput({
         ))}
       </div>
 
-      <div className="mt-4">
-        <Button type="button" variant="secondary" size="sm" onClick={ajouter}>
-          <Plus className="size-4" aria-hidden />
-          {table.addLabel}
-        </Button>
-      </div>
+      {rows.length < max ? (
+        <div className="mt-4">
+          <Button type="button" variant="secondary" size="sm" onClick={ajouter}>
+            <Plus className="size-4" aria-hidden />
+            {table.addLabel}
+          </Button>
+        </div>
+      ) : null}
     </section>
   );
 }
 
-/** Une cellule de tableau : sélecteur de date, ou champ numérique. */
+/** Une cellule de tableau : liste fermée, sélecteur de date, ou champ numérique. */
 function CellInput({
   col,
   value,
   label,
   onChange,
 }: {
-  col: { unit: string };
+  col: { unit: string; options?: { value: number; label: string }[] };
   value: number;
   label: string;
   onChange: (brut: string) => void;
 }) {
   const commun =
     "h-10 w-full rounded-md border border-border bg-surface px-2.5 text-sm text-ink shadow-xs outline-none focus-visible:border-primary focus-visible:ring-2 focus-visible:ring-primary/25";
+
+  if (col.options) {
+    return (
+      <select
+        aria-label={label}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        className={commun}
+      >
+        {col.options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+    );
+  }
 
   if (col.unit === "date") {
     return (

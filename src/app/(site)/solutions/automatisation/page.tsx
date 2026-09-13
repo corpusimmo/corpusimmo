@@ -71,7 +71,7 @@ export default function AutomatisationPage() {
         },
         {
           href: "/outils/dcf",
-          label: "Le DCF sur dix ans",
+          label: "Le DCF avec levier",
           body: "Un modèle financier complet, avec ses barèmes affichés et modifiables.",
         },
       ]}

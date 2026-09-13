@@ -133,14 +133,14 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     usages: ["valorisation"],
     body: [
       "Un avis de valeur se défend devant un vendeur qui a une idée en tête. Ce qui le tient, ce n'est pas le chiffre : ce sont les ventes citées et les ajustements assumés, ligne par ligne.",
-      "L'outil part de comparables réels, applique des ajustements explicites (surface, état, étage, extérieur) et produit une fourchette dont on peut expliquer chaque euro.",
+      "L'outil ramène chaque vente au bien évalué (état, étage, extérieur, DPE, stationnement, dérive du marché), pondère par la similarité, et tire la largeur de la fourchette de la dispersion mesurée.",
     ],
     contents: [
-      "Prix au m² pondéré des comparables retenus",
-      "Ajustements par comparable, chacun signé et motivé",
-      "Valeur centrale et fourchette",
-      "Dispersion du jeu de comparables",
-      "Trame d'argumentaire pour l'entretien vendeur",
+      "Ajustement calculé par comparable, avec la valeur verte du DPE",
+      "Verrous : ajustement plafonné, vente trop ancienne, panel trop mince, comparable dominant",
+      "Prix au m² retenu, pondéré par la similarité",
+      "Écart type pondéré et coefficient de variation",
+      "Valeur centrale et fourchette à présenter au vendeur",
     ],
     limits:
       "Un avis de valeur n'est pas une expertise au sens réglementaire. Seul un professionnel ayant visité le bien peut établir une valeur vénale ferme, et DVF ne publie ni l'état intérieur, ni le DPE, ni le contexte de la vente.",

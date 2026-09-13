@@ -154,17 +154,17 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
     usages: ["valorisation"],
     body: [
       "Entre le prix affiché sur l'annonce et le virement du notaire, il y a les honoraires, le solde du prêt, l'indemnité de remboursement anticipé et, souvent, l'impôt de plus-value.",
-      "L'outil remonte la chaîne dans les deux sens : du prix affiché au net perçu, et du net souhaité au prix à afficher.",
+      "L'outil déroule la chaîne dans cet ordre, avec une durée de détention calculée de date à date. Puis une grille de huit critères pondérés dit si le mandat vaut le temps qu'il va coûter.",
     ],
     contents: [
-      "Net vendeur à partir d'un prix affiché",
-      "Prix à afficher pour un net vendeur visé",
       "Honoraires d'agence, charge vendeur ou acquéreur",
-      "Solde de prêt et indemnité de remboursement anticipé",
-      "Impôt de plus-value, abattements pour durée de détention appliqués",
+      "Solde du prêt et plafond légal de l'indemnité de remboursement anticipé",
+      "Frais et travaux au forfait ou au réel, selon le mode d'acquisition",
+      "Abattements, exonérations dans l'ordre du code, surtaxe sur les plus-values élevées",
+      "Grille de qualification du mandat, avec l'écart de prix éliminatoire",
     ],
     limits:
-      "La plus-value est calculée dans le régime de droit commun des particuliers. Elle ne couvre ni la résidence principale exonérée, ni les cessions par une société, ni les régimes dérogatoires.",
+      "Le modèle traite la vente en pleine propriété par un particulier résident. Le démembrement, les biens détenus en société ou à l'étranger et les cessions de parts sortent de son périmètre.",
     matrix: "available",
     matrixFile: "net-vendeur-honoraires-et-qualification.xlsx",
   },

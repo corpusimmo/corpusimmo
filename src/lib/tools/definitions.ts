@@ -24,6 +24,7 @@ import {
 import type { ToolId } from "@/types/tool";
 import { arbitrageFiscal } from "./outils/arbitrage-fiscal";
 import { capaciteEmprunt } from "./outils/capacite-emprunt";
+import { netVendeur } from "./outils/net-vendeur";
 import { pretAmortissement } from "./outils/pret-amortissement";
 import { rentabiliteLocative } from "./outils/rentabilite-locative";
 
@@ -349,113 +350,6 @@ function evaluer(
     valeur: prixM2 * (v.surface ?? 0),
     dispersion,
   };
-}
-
-/* -------------------------------------------------------------------------- */
-
-const netVendeur: ToolSpec = {
-  id: "net-vendeur",
-  title: "Net vendeur",
-  intro:
-    "Du prix affiché au virement du notaire : honoraires, solde de prêt et impôt de plus-value.",
-  sections: [
-    {
-      title: "La vente",
-      fields: [
-        { id: "prix", label: "Prix affiché, honoraires inclus", value: 385000, unit: "eur", hint: "Le prix inscrit à l'acte, hors frais. C'est la base de tout le reste : le majorer « pour arrondir » fausse les trois rendements." },
-        { id: "honoraires", label: "Honoraires d'agence", value: 4.5, unit: "pct", hint: "En % du prix net vendeur.", step: 0.1 },
-        {
-          id: "charge",
-          label: "Honoraires à la charge de",
-          value: "acquereur",
-          options: [
-            { value: "acquereur", label: "L'acquéreur" },
-            { value: "vendeur", label: "Le vendeur" },
-          ],
-        },
-        { id: "crd", label: "Capital restant dû du prêt", value: 148000, unit: "eur", hint: "Le capital restant dû au jour de la vente, pas le montant emprunté à l'origine. Votre banque le fournit sur demande." },
-        { id: "ira", label: "Indemnité de remboursement anticipé", value: 2200, unit: "eur", hint: "Plafonnée à 6 mois d'intérêts et à 3 % du capital restant dû." },
-        { id: "diag", label: "Diagnostics et frais divers", value: 750, unit: "eur" },
-      ],
-    },
-    {
-      title: "L'acquisition d'origine",
-      fields: [
-        { id: "achat", label: "Prix d'achat d'origine", value: 268000, unit: "eur" },
-        { id: "detention", label: "Durée de détention", value: 13, unit: "an", min: 0, max: 40, hint: "Comptée en années pleines depuis l'acte d'achat. Les abattements ne démarrent qu'après la cinquième année." },
-        { id: "travaux", label: "Travaux justifiés sur factures", value: 24000, unit: "eur", hint: "Le budget TTC, provision pour aléas comprise. Notre chiffrage de travaux par lot le calcule poste par poste." },
-        {
-          id: "rp",
-          label: "S'agit-il de la résidence principale ?",
-          value: "non",
-          options: [
-            { value: "non", label: "Non" },
-            { value: "oui", label: "Oui, plus-value exonérée" },
-          ],
-        },
-      ],
-    },
-  ],
-  params: [
-    { id: "tauxIR", label: "Impôt sur la plus-value", value: 19, unit: "pct" },
-    { id: "tauxPS", label: "Prélèvements sociaux sur la plus-value", value: 17.2, unit: "pct" },
-    { id: "exoIR", label: "Exonération totale, impôt", value: 22, unit: "an" },
-    { id: "exoPS", label: "Exonération totale, prélèvements sociaux", value: 30, unit: "an" },
-    { id: "forfaitTravaux", label: "Forfait travaux au-delà de 5 ans", value: 15, unit: "pct" },
-    { id: "forfaitFrais", label: "Forfait frais d'acquisition", value: 7.5, unit: "pct" },
-  ],
-  headlines: [
-    {
-      label: "Net en poche pour le vendeur",
-      unit: "eur",
-      compute: (v, c) => netEnPoche(v, c),
-      caption: (v, c) =>
-        `Soit ${(ratio(netEnPoche(v, c), v.prix ?? 0) * 100).toFixed(0)} % du prix affiché.`,
-    },
-  ],
-  outputs: [
-    { id: "hono", label: "Honoraires d'agence TTC", unit: "eur", compute: (v, c) => honoraires(v, c), strong: true },
-    { id: "netVente", label: "Prix net vendeur", unit: "eur", compute: (v, c) => (v.prix ?? 0) - honoraires(v, c), strong: true },
-    { id: "acqMaj", label: "Prix d'acquisition majoré", unit: "eur", compute: (v) => acquisitionMajoree(v), hint: "Forfait de frais, et le plus favorable du réel ou du forfait travaux." },
-    { id: "pvBrute", label: "Plus-value brute", unit: "eur", compute: (v, c) => Math.max(0, (v.prix ?? 0) - honoraires(v, c) - acquisitionMajoree(v)) },
-    { id: "abtIR", label: "Abattement, impôt", unit: "pct", compute: (v) => abattement(v.detention ?? 0, v.exoIR ?? 22) },
-    { id: "abtPS", label: "Abattement, prélèvements sociaux", unit: "pct", compute: (v) => abattement(v.detention ?? 0, v.exoPS ?? 30) },
-    { id: "impot", label: "Impôt de plus-value", unit: "eur", compute: (v, c) => impotPlusValue(v, c), strong: true },
-  ],
-  caveat:
-    "Les abattements réels sont progressifs par paliers annuels ; ce calcul les approxime linéairement. Il ignore la surtaxe sur les plus-values élevées et les exonérations particulières. Le calcul qui fait foi est celui du notaire : ce chiffre sert à annoncer un ordre de grandeur en rendez-vous.",
-};
-
-function honoraires(v: Record<string, number>, c: Record<string, string>): number {
-  const prix = v.prix ?? 0;
-  const taux = (v.honoraires ?? 0) / 100;
-  // Honoraires à la charge de l'acquéreur : le prix affiché les CONTIENT, donc
-  // on divise. Les soustraire directement est l'erreur qui décale le calcul de
-  // plusieurs centaines d'euros.
-  return c.charge === "acquereur" ? prix - prix / (1 + taux) : prix * taux;
-}
-function acquisitionMajoree(v: Record<string, number>): number {
-  const achat = v.achat ?? 0;
-  const forfait = (v.detention ?? 0) >= 5 ? (achat * (v.forfaitTravaux ?? 15)) / 100 : 0;
-  return achat * (1 + (v.forfaitFrais ?? 7.5) / 100) + Math.max(v.travaux ?? 0, forfait);
-}
-function abattement(detention: number, seuil: number): number {
-  if (detention <= 5) return 0;
-  return Math.min(100, ((detention - 5) / (seuil - 5)) * 100);
-}
-function impotPlusValue(v: Record<string, number>, c: Record<string, string>): number {
-  if (c.rp === "oui") return 0;
-  const pv = Math.max(0, (v.prix ?? 0) - honoraires(v, c) - acquisitionMajoree(v));
-  return (
-    (pv * (1 - abattement(v.detention ?? 0, v.exoIR ?? 22) / 100) * (v.tauxIR ?? 19)) / 100 +
-    (pv * (1 - abattement(v.detention ?? 0, v.exoPS ?? 30) / 100) * (v.tauxPS ?? 17.2)) / 100
-  );
-}
-function netEnPoche(v: Record<string, number>, c: Record<string, string>): number {
-  return (
-    (v.prix ?? 0) - honoraires(v, c) - (v.crd ?? 0) - (v.ira ?? 0) - (v.diag ?? 0) -
-    impotPlusValue(v, c)
-  );
 }
 
 /* -------------------------------------------------------------------------- */

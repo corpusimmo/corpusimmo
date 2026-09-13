@@ -10,7 +10,7 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { getToolPreviews, MAX_PREVIEW_TALLNESS } from "./tool-previews";
+import { getToolPreviews, MAX_PREVIEW_TALLNESS, VERSION_APERCUS } from "./tool-previews";
 import { toolCatalogue } from "./tools-catalogue";
 
 const PUBLIC_DIR = join(process.cwd(), "public");
@@ -60,7 +60,7 @@ describe("les aperçus des classeurs", () => {
   it("nomme chaque capture d'après l'outil et son rang d'onglet", () => {
     for (const tool of toolCatalogue) {
       getToolPreviews(tool.id).forEach((shot, index) => {
-        expect(shot.src).toBe(`/outils/apercus/${tool.id}-${index + 1}.jpg`);
+        expect(shot.src).toBe(`/outils/apercus/${tool.id}-${index + 1}-${VERSION_APERCUS}.jpg`);
         expect(shot.label.trim()).not.toBe("");
       });
     }

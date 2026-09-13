@@ -104,9 +104,15 @@ const SHOTS: Partial<Record<ToolId, Array<[label: string, width: number, height:
  * Les captures d'un outil, dans l'ordre des onglets. Tableau vide quand le
  * classeur n'a pas encore été photographié : l'appelant n'a rien à vérifier.
  */
+/**
+ * Monte à chaque nouvelle série de captures. Le nom du fichier change, donc
+ * aucun cache (navigateur, optimiseur d'images, CDN) ne resert l'ancienne.
+ */
+export const VERSION_APERCUS = "v2";
+
 export function getToolPreviews(id: ToolId): ToolPreviewShot[] {
   return (SHOTS[id] ?? []).map(([label, width, height], index) => ({
-    src: `/outils/apercus/${id}-${index + 1}.jpg`,
+    src: `/outils/apercus/${id}-${index + 1}-${VERSION_APERCUS}.jpg`,
     label,
     width,
     height,

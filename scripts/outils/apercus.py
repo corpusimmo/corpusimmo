@@ -2,7 +2,7 @@
 LES APERÇUS DES CLASSEURS, TIRÉS DES FICHIERS EUX-MÊMES.
 
 Une capture par onglet de chaque matrice de `public/outils/matrices/`, écrite
-dans `public/outils/apercus/<outil>-<n>.jpg`. La première sert d'illustration à
+dans `public/outils/apercus/<outil>-<n>-<version>.jpg`. La première sert d'illustration à
 la fiche de l'outil dans la bibliothèque : elle doit donc montrer le calculateur,
 pas le mode d'emploi.
 
@@ -37,6 +37,9 @@ from PIL import Image, ImageChops
 RACINE = Path(__file__).resolve().parents[2]
 MATRICES = RACINE / "public/outils/matrices"
 SORTIE = RACINE / "public/outils/apercus"
+# À monter avec VERSION_APERCUS de src/data/tool-previews.ts : un nouveau nom
+# de fichier contourne tous les caches.
+VERSION = "v2"
 SWIFT = RACINE / "scripts/outils/pdf-en-png.swift"
 
 # Classeur → identifiant d'outil. L'ordre des onglets est celui du fichier.
@@ -159,7 +162,7 @@ def main() -> None:
                 hauteur = round(image.height * LARGEUR / image.width)
                 image = image.resize((LARGEUR, hauteur), Image.LANCZOS)
                 rang = len(retenus) + 1
-                image.save(SORTIE / f"{outil}-{rang}.jpg", "JPEG", quality=86, optimize=True, progressive=True)
+                image.save(SORTIE / f"{outil}-{rang}-{VERSION}.jpg", "JPEG", quality=86, optimize=True, progressive=True)
                 retenus.append([onglet, LARGEUR, hauteur])
             releve[outil] = retenus
             print(f"  {outil} : {len(retenus)} captures", file=sys.stderr)

@@ -336,7 +336,7 @@ export const pretAmortissement: ToolSpec = {
   id: "pret-amortissement",
   title: "Coût réel d'un prêt immobilier",
   intro:
-    "Mensualité, coût total, TAEG face au taux d'usure, repères HCSF, remboursement anticipé, et trois offres comparées sur le seul critère qui les départage.",
+    "Mensualité, coût total, TAEG face au taux d'usure, remboursement anticipé, et trois offres comparées sur leur TAEG.",
   sections: [
     {
       title: "L'emprunt",

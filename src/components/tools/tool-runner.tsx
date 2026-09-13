@@ -250,9 +250,9 @@ export function ToolRunner({ toolId }: { toolId: ToolId }) {
   };
 
   return (
-    <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-start">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,26rem)] lg:items-start">
       {/* ------------------------------------------------------ les saisies -- */}
-      <div className="flex flex-col gap-5">
+      <div className="flex min-w-0 flex-col gap-5">
         {/* La remise à zéro est EN TÊTE, pas en bas de colonne : quelqu'un qui
             retrouve une simulation vieille de trois semaines veut repartir de
             zéro avant de lire quoi que ce soit, pas après avoir fait défiler
@@ -395,19 +395,27 @@ export function ToolRunner({ toolId }: { toolId: ToolId }) {
                 key={o.id}
                 className="flex flex-col gap-0.5 border-b border-border-soft py-2 last:border-0"
               >
-                <div className="flex items-baseline justify-between gap-4">
-                  <dt
-                    className={`flex min-w-0 items-center gap-1.5 text-sm ${o.strong ? "font-semibold text-ink" : "text-ink-muted"}`}
-                  >
-                    {o.label}
-                    {o.hint ? <InfoBubble label={o.label}>{o.hint}</InfoBubble> : null}
-                  </dt>
-                  <dd
-                    className={`shrink-0 text-sm tabular-nums ${o.strong ? "font-semibold text-ink" : "text-ink"}`}
-                  >
-                    {formatValue(o.compute(values, choices, tables), o.unit)}
-                  </dd>
-                </div>
+                {(() => {
+                  const brut = o.compute(values, choices, tables);
+                  // Un texte long (un échéancier, un motif de correction) ne
+                  // tient pas à droite du libellé : il passe dessous.
+                  const long = typeof brut === "string" && brut.length > 40;
+                  return (
+                    <div className={long ? "flex flex-col gap-1" : "flex items-baseline justify-between gap-4"}>
+                      <dt
+                        className={`flex min-w-0 items-center gap-1.5 text-sm ${o.strong ? "font-semibold text-ink" : "text-ink-muted"}`}
+                      >
+                        {o.label}
+                        {o.hint ? <InfoBubble label={o.label}>{o.hint}</InfoBubble> : null}
+                      </dt>
+                      <dd
+                        className={`text-sm tabular-nums ${long ? "leading-relaxed" : "shrink-0"} ${o.strong ? "font-semibold text-ink" : "text-ink"}`}
+                      >
+                        {formatValue(brut, o.unit)}
+                      </dd>
+                    </div>
+                  );
+                })()}
               </div>
             ))}
           </dl>
@@ -562,7 +570,11 @@ function TableInput({
 
       {/* Tableau à partir de `sm`. */}
       <div className="mt-4 hidden overflow-x-auto sm:block">
-        <table className="w-full min-w-[34rem] border-collapse text-sm">
+        {/* Une colonne a besoin d'environ 7rem pour qu'une date ou un montant reste lisible. */}
+        <table
+          className="w-full min-w-[34rem] border-collapse text-sm"
+          style={{ minWidth: `${Math.max(34, 4 + table.columns.length * 7)}rem` }}
+        >
           <thead>
             <tr>
               <th scope="col" className="pb-2 pr-2 text-left text-xs font-medium text-ink-subtle">

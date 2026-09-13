@@ -1,7 +1,7 @@
 {
  "Rent roll": {
   "B2": "Rent roll",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B7": "Date d'analyse",
   "C7": "2026-06-30T00:00:00",
   "B8": "État locatif exploitable",
@@ -609,7 +609,7 @@
  },
  "Paramètres": {
   "B2": "Paramètres",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  BARÈMES RÉGLEMENTAIRES ET INDICES",
   "B7": "Paramètre",
   "C7": "Valeur",

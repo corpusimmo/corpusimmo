@@ -1,7 +1,7 @@
 {
  "Net vendeur": {
   "B2": "Ce que le vendeur touche vraiment",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  LA VENTE",
   "B7": "Prix affiché dans l'annonce",
   "C7": 385000,
@@ -109,7 +109,7 @@
  },
  "Qualifier le mandat": {
   "B2": "Ce mandat vaut-il vos six prochains mois ?",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  LES HUIT CRITÈRES DU MANDAT",
   "B7": "Critère",
   "C7": "Note (0 à 5)",
@@ -179,7 +179,7 @@
  },
  "Paramètres": {
   "B2": "Paramètres",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  BARÈMES RÉGLEMENTAIRES, MILLÉSIME 2026",
   "B7": "Paramètre",
   "C7": "Valeur",

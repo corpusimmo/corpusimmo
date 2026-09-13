@@ -2,7 +2,7 @@
  "Capacité d'emprunt": {
   "B2": "Capacité d'emprunt",
   "B3": "Jusqu'où la banque peut vous suivre, et ce qu'il vous reste pour vivre.",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  REVENUS MENSUELS NETS DU FOYER",
   "B7": "Salaire net emprunteur 1",
   "C7": 2600,
@@ -136,7 +136,7 @@
  },
  "Bilan patrimonial": {
   "B2": "Bilan patrimonial",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  ACTIF IMMOBILIER (VALEUR DE MARCHÉ)",
   "B7": "Résidence principale",
   "C7": 0,
@@ -247,7 +247,7 @@
  },
  "Paramètres": {
   "B2": "Paramètres",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  BARÈMES RÉGLEMENTAIRES, MILLÉSIME 2026",
   "B7": "Paramètre",
   "C7": "Valeur",

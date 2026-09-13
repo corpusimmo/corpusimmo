@@ -1,7 +1,7 @@
 {
  "Calculateur": {
   "B2": "Calculateur de rentabilité locative",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  LE BIEN",
   "B7": "Prix net vendeur",
   "C7": 90000,
@@ -146,7 +146,7 @@
  },
  "Paramètres": {
   "B2": "Paramètres",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  BARÈMES RÉGLEMENTAIRES, MILLÉSIME 2026",
   "B7": "Paramètre",
   "C7": "Valeur",

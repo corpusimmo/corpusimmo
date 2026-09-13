@@ -64,6 +64,24 @@ def copie_pour_rendu(source: Path, dossier: Path) -> tuple[Path, list[str]]:
     """Copie le classeur, chaque formule remplacée par sa valeur calculée par Excel."""
     wb = openpyxl.load_workbook(source)
     valeurs = openpyxl.load_workbook(source, data_only=True)
+
+    # UN CLASSEUR SANS VALEURS ENREGISTRÉES N'EST PAS FIGÉ. Un fichier produit
+    # par un script, et jamais rouvert dans Excel, n'a aucun résultat en
+    # mémoire : le figer le viderait. Numbers le recalcule alors lui-même, ce
+    # qu'il fait correctement sur ce type de classeur sans texte concaténé.
+    formules = [
+        (ws.title, c.coordinate)
+        for ws in wb.worksheets
+        for ligne in ws.iter_rows()
+        for c in ligne
+        if isinstance(c.value, str) and c.value.startswith("=")
+    ]
+    connues = sum(1 for t, k in formules if valeurs[t][k].value is not None)
+    if formules and connues == 0:
+        cible = dossier / "rendu.xlsx"
+        shutil.copy(source, cible)
+        return cible, [ws.title for ws in wb.worksheets]
+
     for ws in wb.worksheets:
         figee = valeurs[ws.title]
         for ligne in ws.iter_rows():

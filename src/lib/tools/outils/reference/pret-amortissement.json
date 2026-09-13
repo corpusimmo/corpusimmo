@@ -1,7 +1,7 @@
 {
  "Mon prêt": {
   "B2": "Mon prêt",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  L'EMPRUNT",
   "B7": "Montant emprunté",
   "C7": 180000,
@@ -3422,7 +3422,7 @@
  },
  "Comparateur": {
   "B2": "Comparer trois offres de prêt",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  LES OFFRES",
   "C7": "Offre A",
   "D7": "Offre B",
@@ -9321,7 +9321,7 @@
  },
  "Paramètres": {
   "B2": "Paramètres",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  BARÈMES RÉGLEMENTAIRES",
   "B7": "Paramètre",
   "C7": "Valeur",

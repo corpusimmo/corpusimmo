@@ -1,7 +1,6 @@
 {
  "DCF": {
-  "A1": "MATRICE DCF IMMOBILIER — MODÈLE RÉUTILISABLE",
-  "A2": "Ne saisir que les cellules BLEUES. Tout le reste est calculé — ne rien écraser.",
+  "A1": "MATRICE DCF IMMOBILIER : MODÈLE RÉUTILISABLE",
   "D2": "Période",
   "E2": 0,
   "F2": 1,
@@ -98,7 +97,7 @@
   "A33": "Broker fees investissement (%)",
   "B33": 0.025,
   "D33": "LÉGENDE",
-  "D34": "Bleu = à saisir par l'utilisateur",
+  "D34": "Violet = à saisir par l'utilisateur",
   "A35": "5. FINANCEMENT & ACTUALISATION",
   "D35": "Noir italique = calculé, ne pas écraser",
   "A36": "LTV (%)",

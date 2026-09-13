@@ -1,7 +1,7 @@
 {
  "Chiffrage": {
   "B2": "Chiffrage de travaux par lot",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  LE BIEN",
   "B7": "Surface habitable",
   "D7": 90,
@@ -580,7 +580,7 @@
  },
  "Référentiel": {
   "B2": "Référentiel",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B7": "Référentiel cohérent (bornes des barèmes, des prix, des ratios et des taux)",
   "C7": "OK",
   "B8": "  BARÈMES RÉGLEMENTAIRES : TVA DES TRAVAUX ET IMMEUBLE RENDU NEUF (DROIT 2026)",

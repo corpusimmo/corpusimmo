@@ -1,7 +1,7 @@
 {
  "Hypothèses": {
   "B2": "Arbitrage fiscal : nu, LMNP ou SCI à l'IS",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  LE BIEN",
   "B7": "Prix net vendeur",
   "C7": 200000,
@@ -2732,7 +2732,7 @@
  },
  "Paramètres": {
   "B2": "Paramètres",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B6": "  BARÈMES RÉGLEMENTAIRES, MILLÉSIME 2026",
   "B7": "Paramètre",
   "C7": "Valeur",

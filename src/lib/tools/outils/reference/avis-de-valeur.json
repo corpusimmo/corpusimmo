@@ -1,7 +1,7 @@
 {
  "Avis de valeur": {
   "B2": "Avis de valeur par comparaison",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B7": "  LE BIEN À ÉVALUER",
   "B8": "Adresse",
   "C8": "22 rue de la République",
@@ -146,7 +146,7 @@
   "B32": "  LE PANEL DE COMPARABLES",
   "B33": "Comparables renseignés",
   "C33": 6,
-  "D33": "Lignes du tableau où au moins une cellule bleue est remplie.",
+  "D33": "Lignes du tableau où au moins une cellule violette est remplie.",
   "B34": "Comparables retenus",
   "C34": 6,
   "B35": "Dont lignes à compléter",
@@ -200,7 +200,7 @@
  },
  "Référentiel": {
   "B2": "Référentiel",
-  "B5": "Cellules bleues : à remplir.  Cellules blanches : calculées automatiquement.",
+  "B5": "Cellules violettes : à remplir.  Cellules blanches : calculées automatiquement.",
   "B7": "  BARÈME SOURCÉ, MILLÉSIME 2026",
   "B8": "Paramètre",
   "C8": "Valeur",

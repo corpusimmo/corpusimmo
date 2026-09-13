@@ -50,8 +50,8 @@ export default function OutilsPage() {
           <p className="mt-3 leading-relaxed text-ink-muted">
             Les mêmes calculs que les feuilles qu&apos;on se transmet entre
             professionnels, mais avec les barèmes affichés, modifiables, et
-            datés. Chacun se lance en ligne, sans rien installer, et neuf
-            sur dix se téléchargent en classeur Excel pour qui veut garder la
+            datés. Chacun se lance en ligne, sans rien installer, et tous
+            se téléchargent en classeur Excel pour qui veut garder la
             main sur chaque cellule.
           </p>
         </header>

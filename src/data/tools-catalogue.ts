@@ -204,10 +204,12 @@ const EDITORIAL: Record<ToolId, ToolEditorial> = {
       "Frais financiers et frais de commercialisation",
       "Marge en valeur et en pourcentage du chiffre d'affaires",
       "Charge foncière admissible, au global et au m² de surface de plancher",
+      "Contre-épreuve au prix de terrain demandé, et grille de sensibilité vente × construction",
     ],
     limits:
       "Le modèle raisonne sur une opération unique et un phasage simple. Il n'intègre ni la TVA sur marge, ni les participations d'urbanisme locales, ni le risque de recours contre le permis.",
-    matrix: "coming",
+    matrix: "available",
+    matrixFile: "bilan-promoteur-et-charge-fonciere.xlsx",
   },
 
   wault: {

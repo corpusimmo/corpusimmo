@@ -39,7 +39,7 @@ MATRICES = RACINE / "public/outils/matrices"
 SORTIE = RACINE / "public/outils/apercus"
 # À monter avec VERSION_APERCUS de src/data/tool-previews.ts : un nouveau nom
 # de fichier contourne tous les caches.
-VERSION = "v2"
+VERSION = "v3"
 SWIFT = RACINE / "scripts/outils/pdf-en-png.swift"
 
 # Classeur → identifiant d'outil. L'ordre des onglets est celui du fichier.
@@ -53,6 +53,7 @@ CLASSEURS = {
     "avis-de-valeur-par-comparaison.xlsx": "avis-de-valeur",
     "net-vendeur-honoraires-et-qualification.xlsx": "net-vendeur",
     "dcf-valorisation.xlsx": "dcf",
+    "bilan-promoteur-et-charge-fonciere.xlsx": "bilan-promoteur",
 }
 
 # Le mode d'emploi ne se photographie pas : c'est du texte, que la fiche de

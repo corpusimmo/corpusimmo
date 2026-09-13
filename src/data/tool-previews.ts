@@ -94,9 +94,9 @@ const SHOTS: Partial<Record<ToolId, Array<[label: string, width: number, height:
     ["Méthode", 1400, 2627],
   ],
   "bilan-promoteur": [
-    ["Bilan", 1400, 1095],
-    ["Sensibilité", 1400, 1440],
-    ["Méthode", 1400, 1127],
+    ["Bilan", 1400, 1080],
+    ["Sensibilité", 1400, 676],
+    ["Méthode", 1400, 893],
   ],
 };
 
@@ -108,7 +108,7 @@ const SHOTS: Partial<Record<ToolId, Array<[label: string, width: number, height:
  * Monte à chaque nouvelle série de captures. Le nom du fichier change, donc
  * aucun cache (navigateur, optimiseur d'images, CDN) ne resert l'ancienne.
  */
-export const VERSION_APERCUS = "v2";
+export const VERSION_APERCUS = "v3";
 
 export function getToolPreviews(id: ToolId): ToolPreviewShot[] {
   return (SHOTS[id] ?? []).map(([label, width, height], index) => ({

@@ -58,6 +58,14 @@ FONDS = {
 ENCRES = {
     "FF0E1A33": "FF2F2650",  # encre bleu nuit → encre violet sombre (--brand-900)
     "FF0000FF": "FF6C5AB0",  # saisie bleue du DCF → violet d'action (--primary)
+    # Bilan promoteur, classeur de la première série.
+    "FF3B6EF6": "FF6C5AB0",  # surtitre bleu vif → violet d'action
+    "FF2350C8": "FF4B3D7C",  # chiffre clé bleu roi → violet profond
+}
+
+# Couleurs de BORDURE : le filet bleu pâle des tableaux de la première série.
+FILETS = {
+    "FFD6E2F5": "FFE4DFF2",
 }
 
 ONGLETS = {
@@ -95,6 +103,17 @@ TEXTES = [
     # proscrit dans tout texte publié, et ce classeur l'est.
     ("MATRICE DCF IMMOBILIER — MODÈLE RÉUTILISABLE", "MATRICE DCF IMMOBILIER : MODÈLE RÉUTILISABLE"),
     ("Tout le reste est calculé — ne rien écraser.", "Tout le reste est calculé, ne rien écraser."),
+    # Bilan promoteur : classeur de la première série, encore signé Valora.
+    ("VALORA  ·  Données de marché et outils d'analyse immobilière", "CorpusImmo  ·  www.corpus.immo  ·  Estimer, comparer, décider. Sur les ventes réelles."),
+    ("Valora — millésime 2026.", "CorpusImmo, millésime 2026."),
+    ("admissible — la question", "admissible : la question"),
+    ("pas aux travaux — c'est", "pas aux travaux : c'est"),
+    ("la dépollution — trois", "la dépollution, trois"),
+    (">— Il ", ">· Il "),
+    (">— L'", ">· L'"),
+    ("IMMOBILIER — MÉTHODE", "IMMOBILIER : MÉTHODE"),
+    ("Rappel acquisition — ", "Rappel acquisition : "),
+    ("Contrôle — ", "Contrôle : "),
 ]
 
 # ── Le logo ─────────────────────────────────────────────────────────────────
@@ -196,12 +215,16 @@ def remplacer_couleurs(styles: str) -> str:
         def sub(m: re.Match) -> str:
             bloc = m.group(0)
             for ancien, nouveau in table.items():
-                bloc = bloc.replace(f'rgb="{ancien}"', f'rgb="{nouveau}"')
+                # Les classeurs écrits par openpyxl notent l'opacité 00 au
+                # lieu de FF : même couleur, autre écriture.
+                for alpha in ("FF", "00"):
+                    bloc = bloc.replace(f'rgb="{alpha}{ancien[2:]}"', f'rgb="{nouveau}"')
             return bloc
         return re.sub(rf"<{balise}\b[^>]*?(?:/>|>.*?</{balise}>)", sub, texte, flags=re.S)
 
     styles = dans("fill", FONDS, styles)
     styles = dans("font", ENCRES, styles)
+    styles = dans("border", FILETS, styles)
     return styles
 
 
@@ -234,7 +257,8 @@ def habiller(nom: str, png: bytes, logo_l: int, logo_h: int) -> None:
         numero = re.search(r"sheet(\d+)\.xml", chemin).group(1)
         xml = parties[chemin].decode()
         for ancien, nouveau in ONGLETS.items():
-            xml = xml.replace(f'<tabColor rgb="{ancien}"', f'<tabColor rgb="{nouveau}"')
+            for alpha in ("FF", "00"):
+                xml = xml.replace(f'<tabColor rgb="{alpha}{ancien[2:]}"', f'<tabColor rgb="{nouveau}"')
         if "<drawing " in xml:
             parties[chemin] = xml.encode()
             continue

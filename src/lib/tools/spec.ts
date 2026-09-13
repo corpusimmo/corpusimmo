@@ -75,6 +75,16 @@ export interface ToolColumn {
    * l'affichage.
    */
   options?: { value: number; label: string }[];
+  /**
+   * Une cellule qu'on peut laisser VIDE, et dont le vide veut dire autre
+   * chose que zéro : la quantité forcée d'un poste de chiffrage. Vide, le
+   * calcul garde la quantité déduite de la surface ; 0, il désactive le
+   * poste. Le vide se stocke en NaN, que la persistance écrit `null` :
+   * `estVide` reconnaît les deux.
+   */
+  optional?: boolean;
+  /** Texte gris d'une cellule facultative laissée vide. */
+  placeholder?: string;
 }
 
 export interface ToolTable {
@@ -267,6 +277,11 @@ export function toISODate(horodatage: number): string {
   // date absurde que l'utilisateur devrait effacer lui-même.
   if (!Number.isFinite(horodatage) || horodatage === 0) return "";
   return new Date(horodatage).toISOString().slice(0, 10);
+}
+
+/** Une cellule facultative laissée vide : NaN en mémoire, `null` une fois relue du stockage. */
+export function estVide(x: number | null | undefined): boolean {
+  return x === null || x === undefined || Number.isNaN(x);
 }
 
 export function fromISODate(iso: string): number {

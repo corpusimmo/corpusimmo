@@ -24,98 +24,10 @@ import {
 import type { ToolId } from "@/types/tool";
 import { arbitrageFiscal } from "./outils/arbitrage-fiscal";
 import { capaciteEmprunt } from "./outils/capacite-emprunt";
+import { chiffrageTravaux } from "./outils/chiffrage-travaux";
 import { netVendeur } from "./outils/net-vendeur";
 import { pretAmortissement } from "./outils/pret-amortissement";
 import { rentabiliteLocative } from "./outils/rentabilite-locative";
-
-/* -------------------------------------------------------------------------- */
-
-/* -------------------------------------------------------------------------- */
-
-const chiffrageTravaux: ToolSpec = {
-  id: "chiffrage-travaux",
-  title: "Chiffrage de travaux",
-  intro:
-    "Un budget de rénovation crédible avant d'avoir le moindre devis, avec sa fourchette assumée.",
-  sections: [
-    {
-      title: "Le chantier",
-      fields: [
-        { id: "surface", label: "Surface du logement", value: 70, unit: "m2", min: 5, hint: "Surface habitable au sens Carrez pour un appartement. C'est le dénominateur du prix au m² : une erreur ici décale tous les repères de comparaison." },
-        {
-          id: "ampleur",
-          label: "Ampleur des travaux",
-          value: "renovation",
-          options: [
-            { value: "rafraichissement", label: "Rafraîchissement : peinture, sols" },
-            { value: "renovation", label: "Rénovation : électricité, plomberie, cuisine, bains" },
-            { value: "restructuration", label: "Restructuration : murs, réseaux, tout refait" },
-          ],
-        },
-        {
-          id: "curseur",
-          label: "Positionnement dans la fourchette",
-          value: 50,
-          unit: "pct",
-          hint: "0 % = artisans en direct en zone détendue. 100 % = entreprise générale en zone tendue.",
-          min: 0,
-          max: 100,
-          step: 5,
-        },
-        { id: "aleas", label: "Provision pour aléas", value: 12, unit: "pct", hint: "10 à 15 % en rénovation lourde. En dessous de 10 %, vous pariez.", min: 0, max: 30 },
-        {
-          id: "tva",
-          label: "Taux de TVA",
-          value: "10",
-          options: [
-            { value: "20", label: "20 %, cas général" },
-            { value: "10", label: "10 %, logement de plus de 2 ans" },
-            { value: "5.5", label: "5,5 %, rénovation énergétique éligible" },
-          ],
-        },
-      ],
-    },
-  ],
-  params: [],
-  headlines: [
-    {
-      label: "Budget travaux TTC",
-      unit: "eur",
-      compute: (v, c) => budgetTTC(v, c),
-      caption: (v, c) => `Soit ${fr(ratio(budgetTTC(v, c), v.surface ?? 0))} € par m² habitable.`,
-    },
-  ],
-  outputs: [
-    { id: "bas", label: "Fourchette basse au m²", unit: "eurm2", compute: (v, c) => bornes(c)[0] },
-    { id: "haut", label: "Fourchette haute au m²", unit: "eurm2", compute: (v, c) => bornes(c)[1] },
-    { id: "retenu", label: "Prix au m² retenu", unit: "eurm2", compute: (v, c) => prixM2(v, c), strong: true },
-    { id: "ht", label: "Sous-total des travaux", unit: "eur", compute: (v, c) => prixM2(v, c) * (v.surface ?? 0) },
-    { id: "prov", label: "Provision pour aléas", unit: "eur", compute: (v, c) => (prixM2(v, c) * (v.surface ?? 0) * (v.aleas ?? 0)) / 100 },
-    { id: "totalHT", label: "Total hors taxes", unit: "eur", compute: (v, c) => totalHT(v, c), strong: true },
-    { id: "tva", label: "TVA", unit: "eur", compute: (v, c) => (totalHT(v, c) * Number(c.tva ?? "10")) / 100 },
-    { id: "m2", label: "Coût au m² habitable", unit: "eurm2", compute: (v, c) => ratio(budgetTTC(v, c), v.surface ?? 0), strong: true, hint: "400 €/m² : on rafraîchit. 900 €/m² : on rénove. Au-delà de 1 500 €/m² : on restructure." },
-  ],
-  caveat:
-    "Ce chiffrage ne remplace pas un devis : il sert à décider s'il vaut la peine d'en demander trois. Il ignore les contraintes de site, et ne chiffre ni le désamiantage, ni le plomb, ni les fondations. Le modèle Excel détaille les vingt-sept postes lot par lot.",
-};
-
-/** Fourchettes au m² habitable, cohérentes avec les prix de référence du fichier. */
-function bornes(c: Record<string, string>): [number, number] {
-  if (c.ampleur === "rafraichissement") return [180, 520];
-  if (c.ampleur === "restructuration") return [1100, 2200];
-  return [550, 1300];
-}
-function prixM2(v: Record<string, number>, c: Record<string, string>): number {
-  const [bas, haut] = bornes(c);
-  return bas + ((haut - bas) * (v.curseur ?? 50)) / 100;
-}
-function totalHT(v: Record<string, number>, c: Record<string, string>): number {
-  const sous = prixM2(v, c) * (v.surface ?? 0);
-  return sous * (1 + (v.aleas ?? 0) / 100);
-}
-function budgetTTC(v: Record<string, number>, c: Record<string, string>): number {
-  return totalHT(v, c) * (1 + Number(c.tva ?? "10") / 100);
-}
 
 /* -------------------------------------------------------------------------- */
 

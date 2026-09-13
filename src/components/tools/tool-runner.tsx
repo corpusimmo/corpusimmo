@@ -21,6 +21,7 @@ import { Button } from "@/components/ui";
 import { InfoBubble } from "./info-bubble";
 import { getToolSpec } from "@/lib/tools/definitions";
 import {
+  estVide,
   fromISODate,
   isChoice,
   toISODate,
@@ -521,19 +522,23 @@ function TableInput({
 }) {
   const min = table.min ?? 1;
   const max = table.max ?? Number.POSITIVE_INFINITY;
+  // Autant de lignes que de postes, ni plus ni moins : une corbeille toujours
+  // grisée ne serait que du bruit.
+  const fixe = min === max;
 
   const setCell = (ligne: number, colonne: number, brut: string) => {
     const col = table.columns[colonne];
     const parsed =
-      col?.unit === "date" ? fromISODate(brut) : Number(brut.replace(",", "."));
-    onChange(
-      rows.map((r, i) =>
-        i === ligne ? r.map((v, j) => (j === colonne ? (Number.isFinite(parsed) ? parsed : 0) : v)) : r,
-      ),
-    );
+      col?.optional && brut.trim() === ""
+        ? Number.NaN
+        : col?.unit === "date"
+          ? fromISODate(brut)
+          : Number(brut.replace(",", "."));
+    const retenu = Number.isFinite(parsed) || col?.optional ? parsed : 0;
+    onChange(rows.map((r, i) => (i === ligne ? r.map((v, j) => (j === colonne ? retenu : v)) : r)));
   };
 
-  const ajouter = () => onChange([...rows, table.columns.map((c) => c.value)]);
+  const ajouter = () => onChange([...rows, table.columns.map((c) => (c.optional ? Number.NaN : c.value))]);
 
   /** Nom d'une ligne : son libellé déclaré, sinon son rang. */
   const nom = (i: number) =>
@@ -572,9 +577,11 @@ function TableInput({
                   {col.short ?? col.label}
                 </th>
               ))}
-              <th scope="col" className="pb-2">
-                <span className="sr-only">Retirer</span>
-              </th>
+              {fixe ? null : (
+                <th scope="col" className="pb-2">
+                  <span className="sr-only">Retirer</span>
+                </th>
+              )}
             </tr>
           </thead>
           <tbody>
@@ -585,23 +592,25 @@ function TableInput({
                   <td key={col.id} className="py-1 pr-2">
                     <CellInput
                       col={col}
-                      value={ligne[j] ?? 0}
+                      value={ligne[j] === undefined ? 0 : ligne[j]}
                       label={`${col.label}, ${nom(i)}`}
                       onChange={(brut) => setCell(i, j, brut)}
                     />
                   </td>
                 ))}
-                <td className="py-1">
-                  <button
-                    type="button"
-                    onClick={() => retirer(i)}
-                    disabled={rows.length <= min}
-                    aria-label={`Retirer ${nom(i)}`}
-                    className="grid size-9 place-items-center rounded-md text-ink-subtle transition-colors hover:bg-surface-2 hover:text-danger disabled:pointer-events-none disabled:opacity-30"
-                  >
-                    <Trash2 className="size-4" aria-hidden />
-                  </button>
-                </td>
+                {fixe ? null : (
+                  <td className="py-1">
+                    <button
+                      type="button"
+                      onClick={() => retirer(i)}
+                      disabled={rows.length <= min}
+                      aria-label={`Retirer ${nom(i)}`}
+                      className="grid size-9 place-items-center rounded-md text-ink-subtle transition-colors hover:bg-surface-2 hover:text-danger disabled:pointer-events-none disabled:opacity-30"
+                    >
+                      <Trash2 className="size-4" aria-hidden />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -616,15 +625,17 @@ function TableInput({
               <p className="text-xs font-semibold uppercase tracking-wide text-ink-subtle">
                 {nom(i)}
               </p>
-              <button
-                type="button"
-                onClick={() => retirer(i)}
-                disabled={rows.length <= min}
-                aria-label={`Retirer ${nom(i)}`}
-                className="grid size-8 place-items-center rounded-md text-ink-subtle hover:text-danger disabled:opacity-30"
-              >
-                <Trash2 className="size-4" aria-hidden />
-              </button>
+              {fixe ? null : (
+                <button
+                  type="button"
+                  onClick={() => retirer(i)}
+                  disabled={rows.length <= min}
+                  aria-label={`Retirer ${nom(i)}`}
+                  className="grid size-8 place-items-center rounded-md text-ink-subtle hover:text-danger disabled:opacity-30"
+                >
+                  <Trash2 className="size-4" aria-hidden />
+                </button>
+              )}
             </div>
             <div className="mt-2 flex flex-col gap-2.5">
               {table.columns.map((col, j) => (
@@ -632,7 +643,7 @@ function TableInput({
                   {col.label}
                   <CellInput
                     col={col}
-                    value={ligne[j] ?? 0}
+                    value={ligne[j] === undefined ? 0 : ligne[j]}
                     label={col.label}
                     onChange={(brut) => setCell(i, j, brut)}
                   />
@@ -662,7 +673,7 @@ function CellInput({
   label,
   onChange,
 }: {
-  col: { unit: string; options?: { value: number; label: string }[] };
+  col: { unit: string; options?: { value: number; label: string }[]; optional?: boolean; placeholder?: string };
   value: number;
   label: string;
   onChange: (brut: string) => void;
@@ -704,9 +715,10 @@ function CellInput({
       type="number"
       inputMode="decimal"
       aria-label={label}
-      value={value}
+      value={col.optional && estVide(value) ? "" : value}
+      placeholder={col.optional ? col.placeholder : undefined}
       onChange={(e) => onChange(e.target.value)}
-      className={`${commun} tabular-nums`}
+      className={`${commun} tabular-nums placeholder:text-ink-subtle`}
     />
   );
 }

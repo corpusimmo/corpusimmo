@@ -22,6 +22,7 @@ import {
   type ToolSpec,
 } from "./spec";
 import type { ToolId } from "@/types/tool";
+import { arbitrageFiscal } from "./outils/arbitrage-fiscal";
 import { capaciteEmprunt } from "./outils/capacite-emprunt";
 import { pretAmortissement } from "./outils/pret-amortissement";
 import { rentabiliteLocative } from "./outils/rentabilite-locative";
@@ -116,94 +117,6 @@ function budgetTTC(v: Record<string, number>, c: Record<string, string>): number
 }
 
 /* -------------------------------------------------------------------------- */
-
-const arbitrageFiscal: ToolSpec = {
-  id: "arbitrage-fiscal",
-  title: "Nu, LMNP ou SCI à l'IS ?",
-  intro:
-    "Cinq régimes appliqués au même bien, et le classement par revenu net après impôt, la première année.",
-  sections: [
-    {
-      title: "Le bien et son exploitation",
-      fields: [
-        { id: "prix", label: "Prix d'acquisition, frais inclus", value: 220000, unit: "eur", hint: "Le prix inscrit à l'acte, hors frais. C'est la base de tout le reste : le majorer « pour arrondir » fausse les trois rendements." },
-        { id: "mobilier", label: "Dont mobilier et équipement", value: 8000, unit: "eur", hint: "Compte pour le coût total mais s'amortit à part, plus vite que le bâti. Indispensable pour louer en meublé." },
-        { id: "loyer", label: "Loyer annuel encaissé", value: 13200, unit: "eur", hint: "Hors charges, c'est-à-dire ce qui vous reste réellement. Le loyer charges comprises surestime la rentabilité de 10 à 15 %." },
-        { id: "charges", label: "Charges annuelles déductibles", value: 3100, unit: "eur" },
-        { id: "interets", label: "Intérêts d'emprunt de l'année", value: 5400, unit: "eur" },
-        { id: "tmi", label: "Tranche marginale d'imposition", value: 30, unit: "pct", min: 0, max: 45 },
-      ],
-    },
-  ],
-  params: [
-    { id: "ps", label: "Prélèvements sociaux", value: 17.2, unit: "pct" },
-    { id: "abtMF", label: "Abattement micro-foncier", value: 30, unit: "pct" },
-    { id: "abtBIC", label: "Abattement LMNP micro-BIC", value: 50, unit: "pct" },
-    { id: "plafondDeficit", label: "Plafond du déficit foncier imputable", value: 10700, unit: "eur" },
-    { id: "dureeBati", label: "Durée d'amortissement du bâti", value: 30, unit: "an" },
-    { id: "dureeMobilier", label: "Durée d'amortissement du mobilier", value: 7, unit: "an" },
-    { id: "partTerrain", label: "Part du terrain dans le prix", value: 15, unit: "pct", hint: "Le terrain ne s'amortit jamais." },
-    { id: "isReduit", label: "IS, taux réduit", value: 15, unit: "pct" },
-    { id: "isSeuil", label: "IS, seuil du taux réduit", value: 42500, unit: "eur" },
-    { id: "isNormal", label: "IS, taux normal", value: 25, unit: "pct" },
-  ],
-  headlines: [
-    {
-      label: "Régime le plus favorable",
-      unit: "texte",
-      compute: (v) => meilleurRegime(v).nom,
-      caption: (v) => `Revenu net de ${fr(meilleurRegime(v).net)} € la première année.`,
-    },
-  ],
-  outputs: [
-    { id: "resultat", label: "Résultat avant impôt et amortissement", unit: "eur", compute: (v) => resultatBrut(v), strong: true },
-    { id: "amoBati", label: "Amortissement annuel du bâti", unit: "eur", compute: (v) => amoBati(v) },
-    { id: "amoMob", label: "Amortissement annuel du mobilier", unit: "eur", compute: (v) => ratio(v.mobilier ?? 0, v.dureeMobilier ?? 7) },
-    { id: "r1", label: "Micro-foncier, revenu net", unit: "eur", compute: (v) => regimes(v)[0]!.net },
-    { id: "r2", label: "Réel foncier, revenu net", unit: "eur", compute: (v) => regimes(v)[1]!.net },
-    { id: "r3", label: "LMNP micro-BIC, revenu net", unit: "eur", compute: (v) => regimes(v)[2]!.net },
-    { id: "r4", label: "LMNP au réel, revenu net", unit: "eur", compute: (v) => regimes(v)[3]!.net, strong: true },
-    { id: "r5", label: "SCI à l'IS, revenu net", unit: "eur", compute: (v) => regimes(v)[4]!.net },
-    { id: "ecart", label: "Écart entre le meilleur et le pire régime", unit: "eur", compute: (v) => { const n = regimes(v).map((r) => r.net); return Math.max(...n) - Math.min(...n); }, strong: true },
-  ],
-  caveat:
-    "La comparaison porte sur la première année, pas sur la durée de détention. Elle ne modélise pas la plus-value de revente, qui inverse souvent le classement, d'autant que depuis le 15 février 2025, les amortissements déduits en LMNP réel sont réintégrés dans la plus-value. Consultez un expert-comptable avant tout passage à l'IS.",
-};
-
-function resultatBrut(v: Record<string, number>): number {
-  return (v.loyer ?? 0) - (v.charges ?? 0) - (v.interets ?? 0);
-}
-function amoBati(v: Record<string, number>): number {
-  const base = Math.max(0, ((v.prix ?? 0) - (v.mobilier ?? 0)) * (1 - (v.partTerrain ?? 15) / 100));
-  return ratio(base, v.dureeBati ?? 30);
-}
-function regimes(v: Record<string, number>): { nom: string; net: number }[] {
-  const brut = resultatBrut(v);
-  const amo = amoBati(v) + ratio(v.mobilier ?? 0, v.dureeMobilier ?? 7);
-  const tauxIR = ((v.tmi ?? 0) + (v.ps ?? 17.2)) / 100;
-
-  const baseMF = (v.loyer ?? 0) * (1 - (v.abtMF ?? 30) / 100);
-  const baseReel = Math.max(-(v.plafondDeficit ?? 10700), brut);
-  const baseBIC = (v.loyer ?? 0) * (1 - (v.abtBIC ?? 50) / 100);
-  const baseAmorti = Math.max(0, brut - amo);
-
-  const impotIS =
-    Math.min(baseAmorti, v.isSeuil ?? 42500) * ((v.isReduit ?? 15) / 100) +
-    Math.max(0, baseAmorti - (v.isSeuil ?? 42500)) * ((v.isNormal ?? 25) / 100);
-
-  return [
-    { nom: "Micro-foncier", net: brut - Math.max(0, baseMF) * tauxIR },
-    // Un déficit s'impute sur le revenu global au seul taux de l'IR : les
-    // prélèvements sociaux ne créent pas d'économie sur un résultat négatif.
-    { nom: "Réel foncier", net: brut - (baseReel < 0 ? baseReel * ((v.tmi ?? 0) / 100) : baseReel * tauxIR) },
-    { nom: "LMNP micro-BIC", net: brut - Math.max(0, baseBIC) * tauxIR },
-    { nom: "LMNP au réel", net: brut - baseAmorti * tauxIR },
-    { nom: "SCI à l'IS", net: brut - impotIS },
-  ];
-}
-function meilleurRegime(v: Record<string, number>): { nom: string; net: number } {
-  return regimes(v).reduce((a, b) => (b.net > a.net ? b : a));
-}
 
 /* -------------------------------------------------------------------------- */
 
